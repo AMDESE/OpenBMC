@@ -1,0 +1,153 @@
+From 241fa3a3c65b95faae7601f79ea20ed78015aee5 Mon Sep 17 00:00:00 2001
+From: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
+Date: Sun, 23 May 2021 13:40:36 -0500
+Subject: [PATCH 1/1] ARM:dts:aspeed: Initial device tree for AMD Onyx Platform
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+This patch adds initial device tree for AMD Onyx platform.
+
+AMD Onyx platform is an AMD customer reference board with an Aspeed
+ast2600 BMC manufactured by AMD.
+It describes I2c devices, Fans, Kcs devices, Uarts, Mac, LEDs, etc.
+present on AMD Onyx platform.
+
+Signed-off-by: Sreedhar Govardhana <srgovard@amd.com>
+Signed-off-by: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
+---
+ arch/arm/boot/dts/Makefile                 |  1 +
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts  | 82 ++++++++++++++++++++++
+ arch/arm/boot/dts/aspeed-g6-pinctrl.dtsi   |  2 +-
+ drivers/pinctrl/aspeed/pinctrl-aspeed-g6.c |  2 +-
+ 4 files changed, 85 insertions(+), 2 deletions(-)
+ create mode 100644 arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+
+diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
+index 03b5424bafa8..b38e29d06cde 100644
+--- a/arch/arm/boot/dts/Makefile
++++ b/arch/arm/boot/dts/Makefile
+@@ -1385,6 +1385,7 @@ dtb-$(CONFIG_ARCH_ASPEED) += \
+ 	aspeed-ast2500-evb.dtb \
+ 	aspeed-ast2600-evb.dtb \
+ 	aspeed-bmc-amd-ethanolx.dtb \
++	aspeed-bmc-amd-onyx.dtb \
+ 	aspeed-bmc-ampere-mtjade.dtb \
+ 	aspeed-bmc-arm-centriq2400-rep.dtb \
+ 	aspeed-bmc-arm-stardragon4800-rep2.dtb \
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+new file mode 100644
+index 000000000000..38c53c49232b
+--- /dev/null
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+@@ -0,0 +1,82 @@
++// SPDX-License-Identifier: GPL-2.0
++// Copyright (c) 2021 AMD Inc.
++// Author: Sreedhar Govardhana <srgovard@amd.com>
++// Author: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
++
++/dts-v1/;
++
++#include "aspeed-g6.dtsi"
++#include "dt-bindings/gpio/aspeed-gpio.h"
++
++/ {
++	model = "AMD Onyx BMC";
++	compatible = "amd,onyx-bmc", "aspeed,ast2600";
++
++	aliases {
++		serial4 = &uart5;
++	};
++
++	chosen {
++		stdout-path = &uart5;
++		bootargs = "console=ttyS4,115200 earlycon vmalloc=512MB";
++	};
++
++	memory@80000000 {
++		device_type = "memory";
++		reg = <0x80000000 0x80000000>;
++	};
++
++};
++
++&mdio0 {
++	status = "okay";
++
++	ethphy0: ethernet-phy@0 {
++		compatible = "ethernet-phy-ieee802.3-c22";
++		reg = <0>;
++	};
++};
++
++&mac3 {
++	status = "okay";
++	phy-mode = "rgmii";
++	phy-handle = <&ethphy0>;
++
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_rgmii4_default>;
++};
++
++
++
++&fmc {
++	status = "okay";
++	fmc-spi-user-mode;
++	flash@0 {
++		compatible = "jedec,spi-nor";
++		status = "okay";
++		label = "bmc";
++		spi-tx-bus-width = <4>;
++		spi-rx-bus-width = <4>;
++		#include "openbmc-flash-layout-128.dtsi"
++	};
++};
++
++&spi1 {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_spi1_default &pinctrl_qspi1_default>;
++	fmc-spi-user-mode;
++	compatible = "aspeed,ast2600-spi";
++
++	flash@0 {
++		compatible = "jedec,spi-nor";
++		label = "pnor";
++		status = "okay";
++	};
++
++};
++
++//BMC Console
++&uart5 {
++	status = "okay";
++};
+diff --git a/arch/arm/boot/dts/aspeed-g6-pinctrl.dtsi b/arch/arm/boot/dts/aspeed-g6-pinctrl.dtsi
+index 7028e21bdd98..8cf8d5314d22 100644
+--- a/arch/arm/boot/dts/aspeed-g6-pinctrl.dtsi
++++ b/arch/arm/boot/dts/aspeed-g6-pinctrl.dtsi
+@@ -653,7 +653,7 @@
+ 	};
+
+ 	pinctrl_qspi1_default: qspi1_default {
+-		function = "QSPI1";
++		function = "SPI1";
+ 		groups = "QSPI1";
+ 	};
+
+diff --git a/drivers/pinctrl/aspeed/pinctrl-aspeed-g6.c b/drivers/pinctrl/aspeed/pinctrl-aspeed-g6.c
+index 5c1a109842a7..31528184a5d0 100644
+--- a/drivers/pinctrl/aspeed/pinctrl-aspeed-g6.c
++++ b/drivers/pinctrl/aspeed/pinctrl-aspeed-g6.c
+@@ -1278,7 +1278,7 @@ SIG_EXPR_LIST_DECL_SEMG(AF10, RXD13, UART13G1, UART13,
+ 			SIG_DESC_CLEAR(SCU4B8, 3), SIG_DESC_SET(SCU4D8, 15));
+ PIN_DECL_2(AF10, GPIOZ7, SPI1DQ3, RXD13);
+
+-GROUP_DECL(QSPI1, AB11, AC11, AA11, AD11, AF10);
++GROUP_DECL(QSPI1, AD11, AF10);
+ FUNC_DECL_2(SPI1, SPI1, QSPI1);
+
+ GROUP_DECL(UART13G1, AD11, AF10);
+--
+2.17.1
+
