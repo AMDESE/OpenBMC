@@ -1,0 +1,306 @@
+From bc3d8957a754ef0b7cc3f6cd0da0556d326605b2 Mon Sep 17 00:00:00 2001
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Thu, 17 Jun 2021 09:46:43 -0500
+Subject: [PATCH] meta sp5 Modify phosphor network to set host nam
+
+Phosphor-Network stack modified for
+   1. reading the MAC address and board_id from u-boot env
+   2. setting the hostname with borad ID + last 4 digit of MAC address
+
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ ethernet_interface.cpp                 |  2 +-
+ ethernet_interface.hpp                 |  9 +++
+ network_manager.cpp                    | 14 +++-
+ network_manager.hpp                    |  2 +-
+ system_configuration.cpp               | 91 +++++++++++++++++++++++++-
+ system_configuration.hpp               | 10 ++-
+ xyz.openbmc_project.Network.service.in |  1 +
+ 7 files changed, 121 insertions(+), 8 deletions(-)
+
+diff --git a/ethernet_interface.cpp b/ethernet_interface.cpp
+index ce424ff..332fa97 100644
+--- a/ethernet_interface.cpp
++++ b/ethernet_interface.cpp
+@@ -115,7 +115,7 @@ EthernetInterface::EthernetInterface(sdbusplus::bus::bus& bus,
+     // would be same as parent interface.
+     if (intfName.find(".") == std::string::npos)
+     {
+-        MacAddressIntf::macAddress(getMACAddress(intfName));
++   activeMACAddress = MacAddressIntf::macAddress(getMACAddress(intfName));
+     }
+     EthernetInterfaceIntf::ntpServers(getNTPServersFromConf());
+
+diff --git a/ethernet_interface.hpp b/ethernet_interface.hpp
+index 8e28b51..fa58dc7 100644
+--- a/ethernet_interface.hpp
++++ b/ethernet_interface.hpp
+@@ -233,6 +233,12 @@ class EthernetInterface : public Ifaces
+      */
+     void deleteAll();
+
++    /** @brief Get Active MAC Address.
++    */
++    std::string getActiveMACAddress() {
++        return activeMACAddress;
++    }
++
+     /** @brief set the default v4 gateway of the interface.
+      *  @param[in] gateway - default v4 gateway of the interface.
+      */
+@@ -366,6 +372,9 @@ class EthernetInterface : public Ifaces
+      *  @returns true/false value if the address is static
+      */
+     bool originIsManuallyAssigned(IP::AddressOrigin origin);
++
++    /** @brief active MAC Address */
++    std::string activeMACAddress;
+ };
+
+ } // namespace network
+diff --git a/network_manager.cpp b/network_manager.cpp
+index 751d1a1..b74a59f 100644
+--- a/network_manager.cpp
++++ b/network_manager.cpp
+@@ -117,12 +117,13 @@ void Manager::setConfDir(const fs::path& dir)
+     }
+ }
+
+-void Manager::createInterfaces()
++std::string Manager::createInterfaces()
+ {
+     // clear all the interfaces first
+     interfaces.clear();
+
+     auto interfaceStrList = getInterfaces();
++    std::string activeMAC = "00:00:00:00:00:00";
+
+     for (auto& interface : interfaceStrList)
+     {
+@@ -154,16 +155,23 @@ void Manager::createInterfaces()
+         intf->createIPAddressObjects();
+         intf->createStaticNeighborObjects();
+         intf->loadNameServers();
++        auto mac = intf->getActiveMACAddress();
++        if (mac.compare("00:00:00:00:00:00") != 0)
++        {
++            activeMAC = mac;
++        }
+
+         this->interfaces.emplace(
+             std::make_pair(std::move(interface), std::move(intf)));
+     }
++
++    return activeMAC;
+ }
+
+ void Manager::createChildObjects()
+ {
+     // creates the ethernet interface dbus object.
+-    createInterfaces();
++    auto mac = createInterfaces();
+
+     systemConf.reset(nullptr);
+     dhcpConf.reset(nullptr);
+@@ -173,7 +181,7 @@ void Manager::createChildObjects()
+
+     // create the system conf object.
+     systemConf = std::make_unique<phosphor::network::SystemConfiguration>(
+-        bus, objPath.string(), *this);
++        bus, objPath.string(), mac, *this);
+     // create the dhcp conf object.
+     objPath /= "dhcp";
+     dhcpConf = std::make_unique<phosphor::network::dhcp::Configuration>(
+diff --git a/network_manager.hpp b/network_manager.hpp
+index 227955c..a872cf5 100644
+--- a/network_manager.hpp
++++ b/network_manager.hpp
+@@ -70,7 +70,7 @@ class Manager : public details::VLANCreateIface
+      *         from the system and create the ethernet interraces
+      *         dbus object.
+      */
+-    virtual void createInterfaces();
++    virtual std::string createInterfaces();
+
+     /** @brief create child interface object and the system conf object.
+      */
+diff --git a/system_configuration.cpp b/system_configuration.cpp
+index 4fbf601..3f432e0 100644
+--- a/system_configuration.cpp
++++ b/system_configuration.cpp
+@@ -1,7 +1,5 @@
+ #include "config.h"
+-
+ #include "system_configuration.hpp"
+-
+ #include "network_manager.hpp"
+ #include "routing_table.hpp"
+
+@@ -21,6 +19,12 @@ constexpr auto HOSTNAMED_INTERFACE = "org.freedesktop.hostname1";
+ constexpr auto PROPERTY_INTERFACE = "org.freedesktop.DBus.Properties";
+ constexpr auto METHOD_GET = "Get";
+ constexpr auto METHOD_SET = "SetStaticHostname";
++constexpr auto LAST4MACPOS = 12;
++constexpr auto LAST4MACLEN = 5;
++constexpr auto ONYX_G_ID = "40";
++
++#define COMMAND_BOARD_ID    ("/sbin/fw_printenv -n board_id")
++#define COMMAND_OUTPUT_LEN  (8)
+
+ using namespace phosphor::logging;
+ using namespace sdbusplus::xyz::openbmc_project::Common::Error;
+@@ -29,12 +33,49 @@ using InvalidArgumentMetadata = xyz::openbmc_project::Common::InvalidArgument;
+ using SystemConfigIntf =
+     sdbusplus::xyz::openbmc_project::Network::server::SystemConfiguration;
+
++static bool getPlatformID(char *data)
++//static bool getPlatformID()
++{
++    FILE *pf;
++
++    // Setup pipe for reading and execute to get u-boot environment
++    // variable board_id.
++    pf = popen(COMMAND_BOARD_ID,"r");
++
++    // Error handling
++    if(pf < 0)
++    {
++        log<level::ERR>("Unable to get Board ID");
++        return false;
++    }
++
++    // Get the data from the process execution
++    if (fgets(data, COMMAND_OUTPUT_LEN , pf) == NULL)
++    {
++        log<level::ERR>("Board ID data is null");
++        return false;
++    }
++
++    // the data is now in 'data'
++    if (pclose(pf) != 0)
++    {
++        log<level::ERR>("Failed to close command stream");
++        return false;
++    }
++
++    return true;
++}
++
+ SystemConfiguration::SystemConfiguration(sdbusplus::bus::bus& bus,
+                                          const std::string& objPath,
++                                         const std::string mac,
+                                          Manager& parent) :
+     Iface(bus, objPath.c_str(), true),
+     bus(bus), manager(parent)
+ {
++    macAddress = mac;
++    setHostName();
++
+     auto name = getHostNameFromSystem();
+     route::Table routingTable;
+
+@@ -77,8 +118,54 @@ std::string SystemConfiguration::hostName(std::string name)
+         return SystemConfigIntf::hostName();
+     }
+
++    log<level::INFO>("hostname", entry("hostname=%s", name.c_str()));
++
+     return SystemConfigIntf::hostName(name);
+ }
++std::string SystemConfiguration::setHostName()
++{
++    std::string name;
++    std::string boardID;
++    char * data = (char*)malloc(8);
++
++    auto macLast4 = macAddress.substr (LAST4MACPOS, LAST4MACLEN);
++
++    log<level::INFO>("macLast4", entry("macLast4=%s", macLast4.c_str()));
++
++    // Get rid of ":" character
++    macLast4.erase(2,1);
++
++    if (getPlatformID(data)) {
++        boardID = data;
++        if (boardID.compare(0, 2, ONYX_G_ID) == 0)
++        {
++            name = "Onyx-" + macLast4;
++            log<level::INFO>("Hostname : ",  entry("name = %s", name.c_str()));
++        }
++        else
++        {
++            log<level::ERR>("Invalid board_ID : ",  entry("boardID = %s", boardID.c_str()));
++            name = "sp5-" + macLast4;
++        }
++    }
++    else {
++       name = "sp5-" + macLast4;
++    }
++
++    auto method = bus.new_method_call(HOSTNAMED_SERVICE, HOSTNAMED_SERVICE_PATH,
++                                      HOSTNAMED_INTERFACE, METHOD_SET);
++
++    method.append(name, true);
++
++    if (!bus.call(method))
++    {
++        log<level::ERR>("Failed to set the hostname");
++        report<InternalFailure>();
++        return name;
++    }
++
++    return name;
++}
+
+ std::string SystemConfiguration::getHostNameFromSystem() const
+ {
+diff --git a/system_configuration.hpp b/system_configuration.hpp
+index a29309c..91c83a4 100644
+--- a/system_configuration.hpp
++++ b/system_configuration.hpp
+@@ -37,7 +37,7 @@ class SystemConfiguration : public Iface
+      *  @param[in] objPath - Path to attach at.
+      *  @param[in] parent - Parent object.
+      */
+-    SystemConfiguration(sdbusplus::bus::bus& bus, const std::string& objPath,
++    SystemConfiguration(sdbusplus::bus::bus& bus, const std::string& objPath, std::string mac,
+                         Manager& parent);
+
+     /** @brief set the hostname of the system.
+@@ -45,6 +45,11 @@ class SystemConfiguration : public Iface
+      */
+     std::string hostName(std::string name) override;
+
++    /** @brief set the platform specific hostname of the system.
++     *
++     */
++    std::string setHostName();
++
+     /** @brief set the default v4 gateway of the system.
+      *  @param[in] gateway - default v4 gateway of the system.
+      */
+@@ -70,6 +75,9 @@ class SystemConfiguration : public Iface
+
+     /** @brief Network Manager object. */
+     Manager& manager;
++
++    /** @brief Active MAC Address. */
++    std::string macAddress;
+ };
+
+ } // namespace network
+diff --git a/xyz.openbmc_project.Network.service.in b/xyz.openbmc_project.Network.service.in
+index 20e1631..db58fc9 100644
+--- a/xyz.openbmc_project.Network.service.in
++++ b/xyz.openbmc_project.Network.service.in
+@@ -1,6 +1,7 @@
+ [Unit]
+ Description=Phosphor Network Manager
+ After=obmc-mapper.target
++Before=bmcweb.service
+
+ [Service]
+ ExecStart=/usr/bin/env phosphor-network-manager
+--
+2.17.1
+
