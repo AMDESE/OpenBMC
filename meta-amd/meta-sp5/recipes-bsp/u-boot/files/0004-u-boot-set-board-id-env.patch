@@ -1,0 +1,79 @@
+From 354ca87c5f7ea14dae90699f3dce6d14b29ceb1f Mon Sep 17 00:00:00 2001
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Tue, 15 Jun 2021 10:09:39 -0500
+Subject: [PATCH 4/4] u-boot set board id env
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ common/main.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
+
+diff --git a/common/main.c b/common/main.c
+index 07b34bf2b0..fa80aea845 100644
+--- a/common/main.c
++++ b/common/main.c
+@@ -11,12 +11,49 @@
+ #include <cli.h>
+ #include <console.h>
+ #include <version.h>
++#include <i2c.h>
++
++
++#define EEPROM_I2C_BUS 7
++#define EEPROM_DEV_ADDR 0X50
++#define EEPROM_BOARD_ID_OFFSET 0X1F
++#define EEPROM_ADDR_LEN 2
++#define BOARD_ID_LEN 1
+
+ /*
+  * Board-specific Platform code can reimplement show_boot_progress () if needed
+  */
+ __weak void show_boot_progress(int val) {}
+
++/*
++ * Read board ID from mother board eeprom and set as an env
++ */
++void set_board_id()
++{
++	char *s;
++	unsigned char board_id [BOARD_ID_LEN];
++	int ret;
++	char brdid[2];
++
++	/* Check if the board_id env is set */
++	s = env_get("board_id");
++	if (s == NULL) {
++		i2c_set_bus_num(EEPROM_I2C_BUS);
++		ret = i2c_read(EEPROM_DEV_ADDR, EEPROM_BOARD_ID_OFFSET, EEPROM_ADDR_LEN, board_id, BOARD_ID_LEN);
++		if (ret < 0) {
++			printf("Error : Retrieving board_id from EEPROM Failed\n");
++		}
++		else {
++			sprintf(brdid, "%x", board_id[0]);
++			env_set("board_id", brdid);
++			env_save();
++		}
++	}
++
++	printf("Board_id : %s\n", env_get("board_id"));
++	return;
++}
++
+ static void run_preboot_environment_command(void)
+ {
+ #ifdef CONFIG_PREBOOT
+@@ -54,6 +91,9 @@ void main_loop(void)
+ 	if (IS_ENABLED(CONFIG_UPDATE_TFTP))
+ 		update_tftp(0UL, NULL, NULL);
+
++	/* Read board id from eerpom and set env */
++	set_board_id();
++
+ 	s = bootdelay_process();
+ 	if (cli_process_fdt(&s))
+ 		cli_secure_boot_cmd(s);
+--
+2.17.1
+
