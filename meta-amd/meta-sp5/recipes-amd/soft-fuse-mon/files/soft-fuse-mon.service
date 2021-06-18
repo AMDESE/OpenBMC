@@ -1,0 +1,10 @@
+[Unit]
+Description=Monitor Soft Fuse done signal
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/usr/sbin/soft-fuse-mon.sh
+
+[Install]
+WantedBy=multi-user.target

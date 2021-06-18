@@ -34,4 +34,5 @@ RDEPENDS_${PN}-system = " \
         bmcweb \
         ipmitool \
         phosphor-webui \
+        soft-fuse-mon \
         "
