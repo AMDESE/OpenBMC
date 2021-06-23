@@ -139,7 +139,7 @@ then
             mtd=`cat /sys/class/mtd/$d/name`
             if [ $mtd == "pnor" ]; then
                 echo "Flashing bios image to $d..."
-                flashcp -v $IMAGE_FILE /dev/$d
+                dd if=$IMAGE_FILE of=/dev/$d bs=4096
                 if [ $? -eq 0 ]; then
                     echo "bios updated successfully..."
                 else
