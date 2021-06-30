@@ -37,6 +37,5 @@ RDEPENDS_${PN}-system = " \
         bmcweb \
         ipmitool \
         phosphor-hostlogger \
-        phosphor-webui \
-        soft-fuse-mon \
+        webui-vue \
         "
