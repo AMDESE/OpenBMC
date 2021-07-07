@@ -1,0 +1,209 @@
+From c39fbba1e4af2c000086cd5915823f69ea18f36b Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Fri, 25 Jun 2021 03:04:27 -0500
+Subject: [PATCH] updates to Onyx device tree
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts | 191 ++++++++++++++++++++++
+ 1 file changed, 191 insertions(+)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+index 38c53c49232b..c691f7d87dfa 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+@@ -80,3 +80,194 @@
+ &uart5 {
+ 	status = "okay";
+ };
++
++// I2C configs
++&i2c0 {
++	//Net name i2c9 - MB FPGA slave
++	status = "okay";
++};
++
++&i2c1 {
++	//Net name i2c10 - onyx side i2c12
++	// Connected to TCA9546A and to LCD HDR
++	status = "okay";
++
++	tca9546a@70 {
++		compatible = "nxp,pca9546";
++		reg = <0x70>;
++		//<TBD> Define LCD details here
++	};
++};
++
++&i2c2 {
++	// Net name i3c4 - P0 APML
++	// Will use i2c until I3C is enabled/verified on SoC
++	status = "okay";
++};
++
++&i2c4 {
++	// Net name i2c1
++	status = "okay";
++};
++
++&i2c5 {
++	// Net name i2c2
++	status = "okay";
++
++	tca9546a@70 {
++	compatible = "nxp,pca9546";
++	reg = <0x70>;
++	//<TBD> P0 VRM controllers
++	};
++};
++
++&i2c7 {
++	// Net name i2c4
++	status = "okay";
++
++	mbeeprom@50 {
++	compatible = "microchip,24lc256","atmel,24c256";
++	reg = <0x50>;
++	};
++};
++
++&i2c8 {
++	// Net name i2c5 - PSU
++	status = "okay";
++};
++
++&i2c10 {
++	// Net name i2c7
++	status = "okay";
++
++	tca9548a@70 {
++	compatible = "nxp,pca9546";
++	reg = <0x70>;
++
++	};
++
++};
++
++&i2c11 {
++	// Net name i2c8 - MB LOM
++	status = "okay";
++};
++
++&i2c12 {
++	// LOCAL MGMT - FPGA slave
++	status = "okay";
++};
++
++&i2c14 {
++	// LOCAL MGMT - EEPROM, RTC
++	status = "okay";
++	bmceeprom@50 {
++	compatible = "microchip,24lc512","atmel,24c512";
++	reg = <0x50>;
++	};
++};
++
++&i2c15 {
++	// RoT
++	status = "okay";
++};
++
++&i2c9 {
++	// Net name i2c6
++	status = "okay";
++
++	i2cswitch@70 {
++		compatible = "nxp,pca9548";
++		reg = <0x70>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		//  port 0 to 4 connected to 5 fans@0x4d
++		i2c@0 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0>;
++			emc2305@4d {
++				compatible = "smsc,emc2305";
++				reg = <0x4d>;
++			};
++		};
++
++		i2c@5 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <5>;
++
++			lm75a@48 {
++				compatible = "national,lm75a";
++				reg = <0x48>;
++			};
++
++			lm75a@49 {
++				compatible = "national,lm75a";
++				reg = <0x49>;
++			};
++
++			lm75a@4a {
++				compatible = "national,lm75a";
++				reg = <0x4a>;
++			};
++
++			lm75a@4b {
++				compatible = "national,lm75a";
++				reg = <0x4b>;
++			};
++
++			lm75a@4c {
++				compatible = "national,lm75a";
++				reg = <0x4c>;
++			};
++
++			lm75a@4d {
++				compatible = "national,lm75a";
++				reg = <0x4d>;
++			};
++
++			lm75a@4e {
++				compatible = "national,lm75a";
++				reg = <0x4e>;
++			};
++
++			lm75a@4f {
++				compatible = "national,lm75a";
++				reg = <0x4f>;
++			};
++		};
++
++		i2c@6 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <6>;
++
++			adc121c@50 {
++				compatible = "ti,adc121c";
++				reg = <0x50>;
++			};
++			adc121c@51 {
++				compatible = "ti,adc121c";
++				reg = <0x51>;
++			};
++			adc121c@52 {
++				compatible = "ti,adc121c";
++				reg = <0x52>;
++			};
++			adc121c@53 {
++				compatible = "ti,adc121c";
++				reg = <0x53>;
++			};
++			adc121c@54 {
++				compatible = "ti,adc121c";
++				reg = <0x54>;
++			};
++			adc121c@55 {
++				compatible = "ti,adc121c";
++				reg = <0x55>;
++			};
++		};
++	};
++};
