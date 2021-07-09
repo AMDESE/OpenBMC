@@ -31,6 +31,7 @@ RDEPENDS_${PN}-flash = " \
 
 SUMMARY_${PN}-system = "AMD System"
 RDEPENDS_${PN}-system = " \
+        amd-lcd-lib \
         bmcweb \
         ipmitool \
         phosphor-hostlogger \
