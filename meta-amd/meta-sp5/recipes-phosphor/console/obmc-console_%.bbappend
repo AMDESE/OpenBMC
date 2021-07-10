@@ -1,4 +1,4 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}/${MACHINE}:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 OBMC_CONSOLE_HOST_TTY = "ttyS0"
 
 SRC_URI_remove = "file://${BPN}.conf"
