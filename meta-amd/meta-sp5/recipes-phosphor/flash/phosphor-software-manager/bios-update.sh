@@ -7,10 +7,10 @@ POWER_CMD_ON="busctl set-property xyz.openbmc_project.State.Chassis /xyz/openbmc
 IMAGE_DIR=$1
 
 GPIOCHIP=816
-GPIOV0=$((${GPIOCHIP} + 168 + 0))
-GPIOV1=$((${GPIOCHIP} + 168 + 1))
+GPIOM1=$((${GPIOCHIP} + 96 + 1))
 
-SPI_DEV="1e630000.spi"
+
+SPI_DEV="1e631000.spi"
 SPI_PATH="/sys/bus/platform/drivers/aspeed-smc"
 
 power_status() {
@@ -25,28 +25,12 @@ power_status() {
 set_gpio_to_bmc()
 {
     echo "switch bios GPIO to bmc"
-    if [ ! -d /sys/class/gpio/gpio$GPIOV0 ]; then
+    if [ ! -d /sys/class/gpio/gpio$GPIOM1 ]; then
         cd /sys/class/gpio
-        echo $GPIOV0 > export
-        cd gpio$GPIOV0
+        echo $GPIOM1 > export
+        cd gpio$GPIOM1
     else
-        cd /sys/class/gpio/gpio$GPIOV0
-    fi
-    direc=`cat direction`
-    if [ $direc == "in" ]; then
-        echo "out" > direction
-    fi
-    data=`cat value`
-    if [ "$data" == "0" ]; then
-        echo 1 > value
-    fi
-
-    if [ ! -d /sys/class/gpio/gpio$GPIOV1 ]; then
-        cd /sys/class/gpio
-        echo $GPIOV1 > export
-        cd gpio$GPIOV1
-    else
-        cd /sys/class/gpio/gpio$GPIOV1
+        cd /sys/class/gpio/gpio$GPIOM1
     fi
     direc=`cat direction`
     if [ $direc == "in" ]; then
@@ -63,12 +47,12 @@ set_gpio_to_bmc()
 set_gpio_to_host()
 {
     echo "switch bios GPIO to host"
-    if [ ! -d /sys/class/gpio/gpio$GPIOV0 ]; then
+    if [ ! -d /sys/class/gpio/gpio$GPIOM1 ]; then
         cd /sys/class/gpio
-        echo $GPIOV0 > export
-        cd gpio$GPIOV0
+        echo $GPIOM1 > export
+        cd gpio$GPIOM1
     else
-        cd /sys/class/gpio/gpio$GPIOV0
+        cd /sys/class/gpio/gpio$GPIOM1
     fi
     direc=`cat direction`
     if [ $direc == "in" ]; then
@@ -79,25 +63,7 @@ set_gpio_to_host()
         echo 0 > value
     fi
     echo "in" > direction
-    echo $GPIOV0 > /sys/class/gpio/unexport
-
-    if [ ! -d /sys/class/gpio/gpio$GPIOV1 ]; then
-        cd /sys/class/gpio
-        echo $GPIOV1 > export
-        cd gpio$GPIOV1
-    else
-        cd /sys/class/gpio/gpio$GPIOV1
-    fi
-    direc=`cat direction`
-    if [ $direc == "in" ]; then
-        echo "out" > direction
-    fi
-    data=`cat value`
-    if [ "$data" == "1" ]; then
-        echo 0 > value
-    fi
-    echo "in" > direction
-    echo $GPIOV1 > /sys/class/gpio/unexport
+    echo $GPIOM1 > /sys/class/gpio/unexport
 
     return 0
 }
@@ -139,6 +105,7 @@ then
             mtd=`cat /sys/class/mtd/$d/name`
             if [ $mtd == "pnor" ]; then
                 echo "Flashing bios image to $d..."
+                flash_eraseall /dev/$d
                 dd if=$IMAGE_FILE of=/dev/$d bs=4096
                 if [ $? -eq 0 ]; then
                     echo "bios updated successfully..."
