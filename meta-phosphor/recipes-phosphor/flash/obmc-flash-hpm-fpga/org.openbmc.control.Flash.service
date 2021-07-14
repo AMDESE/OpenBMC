@@ -1,0 +1,14 @@
+[Unit]
+Description=Phosphor HPM FPGA Code Update
+Wants=mapper-wait@-org-openbmc-managers-Download.service
+After=mapper-wait@-org-openbmc-managers-Download.service
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/env flash_hpm_fpga.exe
+SyslogIdentifier=flash_hpm_fpga.exe
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy=multi-user.target

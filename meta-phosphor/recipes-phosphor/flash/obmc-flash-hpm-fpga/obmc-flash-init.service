@@ -1,0 +1,12 @@
+[Unit]
+Description=Initialize HPM FPGA Flash
+Wants=mapper-wait@-org-openbmc-control-flash-hpm-fpga.service
+After=mapper-wait@-org-openbmc-control-flash-hpm-fpga.service
+
+[Service]
+Restart=no
+ExecStart=/bin/sh -c "busctl call `mapper get-service /org/openbmc/control/flash/hpm_fpga` /org/openbmc/control/flash/hpm_fpga org.openbmc.Flash init"
+SyslogIdentifier=obmc-flash-hpm-fpga-init
+
+[Install]
+WantedBy=multi-user.target
