@@ -37,6 +37,7 @@ RDEPENDS_${PN}-system = " \
         amd-lcd-lib \
         amd-yaap \
         bmcweb \
+        debug-apps \
         i3c-tools \
         ipmitool \
         phosphor-hostlogger \
