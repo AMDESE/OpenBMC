@@ -33,6 +33,7 @@ SUMMARY_${PN}-system = "AMD System"
 RDEPENDS_${PN}-system = " \
         bmcweb \
         ipmitool \
+        phosphor-hostlogger \
         phosphor-webui \
         soft-fuse-mon \
         "
