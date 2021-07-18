@@ -6,5 +6,6 @@ SRC_URI += "file://sp5.cfg \
             file://0003-ARM-dts-aspeed-Add-I2C-updates-to-dts-for-sensors.patch \
             file://0004-ARM-dts-aspeed-Add-kcs-ports-in-onyx.patch \
             file://0005-ARM-dts-aspeed-Add-device-tree-entry-for-SPI2.patch \
+            file://0006-ARM-dts-aspeed-Add-device-tree-entry-for-GPIO0-bank.patch \
             "
 
