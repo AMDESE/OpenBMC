@@ -153,4 +153,4 @@ set_gpio_to_hpm_fpga
 sleep 5
 
 #reboot HOST
-echo "WARNING!! Reboot HOST to activate HPM FPGA"
+echo "WARNING!! AC POWER CYCLE required to activate HPM FPGA"

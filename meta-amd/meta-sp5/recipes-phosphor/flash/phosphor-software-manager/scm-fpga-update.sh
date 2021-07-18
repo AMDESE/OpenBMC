@@ -143,4 +143,4 @@ set_gpio_to_scm_fpga
 sleep 5
 
 #reboot BMC
-echo "WARNING!! Reboot BMC to activate SCM FPGA"
+echo "WARNING!! AC POWER CYCLE required to activate SCM FPGA"
