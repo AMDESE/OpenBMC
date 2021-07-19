@@ -5,7 +5,7 @@ set -e
 echo "Initiating Soft-fuse Configuration"
 
 GPIOCHIP0_BASE=816
-GPIO_NOTIFY=110
+GPIO_NOTIFY=$((${GPIOCHIP0_BASE} + 104 + 6))
 GPIO_XTRIG5=$((${GPIOCHIP0_BASE} + 112 + 3))
 GPIO_XTRIG6=$((${GPIOCHIP0_BASE} + 112 + 4))
 
