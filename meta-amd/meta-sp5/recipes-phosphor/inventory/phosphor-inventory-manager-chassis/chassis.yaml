@@ -1,0 +1,33 @@
+events:
+    - name: Add Chassis interface
+      description: >
+          Add the chassis interface on the chassis inventory path
+      type: startup
+      actions:
+          - name: createObjects
+            objs:
+              /system/chassis:
+                xyz.openbmc_project.Inventory.Item.Chassis:
+                  Type:
+                    value: "AMD SP5 Chassis"
+                    type: string
+
+    - name: Add motherboard interface
+      description: >
+          Add the motherboard interface on the motherboard inventory path
+      type: startup
+      actions:
+          - name: createObjects
+            objs:
+              /system/chassis/motherboard:
+                xyz.openbmc_project.Inventory.Item.Board:
+
+    - name: Add BMC interface
+      description: >
+          Add the BMC interface on the BMC inventory path
+      type: startup
+      actions:
+          - name: createObjects
+            objs:
+              /system/chassis/motherboard/bmc:
+                xyz.openbmc_project.Inventory.Item.Bmc:

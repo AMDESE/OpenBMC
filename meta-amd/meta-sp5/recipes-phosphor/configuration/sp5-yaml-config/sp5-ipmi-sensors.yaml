@@ -158,4 +158,534 @@
           0xFF:
             type: double
 
+9:
+  sensorType: 0x02
+  path: /xyz/openbmc_project/sensors/voltage/VDD_CORE0_VOUT
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
+  scale: 0
+  multiplierM: 6
+  offsetB: 0
+  bExp: 0
+  rExp: -3
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
 
+10:
+  sensorType: 0x03
+  path: /xyz/openbmc_project/sensors/current/VDD_CORE0_IOUT
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Amperes
+  scale: 0
+  multiplierM: 354
+  offsetB: 0
+  bExp: 0
+  rExp: -6
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+11:
+  sensorType: 0x08
+  path: /xyz/openbmc_project/sensors/power/VDD_CORE0_POUT
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Watts
+  scale: 0
+  multiplierM: 487
+  offsetB: 0
+  bExp: 0
+  rExp: -6
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+12:
+  sensorType: 0x01
+  path: /xyz/openbmc_project/sensors/temperature/VDD_CORE0_TEMP
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  scale: 0
+  multiplierM: 489
+  offsetB: 0
+  bExp: 0
+  rExp: -3
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+13:
+  sensorType: 0x02
+  path: /xyz/openbmc_project/sensors/voltage/VDD_CORE1_VOUT
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
+  scale: 0
+  multiplierM: 6
+  offsetB: 0
+  bExp: 0
+  rExp: -3
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+14:
+  sensorType: 0x03
+  path: /xyz/openbmc_project/sensors/current/VDD_CORE1_IOUT
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Amperes
+  scale: 0
+  multiplierM: 354
+  offsetB: 0
+  bExp: 0
+  rExp: -6
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+15:
+  sensorType: 0x08
+  path: /xyz/openbmc_project/sensors/power/VDD_CORE1_POUT
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Watts
+  scale: 0
+  multiplierM: 487
+  offsetB: 0
+  bExp: 0
+  rExp: -6
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+16:
+  sensorType: 0x01
+  path: /xyz/openbmc_project/sensors/temperature/VDD_CORE1_TEMP
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  scale: 0
+  multiplierM: 489
+  offsetB: 0
+  bExp: 0
+  rExp: -3
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+17:
+  sensorType: 0x02
+  path: /xyz/openbmc_project/sensors/voltage/SOC_VOUT
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
+  scale: 0
+  multiplierM: 6
+  offsetB: 0
+  bExp: 0
+  rExp: -3
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+18:
+  sensorType: 0x03
+  path: /xyz/openbmc_project/sensors/current/SOC_IOUT
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Amperes
+  scale: 0
+  multiplierM: 354
+  offsetB: 0
+  bExp: 0
+  rExp: -6
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+19:
+  sensorType: 0x08
+  path: /xyz/openbmc_project/sensors/power/SOC_POUT
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Watts
+  scale: 0
+  multiplierM: 487
+  offsetB: 0
+  bExp: 0
+  rExp: -6
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+20:
+  sensorType: 0x01
+  path: /xyz/openbmc_project/sensors/temperature/SOC_TEMP
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  scale: 0
+  multiplierM: 489
+  offsetB: 0
+  bExp: 0
+  rExp: -3
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+21:
+  sensorType: 0x02
+  path: /xyz/openbmc_project/sensors/voltage/VDDIO_VOUT
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
+  scale: 0
+  multiplierM: 6
+  offsetB: 0
+  bExp: 0
+  rExp: -3
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+22:
+  sensorType: 0x03
+  path: /xyz/openbmc_project/sensors/current/VDDIO_IOUT
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Amperes
+  scale: 0
+  multiplierM: 354
+  offsetB: 0
+  bExp: 0
+  rExp: -6
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+23:
+  sensorType: 0x08
+  path: /xyz/openbmc_project/sensors/power/VDDIO_POUT
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Watts
+  scale: 0
+  multiplierM: 487
+  offsetB: 0
+  bExp: 0
+  rExp: -6
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+24:
+  sensorType: 0x01
+  path: /xyz/openbmc_project/sensors/temperature/VDDIO_TEMP
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  scale: 0
+  multiplierM: 489
+  offsetB: 0
+  bExp: 0
+  rExp: -3
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+25:
+  sensorType: 0x02
+  path: /xyz/openbmc_project/sensors/voltage/VDD33_DUAL_VOUT
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
+  scale: 0
+  multiplierM: 6
+  offsetB: 0
+  bExp: 0
+  rExp: -3
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+26:
+  sensorType: 0x03
+  path: /xyz/openbmc_project/sensors/current/VDD33_DUAL_IOUT
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Amperes
+  scale: 0
+  multiplierM: 354
+  offsetB: 0
+  bExp: 0
+  rExp: -6
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+27:
+  sensorType: 0x08
+  path: /xyz/openbmc_project/sensors/power/VDD33_DUAL_POUT
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Watts
+  scale: 0
+  multiplierM: 487
+  offsetB: 0
+  bExp: 0
+  rExp: -6
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+28:
+  sensorType: 0x01
+  path: /xyz/openbmc_project/sensors/temperature/VDD33_DUAL_TEMP
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  scale: 0
+  multiplierM: 489
+  offsetB: 0
+  bExp: 0
+  rExp: -3
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+29:
+  sensorType: 0x02
+  path: /xyz/openbmc_project/sensors/voltage/VDD18_DUAL_VOUT
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
+  scale: 0
+  multiplierM: 6
+  offsetB: 0
+  bExp: 0
+  rExp: -3
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+30:
+  sensorType: 0x03
+  path: /xyz/openbmc_project/sensors/current/VDD18_DUAL_IOUT
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Amperes
+  scale: 0
+  multiplierM: 354
+  offsetB: 0
+  bExp: 0
+  rExp: -6
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+31:
+  sensorType: 0x08
+  path: /xyz/openbmc_project/sensors/power/VDD18_DUAL_POUT
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Watts
+  scale: 0
+  multiplierM: 487
+  offsetB: 0
+  bExp: 0
+  rExp: -6
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+32:
+  sensorType: 0x01
+  path: /xyz/openbmc_project/sensors/temperature/VDD18_DUAL_TEMP
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  scale: 0
+  multiplierM: 489
+  offsetB: 0
+  bExp: 0
+  rExp: -3
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+33:
+  sensorType: 0x02
+  path: /xyz/openbmc_project/sensors/voltage/VDD11_SUS_VOUT
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
+  scale: 0
+  multiplierM: 6
+  offsetB: 0
+  bExp: 0
+  rExp: -3
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+34:
+  sensorType: 0x03
+  path: /xyz/openbmc_project/sensors/current/VDD11_SUS_IOUT
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Amperes
+  scale: 0
+  multiplierM: 354
+  offsetB: 0
+  bExp: 0
+  rExp: -6
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+35:
+  sensorType: 0x08
+  path: /xyz/openbmc_project/sensors/power/VDD11_SUS_POUT
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.Watts
+  scale: 0
+  multiplierM: 487
+  offsetB: 0
+  bExp: 0
+  rExp: -6
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+36:
+  sensorType: 0x01
+  path: /xyz/openbmc_project/sensors/temperature/VDD11_SUS_TEMP
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  scale: 0
+  multiplierM: 489
+  offsetB: 0
+  bExp: 0
+  rExp: -3
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double

@@ -1,0 +1,96 @@
+[
+    {
+        "path": "system/chassis/motherboard",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/voltage/VDD_CORE0_VOUT",
+                    "/xyz/openbmc_project/sensors/voltage/VDD_CORE1_VOUT",
+                    "/xyz/openbmc_project/sensors/voltage/SOC_VOUT",
+                    "/xyz/openbmc_project/sensors/voltage/VDDIO_VOUT",
+                    "/xyz/openbmc_project/sensors/voltage/VDD11_SUS_VOUT",
+                    "/xyz/openbmc_project/sensors/voltage/VDD33_DUAL_VOUT",
+                    "/xyz/openbmc_project/sensors/voltage/VDD18_DUAL_VOUT",
+
+                    "/xyz/openbmc_project/sensors/current/VDD_CORE0_IOUT",
+                    "/xyz/openbmc_project/sensors/current/VDD_CORE1_IOUT",
+                    "/xyz/openbmc_project/sensors/current/SOC_IOUT",
+                    "/xyz/openbmc_project/sensors/current/VDDIO_IOUT",
+                    "/xyz/openbmc_project/sensors/current/VDD11_SUS_IOUT",
+                    "/xyz/openbmc_project/sensors/current/VDD33_DUAL_IOUT",
+                    "/xyz/openbmc_project/sensors/current/VDD18_DUAL_IOUT",
+
+                    "/xyz/openbmc_project/sensors/power/VDD_CORE0_POUT",
+                    "/xyz/openbmc_project/sensors/power/VDD_CORE1_POUT",
+                    "/xyz/openbmc_project/sensors/power/SOC_POUT",
+                    "/xyz/openbmc_project/sensors/power/VDDIO_POUT",
+                    "/xyz/openbmc_project/sensors/power/VDD11_SUS_POUT",
+                    "/xyz/openbmc_project/sensors/power/VDD33_DUAL_POUT",
+                    "/xyz/openbmc_project/sensors/power/VDD18_DUAL_POUT",
+
+                    "/xyz/openbmc_project/sensors/temperature/VDD_CORE0_TEMP",
+                    "/xyz/openbmc_project/sensors/temperature/VDD_CORE1_TEMP",
+                    "/xyz/openbmc_project/sensors/temperature/SOC_TEMP",
+                    "/xyz/openbmc_project/sensors/temperature/VDDIO_TEMP",
+                    "/xyz/openbmc_project/sensors/temperature/VDD11_SUS_TEMP",
+                    "/xyz/openbmc_project/sensors/temperature/VDD33_DUAL_TEMP",
+                    "/xyz/openbmc_project/sensors/temperature/VDD18_DUAL_TEMP"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "chassis",
+                    "fType": "all_sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/voltage/VDD_CORE0_VOUT",
+                    "/xyz/openbmc_project/sensors/voltage/VDD_CORE1_VOUT",
+                    "/xyz/openbmc_project/sensors/voltage/SOC_VOUT",
+                    "/xyz/openbmc_project/sensors/voltage/VDDIO_VOUT",
+                    "/xyz/openbmc_project/sensors/voltage/VDD11_SUS_VOUT",
+                    "/xyz/openbmc_project/sensors/voltage/VDD33_DUAL_VOUT",
+                    "/xyz/openbmc_project/sensors/voltage/VDD18_DUAL_VOUT",
+
+                    "/xyz/openbmc_project/sensors/current/VDD_CORE0_IOUT",
+                    "/xyz/openbmc_project/sensors/current/VDD_CORE1_IOUT",
+                    "/xyz/openbmc_project/sensors/current/SOC_IOUT",
+                    "/xyz/openbmc_project/sensors/current/VDDIO_IOUT",
+                    "/xyz/openbmc_project/sensors/current/VDD11_SUS_IOUT",
+                    "/xyz/openbmc_project/sensors/current/VDD33_DUAL_IOUT",
+                    "/xyz/openbmc_project/sensors/current/VDD18_DUAL_IOUT",
+
+                    "/xyz/openbmc_project/sensors/power/VDD_CORE0_POUT",
+                    "/xyz/openbmc_project/sensors/power/VDD_CORE1_POUT",
+                    "/xyz/openbmc_project/sensors/power/SOC_POUT",
+                    "/xyz/openbmc_project/sensors/power/VDDIO_POUT",
+                    "/xyz/openbmc_project/sensors/power/VDD11_SUS_POUT",
+                    "/xyz/openbmc_project/sensors/power/VDD33_DUAL_POUT",
+                    "/xyz/openbmc_project/sensors/power/VDD18_DUAL_POUT",
+
+                    "/xyz/openbmc_project/sensors/temperature/VDD_CORE0_TEMP",
+                    "/xyz/openbmc_project/sensors/temperature/VDD_CORE1_TEMP",
+                    "/xyz/openbmc_project/sensors/temperature/SOC_TEMP",
+                    "/xyz/openbmc_project/sensors/temperature/VDDIO_TEMP",
+		    "/xyz/openbmc_project/sensors/temperature/VDD11_SUS_TEMP",
+                    "/xyz/openbmc_project/sensors/temperature/VDD33_DUAL_TEMP",
+                    "/xyz/openbmc_project/sensors/temperature/VDD18_DUAL_TEMP"
+                ]
+            }
+        ]
+    }
+]
