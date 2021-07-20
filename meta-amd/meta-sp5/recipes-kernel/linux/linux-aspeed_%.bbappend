@@ -9,5 +9,6 @@ SRC_URI += "file://sp5.cfg \
             file://0006-ARM-dts-aspeed-Add-device-tree-entry-for-GPIO0-bank.patch \
             file://0007-ARM-dts-aspeed-Add-device-tree-entry-for-JTAG.patch \
             file://0008-drivers-jtag-Add-Aspeed-SoC-24xx-25xx-26xx-families-.patch \
+            file://0009-drivers-hwmon-pmbus-Adding-support-for-XDPE192xxx-an.patch \
             "
 
