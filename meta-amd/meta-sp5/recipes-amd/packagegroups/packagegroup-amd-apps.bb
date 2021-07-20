@@ -36,6 +36,7 @@ RDEPENDS_${PN}-system = " \
         amd-lcd-lib \
         amd-yaap \
         bmcweb \
+        i3c-tools \
         ipmitool \
         phosphor-hostlogger \
         set-fan-speed \
