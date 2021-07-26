@@ -1,0 +1,53 @@
+From 9e194acf288f92d0f5b905ca21e603cd962ae509 Mon Sep 17 00:00:00 2001
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Mon, 26 Jul 2021 18:44:21 -0500
+Subject: [PATCH] ARM dts aspeed Add emc-2305 fan controller
+
+Device tree nodes added for emc-2305 fan controller
+
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts | 24 ++++++++++++++++++-----
+ 1 file changed, 19 insertions(+), 5 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+index 7da02ea3e513..6bba4c7f511e 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+@@ -241,14 +241,28 @@
+		#size-cells = <0>;
+
+		//  port 0 to 4 connected to 5 fans@0x4d
+-		i2c@0 {
++		emc2305_1@0 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0>;
++		};
++
++		emc2305_2@1 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0>;
++		};
++
++		emc2305_3@2 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0>;
++		};
++
++		emc2305_4@3 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0>;
+-			emc2305@4d {
+-				compatible = "smsc,emc2305";
+-				reg = <0x4d>;
+-			};
+		};
+
+		i2c@5 {
+--
+2.17.1
+
