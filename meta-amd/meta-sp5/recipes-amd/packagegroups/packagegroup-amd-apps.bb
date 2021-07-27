@@ -37,5 +37,6 @@ RDEPENDS_${PN}-system = " \
         bmcweb \
         ipmitool \
         phosphor-hostlogger \
+        set-fan-speed \
         webui-vue \
         "
