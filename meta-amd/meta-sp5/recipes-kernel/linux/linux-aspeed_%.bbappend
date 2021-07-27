@@ -11,5 +11,6 @@ SRC_URI += "file://sp5.cfg \
             file://0008-drivers-jtag-Add-Aspeed-SoC-24xx-25xx-26xx-families-.patch \
             file://0009-drivers-hwmon-pmbus-Adding-support-for-XDPE192xxx-an.patch \
             file://0010-ARM-dts-aspeed-Adding-device-tree-entries-for-Voltag.patch \
+            file://0011-ARM-dts-aspeed-Add-device-tree-entries-to-enable-KVM.patch \
             "
 
