@@ -30,15 +30,15 @@ power_status() {
 set_fan_speed()
 {
     # Wrtie speed valu to controller Regs.
-    echo "Setting all Fan speeds to $1"
+    echo "Setting all Fan speeds to $speed_val"
     echo
     for i in 16 17 18 19
     do
-        i2cset -y $i $EMC2305_DEV $FAN1_SET_REG $1
-        i2cset -y $i $EMC2305_DEV $FAN2_SET_REG $1
-        i2cset -y $i $EMC2305_DEV $FAN3_SET_REG $1
-        i2cset -y $i $EMC2305_DEV $FAN4_SET_REG $1
-        i2cset -y $i $EMC2305_DEV $FAN5_SET_REG $1
+        i2cset -y $i $EMC2305_DEV $FAN1_SET_REG $speed_val
+        i2cset -y $i $EMC2305_DEV $FAN2_SET_REG $speed_val
+        i2cset -y $i $EMC2305_DEV $FAN3_SET_REG $speed_val
+        i2cset -y $i $EMC2305_DEV $FAN4_SET_REG $speed_val
+        i2cset -y $i $EMC2305_DEV $FAN5_SET_REG $speed_val
     done
     exit 0
 }
@@ -48,7 +48,7 @@ if [[ $1 -lt $SPEED_LIMIT ]]; then
         echo "Error : You can not set Fan speed less then 50% (0x80)"
         exit -1
 else
-        SPEED_VAL=$1
+        speed_val=$1
 fi
 
 
