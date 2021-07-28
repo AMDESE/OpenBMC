@@ -32,6 +32,7 @@ RDEPENDS_${PN}-flash = " \
 
 SUMMARY_${PN}-system = "AMD System"
 RDEPENDS_${PN}-system = " \
+        amd-apml \
         amd-lcd-lib \
         amd-yaap \
         bmcweb \
