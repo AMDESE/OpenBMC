@@ -42,6 +42,15 @@
                     "/xyz/openbmc_project/sensors/temperature/VDD11_SUS_TEMP",
                     "/xyz/openbmc_project/sensors/temperature/VDD33_DUAL_TEMP",
                     "/xyz/openbmc_project/sensors/temperature/VDD18_DUAL_TEMP"
+
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_48",
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_49",
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_4A",
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_4B",
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_4C",
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_4D",
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_4E",
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_4F"
                 ]
             }
         ]
@@ -86,9 +95,18 @@
                     "/xyz/openbmc_project/sensors/temperature/VDD_CORE1_TEMP",
                     "/xyz/openbmc_project/sensors/temperature/SOC_TEMP",
                     "/xyz/openbmc_project/sensors/temperature/VDDIO_TEMP",
-		    "/xyz/openbmc_project/sensors/temperature/VDD11_SUS_TEMP",
+                    "/xyz/openbmc_project/sensors/temperature/VDD11_SUS_TEMP",
                     "/xyz/openbmc_project/sensors/temperature/VDD33_DUAL_TEMP",
                     "/xyz/openbmc_project/sensors/temperature/VDD18_DUAL_TEMP"
+
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_48",
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_49",
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_4A",
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_4B",
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_4C",
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_4D",
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_4E",
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_4F"
                 ]
             }
         ]
