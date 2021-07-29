@@ -41,7 +41,7 @@
                     "/xyz/openbmc_project/sensors/temperature/VDDIO_TEMP",
                     "/xyz/openbmc_project/sensors/temperature/VDD11_SUS_TEMP",
                     "/xyz/openbmc_project/sensors/temperature/VDD33_DUAL_TEMP",
-                    "/xyz/openbmc_project/sensors/temperature/VDD18_DUAL_TEMP"
+                    "/xyz/openbmc_project/sensors/temperature/VDD18_DUAL_TEMP",
 
                     "/xyz/openbmc_project/sensors/temperature/LM75A_48",
                     "/xyz/openbmc_project/sensors/temperature/LM75A_49",
@@ -97,7 +97,7 @@
                     "/xyz/openbmc_project/sensors/temperature/VDDIO_TEMP",
                     "/xyz/openbmc_project/sensors/temperature/VDD11_SUS_TEMP",
                     "/xyz/openbmc_project/sensors/temperature/VDD33_DUAL_TEMP",
-                    "/xyz/openbmc_project/sensors/temperature/VDD18_DUAL_TEMP"
+                    "/xyz/openbmc_project/sensors/temperature/VDD18_DUAL_TEMP",
 
                     "/xyz/openbmc_project/sensors/temperature/LM75A_48",
                     "/xyz/openbmc_project/sensors/temperature/LM75A_49",
