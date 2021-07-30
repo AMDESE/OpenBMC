@@ -15,5 +15,6 @@ SRC_URI += "file://sp5.cfg \
             file://0012-ARM-dts-aspeed-Add-Fan-controllers-to-dts.patch \
             file://0013-drivers-jtag-Fix-incorrect-TRST-implementation.patch \
             file://0014-drivers-i3c-Add-ast2600-i3c-patch.patch \
+            file://0015-ARM-dts-aspeed-Add-I3C-controllers-to-dtsi-files-and.patch \
             "
 
