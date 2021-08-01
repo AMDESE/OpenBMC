@@ -17,5 +17,6 @@ SRC_URI += "file://sp5.cfg \
             file://0014-drivers-i3c-Add-ast2600-i3c-patch.patch \
             file://0015-ARM-dts-aspeed-Add-I3C-controllers-to-dtsi-files-and.patch \
             file://0016-ARM-dts-aspeed-Add-I3C-entries-to-Onyx-dts-file.patch \
+            file://0017-ARM-dts-aspeed-Correct-register-space-size-for-JTAG-.patch \
             "
 
