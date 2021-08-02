@@ -4,6 +4,7 @@ SRC_URI += "file://bios-update.sh \
             file://hpm-fpga-update.sh \
             file://0001-Add-support-for-SCM-FPGA-firmware-update.patch \
             file://0002-Add-support-for-HPM-FPGA-firmware-update.patch \
+            file://0003-save-version-to-persistent-store.patch \
             "
 
 PACKAGECONFIG_append = " flash_bios flash_scm_fpga flash_hpm_fpga"
