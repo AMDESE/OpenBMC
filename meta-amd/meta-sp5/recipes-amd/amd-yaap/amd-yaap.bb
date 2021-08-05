@@ -3,7 +3,10 @@ DESCRIPTION = "Yet Another AMD Protocol for Jtag communication with main Process
 
 LICENSE = "CLOSED"
 
-SRC_URI = "git://git@github.com/AMDESE/YAAP.git;branch=sp5;protocol=ssh"
+SRC_URI  = "git://git@github.com/AMDESE/YAAP.git;branch=sp5;protocol=ssh"
+SRC_URI += "file://0001-amd-yaap-Add-soft-fuse-support-feature.patch \
+            "
+
 SRCREV = "${AUTOREV}"
 
 S="${WORKDIR}/git"
@@ -24,6 +27,8 @@ do_install() {
   cp --preserve=mode,timestamps -R ${S}/Source/Linux/bmc/yaapd ${D}${bindir}/
   install -d ${D}/${systemd_unitdir}/system
   install -m 0644 ${S}/yaapd.service ${D}/${systemd_unitdir}/system
+  install -d ${D}${sysconfdir}/${BPN}
+  install -m 0644 ${S}/coolreset.txt ${D}${sysconfdir}/${BPN}/
 }
 
 
@@ -32,3 +37,4 @@ SYSTEMD_SERVICE_${PN} += "yaapd.service \
                           "
 
 DEPENDS += "libgpiod"
+DEPENDS += "boost"
