@@ -19,5 +19,6 @@ SRC_URI += "file://sp5.cfg \
             file://0016-ARM-dts-aspeed-Add-I3C-entries-to-Onyx-dts-file.patch \
             file://0017-ARM-dts-aspeed-Correct-register-space-size-for-JTAG-.patch \
             file://0018-ARM-dts-aspeed-Quartz-initial-device-tree.patch \
+            file://0019-ARM-dts-aspeed-Quartz-dts-fan-i2c-channels-add.patch \
             "
 
