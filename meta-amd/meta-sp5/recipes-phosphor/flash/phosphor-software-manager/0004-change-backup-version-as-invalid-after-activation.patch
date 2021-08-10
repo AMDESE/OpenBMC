@@ -1,0 +1,41 @@
+From 115eeb2a31709f447fbc42ee73470ba0af427a2e Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Tue, 10 Aug 2021 05:14:52 -0500
+Subject: [PATCH] change backup version as invalid after activation
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+---
+ activation.cpp | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/activation.cpp b/activation.cpp
+index 79971c1..2f4487a 100644
+--- a/activation.cpp
++++ b/activation.cpp
+@@ -504,6 +504,7 @@ void Activation::onStateChangesBios(sdbusplus::message::message& msg)
+             parent.biosVersion->version(
+                 parent.versions.find(versionId)->second->version());
+             SET_VER(BIOS_VER_FILE);
++            parent.versions.find(versionId)->second->version("--");
+         }
+         else if (newStateResult == "failed")
+         {
+@@ -569,6 +570,7 @@ void Activation::onStateChangesScmFpga(sdbusplus::message::message& msg)
+             parent.scmfpgaVersion->version(
+                 parent.versions.find(versionId)->second->version());
+             SET_VER(SCM_VER_FILE);
++            parent.versions.find(versionId)->second->version("--");
+
+         }
+         else if (newStateResult == "failed")
+@@ -635,6 +637,7 @@ void Activation::onStateChangesHpmFpga(sdbusplus::message::message& msg)
+             parent.hpmfpgaVersion->version(
+                 parent.versions.find(versionId)->second->version());
+             SET_VER(HPM_VER_FILE);
++            parent.versions.find(versionId)->second->version("--");
+
+         }
+         else if (newStateResult == "failed")
+--
+2.17.1
+
