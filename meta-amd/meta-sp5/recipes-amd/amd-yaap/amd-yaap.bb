@@ -5,6 +5,7 @@ LICENSE = "CLOSED"
 
 SRC_URI  = "git://git@github.com/AMDESE/YAAP.git;branch=sp5;protocol=ssh"
 SRC_URI += "file://0001-amd-yaap-Add-soft-fuse-support-feature.patch \
+            file://0002-amd-yaap-Add-Jtag-initialization-for-coolreset.patch \
             "
 
 SRCREV = "${AUTOREV}"
