@@ -22,5 +22,6 @@ SRC_URI += "file://sp5.cfg \
             file://0019-ARM-dts-aspeed-Quartz-dts-fan-i2c-channels-add.patch \
             file://0020-ARM-dts-aspeed-Add-PSP-Soft-fuse-gpios.patch \
             file://0021-ARM-dts-aspeed-Adding-DIMM-SPD-slaves-to-the-device-.patch \
+            file://0022-ARM-dts-aspeed-Adding-P0-P1-DIMM-SPD-slaves-to-the-Q.patch \
             "
 
