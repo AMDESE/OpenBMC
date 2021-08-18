@@ -7,9 +7,10 @@ LICENSE = "CLOSED"
 
 DEPENDS += "i2c-tools"
 
-SRC_URI += "file://esmi-lib-1.0.0.tar.gz"
+SRC_URI += "git://git@github.com/amd/esmi_oob_library.git;protocol=ssh"
+SRCREV_pn-amd-apml = "${AUTOREV}"
 
-S="${WORKDIR}"
+S="${WORKDIR}/git"
 
 inherit cmake
 
