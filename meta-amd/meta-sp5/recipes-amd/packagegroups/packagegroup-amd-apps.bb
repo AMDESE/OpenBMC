@@ -38,6 +38,7 @@ RDEPENDS_${PN}-system = " \
         amd-yaap \
         bmcweb \
         debug-apps \
+        first-boot-set-hwmon-path \
         i3c-tools \
         ipmitool \
         phosphor-hostlogger \
