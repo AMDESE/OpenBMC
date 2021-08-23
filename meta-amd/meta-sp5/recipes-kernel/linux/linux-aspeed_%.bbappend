@@ -25,5 +25,6 @@ SRC_URI += "file://sp5.cfg \
             file://0022-ARM-dts-aspeed-Adding-P0-P1-DIMM-SPD-slaves-to-the-Q.patch \
             file://0023-ARM-dts-aspeed-APML-over-I2C-device-tree-support-for.patch \
             file://0024-ARM-dts-aspeed-Add-Ruby-initial-device-tree.patch \
+            file://0025-ARM-dts-aspeed-Add-Quartz-DTS-Temp-sensor.patc \
             "
 
