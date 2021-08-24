@@ -26,5 +26,8 @@ SRC_URI += "file://sp5.cfg \
             file://0023-ARM-dts-aspeed-APML-over-I2C-device-tree-support-for.patch \
             file://0024-ARM-dts-aspeed-Add-Ruby-initial-device-tree.patch \
             file://0025-ARM-dts-aspeed-Add-Quartz-DTS-Temp-sensor.patch \
+            file://0026-ARM-dts-aspeed-enable-espi-controller-in-onyx.patch \
+            file://0027-ARM-dts-aspeed-enable-espi-controller-in-ruby.patch \
+            file://0028-ARM-dts-aspeed-enable-espi-controller-in-quartz.patch \
             "
 
