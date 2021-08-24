@@ -1,22 +1,22 @@
-From 244c015ed94dc9f31ba60af82a4c71c19d3c4be4 Mon Sep 17 00:00:00 2001
+From 6a516733c7881369a27bd444844f96b381255009 Mon Sep 17 00:00:00 2001
 From: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
 Date: Thu, 5 Aug 2021 00:10:57 -0500
-Subject: [PATCH 1/1] amd-yaap: Add soft fuse support feature
+Subject: [PATCH 1/1] amd-yaap: Add firmware soft fuse feature
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 
-Adds support for soft fuse feature.
+Adds support for firmware soft fuse feature.
 
 Signed-off-by: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
 ---
  Source/Linux/bmc/Makefile         |  5 ++-
- Source/Linux/bmc/hw/jtag_hw.cpp   | 53 +++++++++++++++++++------
+ Source/Linux/bmc/hw/jtag_hw.cpp   | 59 ++++++++++++++++++++++------
  Source/Linux/bmc/hw/jtag_hw.h     |  1 +
- Source/Linux/bmc/hw/psp_sfmon.cpp | 65 +++++++++++++++++++++++++++++++
- Source/Linux/bmc/hw/psp_sfmon.h   | 64 ++++++++++++++++++++++++++++++
+ Source/Linux/bmc/hw/psp_sfmon.cpp | 64 +++++++++++++++++++++++++++++++
+ Source/Linux/bmc/hw/psp_sfmon.h   | 64 +++++++++++++++++++++++++++++++
  Source/Linux/bmc/main.cpp         | 21 +++++++++-
- coolreset.txt                     | 15 +++++++
- 7 files changed, 210 insertions(+), 14 deletions(-)
+ coolreset.txt                     | 15 ++++++++
+ 7 files changed, 215 insertions(+), 14 deletions(-)
  create mode 100644 Source/Linux/bmc/hw/psp_sfmon.cpp
  create mode 100644 Source/Linux/bmc/hw/psp_sfmon.h
  create mode 100644 coolreset.txt
@@ -45,10 +45,10 @@ index 9560ca2..4edf59d 100644
  %.d: %.c
  	$(CC) -MM -MT "$*.o" -MT "$*.d" $(CFLAGS) $< > $@
 diff --git a/Source/Linux/bmc/hw/jtag_hw.cpp b/Source/Linux/bmc/hw/jtag_hw.cpp
-index 494a625..2797504 100644
+index 494a625..ef8597e 100644
 --- a/Source/Linux/bmc/hw/jtag_hw.cpp
 +++ b/Source/Linux/bmc/hw/jtag_hw.cpp
-@@ -74,24 +74,55 @@
+@@ -74,25 +74,62 @@
  #include <stdio.h>
  #include "infrastructure/debug.h"
 
@@ -78,10 +78,10 @@ index 494a625..2797504 100644
 +            DEBUG_PRINT(DEBUG_INFO," \n");
 +        }
      }
+-}
+-return 0;
 +    return 0;
  }
--return 0;
--}
 
 +void bmc::JtagHw::coolreset()
 +{
@@ -91,6 +91,11 @@ index 494a625..2797504 100644
 +    int     bits = 0;
 +    FILE *file;
 +    enum yaap::hal::jtagOp op;
++
++    // Enable jtag mux
++    setGPIOValue(hdtSelName, 1);
++    // Reset Tap State
++    tapStateSet(yaap::hal::JTAG_STATE_TLR);
 +
 +    file = fopen("/etc/amd-yaap/coolreset.txt", "r");
 +    while(!feof(file))
@@ -110,11 +115,13 @@ index 494a625..2797504 100644
 +      memset (&inData[0], 0, COOL_RESET_MAX_SIZE);
 +      memset (&outData[0], 0, COOL_RESET_MAX_SIZE);
 +    }
-+
+
++    // Release Jtag mux
++    setGPIOValue(hdtSelName, 0);
 +}
 
-
  bmc::JtagHw::JtagHw(int driver)
+     : m_freq(8250000), m_state(yaap::hal::JTAG_STATE_TLR)
 diff --git a/Source/Linux/bmc/hw/jtag_hw.h b/Source/Linux/bmc/hw/jtag_hw.h
 index 7e07e9a..afd5ea5 100644
 --- a/Source/Linux/bmc/hw/jtag_hw.h
@@ -129,10 +136,10 @@ index 7e07e9a..afd5ea5 100644
  };
 diff --git a/Source/Linux/bmc/hw/psp_sfmon.cpp b/Source/Linux/bmc/hw/psp_sfmon.cpp
 new file mode 100644
-index 0000000..559b2f1
+index 0000000..d9dcacf
 --- /dev/null
 +++ b/Source/Linux/bmc/hw/psp_sfmon.cpp
-@@ -0,0 +1,65 @@
+@@ -0,0 +1,64 @@
 +#include "psp_sfmon.h"
 +
 +void pspSfMonitor::scheduleEventHandler()
@@ -162,7 +169,6 @@ index 0000000..559b2f1
 +    if (gpioLineEvent.event_type == gpiod::line_event::RISING_EDGE)
 +    {
 +        coolresetJtagHw->coolreset();
-+        return;
 +    }
 +
 +    /* Schedule a wait event */
