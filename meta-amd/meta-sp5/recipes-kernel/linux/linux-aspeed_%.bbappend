@@ -29,5 +29,6 @@ SRC_URI += "file://sp5.cfg \
             file://0026-ARM-dts-aspeed-enable-espi-controller-in-onyx.patch \
             file://0027-ARM-dts-aspeed-enable-espi-controller-in-ruby.patch \
             file://0028-ARM-dts-aspeed-enable-espi-controller-in-quartz.patch \
+            file://0029-drivers-soc-aspeed-espi-drv-addition.patch \
             "
 
