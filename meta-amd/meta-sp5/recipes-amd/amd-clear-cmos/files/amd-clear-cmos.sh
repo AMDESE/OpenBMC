@@ -4,7 +4,7 @@
 set -e
 
 GPIOCHIP=816
-GPIO110_CLR_CMOS=$((${GPIOCHIP} + 110))
+GPIO_CLR_CMOS=$((${GPIOCHIP} + 98))
 
 # Host power controls
 POWER_CMD_OFF="busctl set-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis RequestedPowerTransition s xyz.openbmc_project.State.Chassis.Transition.Off"
@@ -24,12 +24,12 @@ power_status() {
 clear_cmos()
 {
     # Set GPIO
-    if [ ! -d /sys/class/gpio/gpio$GPIO110_CLR_CMOS ]; then
+    if [ ! -d /sys/class/gpio/gpio$GPIO_CLR_CMOS ]; then
         cd /sys/class/gpio
-        echo $GPIO110_CLR_CMOS > export
-        cd gpio$GPIO110_CLR_CMOS
+        echo $GPIO_CLR_CMOS > export
+        cd gpio$GPIO_CLR_CMOS
     else
-        cd /sys/class/gpio/gpio$GPIO110_CLR_CMOS
+        cd /sys/class/gpio/gpio$GPIO_CLR_CMOS
     fi
 
     # check direction
@@ -52,7 +52,7 @@ clear_cmos()
     #reset GPIO
     echo "in" > direction
     cd /sys/class/gpio
-    echo $GPIO110_CLR_CMOS > unexport
+    echo $GPIO_CLR_CMOS > unexport
     }
 
 # Check Host power status
