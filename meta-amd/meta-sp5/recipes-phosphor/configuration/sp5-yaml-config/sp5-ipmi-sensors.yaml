@@ -689,3 +689,43 @@
         Offsets:
           0xFF:
             type: double
+
+37:
+  sensorType: 0x01
+  entityID: 0x20
+  path: /xyz/openbmc_project/sensors/temperature/CPU0_Temp
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  scale: 0
+  offsetB: 0
+  bExp: 0
+  rExp: 0
+  mutability: Mutability::Write | Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
+
+38:
+  sensorType: 0x01
+  entityID: 0x20
+  path: /xyz/openbmc_project/sensors/temperature/CPU1_Temp
+  sensorReadingType: 0x01
+  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
+  scale: 0
+  offsetB: 0
+  bExp: 0
+  rExp: 0
+  mutability: Mutability::Write | Mutability::Read
+  serviceInterface: org.freedesktop.DBus.Properties
+  readingType: readingData
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          0xFF:
+            type: double
