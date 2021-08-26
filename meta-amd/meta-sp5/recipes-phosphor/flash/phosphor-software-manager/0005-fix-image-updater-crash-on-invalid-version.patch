@@ -1,0 +1,52 @@
+From c768cf05e04bbd39133ab0b4feeb849de81bb0ea Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Thu, 26 Aug 2021 07:15:10 -0500
+Subject: [PATCH] fix image updater crash on invalid version
+
+---
+ item_updater.cpp | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/item_updater.cpp b/item_updater.cpp
+index 908543e..ae7130a 100644
+--- a/item_updater.cpp
++++ b/item_updater.cpp
+@@ -29,7 +29,7 @@
+         { \
+             cereal::JSONInputArchive iarchive(is); \
+                 iarchive(cereal::make_nvp(ACTIVE_VER_KEY, line)); \
+-            version = line.c_str(); \
++            version = line;\
+         } \
+         catch (cereal::Exception& e) \
+         { \
+@@ -790,7 +790,7 @@ void ItemUpdater::createBIOSObject()
+     createFunctionalAssociation(path);
+
+     auto versionId = path.substr(pos + 1);
+-    auto version = "Unknown";
++    std::string version = "Unknown";
+     GET_VER(BIOS_VER_FILE);
+     AssociationList assocs = {};
+     biosActivation = std::make_unique<Activation>(
+@@ -825,7 +825,7 @@ void ItemUpdater::createSCMFPGAObject()
+     createFunctionalAssociation(path);
+
+     auto versionId = path.substr(pos + 1);
+-    auto version = "Unknown";
++    std::string version = "Unknown";
+     GET_VER(SCM_VER_FILE);
+
+     AssociationList assocs = {};
+@@ -861,7 +861,7 @@ void ItemUpdater::createHPMFPGAObject()
+     createFunctionalAssociation(path);
+
+     auto versionId = path.substr(pos + 1);
+-    auto version = "Unknown";
++    std::string version = "Unknown";
+     GET_VER(HPM_VER_FILE);
+
+     AssociationList assocs = {};
+--
+2.17.1
+
