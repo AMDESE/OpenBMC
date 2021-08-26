@@ -31,5 +31,9 @@ SRC_URI += "file://sp5.cfg \
             file://0028-ARM-dts-aspeed-enable-espi-controller-in-quartz.patch \
             file://0029-drivers-soc-aspeed-espi-drv-addition.patch \
             file://0030-ARM-dts-aspeed-Add-led-definitions-for-fault-and-ide.patch \
+            file://0031-hwmon-Add-support-for-SB-RMI-power-module.patch \
+            file://0032-hwmon-sbrmi-Add-Documentation.patch \
+            file://0033-dt-bindings-sbrmi-Add-SB-RMI-hwmon-driver-bindings.patch \
+            file://0034-ARM-dts-aspeed-Add-dts-support-for-sbrmi-module-for-.patch \
             "
 
