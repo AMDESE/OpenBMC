@@ -8,7 +8,7 @@
 #   	[11] = HPM LOM SPI
 #
 
-set -e
+set +e
 
 POWER_CMD_OFF="busctl set-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis RequestedPowerTransition s xyz.openbmc_project.State.Chassis.Transition.Off"
 POWER_CMD_ON="busctl set-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis RequestedPowerTransition s xyz.openbmc_project.State.Chassis.Transition.On"
@@ -112,12 +112,17 @@ set_gpio_to_host()
 }
 
 echo "Bios upgrade started at $(date)"
+power_state=$(power_status)
+echo "Current Host state is $power_state"
 
+if [ "$power_state" != "off" ];
+then
 #Power off host server.
 echo "Power off host server"
-
 $POWER_CMD_OFF
-sleep 15
+sleep 10
+fi
+
 if [ $(power_status) != "off" ];
 then
     echo "Host server didn't power off"
@@ -134,6 +139,15 @@ set_gpio_to_bmc
 #Bind spi driver to access flash
 echo "bind aspeed-smc spi driver"
 echo -n $SPI_DEV > $SPI_PATH/bind
+if [ $? -eq 0 ];
+then
+    echo "SPI Driver Bind Successful"
+else
+    echo "SPI Driver Bind Failed"
+    set_gpio_to_host
+    sleep 5
+    exit -1
+fi
 sleep 1
 
 #Flashcp image to device.
@@ -170,10 +184,17 @@ popd
 sleep 1
 echo "Unbind aspeed-smc spi driver"
 echo -n $SPI_DEV > $SPI_PATH/unbind
-sleep 10
+sleep 1
 
 #Flip GPIO back for host to access SPI flash
 echo "Set GPIO $GPIO back for host to access SPI flash"
 set_gpio_to_host
 sleep 5
+
+if [ "$power_state" != "off" ];
+then
+$POWER_CMD_ON
+sleep 1
+fi
+exit 0
 

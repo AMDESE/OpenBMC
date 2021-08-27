@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set +e
 
 IMAGE_DIR=$1
 
@@ -100,6 +100,15 @@ set_gpio_to_bmc
 #Bind spi driver to access flash
 echo "bind aspeed-smc spi driver"
 echo -n $SPI_DEV > $SPI_PATH/bind
+if [ $? -eq 0 ];
+then
+    echo "SPI Driver Bind Successful"
+else
+    echo "SPI Driver Bind Failed"
+    set_gpio_to_scm_fpga
+    sleep 5
+    exit -1
+fi
 sleep 1
 
 #Flashcp image to device.
