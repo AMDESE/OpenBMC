@@ -7,6 +7,7 @@ SRC_URI += "file://bios-update.sh \
             file://0003-save-version-to-persistent-store.patch \
             file://0004-change-backup-version-as-invalid-after-activation.patch \
             file://0005-fix-image-updater-crash-on-invalid-version.patch \
+            file://0006-delete-stale-objects-after-activation.patch \
             "
 
 PACKAGECONFIG_append = " flash_bios flash_scm_fpga flash_hpm_fpga"
