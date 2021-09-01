@@ -35,5 +35,6 @@ SRC_URI += "file://sp5.cfg \
             file://0032-hwmon-sbrmi-Add-Documentation.patch \
             file://0033-dt-bindings-sbrmi-Add-SB-RMI-hwmon-driver-bindings.patch \
             file://0034-ARM-dts-aspeed-Add-dts-support-for-sbrmi-module-for-.patch \
+            file://0035-ARM-dts-aspeed-Add-Titanite-initial-device-tree.patch \
             "
 
