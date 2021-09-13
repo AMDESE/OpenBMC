@@ -42,6 +42,8 @@ RDEPENDS_${PN}-system = " \
         i3c-tools \
         ipmitool \
         phosphor-hostlogger \
+        phosphor-host-postd \
+        phosphor-post-code-manager \
         set-fan-speed \
         webui-vue \
         "
