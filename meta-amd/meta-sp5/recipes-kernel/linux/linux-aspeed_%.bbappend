@@ -37,5 +37,6 @@ SRC_URI += "file://sp5.cfg \
             file://0034-ARM-dts-aspeed-Add-dts-support-for-sbrmi-module-for-.patch \
             file://0035-ARM-dts-aspeed-Add-Titanite-initial-device-tree.patch \
             file://0041-drivers-soc-aspeed-add-lpc-pcc-driver.patch \
+            file://0042-ARM-dts-aspeed-Add-LPC-PCC-dts-for-sp5.patch \
             "
 

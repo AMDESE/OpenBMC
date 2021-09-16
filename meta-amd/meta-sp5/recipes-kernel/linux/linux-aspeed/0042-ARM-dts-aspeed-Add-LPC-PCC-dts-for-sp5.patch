@@ -1,0 +1,123 @@
+From 8fee37976d21b07d1c778e81df5dfa0c2002b10b Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Thu, 16 Sep 2021 04:03:01 -0500
+Subject: [PATCH] ARM dts aspeed Add LPC-PCC dts for sp5
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts     | 14 ++++++++++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts   | 14 ++++++++++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts     | 14 ++++++++++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts | 14 ++++++++++++++
+ arch/arm/boot/dts/aspeed-g6.dtsi              |  7 +++++++
+ 5 files changed, 63 insertions(+)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+index 6d9f510f335a..5e32d9326521 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+@@ -688,3 +688,17 @@
+ 	status = "okay";
+ };
+
++&lpc_ctrl {
++	status = "okay";
++};
++
++&lpc_snoop {
++	status = "okay";
++	snoop-ports = <0x80>;
++};
++
++&lpc_pcc {
++	port-addr = <0x80>;
++	dma-mode;
++	status = "okay";
++};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+index b851f74313e1..d872a9601eba 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+@@ -808,3 +808,17 @@
+ 	status = "okay";
+ };
+
++&lpc_ctrl {
++	status = "okay";
++};
++
++&lpc_snoop {
++	status = "okay";
++	snoop-ports = <0x80>;
++};
++
++&lpc_pcc {
++	port-addr = <0x80>;
++	dma-mode;
++	status = "okay";
++};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+index a2f2a89b561e..291fd3c470fa 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+@@ -416,3 +416,17 @@
+ 	status = "okay";
+ };
+
++&lpc_ctrl {
++	status = "okay";
++};
++
++&lpc_snoop {
++	status = "okay";
++	snoop-ports = <0x80>;
++};
++
++&lpc_pcc {
++	port-addr = <0x80>;
++	dma-mode;
++	status = "okay";
++};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts b/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
+index 785e1d88b9ff..3e74314a02bd 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
+@@ -397,3 +397,17 @@
+ 	status = "okay";
+ };
+
++&lpc_ctrl {
++	status = "okay";
++};
++
++&lpc_snoop {
++	status = "okay";
++	snoop-ports = <0x80>;
++};
++
++&lpc_pcc {
++	port-addr = <0x80>;
++	dma-mode;
++	status = "okay";
++};
+diff --git a/arch/arm/boot/dts/aspeed-g6.dtsi b/arch/arm/boot/dts/aspeed-g6.dtsi
+index 29091cb12434..f99d03d52f4e 100644
+--- a/arch/arm/boot/dts/aspeed-g6.dtsi
++++ b/arch/arm/boot/dts/aspeed-g6.dtsi
+@@ -577,6 +577,13 @@
+ 					status = "disabled";
+ 				};
+
++				lpc_pcc: lpc-pcc@0 {
++					compatible = "aspeed,ast2600-lpc-pcc";
++					reg = <0x0 0x140>;
++					interrupts = <GIC_SPI 145 IRQ_TYPE_LEVEL_HIGH>;
++					status = "disabled";
++				};
++
+ 				lhc: lhc@a0 {
+ 					compatible = "aspeed,ast2600-lhc";
+ 					reg = <0xa0 0x24 0xc8 0x8>;
+--
+2.17.1
+
