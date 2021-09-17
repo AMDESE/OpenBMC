@@ -1,0 +1,29 @@
+From 17bc54246afacd6e2c035709432619d8de44bab5 Mon Sep 17 00:00:00 2001
+From: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
+Date: Fri, 17 Sep 2021 16:40:54 -0500
+Subject: [PATCH 1/1] u-boot-aspeed-sdk: Enable display port for HAWAII
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+Enables display port for HAWAII in the device tree.
+
+Signed-off-by: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
+---
+ arch/arm/dts/ast2600-hawaii.dts | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm/dts/ast2600-hawaii.dts b/arch/arm/dts/ast2600-hawaii.dts
+index 94118ee5c8..97764f145c 100644
+--- a/arch/arm/dts/ast2600-hawaii.dts
++++ b/arch/arm/dts/ast2600-hawaii.dts
+@@ -201,3 +201,7 @@
+ &hace {
+ 	status = "okay";
+ };
++
++&display_port {
++	status = "okay";
++};
+--
+2.17.1
+
