@@ -39,5 +39,6 @@ SRC_URI += "file://sp5.cfg \
             file://0041-drivers-soc-aspeed-add-lpc-pcc-driver.patch \
             file://0042-ARM-dts-aspeed-Add-LPC-PCC-dts-for-sp5.patch \
             file://0043-ARM-dts-aspeed-enable-kcs-interface-for-SP5-platform.patch \
+            file://0044-ARM-dts-aspeed-add-memory-region-to-LPC-PCC-for-sp5.patch \
             "
 
