@@ -1,0 +1,105 @@
+From abc5385abb2d8c2b25fd4930b29329e6078cfb2a Mon Sep 17 00:00:00 2001
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Wed, 22 Sep 2021 11:27:40 -0500
+Subject: [PATCH 1/1] phosphor-network board_id added for hostname
+
+board_id added for Onyx, Quartz, Ruby and Titanite
+
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ system_configuration.cpp | 64 ++++++++++++++++++++++++++++++++--------
+ 1 file changed, 52 insertions(+), 12 deletions(-)
+
+diff --git a/system_configuration.cpp b/system_configuration.cpp
+index 3f432e0..497429b 100644
+--- a/system_configuration.cpp
++++ b/system_configuration.cpp
+@@ -19,9 +19,27 @@ constexpr auto HOSTNAMED_INTERFACE = "org.freedesktop.hostname1";
+ constexpr auto PROPERTY_INTERFACE = "org.freedesktop.DBus.Properties";
+ constexpr auto METHOD_GET = "Get";
+ constexpr auto METHOD_SET = "SetStaticHostname";
+-constexpr auto LAST4MACPOS = 12;
+-constexpr auto LAST4MACLEN = 5;
+-constexpr auto ONYX_G_ID = "40";
++constexpr auto LAST4MACPOS  = 12;
++constexpr auto LAST4MACLEN  = 5;
++constexpr auto ONYX_SLT     = 61;   //0x3D
++constexpr auto ONYX_1       = 64;   //0x40
++constexpr auto ONYX_2       = 65;   //0x41
++constexpr auto ONYX_3       = 66;   //0x42
++constexpr auto ONYX_FR4     = 82;   //0x52
++constexpr auto QUARTZ_DAP   = 62;   //0x3E
++constexpr auto QUARTZ_1     = 67;   //0x43
++constexpr auto QUARTZ_2     = 68;   //0x44
++constexpr auto QUARTZ_3     = 69;   //0x45
++constexpr auto QUARTZ_FR4   = 81;   //0x51
++constexpr auto RUBY_1       = 70;   //0x46
++constexpr auto RUBY_2       = 71;   //0x47
++constexpr auto RUBY_3       = 72;   //0x48
++constexpr auto TITANITE_1   = 73;   //0x49
++constexpr auto TITANITE_2   = 74;   //0x4A
++constexpr auto TITANITE_3   = 75;   //0x4B
++constexpr auto TITANITE_4   = 76;   //0x4C
++constexpr auto TITANITE_5   = 77;   //0x4D
++constexpr auto TITANITE_6   = 78;   //0x4E
+
+ #define COMMAND_BOARD_ID    ("/sbin/fw_printenv -n board_id")
+ #define COMMAND_OUTPUT_LEN  (8)
+@@ -127,6 +145,8 @@ std::string SystemConfiguration::setHostName()
+     std::string name;
+     std::string boardID;
+     char * data = (char*)malloc(8);
++    unsigned int board_id;
++    std::stringstream ss;
+
+     auto macLast4 = macAddress.substr (LAST4MACPOS, LAST4MACLEN);
+
+@@ -137,16 +157,36 @@ std::string SystemConfiguration::setHostName()
+
+     if (getPlatformID(data)) {
+         boardID = data;
+-        if (boardID.compare(0, 2, ONYX_G_ID) == 0)
+-        {
+-            name = "Onyx-" + macLast4;
+-            log<level::INFO>("Hostname : ",  entry("name = %s", name.c_str()));
+-        }
+-        else
++        ss << std::hex << boardID;
++        ss >> board_id;
++
++        switch (board_id)
+         {
+-            log<level::ERR>("Invalid board_ID : ",  entry("boardID = %s", boardID.c_str()));
+-            name = "sp5-" + macLast4;
+-        }
++            case ONYX_SLT:
++            case ONYX_1 ... ONYX_3:
++            case ONYX_FR4:
++                name = "Onyx-" + macLast4;
++                log<level::INFO>("Hostname : ",  entry("name = %s", name.c_str()));
++                break;
++            case QUARTZ_DAP:
++            case QUARTZ_1 ... QUARTZ_3:
++            case QUARTZ_FR4:
++                name = "Quartz-" + macLast4;
++                log<level::INFO>("Hostname : ",  entry("name = %s", name.c_str()));
++                break;
++            case RUBY_1 ... RUBY_3:
++                name = "Ruby-" + macLast4;
++                log<level::INFO>("Hostname : ",  entry("name = %s", name.c_str()));
++                break;
++            case TITANITE_1 ... TITANITE_6:
++                name = "Titanite-" + macLast4;
++                log<level::INFO>("Hostname : ",  entry("name = %s", name.c_str()));
++                break;
++            default:
++                log<level::ERR>("Invalid board_ID : ",  entry("boardID = %s", boardID.c_str()));
++                name = "sp5-" + macLast4;
++                break;
++        }//switch
+     }
+     else {
+        name = "sp5-" + macLast4;
+--
+2.17.1
+
