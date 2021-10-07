@@ -114,7 +114,7 @@ if [ $? -eq 0 ];
 then
     echo "SPI Driver Bind Successful"
 else
-    echo "SPI Driver Bind Failed"
+    echo "SPI Driver Bind Failed.Run micron_v2.ini or micron_v3.ini using DediProg."
     set_gpio_to_hpm_fpga
     sleep 5
     exit -1
