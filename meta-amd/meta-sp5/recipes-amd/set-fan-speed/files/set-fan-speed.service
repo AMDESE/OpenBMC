@@ -1,11 +1,11 @@
 [Unit]
-Description=Set all Fan speeds at 50% at boot time
-After=xyz.openbmc_project.User.Manager.service
+Description=Set all Fan speeds at 30% at boot time
+After=dropbearkey.service
 
 [Service]
 Type=oneshot
 RemainAfterExit=no
-ExecStart=/usr/sbin/set-fan-speed.sh 0x80
+ExecStart=/usr/sbin/set-fan-speed.sh 76
 
 [Install]
 WantedBy=multi-user.target
