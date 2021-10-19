@@ -53,7 +53,29 @@
                     "/xyz/openbmc_project/sensors/temperature/LM75A_4F",
 
                     "/xyz/openbmc_project/sensors/temperature/CPU0_Temp",
-                    "/xyz/openbmc_project/sensors/temperature/CPU1_Temp"
+                    "/xyz/openbmc_project/sensors/temperature/CPU1_Temp",
+
+                    "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan1",
+                    "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan2",
+                    "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan3",
+                    "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan4",
+                    "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan5",
+
+                    "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan6",
+                    "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan7",
+                    "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan8",
+                    "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan9",
+                    "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan10",
+
+                    "/xyz/openbmc_project/sensors/fan_tach/P0_CPU_Fan",
+                    "/xyz/openbmc_project/sensors/fan_tach/North_VR_Fan1",
+                    "/xyz/openbmc_project/sensors/fan_tach/North_VR_Fan2",
+                    "/xyz/openbmc_project/sensors/fan_tach/P0_WaterPump_Fan",
+                    "/xyz/openbmc_project/sensors/fan_tach/P0_GL_DIMM_Fan",
+
+                    "/xyz/openbmc_project/sensors/fan_tach/South_VR_Fan1",
+                    "/xyz/openbmc_project/sensors/fan_tach/South_VR_Fan2",
+                    "/xyz/openbmc_project/sensors/fan_tach/P0_AF_DIMM_Fan"
                 ]
             }
         ]
@@ -112,7 +134,29 @@
                     "/xyz/openbmc_project/sensors/temperature/LM75A_4F",
 
                     "/xyz/openbmc_project/sensors/temperature/CPU0_Temp",
-                    "/xyz/openbmc_project/sensors/temperature/CPU1_Temp"
+                    "/xyz/openbmc_project/sensors/temperature/CPU1_Temp",
+
+                    "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan1",
+                    "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan2",
+                    "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan3",
+                    "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan4",
+                    "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan5",
+
+                    "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan6",
+                    "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan7",
+                    "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan8",
+                    "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan9",
+                    "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan10",
+
+                    "/xyz/openbmc_project/sensors/fan_tach/P0_CPU_Fan",
+                    "/xyz/openbmc_project/sensors/fan_tach/North_VR_Fan1",
+                    "/xyz/openbmc_project/sensors/fan_tach/North_VR_Fan2",
+                    "/xyz/openbmc_project/sensors/fan_tach/P0_WaterPump_Fan",
+                    "/xyz/openbmc_project/sensors/fan_tach/P0_GL_DIMM_Fan",
+
+                    "/xyz/openbmc_project/sensors/fan_tach/South_VR_Fan1",
+                    "/xyz/openbmc_project/sensors/fan_tach/South_VR_Fan2",
+                    "/xyz/openbmc_project/sensors/fan_tach/P0_AF_DIMM_Fan"
                 ]
             }
         ]

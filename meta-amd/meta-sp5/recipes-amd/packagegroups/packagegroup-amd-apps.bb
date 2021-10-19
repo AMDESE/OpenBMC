@@ -45,5 +45,6 @@ RDEPENDS_${PN}-system = " \
         phosphor-host-postd \
         phosphor-post-code-manager \
         set-fan-speed \
+        set-associations-path \
         webui-vue \
         "
