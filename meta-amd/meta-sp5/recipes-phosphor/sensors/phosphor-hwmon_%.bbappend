@@ -4,6 +4,10 @@ EXTRA_OECONF_append_sp5 = " --enable-negative-errno-on-fail"
 # Onyx specific sensors
 CHIPS_ONYX = " \
         bus@1e78a000/i2c-bus@180/sbtsi@4c \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@0/emc2305@4d \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@1/emc2305@4d \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@2/emc2305@4d \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@3/emc2305@4d \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@48 \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@49 \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4a \
@@ -24,6 +28,11 @@ CHIPS_ONYX = " \
 CHIPS_QUARTZ = " \
         bus@1e78a000/i2c-bus@180/sbtsi@4c \
         bus@1e78a000/i2c-bus@200/sbtsi@48 \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@0/emc2305@4d \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@1/emc2305@4d \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@2/emc2305@4d \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@3/emc2305@4d \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@4/emc2305@4d \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@48 \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@49 \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4a \
