@@ -41,5 +41,6 @@ SRC_URI += "file://sp5.cfg \
             file://0043-ARM-dts-aspeed-enable-kcs-interface-for-SP5-platform.patch \
             file://0044-ARM-dts-aspeed-add-memory-region-to-LPC-PCC-for-sp5.patch \
             file://0045-ARM-dts-aspeed-add-board-eeproms-for-sp5-platforms.patch \
+            file://0046-drivers-soc-aspeed-pcc-Enable-port-80h-83h-snooping.patch \
             "
 
