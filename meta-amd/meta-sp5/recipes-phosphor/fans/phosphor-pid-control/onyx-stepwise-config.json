@@ -1,0 +1,250 @@
+{
+    "version" : "AMD-Onyx-Stepwise-v01",
+    "sensors" : [
+        {
+            "name": "Chassis_Fan1",
+            "type": "fan",
+            "readPath": "/sys/class/hwmon/hwmon0/pwm1",
+            "writePath": "/sys/class/hwmon/hwmon0/pwm1",
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "Chassis_Fan2",
+            "type": "fan",
+            "readPath": "/sys/class/hwmon/hwmon0/pwm2",
+            "writePath": "/sys/class/hwmon/hwmon0/pwm2",
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "Chassis_Fan3",
+            "type": "fan",
+            "readPath": "/sys/class/hwmon/hwmon0/pwm3",
+            "writePath": "/sys/class/hwmon/hwmon0/pwm3",
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "Chassis_Fan4",
+            "type": "fan",
+            "readPath": "/sys/class/hwmon/hwmon0/pwm4",
+            "writePath": "/sys/class/hwmon/hwmon0/pwm4",
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "Chassis_Fan5",
+            "type": "fan",
+            "readPath": "/sys/class/hwmon/hwmon0/pwm5",
+            "writePath": "/sys/class/hwmon/hwmon0/pwm5",
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "Chassis_Fan6",
+            "type": "fan",
+            "readPath": "/sys/class/hwmon/hwmon1/pwm1",
+            "writePath": "/sys/class/hwmon/hwmon1/pwm1",
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "Chassis_Fan7",
+            "type": "fan",
+            "readPath": "/sys/class/hwmon/hwmon1/pwm2",
+            "writePath": "/sys/class/hwmon/hwmon1/pwm2",
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "Chassis_Fan8",
+            "type": "fan",
+            "readPath": "/sys/class/hwmon/hwmon1/pwm3",
+            "writePath": "/sys/class/hwmon/hwmon1/pwm3",
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "Chassis_Fan9",
+            "type": "fan",
+            "readPath": "/sys/class/hwmon/hwmon1/pwm4",
+            "writePath": "/sys/class/hwmon/hwmon1/pwm4",
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "Chassis_Fan10",
+            "type": "fan",
+            "readPath": "/sys/class/hwmon/hwmon1/pwm5",
+            "writePath": "/sys/class/hwmon/hwmon1/pwm5",
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "P0_CPU_Fan",
+            "type": "fan",
+            "readPath": "/sys/class/hwmon/hwmon2/pwm1",
+            "writePath": "/sys/class/hwmon/hwmon2/pwm1",
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "North_VR_Fan1",
+            "type": "fan",
+            "readPath": "/sys/class/hwmon/hwmon2/pwm2",
+            "writePath": "/sys/class/hwmon/hwmon2/pwm2",
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "North_VR_Fan2",
+            "type": "fan",
+            "readPath": "/sys/class/hwmon/hwmon2/pwm3",
+            "writePath": "/sys/class/hwmon/hwmon2/pwm3",
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "P0_GL_DIMM_Fan",
+            "type": "fan",
+            "readPath": "/sys/class/hwmon/hwmon2/pwm5",
+            "writePath": "/sys/class/hwmon/hwmon2/pwm5",
+            "min":0,
+            "max": 255
+        },
+        {
+            "name": "South_VR_Fan1",
+            "type": "fan",
+            "readPath": "/sys/class/hwmon/hwmon3/pwm1",
+            "writePath": "/sys/class/hwmon/hwmon3/pwm1",
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "South_VR_Fan2",
+            "type": "fan",
+            "readPath": "/sys/class/hwmon/hwmon3/pwm2",
+            "writePath": "/sys/class/hwmon/hwmon3/pwm2",
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "P0_AF_DIMM_Fan",
+            "type": "fan",
+            "readPath": "/sys/class/hwmon/hwmon3/pwm4",
+            "writePath": "/sys/class/hwmon/hwmon3/pwm4",
+            "min": 0,
+            "max": 255
+        },
+        {
+            "name": "CPU0",
+            "type": "temp",
+            "readPath": "/sys/class/hwmon/hwmon12/temp1_input",
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        }
+    ],
+
+    "zones" : [
+        {
+            "id": 0,
+            "minThermalOutput": 10.0,
+            "failsafePercent": 30.0,
+            "pids": [
+                {
+                    "name": "Chassis_Fan1-17",
+                    "type": "fan",
+                    "inputs": ["Chassis_Fan1",
+                               "Chassis_Fan2",
+                               "Chassis_Fan3",
+                               "Chassis_Fan4",
+                               "Chassis_Fan5",
+                               "Chassis_Fan6",
+                               "Chassis_Fan7",
+                               "Chassis_Fan8",
+                               "Chassis_Fan9",
+                               "Chassis_Fan10",
+                               "P0_CPU_Fan",
+                               "North_VR_Fan1",
+                               "North_VR_Fan2",
+                               "P0_GL_DIMM_Fan",
+                               "South_VR_Fan1",
+                               "South_VR_Fan2",
+                               "P0_AF_DIMM_Fan"],
+                    "setpoint": 20.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": 0.0,
+                        "integralCoeff": 0.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 1.0,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 10.0,
+                        "outLim_max": 90.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0
+                    }
+                },
+                {
+                    "name": "CPU0",
+                    "type": "stepwise",
+                    "inputs": ["CPU0"],
+                    "setpoint": 20.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0,
+                        "isCeiling": false,
+                        "reading": {
+                            "0": 10,
+                            "1": 20,
+                            "2": 30,
+                            "3": 40,
+                            "4": 50,
+                            "5": 60,
+                            "6": 70,
+                            "7": 73,
+                            "8": 77,
+                            "9": 80,
+                            "10": 82,
+                            "11": 85,
+                            "12": 90,
+                            "13": 95,
+                            "14": 100,
+                            "15": 105,
+                            "16": 110,
+                            "17": 115,
+                            "18": 120,
+                            "19": 125
+                        },
+                        "output": {
+                            "0": 30,
+                            "1": 30,
+                            "2": 30,
+                            "3": 30,
+                            "4": 30,
+                            "5": 30,
+                            "6": 30,
+                            "7": 40,
+                            "8": 50,
+                            "9": 60,
+                            "10": 70,
+                            "11": 75,
+                            "12": 75,
+                            "13": 75,
+                            "14": 100,
+                            "15": 100,
+                            "16": 100,
+                            "17": 100,
+                            "18": 100,
+                            "19": 100
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
+
