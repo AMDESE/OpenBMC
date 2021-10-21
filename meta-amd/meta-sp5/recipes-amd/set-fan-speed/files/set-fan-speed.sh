@@ -61,9 +61,9 @@ set_pump_fan_speed()
    echo "Number of emc2305 controllers: ${curr_emc2305_ctrl}"
    if [[ $curr_emc2305_ctrl -eq 4 ]]; then
         # Set Onyx pump fan speed
-        # Pump fan is on emc2305 controller# 3, fan#2
+        # Pump fan is on emc2305 controller# 3, fan#4
         echo "Setting Onyx Pump Fans at full speed...."
-        i2cset -f -y ${i2c_bus_array[2]} $EMC2305_DEV ${FAN_SET_REG[1]} $speed_val
+        i2cset -f -y ${i2c_bus_array[2]} $EMC2305_DEV ${FAN_SET_REG[3]} $speed_val
         if [ $? -ne 0 ]; then
             echo "Error: Setting Pump fan speed failed.."
         fi
