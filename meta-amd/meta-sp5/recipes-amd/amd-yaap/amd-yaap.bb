@@ -27,8 +27,10 @@ do_install() {
   cp --preserve=mode,timestamps -R ${S}/Source/Linux/bmc/yaapd ${D}${bindir}/
   install -d ${D}/${systemd_unitdir}/system
   install -m 0644 ${S}/yaapd.service ${D}/${systemd_unitdir}/system
-  install -d ${D}${sysconfdir}/${BPN}
-  install -m 0644 ${S}/coolreset.txt ${D}${sysconfdir}/${BPN}/
+  install -d ${D}${sysconfdir}/${BPN}/1P
+  install -d ${D}${sysconfdir}/${BPN}/2P
+  install -m 0644 ${S}/Data/1P/* ${D}${sysconfdir}/${BPN}/1P/
+  install -m 0644 ${S}/Data/2P/* ${D}${sysconfdir}/${BPN}/2P/
 }
 
 

@@ -1,6 +1,6 @@
-From 6a516733c7881369a27bd444844f96b381255009 Mon Sep 17 00:00:00 2001
+From b6998fa07e248949d09777a4cf30e7a7b825b978 Mon Sep 17 00:00:00 2001
 From: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
-Date: Thu, 5 Aug 2021 00:10:57 -0500
+Date: Sun, 24 Oct 2021 09:21:51 -0500
 Subject: [PATCH 1/1] amd-yaap: Add firmware soft fuse feature
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
@@ -10,16 +10,16 @@ Adds support for firmware soft fuse feature.
 Signed-off-by: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
 ---
  Source/Linux/bmc/Makefile         |  5 ++-
- Source/Linux/bmc/hw/jtag_hw.cpp   | 59 ++++++++++++++++++++++------
+ Source/Linux/bmc/hw/aspeed.h      |  1 +
+ Source/Linux/bmc/hw/hdt_hw.cpp    | 21 +++++++--
+ Source/Linux/bmc/hw/jtag_hw.cpp   | 71 ++++++++++++++++++++++++++-----
  Source/Linux/bmc/hw/jtag_hw.h     |  1 +
- Source/Linux/bmc/hw/psp_sfmon.cpp | 64 +++++++++++++++++++++++++++++++
- Source/Linux/bmc/hw/psp_sfmon.h   | 64 +++++++++++++++++++++++++++++++
- Source/Linux/bmc/main.cpp         | 21 +++++++++-
- coolreset.txt                     | 15 ++++++++
- 7 files changed, 215 insertions(+), 14 deletions(-)
+ Source/Linux/bmc/hw/psp_sfmon.cpp | 64 ++++++++++++++++++++++++++++
+ Source/Linux/bmc/hw/psp_sfmon.h   | 64 ++++++++++++++++++++++++++++
+ Source/Linux/bmc/main.cpp         | 21 +++++++++
+ 8 files changed, 231 insertions(+), 17 deletions(-)
  create mode 100644 Source/Linux/bmc/hw/psp_sfmon.cpp
  create mode 100644 Source/Linux/bmc/hw/psp_sfmon.h
- create mode 100644 coolreset.txt
 
 diff --git a/Source/Linux/bmc/Makefile b/Source/Linux/bmc/Makefile
 index 9560ca2..4edf59d 100644
@@ -44,11 +44,76 @@ index 9560ca2..4edf59d 100644
 
  %.d: %.c
  	$(CC) -MM -MT "$*.o" -MT "$*.d" $(CFLAGS) $< > $@
+diff --git a/Source/Linux/bmc/hw/aspeed.h b/Source/Linux/bmc/hw/aspeed.h
+index 7ea84c6..d2e6a5e 100644
+--- a/Source/Linux/bmc/hw/aspeed.h
++++ b/Source/Linux/bmc/hw/aspeed.h
+@@ -78,6 +78,7 @@ extern const std::string warmResetButtonName;
+ extern const std::string fpgaReservedButtonName;
+ extern const std::string jtagTRSTName;
+
++extern bool is2PSystem;
+
+ extern int  getGPIOValue(const std::string& name);
+ extern bool setGPIOValue(const std::string& name, const int value);
+diff --git a/Source/Linux/bmc/hw/hdt_hw.cpp b/Source/Linux/bmc/hw/hdt_hw.cpp
+index 16fc17b..e83cfdf 100644
+--- a/Source/Linux/bmc/hw/hdt_hw.cpp
++++ b/Source/Linux/bmc/hw/hdt_hw.cpp
+@@ -62,12 +62,15 @@
+ #include <unistd.h>
+ #include <stdio.h>
+ #include <gpiod.hpp>
++#include <inttypes.h>
+ #include "hdt_hw.h"
+ #include "infrastructure/debug.h"
+
+ int JTAG_get_idcode (int fd, int device)
+ {
+-    uint32_t idcode;
++    uint64_t idcode;
++    uint32_t idcode32_l;
++    uint32_t idcode32_h;
+     struct jtag_tap_state tap_state;
+     struct jtag_xfer xfer;
+     struct jtag_mode mode;
+@@ -92,7 +95,7 @@ int JTAG_get_idcode (int fd, int device)
+     tap_state.reset = JTAG_FORCE_RESET;
+     tap_state.from = JTAG_STATE_CURRENT;
+     tap_state.endstate = JTAG_STATE_TLRESET;
+-    tap_state.tck = 5;
++    tap_state.tck = 10;
+
+     test = ioctl (fd, JTAG_SIOCSTATE, &tap_state);
+     if (test < 0) {
+@@ -116,10 +119,20 @@ int JTAG_get_idcode (int fd, int device)
+      return -1;
+     }
+
+-    idcode = *(uint32_t *)(xfer.tdio);
++    idcode = *(uint64_t *)(xfer.tdio);
+
+-    DEBUG_PRINT(DEBUG_INFO, "%s_IDCODE=%08x \n",device?"CPU":"FPGA",idcode);
++    DEBUG_PRINT(DEBUG_INFO, "%s_IDCODE=0x%" PRIx64 "\n",device?"CPU":"FPGA",idcode);
+
++    idcode32_l = (uint32_t)(idcode & 0xFFFFFFFF);
++    idcode32_h = (uint32_t)((idcode & 0xFFFFFFFF00000000) >> 32);
++
++    DEBUG_PRINT(DEBUG_INFO, "Lower_IDCODE=0x%x, Higher_IDCODE=0x%x\n",idcode32_l, idcode32_h);
++    if (idcode32_l == idcode32_h)
++    {
++      DEBUG_PRINT(DEBUG_INFO, "2P System\n");
++      is2PSystem = true;
++
++    }
+     //select jtag mux setting '1',default
+     setGPIOValue(hdtSelName, 0);
+
 diff --git a/Source/Linux/bmc/hw/jtag_hw.cpp b/Source/Linux/bmc/hw/jtag_hw.cpp
-index 494a625..ef8597e 100644
+index 9631681..41f85cc 100644
 --- a/Source/Linux/bmc/hw/jtag_hw.cpp
 +++ b/Source/Linux/bmc/hw/jtag_hw.cpp
-@@ -74,25 +74,62 @@
+@@ -74,25 +74,74 @@
  #include <stdio.h>
  #include "infrastructure/debug.h"
 
@@ -78,10 +143,10 @@ index 494a625..ef8597e 100644
 +            DEBUG_PRINT(DEBUG_INFO," \n");
 +        }
      }
--}
--return 0;
 +    return 0;
  }
+-return 0;
+-}
 
 +void bmc::JtagHw::coolreset()
 +{
@@ -91,13 +156,25 @@ index 494a625..ef8597e 100644
 +    int     bits = 0;
 +    FILE *file;
 +    enum yaap::hal::jtagOp op;
++    char filePath[COOL_RESET_MAX_SIZE] = {0};
 +
 +    // Enable jtag mux
 +    setGPIOValue(hdtSelName, 1);
 +    // Reset Tap State
 +    tapStateSet(yaap::hal::JTAG_STATE_TLR);
 +
-+    file = fopen("/etc/amd-yaap/coolreset.txt", "r");
++    if(is2PSystem == true)
++    {
++      DEBUG_PRINT(DEBUG_INFO, "2P System\n");
++      strcpy(filePath, "/etc/amd-yaap/2P/coolreset.txt");
++    }
++    else
++    {
++      DEBUG_PRINT(DEBUG_INFO, "1P System\n");
++      strcpy(filePath, "/etc/amd-yaap/1P/coolreset.txt");
++    }
++
++    file = fopen(filePath, "r");
 +    while(!feof(file))
 +    {
 +      fscanf(file, "%x\t%d\t", &operation, &bits);
@@ -275,7 +352,7 @@ index 0000000..6f9cd81
 +    void requestGPIOEvents();
 +};
 diff --git a/Source/Linux/bmc/main.cpp b/Source/Linux/bmc/main.cpp
-index dd54c51..e372865 100644
+index dd54c51..587d840 100644
 --- a/Source/Linux/bmc/main.cpp
 +++ b/Source/Linux/bmc/main.cpp
 @@ -58,6 +58,8 @@
@@ -295,15 +372,15 @@ index dd54c51..e372865 100644
 
  #include "infrastructure/socketHandler.h"
 
-@@ -102,7 +105,6 @@ const std::string warmResetButtonName = "ASSERT_WARM_RST_BTN_L";
+@@ -102,6 +105,7 @@ const std::string warmResetButtonName = "ASSERT_WARM_RST_BTN_L";
  const std::string fpgaReservedButtonName = "ASSERT_SOC_RST_BTN_L";
  const std::string jtagTRSTName = "JTAG_TRST_N";
 
--
++bool is2PSystem = false;
+
  #ifndef CONSUMER
  #define CONSUMER "Consumer"
- #endif
-@@ -194,6 +196,9 @@ int main(int argc, char *argv[])
+@@ -194,6 +198,9 @@ int main(int argc, char *argv[])
      int yaapPort = DEFAULT_YAAP_PORT;
      int yaapTimeout = -1;
 
@@ -313,7 +390,7 @@ index dd54c51..e372865 100644
      // Parse command line
      if (argc > 1) {
          for (i = 0; i < argc; i++) {
-@@ -283,6 +288,20 @@ int main(int argc, char *argv[])
+@@ -283,6 +290,20 @@ int main(int argc, char *argv[])
          socketHandler::setConnectionTimeout(yaapTimeout);
      }
 
@@ -334,27 +411,6 @@ index dd54c51..e372865 100644
      // Start the YAAP server...
      return startServer(yaapPort, __debugLevel__);
  }
-diff --git a/coolreset.txt b/coolreset.txt
-new file mode 100644
-index 0000000..8304467
---- /dev/null
-+++ b/coolreset.txt
-@@ -0,0 +1,15 @@
-+0	8	03	
-+1	6	01	
-+0	8	13	
-+1	2	01	
-+1	11	13	02	
-+1	17	00	88	00	
-+1	26	13	00	10	01	
-+1	62	00	00	00	00	20	00	00	11	
-+1	71	03	00	00	00	00	40	00	00	22	
-+1	66	01	00	00	00	00	02	00	10	01	
-+1	76	9F	05	00	00	00	00	08	00	40	04	
-+1	77	0D	08	00	00	00	00	10	00	80	08	
-+1	77	05	08	00	00	00	00	10	00	80	08	
-+1	77	06	08	00	00	00	00	10	00	80	08	
-+1	77	0A	44	00	00	00	00	00	08	00	0C	
 --
 2.17.1
 
