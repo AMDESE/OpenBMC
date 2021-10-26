@@ -46,5 +46,6 @@ SRC_URI += "file://sp5.cfg \
             file://0046-drivers-soc-aspeed-pcc-Enable-port-80h-83h-snooping.patch \
             file://0047-ARM-dts-aspeed-enable-pcc-record-mode-for-SP5-platfo.patch \
             file://0048-drivers-mtd-spi-nor-Add-support-for-Gigadevice-flash.patch \
+            file://0049-linux-drivers-Update-JTAG-drivers-from-Aspeed.patch \
             "
 
