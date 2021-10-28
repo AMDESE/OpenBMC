@@ -104,7 +104,7 @@ if [ $? -eq 0 ];
 then
     echo "SPI Driver Bind Successful"
 else
-    echo "SPI Driver Bind Failed"
+    echo "SPI Driver Bind Failed.Run micron_v2.ini or micron_v3.ini using DediProg."
     set_gpio_to_scm_fpga
     sleep 5
     exit -1
@@ -123,11 +123,12 @@ then
             mtd=`cat /sys/class/mtd/$d/name`
             if [ $mtd == "pnor" ]; then
                 echo "Flashing scm fpga image to $d..."
-                flashcp -v $IMAGE_FILE /dev/$d
+                flash_eraseall /dev/$d
+                dd if=$IMAGE_FILE of=/dev/$d bs=4096
                 if [ $? -eq 0 ]; then
-                    echo "scm fpga updated successfully..."
+                    echo "scm fpga updated successfully."
                 else
-                    echo "scm fpga update failed..."
+                    echo "scm fpga update failed."
                 fi
                 break
             fi
