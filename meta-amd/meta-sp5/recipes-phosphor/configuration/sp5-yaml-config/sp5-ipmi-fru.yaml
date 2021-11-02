@@ -57,3 +57,4 @@
         AssetTag:
           IPMIFruProperty: Asset Tag
           IPMIFruSection: Product
+      xyz.openbmc_project.Inventory.Item.System:
