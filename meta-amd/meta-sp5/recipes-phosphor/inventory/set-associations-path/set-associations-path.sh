@@ -15,6 +15,9 @@ sync_associations_path() {
            "3E"|"43"|"44"|"45"|"51")  # Quartz board_ids
                 ln -s  /usr/share/phosphor-inventory-manager/quartz-associations.json /usr/share/phosphor-inventory-manager/associations.json
            ;;
+           "46"|"47"|"48")  # Ruby board_ids
+                ln -s  /usr/share/phosphor-inventory-manager/ruby-associations.json /usr/share/phosphor-inventory-manager/associations.json
+           ;;
            *)  # Default set to Quartz board
                 ln -s  /usr/share/phosphor-inventory-manager/quartz-associations.json /usr/share/phosphor-inventory-manager/associations.json
     esac

@@ -19,6 +19,9 @@ case $boardID in
    "3E"|"43"|"44"|"45"|"51")  # Quartz board_ids
         ln -s /usr/share/swampd/quartz-stepwise-config.json /usr/share/swampd/config.json
    ;;
+   "46"|"47"|"48")  # Ruby board_ids
+        ln -s /usr/share/swampd/ruby-stepwise-config.json /usr/share/swampd/config.json
+   ;;
    *)  # Default set to Quartz board, as it have most fans connected
         ln -s /usr/share/swampd/quartz-stepwise-config.json /usr/share/swampd/config.json
 esac

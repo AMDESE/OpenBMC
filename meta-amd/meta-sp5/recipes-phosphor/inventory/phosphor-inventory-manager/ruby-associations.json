@@ -1,0 +1,64 @@
+[
+    {
+        "path": "system/chassis/motherboard",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_48",
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_49",
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_4A",
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_4B",
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_4C",
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_4D",
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_4E",
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_4F",
+
+                    "/xyz/openbmc_project/sensors/temperature/CPU0_Temp",
+
+                    "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan1",
+                    "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan2",
+                    "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan3",
+                    "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan4"
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "chassis",
+                    "fType": "all_sensors"
+                },
+                "paths":
+                [
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_48",
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_49",
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_4A",
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_4B",
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_4C",
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_4D",
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_4E",
+                    "/xyz/openbmc_project/sensors/temperature/LM75A_4F",
+
+                    "/xyz/openbmc_project/sensors/temperature/CPU0_Temp",
+
+                    "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan1",
+                    "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan2",
+                    "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan3",
+                    "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan4"
+                ]
+            }
+        ]
+    }
+]
