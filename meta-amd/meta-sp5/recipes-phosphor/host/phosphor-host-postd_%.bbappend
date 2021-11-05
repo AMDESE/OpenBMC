@@ -5,5 +5,7 @@ S = "${WORKDIR}/git"
 SNOOP_DEVICE = "aspeed-lpc-pcc"
 POST_CODE_BYTES = "8"
 
-SRC_URI += "file://0001-espi-post-code-capture-handler.patch"
+SRC_URI += "file://0001-espi-post-code-capture-handler.patch \
+            file://0002-fix-to-return-four-byte-post-code.patch \
+            "
 
