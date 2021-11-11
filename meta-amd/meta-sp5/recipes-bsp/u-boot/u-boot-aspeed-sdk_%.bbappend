@@ -12,5 +12,6 @@ SRC_URI += "file://0001-Add-Initial-u-boot-configuration.patch \
             file://0008-u-boot-sdk-Add-additional-board_id-codes.patch \
             file://0010-u-boot-aspeed-sdk-Enable-display-port-for-HAWAII.patch \
             file://0011-u-boot-Modify-default-dts-selection-to-quartz.patch \
+            file://0012-u-boot-aspeed-sdk-Modify-board_id-and-dts-bug-fix.patch \
             file://sp5-u-boot.cfg \
             "
