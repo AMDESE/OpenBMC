@@ -5,6 +5,7 @@ set -e
 
 GPIOCHIP=816
 GPIO_CLR_CMOS=$((${GPIOCHIP} + 98))
+choice=$1
 
 # Host power controls
 POWER_CMD_OFF="busctl set-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis RequestedPowerTransition s xyz.openbmc_project.State.Chassis.Transition.Off"
@@ -58,9 +59,12 @@ clear_cmos()
 # Check Host power status
 if [ $(power_status) != "off" ];
 then
-    echo "Warning : Host is powered 'ON'"
-    echo "It will be powered OFF before clearing CMOS\n"
-    read -r -p  "Do You want to continue? (Y/N): " choice
+    if [ -z $choice ]
+    then
+        echo "Warning : Host is powered 'ON'"
+        echo "It will be powered OFF before clearing CMOS\n"
+        read -r -p  "Do You want to continue? (Y/N): " choice
+    fi
     if [ "$choice" != 'Y' ] && [ "$choice" != 'y' ]; then
         exit -1
     fi
