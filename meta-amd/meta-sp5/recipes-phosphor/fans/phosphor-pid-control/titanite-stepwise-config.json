@@ -1,0 +1,211 @@
+{
+    "version" : "AMD-Titanite-Stepwise-v01",
+    "sensors" : [
+        {
+            "name": "FAN_SYS0_0",
+            "type": "fan",
+            "readPath": "/sys/class/hwmon/hwmon10/pwm1",
+            "writePath": "/sys/class/hwmon/hwmon10/pwm1",
+            "min": 0,
+            "max": 100
+        },
+        {
+            "name": "FAN_SYS0_1",
+            "type": "fan",
+            "readPath": "/sys/class/hwmon/hwmon10/pwm1",
+            "writePath": "/sys/class/hwmon/hwmon10/pwm1",
+            "min": 0,
+            "max": 100
+        },
+        {
+            "name": "FAN_SYS1_0",
+            "type": "fan",
+            "readPath": "/sys/class/hwmon/hwmon10/pwm2",
+            "writePath": "/sys/class/hwmon/hwmon10/pwm2",
+            "min": 0,
+            "max": 100
+        },
+        {
+            "name": "FAN_SYS1_1",
+            "type": "fan",
+            "readPath": "/sys/class/hwmon/hwmon10/pwm2",
+            "writePath": "/sys/class/hwmon/hwmon10/pwm2",
+            "min": 0,
+            "max": 100
+        },
+        {
+            "name": "FAN_SYS2_0",
+            "type": "fan",
+            "readPath": "/sys/class/hwmon/hwmon10/pwm3",
+            "writePath": "/sys/class/hwmon/hwmon10/pwm3",
+            "min": 0,
+            "max": 100
+        },
+        {
+            "name": "FAN_SYS2_1",
+            "type": "fan",
+            "readPath": "/sys/class/hwmon/hwmon10/pwm3",
+            "writePath": "/sys/class/hwmon/hwmon10/pwm3",
+            "min": 0,
+            "max": 100
+        },
+        {
+            "name": "FAN_SYS3_0",
+            "type": "fan",
+            "readPath": "/sys/class/hwmon/hwmon10/pwm4",
+            "writePath": "/sys/class/hwmon/hwmon10/pwm4",
+            "min": 0,
+            "max": 100
+        },
+        {
+            "name": "FAN_SYS3_1",
+            "type": "fan",
+            "readPath": "/sys/class/hwmon/hwmon10/pwm4",
+            "writePath": "/sys/class/hwmon/hwmon10/pwm4",
+            "min": 0,
+            "max": 100
+        },
+        {
+            "name": "FAN_SYS4_0",
+            "type": "fan",
+            "readPath": "/sys/class/hwmon/hwmon10/pwm5",
+            "writePath": "/sys/class/hwmon/hwmon10/pwm5",
+            "min": 0,
+            "max": 100
+        },
+        {
+            "name": "FAN_SYS4_1",
+            "type": "fan",
+            "readPath": "/sys/class/hwmon/hwmon10/pwm5",
+            "writePath": "/sys/class/hwmon/hwmon10/pwm5",
+            "min": 0,
+            "max": 100
+        },
+        {
+            "name": "FAN_SYS5_0",
+            "type": "fan",
+            "readPath": "/sys/class/hwmon/hwmon10/pwm6",
+            "writePath": "/sys/class/hwmon/hwmon10/pwm6",
+            "min": 0,
+            "max": 100
+        },
+        {
+            "name": "FAN_SYS5_1",
+            "type": "fan",
+            "readPath": "/sys/class/hwmon/hwmon10/pwm6",
+            "writePath": "/sys/class/hwmon/hwmon10/pwm6",
+            "min": 0,
+            "max": 100
+        },
+        {
+            "name": "CPU0",
+            "type": "temp",
+            "readPath": "/sys/class/hwmon/hwmon6/temp1_input"
+        },
+        {
+            "name": "CPU1",
+            "type": "temp",
+            "readPath": "/sys/class/hwmon/hwmon7/temp1_input",
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        }
+    ],
+
+    "zones" : [
+        {
+            "id": 0,
+			"name":"SYS_FANS",
+            "minThermalOutput": 10.0,
+            "failsafePercent": 30.0,
+            "pids": [
+                {
+                    "name": "FAN_SYS0_0-5_1",
+                    "type": "fan",
+                    "inputs": ["FAN_SYS0_0",
+                               "FAN_SYS0_1",
+                               "FAN_SYS1_0",
+                               "FAN_SYS1_1",
+                               "FAN_SYS2_0",
+                               "FAN_SYS2_1",
+                               "FAN_SYS3_0",
+                               "FAN_SYS3_1",
+                               "FAN_SYS4_0",
+                               "FAN_SYS4_1",
+                               "FAN_SYS5_0",
+                               "FAN_SYS5_1"],
+                    "setpoint": 20.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": 0.0,
+                        "integralCoeff": 0.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 1.0,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 10.0,
+                        "outLim_max": 90.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0
+                    }
+                },
+                {
+                    "name": "CPU0-1",
+                    "type": "stepwise",
+                    "inputs": ["CPU0", "CPU1"],
+                    "setpoint": 20.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0,
+                        "isCeiling": false,
+                        "reading": {
+                            "0": 10,
+                            "1": 20,
+                            "2": 30,
+                            "3": 40,
+                            "4": 50,
+                            "5": 60,
+                            "6": 70,
+                            "7": 73,
+                            "8": 77,
+                            "9": 80,
+                            "10": 82,
+                            "11": 85,
+                            "12": 90,
+                            "13": 95,
+                            "14": 100,
+                            "15": 105,
+                            "16": 110,
+                            "17": 115,
+                            "18": 120,
+                            "19": 125
+                        },
+                        "output": {
+                            "0": 30,
+                            "1": 30,
+                            "2": 30,
+                            "3": 30,
+                            "4": 30,
+                            "5": 30,
+                            "6": 30,
+                            "7": 40,
+                            "8": 50,
+                            "9": 60,
+                            "10": 70,
+                            "11": 75,
+                            "12": 75,
+                            "13": 75,
+                            "14": 100,
+                            "15": 100,
+                            "16": 100,
+                            "17": 100,
+                            "18": 100,
+                            "19": 100
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
+
