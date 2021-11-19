@@ -49,6 +49,7 @@ RDEPENDS_${PN}-system = " \
         phosphor-pid-control \
         phosphor-host-postd \
         phosphor-post-code-manager \
+        power-capping \
         set-fan-speed \
         set-associations-path \
         webui-vue \
