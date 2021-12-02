@@ -51,4 +51,5 @@ SRC_URI += "file://sp5.cfg \
             file://0051-linux-drivers-Add-fan-driver-for-titanite.patch \
             file://0052-ARM-dts-aspeed-Remove-board-SPD-for-sp5-platforms.patch\
             file://0053-linux-drivers-change-i2c-1-freq-to-50KHz-for-LCD.patch \
+            file://0054-ARM-dts-aspeed-Remove-LCD-Mux-for-sp5.patch \
             "
