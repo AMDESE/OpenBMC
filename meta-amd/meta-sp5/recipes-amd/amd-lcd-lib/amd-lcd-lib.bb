@@ -18,9 +18,6 @@ do_install () {
         install -d ${D}${libdir}
         cp --preserve=mode,timestamps -R ${B}/liblcdlib32* ${D}${libdir}/
 
-        install -d ${D}${bindir}
-        install -m 0755 ${B}/lcdlib_tool ${D}${bindir}/
-
         install -d ${D}${includedir}
         install -m 0644 ${S}/include/lcdlib/* ${D}${includedir}/
 }
