@@ -52,4 +52,5 @@ SRC_URI += "file://sp5.cfg \
             file://0052-ARM-dts-aspeed-Remove-board-SPD-for-sp5-platforms.patch\
             file://0053-linux-drivers-change-i2c-1-freq-to-50KHz-for-LCD.patch \
             file://0054-ARM-dts-aspeed-Remove-LCD-Mux-for-sp5.patch \
+            file://0055-drivers-jtag-Add-runtest-IOCTL.patch \
             "
