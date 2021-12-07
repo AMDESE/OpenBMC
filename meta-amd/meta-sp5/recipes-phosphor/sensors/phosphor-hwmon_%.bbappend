@@ -41,6 +41,18 @@ CHIPS_QUARTZ = " \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4d \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4e \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4f \
+        bus@1e78a000/i2c-bus@300/i2cswitch@70/i2c@0/p0_vdd_core0_run@60 \
+        bus@1e78a000/i2c-bus@300/i2cswitch@70/i2c@0/p0_vdd_core1_run@61 \
+        bus@1e78a000/i2c-bus@300/i2cswitch@70/i2c@0/p0_vdd_vddio_run@62 \
+        bus@1e78a000/i2c-bus@300/i2cswitch@70/i2c@0/p0_vdd_11_sus@63 \
+        bus@1e78a000/i2c-bus@300/i2cswitch@70/i2c@0/p0_vdd_18_dual@64 \
+        bus@1e78a000/i2c-bus@300/i2cswitch@70/i2c@0/p0_vdd_33_dual@65 \
+        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@0/p1_vdd_core0_run@60 \
+        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@0/p1_vdd_core1_run@61 \
+        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@0/p1_vdd_vddio_run@62 \
+        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@0/p1_vdd_11_sus@63 \
+        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@0/p1_vdd_18_dual@64 \
+        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@0/p1_vdd_33_dual@65 \
         "
 
 # Ruby specific sensors
