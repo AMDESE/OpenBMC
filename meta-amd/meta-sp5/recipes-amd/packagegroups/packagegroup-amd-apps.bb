@@ -46,6 +46,7 @@ RDEPENDS_${PN}-system = " \
         first-boot-set-hwmon-path \
         fpga-tools \
         i3c-tools \
+        infineon-vr-update \
         ipmitool \
         phosphor-hostlogger \
         phosphor-pid-control \
