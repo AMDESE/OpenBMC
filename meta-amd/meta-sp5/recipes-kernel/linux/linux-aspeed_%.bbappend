@@ -53,4 +53,5 @@ SRC_URI += "file://sp5.cfg \
             file://0053-linux-drivers-change-i2c-1-freq-to-50KHz-for-LCD.patch \
             file://0054-ARM-dts-aspeed-Remove-LCD-Mux-for-sp5.patch \
             file://0055-drivers-jtag-Add-runtest-IOCTL.patch \
+            file://0056-ARM-dts-aspeed-Add-Quartz-VR-sensors-nodes.patch \
             "
