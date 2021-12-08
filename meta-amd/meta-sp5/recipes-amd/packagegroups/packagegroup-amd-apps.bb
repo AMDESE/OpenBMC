@@ -44,6 +44,7 @@ RDEPENDS_${PN}-system = " \
         bmcweb \
         debug-apps \
         first-boot-set-hwmon-path \
+        fpga-tools \
         i3c-tools \
         ipmitool \
         phosphor-hostlogger \
