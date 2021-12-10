@@ -54,4 +54,5 @@ SRC_URI += "file://sp5.cfg \
             file://0054-ARM-dts-aspeed-Remove-LCD-Mux-for-sp5.patch \
             file://0055-drivers-jtag-Add-runtest-IOCTL.patch \
             file://0056-ARM-dts-aspeed-Add-Quartz-VR-sensors-nodes.patch \
+            file://0057-ARM-dts-aspeed-Increase-bus-frequency-for-APML-i2c-b.patch \
             "
