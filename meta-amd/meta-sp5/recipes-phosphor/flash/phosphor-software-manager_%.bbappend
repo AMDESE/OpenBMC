@@ -8,7 +8,11 @@ SRC_URI += "file://bios-update.sh \
             file://0004-change-backup-version-as-invalid-after-activation.patch \
             file://0005-fix-image-updater-crash-on-invalid-version.patch \
             file://0006-delete-stale-objects-after-activation.patch \
+            file://0007-phosphor-software-manager-Add-LCD-write-for-FW-ver.patch \
             "
+DEPENDS += "amd-lcd-lib"
+
+TARGET_LDFLAGS += " -llcdlib32"
 
 PACKAGECONFIG_append = " flash_bios flash_scm_fpga flash_hpm_fpga"
 RDEPENDS_${PN} += "bash"
