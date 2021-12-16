@@ -7,3 +7,5 @@ EXTRA_OECONF_sp5 = " \
     "
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
+SRC_URI += "file://0001-set-BIOS-boot-type-to-EFI.patch"
+
