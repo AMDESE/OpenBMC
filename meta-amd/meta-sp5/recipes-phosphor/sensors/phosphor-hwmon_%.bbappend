@@ -83,6 +83,7 @@ CHIPS_TITANITE = " \
         "
 ITEMSFMT = "ahb/apb/{0}.conf"
 ITEMS_ONYX = "${@compose_list(d, 'ITEMSFMT', 'CHIPS_ONYX')}"
+ITEMS_ONYX += "iio-hwmon-adc121c.conf"
 ITEMS_QUARTZ = "${@compose_list(d, 'ITEMSFMT', 'CHIPS_QUARTZ')}"
 ITEMS_RUBY = "${@compose_list(d, 'ITEMSFMT', 'CHIPS_RUBY')}"
 ITEMS_TITANITE = "${@compose_list(d, 'ITEMSFMT', 'CHIPS_TITANITE')}"
