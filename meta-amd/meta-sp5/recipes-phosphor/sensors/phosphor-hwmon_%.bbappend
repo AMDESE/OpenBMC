@@ -16,6 +16,7 @@ CHIPS_ONYX = " \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4d \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4e \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4f \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@7/tmp468@48 \
         bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/core0socvrm@40 \
         bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/iovrm@41 \
         bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/core1vrm@42 \
