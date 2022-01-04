@@ -60,4 +60,5 @@ SRC_URI += "file://sp5.cfg \
             file://0060-drivers-soc-aspeed-Add-UDMA-driver.patch \
             file://0061-linux-drivers-Add-tmp468-Temp-sensor-driver.patch \
             file://0062-add-UDMA-engine-node-to-aspeed-g6.patch
+            file://0063-ARM-dts-aspeed-enable-uart-dma-drivers-for-host-console.patch \
             "
