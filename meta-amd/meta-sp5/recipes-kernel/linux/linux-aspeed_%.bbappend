@@ -59,4 +59,5 @@ SRC_URI += "file://sp5.cfg \
             file://0059-ARM-dts-aspeed-Add-Onyx-dts-adc121c-and-tmp468-sensor.patch \
             file://0060-drivers-soc-aspeed-Add-UDMA-driver.patch \
             file://0061-linux-drivers-Add-tmp468-Temp-sensor-driver.patch \
+            file://0062-add-UDMA-engine-node-to-aspeed-g6.patch
             "
