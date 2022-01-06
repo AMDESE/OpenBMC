@@ -4,108 +4,108 @@
         {
             "name": "FAN_SYS0_0",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon10/pwm1",
-            "writePath": "/sys/class/hwmon/hwmon10/pwm1",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS0_0",
+            "writePath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a500.i2c-bus/i2c-9/i2c-16/i2c-17/17-0028/hwmon/**/pwm1",
             "min": 0,
             "max": 100
         },
         {
             "name": "FAN_SYS0_1",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon10/pwm1",
-            "writePath": "/sys/class/hwmon/hwmon10/pwm1",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS0_1",
+            "writePath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a500.i2c-bus/i2c-9/i2c-16/i2c-17/17-0028/hwmon/**/pwm1",
             "min": 0,
             "max": 100
         },
         {
             "name": "FAN_SYS1_0",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon10/pwm2",
-            "writePath": "/sys/class/hwmon/hwmon10/pwm2",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS1_0",
+            "writePath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a500.i2c-bus/i2c-9/i2c-16/i2c-17/17-0028/hwmon/**/pwm2",
             "min": 0,
             "max": 100
         },
         {
             "name": "FAN_SYS1_1",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon10/pwm2",
-            "writePath": "/sys/class/hwmon/hwmon10/pwm2",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS1_1",
+            "writePath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a500.i2c-bus/i2c-9/i2c-16/i2c-17/17-0028/hwmon/**/pwm2",
             "min": 0,
             "max": 100
         },
         {
             "name": "FAN_SYS2_0",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon10/pwm3",
-            "writePath": "/sys/class/hwmon/hwmon10/pwm3",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS2_0",
+            "writePath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a500.i2c-bus/i2c-9/i2c-16/i2c-17/17-0028/hwmon/**/pwm3",
             "min": 0,
             "max": 100
         },
         {
             "name": "FAN_SYS2_1",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon10/pwm3",
-            "writePath": "/sys/class/hwmon/hwmon10/pwm3",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS2_1",
+            "writePath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a500.i2c-bus/i2c-9/i2c-16/i2c-17/17-0028/hwmon/**/pwm3",
             "min": 0,
             "max": 100
         },
         {
             "name": "FAN_SYS3_0",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon10/pwm4",
-            "writePath": "/sys/class/hwmon/hwmon10/pwm4",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS3_0",
+            "writePath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a500.i2c-bus/i2c-9/i2c-16/i2c-17/17-0028/hwmon/**/pwm4",
             "min": 0,
             "max": 100
         },
         {
             "name": "FAN_SYS3_1",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon10/pwm4",
-            "writePath": "/sys/class/hwmon/hwmon10/pwm4",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS3_1",
+            "writePath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a500.i2c-bus/i2c-9/i2c-16/i2c-17/17-0028/hwmon/**/pwm4",
             "min": 0,
             "max": 100
         },
         {
             "name": "FAN_SYS4_0",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon10/pwm5",
-            "writePath": "/sys/class/hwmon/hwmon10/pwm5",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS4_0",
+            "writePath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a500.i2c-bus/i2c-9/i2c-16/i2c-17/17-0028/hwmon/**/pwm5",
             "min": 0,
             "max": 100
         },
         {
             "name": "FAN_SYS4_1",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon10/pwm5",
-            "writePath": "/sys/class/hwmon/hwmon10/pwm5",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS4_1",
+            "writePath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a500.i2c-bus/i2c-9/i2c-16/i2c-17/17-0028/hwmon/**/pwm5",
             "min": 0,
             "max": 100
         },
         {
             "name": "FAN_SYS5_0",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon10/pwm6",
-            "writePath": "/sys/class/hwmon/hwmon10/pwm6",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS5_0",
+            "writePath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a500.i2c-bus/i2c-9/i2c-16/i2c-17/17-0028/hwmon/**/pwm6",
             "min": 0,
             "max": 100
         },
         {
             "name": "FAN_SYS5_1",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon10/pwm6",
-            "writePath": "/sys/class/hwmon/hwmon10/pwm6",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS5_1",
+            "writePath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a500.i2c-bus/i2c-9/i2c-16/i2c-17/17-0028/hwmon/**/pwm6",
             "min": 0,
             "max": 100
         },
         {
-            "name": "CPU0",
+            "name": "CPU0_Temp",
             "type": "temp",
-            "readPath": "/sys/class/hwmon/hwmon6/temp1_input"
+            "readPath": "/xyz/openbmc_project/sensors/temperature/CPU0_Temp"
         },
         {
-            "name": "CPU1",
+            "name": "CPU1_Temp",
             "type": "temp",
-            "readPath": "/sys/class/hwmon/hwmon7/temp1_input",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/CPU1_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         }
@@ -151,7 +151,7 @@
                 {
                     "name": "CPU0-1",
                     "type": "stepwise",
-                    "inputs": ["CPU0", "CPU1"],
+                    "inputs": ["CPU0_Temp", "CPU1_Temp"],
                     "setpoint": 20.0,
                     "pid": {
                         "samplePeriod": 1.0,
