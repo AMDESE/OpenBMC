@@ -61,4 +61,5 @@ SRC_URI += "file://sp5.cfg \
             file://0061-drivers-tty-serial-8250-Add-ASPEED-8250-driver.patch \
             file://0062-add-UDMA-engine-node-to-aspeed-g6.patch \
             file://0063-ARM-dts-aspeed-enable-uart-dma-drivers-for-host-console.patch \
+            file://0064-ARM-dts-aspeed-Modify-Onyx-dts-for-iio-channel-issue.patch \
             "
