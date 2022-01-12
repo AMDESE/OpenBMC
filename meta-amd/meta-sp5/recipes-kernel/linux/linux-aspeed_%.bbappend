@@ -63,4 +63,5 @@ SRC_URI += "file://sp5.cfg \
             file://0063-ARM-dts-aspeed-enable-uart-dma-drivers-for-host-console.patch \
             file://0064-ARM-dts-aspeed-Modify-Onyx-dts-for-iio-channel-issue.patch \
             file://0065-linux-driver-hwmon-Modify-hwmon-driver-for-dbg-msg.patch \
+            file://0066-ARM-dts-aspeed-Add-Quartz-dts-adc121c-sensors.patch \
             "
