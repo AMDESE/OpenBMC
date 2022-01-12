@@ -89,7 +89,7 @@ ITEMS_QUARTZ = "${@compose_list(d, 'ITEMSFMT', 'CHIPS_QUARTZ')}"
 ITEMS_QUARTZ += "iio-hwmon-adc121c.conf"
 ITEMS_RUBY = "${@compose_list(d, 'ITEMSFMT', 'CHIPS_RUBY')}"
 ITEMS_TITANITE = "${@compose_list(d, 'ITEMSFMT', 'CHIPS_TITANITE')}"
-
+ITEMS_TITANITE += "iio-hwmon-adc121c.conf"
 
 ENVS_ONYX = "obmc/hwmon_onyx/{0}"
 SYSTEMD_ENVIRONMENT_FILE_${PN}_append_sp5 += " ${@compose_list(d, 'ENVS_ONYX', 'ITEMS_ONYX')}"
