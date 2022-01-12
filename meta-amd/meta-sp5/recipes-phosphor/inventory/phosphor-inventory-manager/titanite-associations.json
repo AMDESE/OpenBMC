@@ -11,6 +11,12 @@
                 },
                 "paths":
                 [
+                   "/xyz/openbmc_project/sensors/voltage/ADC_P1V0_AUX",
+                   "/xyz/openbmc_project/sensors/voltage/ADC_P1V8_AUX",
+                   "/xyz/openbmc_project/sensors/voltage/ADC_P3V3_AUX",
+                   "/xyz/openbmc_project/sensors/voltage/ADC_P1V27_AUX",
+                   "/xyz/openbmc_project/sensors/voltage/ADC_P12V_AUX",
+
                     "/xyz/openbmc_project/sensors/temperature/SYS_OUTLET",
                     "/xyz/openbmc_project/sensors/temperature/OCP_INLET",
                     "/xyz/openbmc_project/sensors/temperature/SCM_INLET",
@@ -50,6 +56,12 @@
                 },
                 "paths":
                 [
+                   "/xyz/openbmc_project/sensors/voltage/ADC_P1V0_AUX",
+                   "/xyz/openbmc_project/sensors/voltage/ADC_P1V8_AUX",
+                   "/xyz/openbmc_project/sensors/voltage/ADC_P3V3_AUX",
+                   "/xyz/openbmc_project/sensors/voltage/ADC_P1V27_AUX",
+                   "/xyz/openbmc_project/sensors/voltage/ADC_P12V_AUX",
+
                     "/xyz/openbmc_project/sensors/temperature/SYS_OUTLET",
                     "/xyz/openbmc_project/sensors/temperature/OCP_INLET",
                     "/xyz/openbmc_project/sensors/temperature/SCM_INLET",
