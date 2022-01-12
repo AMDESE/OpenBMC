@@ -60,7 +60,6 @@
                     "/xyz/openbmc_project/sensors/temperature/LM75A_4F",
 
                     "/xyz/openbmc_project/sensors/temperature/CPU0_Temp",
-                    "/xyz/openbmc_project/sensors/temperature/CPU1_Temp",
 
                      "/xyz/openbmc_project/sensors/temperature/TMP468_48",
                      "/xyz/openbmc_project/sensors/temperature/TMP468_P0_CCD0",
@@ -154,7 +153,6 @@
                     "/xyz/openbmc_project/sensors/temperature/LM75A_4F",
 
                     "/xyz/openbmc_project/sensors/temperature/CPU0_Temp",
-                    "/xyz/openbmc_project/sensors/temperature/CPU1_Temp",
 
                      "/xyz/openbmc_project/sensors/temperature/TMP468_48",
                      "/xyz/openbmc_project/sensors/temperature/TMP468_P0_CCD0",
