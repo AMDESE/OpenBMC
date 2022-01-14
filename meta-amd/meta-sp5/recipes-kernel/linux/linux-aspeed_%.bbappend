@@ -66,4 +66,5 @@ SRC_URI += "file://sp5.cfg \
             file://0066-ARM-dts-aspeed-Add-Quartz-dts-adc121c-sensors.patch \
             file://0067-ARM-dts-aspeed-Add-Titanite-dts-adc121c-sensors.patch \
             file://0068-ARM-dts-aspeed-Add-Ruby-device-tree-VR-sensors.patch \
+            file://0069-ARM-dts-aspeed-Modify-Ruby-dts-for-adc121-sensors.patch \
             "
