@@ -21,6 +21,14 @@
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_VDDIO33_VOUT1",
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_VDDIO33_VOUT2",
 
+                   "/xyz/openbmc_project/sensors/voltage/ADC121C_50",
+                   "/xyz/openbmc_project/sensors/voltage/ADC121C_51",
+                   "/xyz/openbmc_project/sensors/voltage/ADC121C_52",
+                   "/xyz/openbmc_project/sensors/voltage/ADC121C_53",
+                   "/xyz/openbmc_project/sensors/voltage/ADC121C_54",
+                   "/xyz/openbmc_project/sensors/voltage/ADC121C_55",
+                   "/xyz/openbmc_project/sensors/voltage/ADC121C_56",
+
                     "/xyz/openbmc_project/sensors/current/VDDCR_SOC_IIN",
                     "/xyz/openbmc_project/sensors/current/VDDCR_SOC_IOUT1",
                     "/xyz/openbmc_project/sensors/current/VDDCR_SOC_IOUT2",
@@ -86,6 +94,14 @@
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_VDDIO33_VIN",
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_VDDIO33_VOUT1",
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_VDDIO33_VOUT2",
+
+                    "/xyz/openbmc_project/sensors/voltage/ADC121C_50",
+                   "/xyz/openbmc_project/sensors/voltage/ADC121C_51",
+                   "/xyz/openbmc_project/sensors/voltage/ADC121C_52",
+                   "/xyz/openbmc_project/sensors/voltage/ADC121C_53",
+                   "/xyz/openbmc_project/sensors/voltage/ADC121C_54",
+                   "/xyz/openbmc_project/sensors/voltage/ADC121C_55",
+                   "/xyz/openbmc_project/sensors/voltage/ADC121C_56",
 
                     "/xyz/openbmc_project/sensors/current/VDDCR_SOC_IIN",
                     "/xyz/openbmc_project/sensors/current/VDDCR_SOC_IOUT1",
