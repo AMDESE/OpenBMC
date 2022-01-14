@@ -91,6 +91,7 @@ ITEMS_ONYX += "iio-hwmon-adc121c.conf"
 ITEMS_QUARTZ = "${@compose_list(d, 'ITEMSFMT', 'CHIPS_QUARTZ')}"
 ITEMS_QUARTZ += "iio-hwmon-adc121c.conf"
 ITEMS_RUBY = "${@compose_list(d, 'ITEMSFMT', 'CHIPS_RUBY')}"
+ITEMS_RUBY += "iio-hwmon-adc121c.conf"
 ITEMS_TITANITE = "${@compose_list(d, 'ITEMSFMT', 'CHIPS_TITANITE')}"
 ITEMS_TITANITE += "iio-hwmon-adc121c.conf"
 
