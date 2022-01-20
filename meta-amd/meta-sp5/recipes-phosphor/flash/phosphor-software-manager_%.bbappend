@@ -9,6 +9,7 @@ SRC_URI += "file://bios-update.sh \
             file://0005-fix-image-updater-crash-on-invalid-version.patch \
             file://0006-delete-stale-objects-after-activation.patch \
             file://0007-phosphor-software-manager-Add-LCD-write-for-FW-ver.patch \
+            file://0008-phosphor-software-manager-Delete-LCD-extra-char.patch  \
             "
 DEPENDS += "amd-lcd-lib"
 
