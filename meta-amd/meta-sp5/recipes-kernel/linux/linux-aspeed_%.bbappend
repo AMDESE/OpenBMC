@@ -70,4 +70,5 @@ SRC_URI += "file://sp5.cfg \
             file://0070-linux-aspeed-Add-I3C-changes-for-SP5.patch  \
             file://0071-ARM-dts-aspeed-Add-I3C-DIMM-and-CPU-RAS-devices.patch \
             file://0072-ARM-dts-aspeed-add-espi-virtual-uart.patch \
+            file://0073-ARM-dts-aspeed-Add-identify-and-fault-LEDs-with-Titanite.patch \
             "
