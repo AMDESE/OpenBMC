@@ -68,4 +68,5 @@ SRC_URI += "file://sp5.cfg \
             file://0068-ARM-dts-aspeed-Add-Ruby-device-tree-VR-sensors.patch \
             file://0069-ARM-dts-aspeed-Modify-Ruby-dts-for-adc121-sensors.patch \
             file://0070-linux-aspeed-Add-I3C-changes-for-SP5.patch  \
+            file://0071-ARM-dts-aspeed-Add-I3C-DIMM-and-CPU-RAS-devices.patch \
             "
