@@ -1,0 +1,21 @@
+From 4b42b2ed1826ae6ce6a9f9d21f4f4c993e0264ab Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Thu, 20 Jan 2022 04:33:34 -0600
+Subject: [PATCH] remove local-tty params
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+---
+ conf/server.ttyVUART0.conf.in | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/conf/server.ttyVUART0.conf.in b/conf/server.ttyVUART0.conf.in
+index 7d3f758..cee42b4 100644
+--- a/conf/server.ttyVUART0.conf.in
++++ b/conf/server.ttyVUART0.conf.in
+@@ -1,6 +1,3 @@
+ lpc-address = 0x3f8
+ sirq = 4
+-upstream-tty = ttyVUART0
+-local-tty = ttyS0
+-local-tty-baud = 115200
+ socket-id = host
