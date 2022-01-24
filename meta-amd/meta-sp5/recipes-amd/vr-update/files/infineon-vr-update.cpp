@@ -12,6 +12,7 @@
 #include <cstring>
 #include <sys/ioctl.h>
 #include "infineon-vr-update.h"
+#include "common.h"
 
 extern "C"
 {
@@ -368,19 +369,15 @@ int doPatchUpdate(const char *filename)
     return (exit_status);
 }
 
-int main(int argc, char* argv[])
+int infineon_vr_update(int argc, char *argv[])
 {
-    if(argc < MINARGS)
-    {
-        std::cout << "usage: vr-update [I2C_BUS] [I2C_ADDR] [FILE_NAME] [MODE: (CHOICES : [verbose, debug] default: none)]" << std::endl;
-        return (1);
-    }
     int exit_status = 0;
     std::fstream file;
-    int i2c_bus = atoi(argv[1]);
-    uint8_t i2c_addr = std::strtoul(argv[2], NULL, 16);
-    const char *file_name = argv[3];
-    std::string mode(argv[4]);
+    int i2c_bus = atoi(argv[3]);
+    uint8_t i2c_addr = std::strtoul(argv[4], NULL, 16);
+    const char *file_name = argv[5];
+    std::string mode(argv[6]);
+
     if(mode == "verbose")
     {
         verbose = 1;

@@ -1,8 +1,7 @@
 #ifndef INFINEON_VR_UPDATE_H
 #define INFINEON_VR_UPDATE_H
 
-#define FILEPATHSIZE 64
-#define MAXBUFFERSIZE 255
+#define MAXBUFFERSIZE     255
 #define LENGTHOFBLOCK 4
 #define MINOTPSIZE 6000
 #define MINWAITTIME 2000
@@ -41,3 +40,5 @@
 #define SPBD3 0x20
 
 #endif
+
+int infineon_vr_update(int argc, char* argv[]);

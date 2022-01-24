@@ -45,15 +45,14 @@ RDEPENDS_${PN}-system = " \
         first-boot-set-hwmon-path \
         fpga-tools \
         i3c-tools \
-        infineon-vr-update \
         ipmitool \
         phosphor-hostlogger \
         phosphor-pid-control \
         phosphor-host-postd \
         phosphor-post-code-manager \
         power-capping \
-        renesas-vr-update \
         set-fan-speed \
         set-associations-path \
+        vr-update \
         webui-vue \
         "
