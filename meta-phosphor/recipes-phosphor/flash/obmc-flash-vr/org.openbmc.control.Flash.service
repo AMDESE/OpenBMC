@@ -1,0 +1,14 @@
+[Unit]
+Description=Phosphor VR Code Update
+Wants=mapper-wait@-org-openbmc-managers-Download.service
+After=mapper-wait@-org-openbmc-managers-Download.service
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/env flash_vr.exe
+SyslogIdentifier=flash_vr.exe
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy=multi-user.target

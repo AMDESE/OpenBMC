@@ -1,0 +1,335 @@
+From 6c00355566d6ebacbc42260379cd64d3c7967c21 Mon Sep 17 00:00:00 2001
+From: Siddharth Jere <Siddharth.Jere@amd.com>
+Date: Thu, 30 Sep 2021 05:49:52 -0500
+Subject: [PATCH] recipes/phosphor-software-manager: Adding VR Support
+
+Signed-off-by: Siddharth Jere <Siddharth.Jere@amd.com>
+
+---
+ activation.cpp    | 110 ++++++++++++++++++++++++++++++++++++++++++++++
+ activation.hpp    |   9 ++++
+ item_updater.cpp  |  41 +++++++++++++++++
+ item_updater.hpp  |  22 ++++++++++
+ meson.build       |   9 ++++
+ meson_options.txt |   9 ++++
+ 6 files changed, 200 insertions(+)
+
+diff --git a/activation.cpp b/activation.cpp
+index b7e187c..884822e 100644
+--- a/activation.cpp
++++ b/activation.cpp
+@@ -189,6 +189,28 @@ auto Activation::activation(Activations value) -> Activations
+             return softwareServer::Activation::activation(value);
+         }
+ #endif
++
++#ifdef VR_UPGRADE
++        if (purpose == VersionPurpose::VR)
++        {
++            if (!activationProgress)
++            {
++                activationProgress =
++                    std::make_unique<ActivationProgress>(bus, path);
++            }
++
++            // Enable systemd signals
++            subscribeToSystemdSignals();
++
++            // Set initial progress
++            activationProgress->progress(20);
++
++            // Initiate image writing to flash
++            flashWriteVR();
++
++            return softwareServer::Activation::activation(value);
++        }
++#endif
+         auto versionStr = parent.versions.find(versionId)->second->version();
+
+         if (!minimum_ship_level::verify(versionStr))
+@@ -396,6 +418,14 @@ void Activation::unitStateChange(sdbusplus::message::message& msg)
+     }
+ #endif
+
++#ifdef VR_UPGRADE
++    if (purpose == VersionPurpose::VR)
++    {
++        onStateChangesVr(msg);
++        return;
++    }
++#endif
++
+     onStateChanges(msg);
+
+     return;
+@@ -719,6 +749,86 @@ void Activation::onStateChangesHpmFpga(sdbusplus::message::message& msg)
+
+ #endif
+
++#ifdef VR_UPGRADE
++void Activation::flashWriteVR()
++{
++    auto method = bus.new_method_call(SYSTEMD_BUSNAME, SYSTEMD_PATH,
++                                      SYSTEMD_INTERFACE, "StartUnit");
++    auto vrServiceFile = "obmc-flash-vr@" + versionId + ".service";
++    method.append(vrServiceFile, "replace");
++    try
++    {
++        auto reply = bus.call(method);
++    }
++    catch (const SdBusError& e)
++    {
++        log<level::ERR>("Error in trying to upgrade VR.");
++        report<InternalFailure>();
++    }
++}
++
++void Activation::onStateChangesVr(sdbusplus::message::message& msg)
++{
++    uint32_t newStateID{};
++    sdbusplus::message::object_path newStateObjPath;
++    std::string newStateUnit{};
++    std::string newStateResult{};
++
++    // Read the msg and populate each variable
++    msg.read(newStateID, newStateObjPath, newStateUnit, newStateResult);
++
++    auto vrServiceFile = "obmc-flash-vr@" + versionId + ".service";
++
++    if (newStateUnit == vrServiceFile)
++    {
++        // unsubscribe to systemd signals
++        unsubscribeFromSystemdSignals();
++
++        if (newStateResult == "done")
++        {
++            // Remove version object from image manager
++            deleteImageManagerObject();
++
++            // Set activation progress to 100
++            activationProgress->progress(100);
++
++            // Set Activation value to active
++            activation(softwareServer::Activation::Activations::Active);
++
++            log<level::INFO>("VR upgrade completed successfully.");
++            parent.vrVersion->version(
++                parent.versions.find(versionId)->second->version());
++            SET_VER(VR_VER_FILE);
++            parent.versions.find(versionId)->second->version("--");
++
++            // Delete the uploaded activation
++            boost::asio::post(getIOContext(), [this]() {
++                this->parent.erase(this->versionId);
++            });
++
++        }
++        else if (newStateResult == "failed")
++        {
++            // Remove version object from image manager
++            deleteImageManagerObject();
++            // Delete the uploaded activation
++            boost::asio::post(getIOContext(), [this]() {
++                this->parent.erase(this->versionId);
++            });
++
++            // Set Activation value to Failed
++            activation(softwareServer::Activation::Activations::Failed);
++
++            log<level::ERR>("VR upgrade failed.");
++        }
++    }
++
++    return;
++}
++
++#endif
++
++
+ void Activation::rebootBmc()
+ {
+     auto method = bus.new_method_call(SYSTEMD_BUSNAME, SYSTEMD_PATH,
+diff --git a/activation.hpp b/activation.hpp
+index dcbc792..4ee4a27 100644
+--- a/activation.hpp
++++ b/activation.hpp
+@@ -263,6 +263,15 @@ class Activation : public ActivationInherit, public Flash
+     void onStateChangesHpmFpga(sdbusplus::message::message&);
+ #endif
+
++#ifdef VR_UPGRADE
++    /* @brief write to HPM FPGA flash function */
++    void flashWriteVR();
++
++    /** @brief Function that acts on HPM FPGA upgrade service file state changes */
++    void onStateChangesVr(sdbusplus::message::message&);
++#endif
++
++
+     /** @brief Overloaded function that acts on service file state changes */
+     void onStateChanges(sdbusplus::message::message&) override;
+
+diff --git a/item_updater.cpp b/item_updater.cpp
+index ae7130a..dc7c702 100644
+--- a/item_updater.cpp
++++ b/item_updater.cpp
+@@ -92,6 +92,10 @@ void ItemUpdater::createActivation(sdbusplus::message::message& msg)
+ #ifdef HPM_FPGA_UPGRADE
+                         value == VersionPurpose::HPM_FPGA ||
+ #endif
++#ifdef VR_UPGRADE
++                        value == VersionPurpose::VR ||
++#endif
++
+                         value == VersionPurpose::System)
+                     {
+                         purpose = value;
+@@ -879,6 +883,43 @@ void ItemUpdater::createHPMFPGAObject()
+                                                               *hpmfpgaVersion);
+ }
+ #endif
++
++#ifdef VR_UPGRADE
++void ItemUpdater::createVRObject()
++{
++    std::string path = VR_OBJPATH;
++    // Get version id from last item in the path
++    auto pos = path.rfind("/");
++    if (pos == std::string::npos)
++    {
++        log<level::ERR>("No version id found in object path",
++                        entry("VR_OBJPATH=%s", path.c_str()));
++        return;
++    }
++
++    createActiveAssociation(path);
++    createFunctionalAssociation(path);
++
++    auto versionId = path.substr(pos + 1);
++    std::string version = "Unknown";
++    GET_VER(VR_VER_FILE);
++
++    AssociationList assocs = {};
++    hpmfpgaActivation = std::make_unique<Activation>(
++        bus, path, *this, versionId, server::Activation::Activations::Active,
++        assocs);
++    auto dummyErase = [](std::string /*entryId*/) {
++        // Do nothing;
++    };
++    vrVersion = std::make_unique<VersionClass>(
++        bus, path, version, VersionPurpose::VR, "", "",
++        std::bind(dummyErase, std::placeholders::_1));
++    vrVersion->deleteObject =
++        std::make_unique<phosphor::software::manager::Delete>(bus, path,
++                                                              *vrVersion);
++}
++#endif
++
+ } // namespace updater
+ } // namespace software
+ } // namespace phosphor
+diff --git a/item_updater.hpp b/item_updater.hpp
+index 096cc3d..4a08cd4 100644
+--- a/item_updater.hpp
++++ b/item_updater.hpp
+@@ -22,6 +22,9 @@
+ #ifdef HPM_FPGA_UPGRADE
+ #define HPM_VER_FILE	"hpm_ver"
+ #endif
++#ifdef VR_UPGRADE
++#define VR_VER_FILE    "vr_ver"
++#endif
+ #define ACTIVE_VER_KEY	"active"
+
+ namespace phosphor
+@@ -81,6 +84,9 @@ class ItemUpdater : public ItemUpdaterInherit
+ #endif
+ #ifdef HPM_FPGA_UPGRADE
+         createHPMFPGAObject();
++#endif
++#ifdef VR_UPGRADE
++        createVRObject();
+ #endif
+         emit_object_added();
+     };
+@@ -321,6 +327,22 @@ class ItemUpdater : public ItemUpdaterInherit
+     /** @brief Persistent Version D-Bus object for HPM FPGA */
+     std::unique_ptr<VersionClass> hpmfpgaVersion;
+ #endif
++
++#ifdef VR_UPGRADE
++    /** @brief Create the VR object without knowing the version.
++     *
++     *  The object is created only to provide the DBus access so that an
++     *  external service could set the correct VR version.
++     *  On VR code update, the version is updated accordingly.
++     */
++    void createVRObject();
++
++    /** @brief Persistent Activation D-Bus object for HPM FPGA */
++    std::unique_ptr<Activation> vrActivation;
++  public:
++    /** @brief Persistent Version D-Bus object for HPM FPGA */
++    std::unique_ptr<VersionClass> vrVersion;
++#endif
+ };
+
+ } // namespace updater
+diff --git a/meson.build b/meson.build
+index 533c8d9..9f319c4 100644
+--- a/meson.build
++++ b/meson.build
+@@ -72,6 +72,7 @@ conf.set('WANT_SIGNATURE_FULL_VERIFY', get_option('verify-full-signature').enabl
+
+ conf.set('SCM_FPGA_UPGRADE', get_option('scm-fpga-upgrade').enabled())
+ conf.set('HPM_FPGA_UPGRADE', get_option('hpm-fpga-upgrade').enabled())
++conf.set('VR_UPGRADE', get_option('vr-upgrade').enabled())
+
+
+ # Configurable variables
+@@ -106,6 +107,10 @@ if get_option('hpm-fpga-upgrade').enabled()
+     conf.set_quoted('HPM_FPGA_OBJPATH', get_option('hpm-fpga-object-path'))
+ endif
+
++if get_option('vr-upgrade').enabled()
++    conf.set_quoted('VR_OBJPATH', get_option('vr-object-path'))
++endif
++
+ configure_file(output: 'config.h', configuration: conf)
+
+ deps = [
+@@ -193,6 +198,10 @@ if get_option('hpm-fpga-upgrade').enabled()
+     unit_files += 'obmc-flash-hpm-fpga@.service.in'
+ endif
+
++if get_option('vr-upgrade').enabled()
++    unit_files += 'obmc-flash-vr@.service.in'
++endif
++
+ if get_option('sync-bmc-files').enabled()
+     executable(
+         'phosphor-sync-software-manager',
+diff --git a/meson_options.txt b/meson_options.txt
+index d231ee9..8b85637 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -18,6 +18,9 @@ option('scm-fpga-upgrade', type: 'feature',
+ option('hpm-fpga-upgrade', type: 'feature',
+     description: 'Enable hpm fpga upgrade support.')
+
++option('vr-upgrade', type: 'feature',
++    description: 'Enable vr upgrade support.')
++
+ option('sync-bmc-files', type: 'feature',
+     description: 'Enable sync of filesystem files.')
+
+@@ -128,3 +131,9 @@ option(
+     value: '/xyz/openbmc_project/software/hpm_fpga_active',
+     description: 'The HPM FPGA DBus object path.',
+ )
++
++option(
++    'vr-object-path', type: 'string',
++    value: '/xyz/openbmc_project/software/vr_active',
++    description: 'The VR DBus object path.',
++)
