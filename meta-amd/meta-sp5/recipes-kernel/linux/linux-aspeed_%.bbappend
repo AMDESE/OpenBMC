@@ -71,4 +71,5 @@ SRC_URI += "file://sp5.cfg \
             file://0071-ARM-dts-aspeed-Add-I3C-DIMM-and-CPU-RAS-devices.patch \
             file://0072-ARM-dts-aspeed-add-espi-virtual-uart.patch \
             file://0073-ARM-dts-aspeed-Add-identify-and-fault-LEDs-with-Titanite.patch \
+            file://0074-drivers-media-Handle-video-engine-spurious-interrupt.patch \
             "
