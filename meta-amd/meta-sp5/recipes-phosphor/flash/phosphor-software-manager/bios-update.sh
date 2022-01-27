@@ -18,6 +18,10 @@ GPIOCHIP=816
 GPIOO0=$((${GPIOCHIP} + 112 + 0))
 GPIOO1=$((${GPIOCHIP} + 112 + 1))
 
+# Lanai
+GPIOV0=$((${GPIOCHIP} + 168 + 0))
+GPIOV1=$((${GPIOCHIP} + 168 + 1))
+LANAI_SPI_DEV="1e630000.spi"
 
 SPI_DEV="1e631000.spi"
 SPI_PATH="/sys/bus/platform/drivers/aspeed-smc"
@@ -68,7 +72,41 @@ set_gpio_to_bmc()
 
     return 0
 }
-
+set_lanai_gpio_to_bmc()
+{
+    echo "switch bios GPIO to bmc"
+    if [ ! -d /sys/class/gpio/gpio$GPIOV0 ]; then
+        cd /sys/class/gpio
+        echo $GPIOV0 > export
+        cd gpio$GPIOV0
+    else
+        cd /sys/class/gpio/gpio$GPIOV0
+    fi
+    direc=`cat direction`
+    if [ $direc == "in" ]; then
+        echo "out" > direction
+    fi
+    data=`cat value`
+    if [ "$data" == "0" ]; then
+        echo 1 > value
+    fi
+    if [ ! -d /sys/class/gpio/gpio$GPIOV1 ]; then
+        cd /sys/class/gpio
+        echo $GPIOV1 > export
+        cd gpio$GPIOV1
+    else
+        cd /sys/class/gpio/gpio$GPIOV1
+    fi
+    direc=`cat direction`
+    if [ $direc == "in" ]; then
+        echo "out" > direction
+    fi
+    data=`cat value`
+    if [ "$data" == "0" ]; then
+        echo 1 > value
+    fi
+    return 0
+}
 set_gpio_to_host()
 {
     echo "switch bios GPIO to host"
@@ -109,6 +147,76 @@ set_gpio_to_host()
     echo $GPIOO1 > /sys/class/gpio/unexport
 
     return 0
+}
+set_lanai_gpio_to_host()
+{
+    echo "switch bios GPIO to host"
+    if [ ! -d /sys/class/gpio/gpio$GPIOV0 ]; then
+        cd /sys/class/gpio
+        echo $GPIOV0 > export
+        cd gpio$GPIOV0
+    else
+        cd /sys/class/gpio/gpio$GPIOV0
+    fi
+    direc=`cat direction`
+    if [ $direc == "in" ]; then
+        echo "out" > direction
+    fi
+    data=`cat value`
+    if [ "$data" == "1" ]; then
+        echo 0 > value
+    fi
+    echo "in" > direction
+    echo $GPIOV0 > /sys/class/gpio/unexport
+    if [ ! -d /sys/class/gpio/gpio$GPIOV1 ]; then
+        cd /sys/class/gpio
+        echo $GPIOV1 > export
+        cd gpio$GPIOV1
+    else
+        cd /sys/class/gpio/gpio$GPIOV1
+    fi
+    direc=`cat direction`
+    if [ $direc == "in" ]; then
+        echo "out" > direction
+    fi
+    data=`cat value`
+    if [ "$data" == "1" ]; then
+        echo 0 > value
+    fi
+    echo "in" > direction
+    echo $GPIOV1 > /sys/class/gpio/unexport
+    return 0
+}
+
+flash_image_to_mtd() {
+	echo $IMAGE_DIR
+	pushd $IMAGE_DIR
+	IMAGE_FILE=$(find -type f -name '*.FD')
+	if [ -e "$IMAGE_FILE" ];
+	then
+		echo "Bios image is $IMAGE_FILE"
+		for d in mtd6 mtd7 ; do
+			if [ -e "/dev/$d" ]; then
+				mtd=`cat /sys/class/mtd/$d/name`
+				if [ $mtd == "pnor" ]; then
+					echo "Flashing bios image to $d..."
+					flash_eraseall /dev/$d
+					dd if=$IMAGE_FILE of=/dev/$d bs=4096
+					if [ $? -eq 0 ]; then
+						echo "bios updated successfully..."
+					else
+						echo "bios update failed..."
+					fi
+					break
+				fi
+				echo "$d is not a pnor device"
+			fi
+			echo "$d not available"
+		done
+	else
+		echo "Bios image $IMAGE_FILE doesn't exist"
+	fi
+	popd
 }
 
 echo "Bios upgrade started at $(date)"
@@ -151,34 +259,7 @@ fi
 sleep 1
 
 #Flashcp image to device.
-echo $IMAGE_DIR
-pushd $IMAGE_DIR
-IMAGE_FILE=$(find -type f -name '*.FD')
-if [ -e "$IMAGE_FILE" ];
-then
-    echo "Bios image is $IMAGE_FILE"
-    for d in mtd6 mtd7 ; do
-        if [ -e "/dev/$d" ]; then
-            mtd=`cat /sys/class/mtd/$d/name`
-            if [ $mtd == "pnor" ]; then
-                echo "Flashing bios image to $d..."
-                flash_eraseall /dev/$d
-                dd if=$IMAGE_FILE of=/dev/$d bs=4096
-                if [ $? -eq 0 ]; then
-                    echo "bios updated successfully..."
-                else
-                    echo "bios update failed..."
-                fi
-                break
-            fi
-            echo "$d is not a pnor device"
-        fi
-        echo "$d not available"
-    done
-else
-    echo "Bios image $IMAGE_FILE doesn't exist"
-fi
-popd
+flash_image_to_mtd
 
 #Unbind spi driver
 sleep 1
@@ -189,7 +270,23 @@ sleep 1
 #Flip GPIO back for host to access SPI flash
 echo "Set GPIO $GPIO back for host to access SPI flash"
 set_gpio_to_host
-sleep 5
+sleep 1
+
+# Lanai flash start--------------------------
+# (ignore errors but capture return status)
+lanai_ret=0
+set_lanai_gpio_to_bmc || lanai_ret=$?
+echo "Lanai gpio switch status: $lanai_ret"
+echo -n $LANAI_SPI_DEV > $SPI_PATH/bind || lanai_ret=$?
+echo "Lanai spi bind status: $lanai_ret"
+flash_image_to_mtd || lanai_ret=$?
+echo "Lanai flashcp status: $lanai_ret"
+echo -n $LANAI_SPI_DEV > $SPI_PATH/unbind || lanai_ret=$?
+echo "Lanai unbind status: $lanai_ret"
+set_lanai_gpio_to_host || lanai_ret=$?
+echo "Lanai gpio restore status: $lanai_ret"
+sleep 1
+# Lanai flash end----------------------------
 
 if [ "$power_state" != "off" ];
 then
