@@ -73,4 +73,5 @@ SRC_URI += "file://sp5.cfg \
             file://0073-ARM-dts-aspeed-Add-identify-and-fault-LEDs-with-Titanite.patch \
             file://0074-drivers-media-Handle-video-engine-spurious-interrupt.patch \
             file://0075-ARM-dts-aspeed-Add-NC-SI-configuration-to-all-dts.patch \
+            file://0076-ARM-dts-aspeed-conditional-enablement-of-MB-eeproms.patch \
             "
