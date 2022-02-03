@@ -51,6 +51,7 @@ RDEPENDS_${PN}-system = " \
         phosphor-host-postd \
         phosphor-post-code-manager \
         power-capping \
+        retimer-update \
         set-fan-speed \
         set-associations-path \
         vr-update \
