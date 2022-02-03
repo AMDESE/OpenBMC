@@ -1,0 +1,14 @@
+[Unit]
+Description=Phosphor Retimer Code Update
+Wants=mapper-wait@-org-openbmc-managers-Download.service
+After=mapper-wait@-org-openbmc-managers-Download.service
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/env flash_retimer.exe
+SyslogIdentifier=flash_retimer.exe
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy=multi-user.target
