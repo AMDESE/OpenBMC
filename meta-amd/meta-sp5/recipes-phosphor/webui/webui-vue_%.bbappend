@@ -8,4 +8,5 @@ SRC_URI += "file://0001-webvue-ui-Support-HPM-and-SCM-FPGA-firmware-updates.patc
             file://0004-SOL-console-shows-disconnected-when-opened-with-Open.patch \
             file://0005-Enable-AMD-power-cap-application.patch \
             file://0006-VR-webui-changes.patch \
+            file://0007-add-support-for-retimer-firmware-update.patch \
             "
