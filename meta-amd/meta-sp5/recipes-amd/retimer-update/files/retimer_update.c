@@ -122,6 +122,14 @@ int main(int argc, char* argv[])
                  ariesDevice->fwVersion.minor, ariesDevice->fwVersion.build);
             return 0;
         }
+        if (0 == strcmp("get-jn-temp", argv[3]))
+        {
+            /*Read Temperature*/
+            rc = ariesGetJunctionTemp(ariesDevice);
+            CHECK_SUCCESS(rc);
+            ASTERA_INFO("Temp Seen: %.2f C", ariesDevice->maxTempC);
+            return 0;
+        }
         // Load ihx file
         // Source code in examples/source/parse_ihx_file.c
         loadIhxFile(argv[3], image);
