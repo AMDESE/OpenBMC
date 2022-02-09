@@ -55,4 +55,5 @@ RDEPENDS_${PN}-system = " \
         set-associations-path \
         vr-update \
         webui-vue \
+        dimm-spd-pmic \
         "
