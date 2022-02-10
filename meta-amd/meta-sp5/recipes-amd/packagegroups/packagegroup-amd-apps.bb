@@ -40,6 +40,7 @@ RDEPENDS_${PN}-system = " \
         amd-clear-cmos \
         amd-dimm \
         amd-lcd-lib \
+        amd-ras \
         amd-yaap \
         bmcweb \
         debug-apps \
