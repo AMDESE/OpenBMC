@@ -38,6 +38,7 @@ SUMMARY_${PN}-system = "AMD System"
 RDEPENDS_${PN}-system = " \
         amd-apml \
         amd-clear-cmos \
+        amd-dimm \
         amd-lcd-lib \
         amd-yaap \
         bmcweb \
@@ -55,5 +56,4 @@ RDEPENDS_${PN}-system = " \
         set-associations-path \
         vr-update \
         webui-vue \
-        dimm-spd-pmic \
         "
