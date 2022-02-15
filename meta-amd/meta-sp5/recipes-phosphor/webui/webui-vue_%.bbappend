@@ -10,4 +10,5 @@ SRC_URI += "file://0001-webvue-ui-Support-HPM-and-SCM-FPGA-firmware-updates.patc
             file://0006-VR-webui-changes.patch \
             file://0007-add-support-for-retimer-firmware-update.patch \
             file://0008-add-POST-timestamp-as-sortable-field.patch \
+            file://0009-add-delete-all-button-to-POST-code-page.patch \
             "
