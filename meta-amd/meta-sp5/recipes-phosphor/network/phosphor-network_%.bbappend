@@ -8,6 +8,7 @@ SRC_URI += "file://0001-meta-sp5-Modify-phosphor-network-to-set-host-name.patch 
             file://0006-phosphor-network-Delete-LCD-extra-char.patch    \
             file://0007-phosphor-network-Modify-active-MAC-address-assign-to.patch \
             file://0008-phosphor-network-Modify-removed-previous-changes-for.patch \
+            file://0009-phosphor-network-LCD-do-not-show-priv-IP.patch             \
             "
 DEPENDS += "amd-lcd-lib"
 
