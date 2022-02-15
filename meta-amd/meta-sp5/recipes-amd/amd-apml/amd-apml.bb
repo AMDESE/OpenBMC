@@ -6,9 +6,12 @@ FILESEXTRAPATHS_prepend := "${THISDIR}:"
 LICENSE = "CLOSED"
 
 DEPENDS += "i2c-tools"
+DEPENDS += "i3c-tools"
 
-SRC_URI += "git://git@github.com/amd/esmi_oob_library.git;protocol=ssh"
-SRCREV_pn-amd-apml = "${AUTOREV}"
+SRC_URI += "git://gerrit-git.amd.com:29418/SYS-MGMT/er/HPC/e_sb_smi_lib;branch=amd-dev;protocol=ssh"
+SRC_URI += "file://0001-esmi_oob-Remove-APIs-calling-into-I3C-driver-read-wr.patch \
+            "
+SRCREV_pn-amd-apml = "6e0c40b57db70168bb7ca215df910bd35333d4a9"
 
 S="${WORKDIR}/git"
 
