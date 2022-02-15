@@ -1,0 +1,92 @@
+From 08b8eb4b84bec04e534985ef4e11c34a70958baa Mon Sep 17 00:00:00 2001
+From: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
+Date: Tue, 15 Feb 2022 11:21:12 -0600
+Subject: [PATCH 1/1] amd-apml: Enable esmi oob library with i3c
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+Enables esmi oob library with i3c.
+Copy of UAPI header file is copied to esmi_oob include folder to resolve
+compilation issues.
+
+Signed-off-by: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
+---
+ CMakeLists.txt            |  2 ++
+ include/esmi_oob/i3cdev.h | 38 ++++++++++++++++++++++++++++++++++++++
+ src/esmi_oob/esmi_i3c.c   |  2 +-
+ 3 files changed, 41 insertions(+), 1 deletion(-)
+ create mode 100644 include/esmi_oob/i3cdev.h
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 93a3db5..a404506 100755
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -172,6 +172,8 @@ install(FILES ${SOURCE_DIR}/include/esmi_oob/esmi_rmi.h
+                                         DESTINATION include)
+ install(FILES ${SOURCE_DIR}/include/esmi_oob/esmi_tsi.h
+                                         DESTINATION include)
++install(FILES ${SOURCE_DIR}/include/esmi_oob/i3cdev.h
++                                        DESTINATION include)
+ install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${SMI_TOOL}
+ 					DESTINATION bin)
+ install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${SMI_EXAMPLE_EXE}
+diff --git a/include/esmi_oob/i3cdev.h b/include/esmi_oob/i3cdev.h
+new file mode 100644
+index 0000000..0897313
+--- /dev/null
++++ b/include/esmi_oob/i3cdev.h
+@@ -0,0 +1,38 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
++/*
++ * Copyright (c) 2019 Synopsys, Inc. and/or its affiliates.
++ *
++ * Author: Vitor Soares <vitor.soares@synopsys.com>
++ */
++
++#ifndef _UAPI_I3C_DEV_H_
++#define _UAPI_I3C_DEV_H_
++
++#include <linux/types.h>
++#include <linux/ioctl.h>
++
++/* IOCTL commands */
++#define I3C_DEV_IOC_MAGIC	0x07
++
++/**
++ * struct i3c_ioc_priv_xfer - I3C SDR ioctl private transfer
++ * @data: Holds pointer to userspace buffer with transmit data.
++ * @len: Length of data buffer buffers, in bytes.
++ * @rnw: encodes the transfer direction. true for a read, false for a write
++ */
++struct i3c_ioc_priv_xfer {
++	__u64 data;
++	__u16 len;
++	__u8 rnw;
++	__u8 pad[5];
++};
++
++
++#define I3C_PRIV_XFER_SIZE(N)	\
++	((((sizeof(struct i3c_ioc_priv_xfer)) * (N)) < (1 << _IOC_SIZEBITS)) \
++	? ((sizeof(struct i3c_ioc_priv_xfer)) * (N)) : 0)
++
++#define I3C_IOC_PRIV_XFER(N)	\
++	_IOC(_IOC_READ|_IOC_WRITE, I3C_DEV_IOC_MAGIC, 30, I3C_PRIV_XFER_SIZE(N))
++
++#endif
+diff --git a/src/esmi_oob/esmi_i3c.c b/src/esmi_oob/esmi_i3c.c
+index 6b61c20..1913dca 100644
+--- a/src/esmi_oob/esmi_i3c.c
++++ b/src/esmi_oob/esmi_i3c.c
+@@ -49,7 +49,7 @@
+ #include <i2c/smbus.h>
+ #include <string.h>
+
+-#include <linux/i3cdev.h>
++#include <esmi_oob/i3cdev.h>
+ #include <esmi_oob/esmi_common.h>
+ #include <esmi_oob/esmi_i2c.h>
+
+--
+2.17.1
+
