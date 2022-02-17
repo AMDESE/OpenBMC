@@ -75,4 +75,5 @@ SRC_URI += "file://sp5.cfg \
             file://0075-ARM-dts-aspeed-Add-NC-SI-configuration-to-all-dts.patch \
             file://0076-ARM-dts-aspeed-conditional-enablement-of-MB-eeproms.patch \
             file://0077-ARM-dts-aspeed-Device-tree-changes-for-APML_ALERT_L.patch \
+            file://0078-linux-net-Modify-temp-fix-for-nc-si-tx-timeout-warni.patch \
             "
