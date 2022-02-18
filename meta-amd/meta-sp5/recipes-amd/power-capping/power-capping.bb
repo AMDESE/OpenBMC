@@ -20,6 +20,7 @@ SYSTEMD_SERVICE_${PN} = "${@get_service(d)}"
 DEPENDS += " \
     amd-apml \
     i2c-tools \
+    libgpiod \
     phosphor-dbus-interfaces \
     phosphor-logging \
     sdbusplus \
