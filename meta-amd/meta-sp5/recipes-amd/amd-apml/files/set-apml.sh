@@ -15,8 +15,8 @@ I3C_TOOL="/usr/bin/i3ctransfer"
 DEV_I3C_PATH="/sys/bus/platform/drivers/dw-i3c-master"
 DEV_I3C_4="1e7a6000.i3c4"
 DEV_I3C_5="1e7a7000.i3c5"
-I3C_MUX_0="/dev/i3c-0-4cc00000000"
-I3C_MUX_1="/dev/i3c-1-4cc00000000"
+I3C_MUX_0="/dev/i3c-4-4cc00000000"
+I3C_MUX_1="/dev/i3c-5-4cc00000000"
 
 # check num of cpu
 check_num_of_cpu()
