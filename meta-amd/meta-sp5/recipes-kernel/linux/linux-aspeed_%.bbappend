@@ -77,4 +77,5 @@ SRC_URI += "file://sp5.cfg \
             file://0077-ARM-dts-aspeed-Device-tree-changes-for-APML_ALERT_L.patch \
             file://0078-linux-net-Modify-temp-fix-for-nc-si-tx-timeout-warni.patch \
             file://0079-ARM-dts-aspeed-Add-I3C-APML-devices.patch \
+            file://0080-linux-aspeed-set-APML-devs-to-dynamic-addr.patch \
             "
