@@ -1,0 +1,2339 @@
+From 711d4a2c28bc9ab25de129e034b77d0d73743985 Mon Sep 17 00:00:00 2001
+From: Mohsen Dolaty <mohsen.dolaty@amd.com>
+Date: Wed, 2 Mar 2022 15:51:04 -0600
+Subject: [PATCH 1/1] linux-aspeed: Add I3C APML Devices to DTS
+
+Add I3C APML devices and I3C Bus ID to ARM DTS
+Remove I2C APML devices
+
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts     | 350 ++++-----
+ arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts   | 703 ++++++++---------
+ arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts     | 366 ++++-----
+ arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts | 716 +++++++++---------
+ 4 files changed, 1095 insertions(+), 1040 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+index 6af4289c017b..16a028f63d87 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+@@ -553,92 +553,93 @@ tmp468@48 {
+ 	};
+ };
+
+-#ifdef OPENBMC_I3C_ENABLE
++#ifdef ENABLE_I3C_DIMM
+
+ &i3c0 {
+ 	// P0 DIMM (A-F) SPD Access
+ 	status = "okay";
+
+ 	jdec-spd;
++	bus_id = <0x00>;
+
+-        //DIMM A
+-        spd5118_0_0: spd@50,3C000000000 {
+-                reg = <0x50 0x3C0 0x00000000>;
+-                assigned-address = <0x50>;
+-        };
+-        pmic5xxx_0_0: pmic@48,20400000000 {
+-                reg = <0x48 0x204 0x00000000>;
+-                assigned-address = <0x48>;
+-        };
+-        rcd_0_0: rcd@58,2C000000000 {
+-                reg = <0x58 0x2C0 0x00000000>;
+-                assigned-address = <0x58>;
+-        };
+-        //DIMM B
+-        spd5118_0_1: spd@51,3C000000001 {
+-                reg = <0x51 0x3C0 0x00000001>;
+-                assigned-address = <0x51>;
+-        };
+-        pmic5xxx_0_1: pmic@49,20400000001 {
+-                reg = <0x49 0x204 0x00000001>;
+-                assigned-address = <0x49>;
+-        };
+-        rcd_0_1: rcd@59,2C000000001 {
+-                reg = <0x59 0x2C0 0x00000001>;
+-                assigned-address = <0x59>;
+-        };
+-        //DIMM C
+-        spd5118_0_2: spd@52,3C000000002 {
+-                reg = <0x52 0x3C0 0x00000002>;
+-                assigned-address = <0x52>;
+-        };
+-        pmic5xxx_0_2: pmic@4a,20400000002 {
+-                reg = <0x4a 0x204 0x00000002>;
+-                assigned-address = <0x4a>;
+-        };
+-        rcd_0_2: rcd@5a,2C000000002 {
+-                reg = <0x5a 0x2C0 0x00000002>;
+-                assigned-address = <0x5a>;
+-        };
+-        //DIMM D
+-        spd5118_0_3: spd@53,3C000000003 {
+-                reg = <0x53 0x3C0 0x00000003>;
+-                assigned-address = <0x53>;
+-        };
+-        pmic5xxx_0_3: pmic@4b,20400000003 {
+-                reg = <0x4b 0x204 0x00000003>;
+-                assigned-address = <0x4b>;
+-        };
+-        rcd_0_3: rcd@5b,2C000000003 {
+-                reg = <0x5b 0x2C0 0x00000003>;
+-                assigned-address = <0x5b>;
+-        };
+-        //DIMM E
+-        spd5118_0_4: spd@54,3C000000004 {
+-                reg = <0x54 0x3C0 0x00000004>;
+-                assigned-address = <0x54>;
+-        };
+-        pmic5xxx_0_4: pmic@4c,20400000004 {
+-                reg = <0x4c 0x204 0x00000004>;
+-                assigned-address = <0x4c>;
+-        };
+-        rcd_0_4: rcd@5c,2C000000004 {
+-                reg = <0x5c 0x2C0 0x00000004>;
+-                assigned-address = <0x5c>;
+-        };
+-        //DIMM F
+-        spd5118_0_5: spd@55,3C000000005 {
+-                reg = <0x55 0x3C0 0x00000005>;
+-                assigned-address = <0x55>;
+-        };
+-        pmic5xxx_0_5: pmic@4d,20400000005 {
+-                reg = <0x4d 0x204 0x00000005>;
+-                assigned-address = <0x4d>;
+-        };
+-        rcd_0_5: rcd@5d,2C000000005 {
+-                reg = <0x5d 0x2C0 0x00000005>;
+-                assigned-address = <0x5d>;
+-        };
++	//DIMM A
++	spd5118_0_0: spd@50,3C000000000 {
++		reg = <0x50 0x3C0 0x00000000>;
++		assigned-address = <0x50>;
++	};
++	pmic5xxx_0_0: pmic@48,20400000000 {
++		reg = <0x48 0x204 0x00000000>;
++		assigned-address = <0x48>;
++	};
++	rcd_0_0: rcd@58,2C000000000 {
++		reg = <0x58 0x2C0 0x00000000>;
++		assigned-address = <0x58>;
++	};
++	//DIMM B
++	spd5118_0_1: spd@51,3C000000001 {
++		reg = <0x51 0x3C0 0x00000001>;
++		assigned-address = <0x51>;
++	};
++	pmic5xxx_0_1: pmic@49,20400000001 {
++		reg = <0x49 0x204 0x00000001>;
++		assigned-address = <0x49>;
++	};
++	rcd_0_1: rcd@59,2C000000001 {
++		reg = <0x59 0x2C0 0x00000001>;
++		assigned-address = <0x59>;
++	};
++	//DIMM C
++	spd5118_0_2: spd@52,3C000000002 {
++		reg = <0x52 0x3C0 0x00000002>;
++		assigned-address = <0x52>;
++	};
++	pmic5xxx_0_2: pmic@4a,20400000002 {
++		reg = <0x4a 0x204 0x00000002>;
++		assigned-address = <0x4a>;
++	};
++	rcd_0_2: rcd@5a,2C000000002 {
++		reg = <0x5a 0x2C0 0x00000002>;
++		assigned-address = <0x5a>;
++	};
++	//DIMM D
++	spd5118_0_3: spd@53,3C000000003 {
++		reg = <0x53 0x3C0 0x00000003>;
++		assigned-address = <0x53>;
++	};
++	pmic5xxx_0_3: pmic@4b,20400000003 {
++		reg = <0x4b 0x204 0x00000003>;
++		assigned-address = <0x4b>;
++	};
++	rcd_0_3: rcd@5b,2C000000003 {
++		reg = <0x5b 0x2C0 0x00000003>;
++		assigned-address = <0x5b>;
++	};
++	//DIMM E
++	spd5118_0_4: spd@54,3C000000004 {
++		reg = <0x54 0x3C0 0x00000004>;
++		assigned-address = <0x54>;
++	};
++	pmic5xxx_0_4: pmic@4c,20400000004 {
++		reg = <0x4c 0x204 0x00000004>;
++		assigned-address = <0x4c>;
++	};
++	rcd_0_4: rcd@5c,2C000000004 {
++		reg = <0x5c 0x2C0 0x00000004>;
++		assigned-address = <0x5c>;
++	};
++	//DIMM F
++	spd5118_0_5: spd@55,3C000000005 {
++		reg = <0x55 0x3C0 0x00000005>;
++		assigned-address = <0x55>;
++	};
++	pmic5xxx_0_5: pmic@4d,20400000005 {
++		reg = <0x4d 0x204 0x00000005>;
++		assigned-address = <0x4d>;
++	};
++	rcd_0_5: rcd@5d,2C000000005 {
++		reg = <0x5d 0x2C0 0x00000005>;
++		assigned-address = <0x5d>;
++	};
+ };
+
+ &i3c1 {
+@@ -646,107 +647,115 @@ &i3c1 {
+ 	status = "okay";
+
+ 	jdec-spd;
++	bus_id = <0x01>;
+
+-        //DIMM G
+-        spd5118_1_0: spd@50,3C000000000 {
+-                reg = <0x50 0x3C0 0x00000000>;
+-                assigned-address = <0x50>;
+-        };
+-        pmic5xxx_1_0: pmic@48,20400000000 {
+-                reg = <0x48 0x204 0x00000000>;
+-                assigned-address = <0x48>;
+-        };
+-        rcd_1_0: rcd@58,2C000000000 {
+-                reg = <0x58 0x2C0 0x00000000>;
+-                assigned-address = <0x58>;
+-        };
+-        //DIMM H
+-        spd5118_1_1: spd@51,3C000000001 {
+-                reg = <0x51 0x3C0 0x00000001>;
+-                assigned-address = <0x51>;
+-        };
+-        pmic5xxx_1_1: pmic@49,20400000001 {
+-                reg = <0x49 0x204 0x00000001>;
+-                assigned-address = <0x49>;
+-        };
+-        rcd_1_1: rcd@59,2C000000001 {
+-                reg = <0x59 0x2C0 0x00000001>;
+-                assigned-address = <0x59>;
+-        };
+-        //DIMM I
+-        spd5118_1_2: spd@52,3C000000002 {
+-                reg = <0x52 0x3C0 0x00000002>;
+-                assigned-address = <0x52>;
+-        };
+-        pmic5xxx_1_2: pmic@4a,20400000002 {
+-                reg = <0x4a 0x204 0x00000002>;
+-                assigned-address = <0x4a>;
+-        };
+-        rcd_1_2: rcd@5a,2C000000002 {
+-                reg = <0x5a 0x2C0 0x00000002>;
+-                assigned-address = <0x5a>;
+-        };
+-        //DIMM J
+-        spd5118_1_3: spd@53,3C000000003 {
+-                reg = <0x53 0x3C0 0x00000003>;
+-                assigned-address = <0x53>;
+-        };
+-        pmic5xxx_1_3: pmic@4b,20400000003 {
+-                reg = <0x4b 0x204 0x00000003>;
+-                assigned-address = <0x4b>;
+-        };
+-        rcd_1_3: rcd@5b,2C000000003 {
+-                reg = <0x5b 0x2C0 0x00000003>;
+-                assigned-address = <0x5b>;
+-        };
+-        //DIMM K
+-        spd5118_1_4: spd@54,3C000000004 {
+-                reg = <0x54 0x3C0 0x00000004>;
+-                assigned-address = <0x54>;
+-        };
+-        pmic5xxx_1_4: pmic@4c,20400000004 {
+-                reg = <0x4c 0x204 0x00000004>;
+-                assigned-address = <0x4c>;
+-        };
+-        rcd_1_4: rcd@5c,2C000000004 {
+-                reg = <0x5c 0x2C0 0x00000004>;
+-                assigned-address = <0x5c>;
+-        };
+-        //DIMM L
+-        spd5118_1_5: spd@55,3C000000005 {
+-                reg = <0x55 0x3C0 0x00000005>;
+-                assigned-address = <0x55>;
+-        };
+-        pmic5xxx_1_5: pmic@4d,20400000005 {
+-                reg = <0x4d 0x204 0x00000005>;
+-                assigned-address = <0x4d>;
+-        };
+-        rcd_1_5: rcd@5d,2C000000005 {
+-                reg = <0x5d 0x2C0 0x00000005>;
+-                assigned-address = <0x5d>;
+-        };
++	//DIMM G
++	spd5118_1_0: spd@50,3C000000000 {
++		reg = <0x50 0x3C0 0x00000000>;
++		assigned-address = <0x50>;
++	};
++	pmic5xxx_1_0: pmic@48,20400000000 {
++		reg = <0x48 0x204 0x00000000>;
++		assigned-address = <0x48>;
++	};
++	rcd_1_0: rcd@58,2C000000000 {
++		reg = <0x58 0x2C0 0x00000000>;
++		assigned-address = <0x58>;
++	};
++	//DIMM H
++	spd5118_1_1: spd@51,3C000000001 {
++		reg = <0x51 0x3C0 0x00000001>;
++		assigned-address = <0x51>;
++	};
++	pmic5xxx_1_1: pmic@49,20400000001 {
++		reg = <0x49 0x204 0x00000001>;
++		assigned-address = <0x49>;
++	};
++	rcd_1_1: rcd@59,2C000000001 {
++		reg = <0x59 0x2C0 0x00000001>;
++		assigned-address = <0x59>;
++	};
++	//DIMM I
++	spd5118_1_2: spd@52,3C000000002 {
++		reg = <0x52 0x3C0 0x00000002>;
++		assigned-address = <0x52>;
++	};
++	pmic5xxx_1_2: pmic@4a,20400000002 {
++		reg = <0x4a 0x204 0x00000002>;
++		assigned-address = <0x4a>;
++	};
++	rcd_1_2: rcd@5a,2C000000002 {
++		reg = <0x5a 0x2C0 0x00000002>;
++		assigned-address = <0x5a>;
++	};
++	//DIMM J
++	spd5118_1_3: spd@53,3C000000003 {
++		reg = <0x53 0x3C0 0x00000003>;
++		assigned-address = <0x53>;
++	};
++	pmic5xxx_1_3: pmic@4b,20400000003 {
++		reg = <0x4b 0x204 0x00000003>;
++		assigned-address = <0x4b>;
++	};
++	rcd_1_3: rcd@5b,2C000000003 {
++		reg = <0x5b 0x2C0 0x00000003>;
++		assigned-address = <0x5b>;
++	};
++	//DIMM K
++	spd5118_1_4: spd@54,3C000000004 {
++		reg = <0x54 0x3C0 0x00000004>;
++		assigned-address = <0x54>;
++	};
++	pmic5xxx_1_4: pmic@4c,20400000004 {
++		reg = <0x4c 0x204 0x00000004>;
++		assigned-address = <0x4c>;
++	};
++	rcd_1_4: rcd@5c,2C000000004 {
++		reg = <0x5c 0x2C0 0x00000004>;
++		assigned-address = <0x5c>;
++	};
++	//DIMM L
++	spd5118_1_5: spd@55,3C000000005 {
++		reg = <0x55 0x3C0 0x00000005>;
++		assigned-address = <0x55>;
++	};
++	pmic5xxx_1_5: pmic@4d,20400000005 {
++		reg = <0x4d 0x204 0x00000005>;
++		assigned-address = <0x4d>;
++	};
++	rcd_1_5: rcd@5d,2C000000005 {
++		reg = <0x5d 0x2C0 0x00000005>;
++		assigned-address = <0x5d>;
++	};
+ };
++#endif  // ENABLE_I3C_DIMM
+
+ &i3c4 {
+-    // P0 APML
+-    status = "okay";
++	// P0 APML
++	status = "okay";
+
+-    jdec-spd;
++	jdec-spd;
++	set_dasa;
++	bus_id = <0x04>;
+
+-    imx3112_p0: i3cmux@70,4CC00000000 {
+-        reg = <0x70 0x4CC 0x00000000>;
+-        assigned-address = <0x70>;
+-    };
+-    sbtsi_p0_0: sbtsi@4c,22400000000 {
+-        reg = <0x4c 0x224 0x00000000>;
+-        assigned-address = <0x4c>;
+-    };
++	imx3112_p0: i3cmux@70,4CC00000000 {
++		reg = <0x70 0x4CC 0x00000000>;
++		assigned-address = <0x70>;
++	};
++	sbtsi_p0_0: sbtsi@4c,22400000001 {
++		reg = <0x4c 0x224 0x00000001>;
++		assigned-address = <0x4c>;
++	};
++	sbrmi_p0_1: sbrmi@3c,22400000002 {
++		reg = <0x3c 0x224 0x00000002>;
++		assigned-address = <0x3c>;
++	};
+ };
+
+-#endif  // OPENBMC_I3C_ENABLE
++#ifdef ENABLE_I2C_APML
+
+ &i2c2 {
+-	// P0 APML
++	// P0 APML - i2c10
+ 	status = "okay";
+ 	bus-frequency = <400000>;
+
+@@ -755,6 +764,7 @@ sbtsi@4c {
+ 		reg = <0x4c>;
+ 	};
+ };
++#endif  // ENABLE_I2C_APML
+
+ &espi_ctrl {
+ 	status = "okay";
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+index e0a4d1178c38..dd2efb7356d5 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+@@ -670,92 +670,93 @@ &i2c15 {
+ 	status = "okay";
+ };
+
+-#ifdef OPENBMC_I3C_ENABLE
++#ifdef ENABLE_I3C_DIMM
+
+ &i3c0 {
+ 	// P0 DIMM (A-F) SPD Access
+ 	status = "okay";
+
+ 	jdec-spd;
++	bus_id = <0x00>;
+
+-        //DIMM A
+-        spd5118_0_0: spd@50,3C000000000 {
+-                reg = <0x50 0x3C0 0x00000000>;
+-                assigned-address = <0x50>;
+-        };
+-        pmic5xxx_0_0: pmic@48,20400000000 {
+-                reg = <0x48 0x204 0x00000000>;
+-                assigned-address = <0x48>;
+-        };
+-        rcd_0_0: rcd@58,2C000000000 {
+-                reg = <0x58 0x2C0 0x00000000>;
+-                assigned-address = <0x58>;
+-        };
+-        //DIMM B
+-        spd5118_0_1: spd@51,3C000000001 {
+-                reg = <0x51 0x3C0 0x00000001>;
+-                assigned-address = <0x51>;
+-        };
+-        pmic5xxx_0_1: pmic@49,20400000001 {
+-                reg = <0x49 0x204 0x00000001>;
+-                assigned-address = <0x49>;
+-        };
+-        rcd_0_1: rcd@59,2C000000001 {
+-                reg = <0x59 0x2C0 0x00000001>;
+-                assigned-address = <0x59>;
+-        };
+-        //DIMM C
+-        spd5118_0_2: spd@52,3C000000002 {
+-                reg = <0x52 0x3C0 0x00000002>;
+-                assigned-address = <0x52>;
+-        };
+-        pmic5xxx_0_2: pmic@4a,20400000002 {
+-                reg = <0x4a 0x204 0x00000002>;
+-                assigned-address = <0x4a>;
+-        };
+-        rcd_0_2: rcd@5a,2C000000002 {
+-                reg = <0x5a 0x2C0 0x00000002>;
+-                assigned-address = <0x5a>;
+-        };
+-        //DIMM D
+-        spd5118_0_3: spd@53,3C000000003 {
+-                reg = <0x53 0x3C0 0x00000003>;
+-                assigned-address = <0x53>;
+-        };
+-        pmic5xxx_0_3: pmic@4b,20400000003 {
+-                reg = <0x4b 0x204 0x00000003>;
+-                assigned-address = <0x4b>;
+-        };
+-        rcd_0_3: rcd@5b,2C000000003 {
+-                reg = <0x5b 0x2C0 0x00000003>;
+-                assigned-address = <0x5b>;
+-        };
+-        //DIMM E
+-        spd5118_0_4: spd@54,3C000000004 {
+-                reg = <0x54 0x3C0 0x00000004>;
+-                assigned-address = <0x54>;
+-        };
+-        pmic5xxx_0_4: pmic@4c,20400000004 {
+-                reg = <0x4c 0x204 0x00000004>;
+-                assigned-address = <0x4c>;
+-        };
+-        rcd_0_4: rcd@5c,2C000000004 {
+-                reg = <0x5c 0x2C0 0x00000004>;
+-                assigned-address = <0x5c>;
+-        };
+-        //DIMM F
+-        spd5118_0_5: spd@55,3C000000005 {
+-                reg = <0x55 0x3C0 0x00000005>;
+-                assigned-address = <0x55>;
+-        };
+-        pmic5xxx_0_5: pmic@4d,20400000005 {
+-                reg = <0x4d 0x204 0x00000005>;
+-                assigned-address = <0x4d>;
+-        };
+-        rcd_0_5: rcd@5d,2C000000005 {
+-                reg = <0x5d 0x2C0 0x00000005>;
+-                assigned-address = <0x5d>;
+-        };
++	//DIMM A
++	spd5118_0_0: spd@50,3C000000000 {
++		reg = <0x50 0x3C0 0x00000000>;
++		assigned-address = <0x50>;
++	};
++	pmic5xxx_0_0: pmic@48,20400000000 {
++		reg = <0x48 0x204 0x00000000>;
++		assigned-address = <0x48>;
++	};
++	rcd_0_0: rcd@58,2C000000000 {
++		reg = <0x58 0x2C0 0x00000000>;
++		assigned-address = <0x58>;
++	};
++	//DIMM B
++	spd5118_0_1: spd@51,3C000000001 {
++		reg = <0x51 0x3C0 0x00000001>;
++		assigned-address = <0x51>;
++	};
++	pmic5xxx_0_1: pmic@49,20400000001 {
++		reg = <0x49 0x204 0x00000001>;
++		assigned-address = <0x49>;
++	};
++	rcd_0_1: rcd@59,2C000000001 {
++		reg = <0x59 0x2C0 0x00000001>;
++		assigned-address = <0x59>;
++	};
++	//DIMM C
++	spd5118_0_2: spd@52,3C000000002 {
++		reg = <0x52 0x3C0 0x00000002>;
++		assigned-address = <0x52>;
++	};
++	pmic5xxx_0_2: pmic@4a,20400000002 {
++		reg = <0x4a 0x204 0x00000002>;
++		assigned-address = <0x4a>;
++	};
++	rcd_0_2: rcd@5a,2C000000002 {
++		reg = <0x5a 0x2C0 0x00000002>;
++		assigned-address = <0x5a>;
++	};
++	//DIMM D
++	spd5118_0_3: spd@53,3C000000003 {
++		reg = <0x53 0x3C0 0x00000003>;
++		assigned-address = <0x53>;
++	};
++	pmic5xxx_0_3: pmic@4b,20400000003 {
++		reg = <0x4b 0x204 0x00000003>;
++		assigned-address = <0x4b>;
++	};
++	rcd_0_3: rcd@5b,2C000000003 {
++		reg = <0x5b 0x2C0 0x00000003>;
++		assigned-address = <0x5b>;
++	};
++	//DIMM E
++	spd5118_0_4: spd@54,3C000000004 {
++		reg = <0x54 0x3C0 0x00000004>;
++		assigned-address = <0x54>;
++	};
++	pmic5xxx_0_4: pmic@4c,20400000004 {
++		reg = <0x4c 0x204 0x00000004>;
++		assigned-address = <0x4c>;
++	};
++	rcd_0_4: rcd@5c,2C000000004 {
++		reg = <0x5c 0x2C0 0x00000004>;
++		assigned-address = <0x5c>;
++	};
++	//DIMM F
++	spd5118_0_5: spd@55,3C000000005 {
++		reg = <0x55 0x3C0 0x00000005>;
++		assigned-address = <0x55>;
++	};
++	pmic5xxx_0_5: pmic@4d,20400000005 {
++		reg = <0x4d 0x204 0x00000005>;
++		assigned-address = <0x4d>;
++	};
++	rcd_0_5: rcd@5d,2C000000005 {
++		reg = <0x5d 0x2C0 0x00000005>;
++		assigned-address = <0x5d>;
++	};
+ };
+
+ &i3c1 {
+@@ -763,85 +764,86 @@ &i3c1 {
+ 	status = "okay";
+
+ 	jdec-spd;
++	bus_id = <0x01>;
+
+-        //DIMM G
+-        spd5118_1_0: spd@50,3C000000000 {
+-                reg = <0x50 0x3C0 0x00000000>;
+-                assigned-address = <0x50>;
+-        };
+-        pmic5xxx_1_0: pmic@48,20400000000 {
+-                reg = <0x48 0x204 0x00000000>;
+-                assigned-address = <0x48>;
+-        };
+-        rcd_1_0: rcd@58,2C000000000 {
+-                reg = <0x58 0x2C0 0x00000000>;
+-                assigned-address = <0x58>;
+-        };
+-        //DIMM H
+-        spd5118_1_1: spd@51,3C000000001 {
+-                reg = <0x51 0x3C0 0x00000001>;
+-                assigned-address = <0x51>;
+-        };
+-        pmic5xxx_1_1: pmic@49,20400000001 {
+-                reg = <0x49 0x204 0x00000001>;
+-                assigned-address = <0x49>;
+-        };
+-        rcd_1_1: rcd@59,2C000000001 {
+-                reg = <0x59 0x2C0 0x00000001>;
+-                assigned-address = <0x59>;
+-        };
+-        //DIMM I
+-        spd5118_1_2: spd@52,3C000000002 {
+-                reg = <0x52 0x3C0 0x00000002>;
+-                assigned-address = <0x52>;
+-        };
+-        pmic5xxx_1_2: pmic@4a,20400000002 {
+-                reg = <0x4a 0x204 0x00000002>;
+-                assigned-address = <0x4a>;
+-        };
+-        rcd_1_2: rcd@5a,2C000000002 {
+-                reg = <0x5a 0x2C0 0x00000002>;
+-                assigned-address = <0x5a>;
+-        };
+-        //DIMM J
+-        spd5118_1_3: spd@53,3C000000003 {
+-                reg = <0x53 0x3C0 0x00000003>;
+-                assigned-address = <0x53>;
+-        };
+-        pmic5xxx_1_3: pmic@4b,20400000003 {
+-                reg = <0x4b 0x204 0x00000003>;
+-                assigned-address = <0x4b>;
+-        };
+-        rcd_1_3: rcd@5b,2C000000003 {
+-                reg = <0x5b 0x2C0 0x00000003>;
+-                assigned-address = <0x5b>;
+-        };
+-        //DIMM K
+-        spd5118_1_4: spd@54,3C000000004 {
+-                reg = <0x54 0x3C0 0x00000004>;
+-                assigned-address = <0x54>;
+-        };
+-        pmic5xxx_1_4: pmic@4c,20400000004 {
+-                reg = <0x4c 0x204 0x00000004>;
+-                assigned-address = <0x4c>;
+-        };
+-        rcd_1_4: rcd@5c,2C000000004 {
+-                reg = <0x5c 0x2C0 0x00000004>;
+-                assigned-address = <0x5c>;
+-        };
+-        //DIMM L
+-        spd5118_1_5: spd@55,3C000000005 {
+-                reg = <0x55 0x3C0 0x00000005>;
+-                assigned-address = <0x55>;
+-        };
+-        pmic5xxx_1_5: pmic@4d,20400000005 {
+-                reg = <0x4d 0x204 0x00000005>;
+-                assigned-address = <0x4d>;
+-        };
+-        rcd_1_5: rcd@5d,2C000000005 {
+-                reg = <0x5d 0x2C0 0x00000005>;
+-                assigned-address = <0x5d>;
+-        };
++	//DIMM G
++	spd5118_1_0: spd@50,3C000000000 {
++		reg = <0x50 0x3C0 0x00000000>;
++		assigned-address = <0x50>;
++	};
++	pmic5xxx_1_0: pmic@48,20400000000 {
++		reg = <0x48 0x204 0x00000000>;
++		assigned-address = <0x48>;
++	};
++	rcd_1_0: rcd@58,2C000000000 {
++		reg = <0x58 0x2C0 0x00000000>;
++		assigned-address = <0x58>;
++	};
++	//DIMM H
++	spd5118_1_1: spd@51,3C000000001 {
++		reg = <0x51 0x3C0 0x00000001>;
++		assigned-address = <0x51>;
++	};
++	pmic5xxx_1_1: pmic@49,20400000001 {
++		reg = <0x49 0x204 0x00000001>;
++		assigned-address = <0x49>;
++	};
++	rcd_1_1: rcd@59,2C000000001 {
++		reg = <0x59 0x2C0 0x00000001>;
++		assigned-address = <0x59>;
++	};
++	//DIMM I
++	spd5118_1_2: spd@52,3C000000002 {
++		reg = <0x52 0x3C0 0x00000002>;
++		assigned-address = <0x52>;
++	};
++	pmic5xxx_1_2: pmic@4a,20400000002 {
++		reg = <0x4a 0x204 0x00000002>;
++		assigned-address = <0x4a>;
++	};
++	rcd_1_2: rcd@5a,2C000000002 {
++		reg = <0x5a 0x2C0 0x00000002>;
++		assigned-address = <0x5a>;
++	};
++	//DIMM J
++	spd5118_1_3: spd@53,3C000000003 {
++		reg = <0x53 0x3C0 0x00000003>;
++		assigned-address = <0x53>;
++	};
++	pmic5xxx_1_3: pmic@4b,20400000003 {
++		reg = <0x4b 0x204 0x00000003>;
++		assigned-address = <0x4b>;
++	};
++	rcd_1_3: rcd@5b,2C000000003 {
++		reg = <0x5b 0x2C0 0x00000003>;
++		assigned-address = <0x5b>;
++	};
++	//DIMM K
++	spd5118_1_4: spd@54,3C000000004 {
++		reg = <0x54 0x3C0 0x00000004>;
++		assigned-address = <0x54>;
++	};
++	pmic5xxx_1_4: pmic@4c,20400000004 {
++		reg = <0x4c 0x204 0x00000004>;
++		assigned-address = <0x4c>;
++	};
++	rcd_1_4: rcd@5c,2C000000004 {
++		reg = <0x5c 0x2C0 0x00000004>;
++		assigned-address = <0x5c>;
++	};
++	//DIMM L
++	spd5118_1_5: spd@55,3C000000005 {
++		reg = <0x55 0x3C0 0x00000005>;
++		assigned-address = <0x55>;
++	};
++	pmic5xxx_1_5: pmic@4d,20400000005 {
++		reg = <0x4d 0x204 0x00000005>;
++		assigned-address = <0x4d>;
++	};
++	rcd_1_5: rcd@5d,2C000000005 {
++		reg = <0x5d 0x2C0 0x00000005>;
++		assigned-address = <0x5d>;
++	};
+  };
+
+ &i3c2 {
+@@ -849,85 +851,86 @@ &i3c2 {
+ 	status = "okay";
+
+ 	jdec-spd;
++	bus_id = <0x02>;
+
+-        //DIMM A
+-        spd5118_2_0: spd@50,3C000000000 {
+-                reg = <0x50 0x3C0 0x00000000>;
+-                assigned-address = <0x50>;
+-        };
+-        pmic5xxx_2_0: pmic@48,20400000000 {
+-                reg = <0x48 0x204 0x00000000>;
+-                assigned-address = <0x48>;
+-        };
+-        rcd_2_0: rcd@58,2C000000000 {
+-                reg = <0x58 0x2C0 0x00000000>;
+-                assigned-address = <0x58>;
+-        };
+-        //DIMM B
+-        spd5118_2_1: spd@51,3C000000001 {
+-                reg = <0x51 0x3C0 0x00000001>;
+-                assigned-address = <0x51>;
+-        };
+-        pmic5xxx_2_1: pmic@49,20400000001 {
+-                reg = <0x49 0x204 0x00000001>;
+-                assigned-address = <0x49>;
+-        };
+-        rcd_2_1: rcd@59,2C000000001 {
+-                reg = <0x59 0x2C0 0x00000001>;
+-                assigned-address = <0x59>;
+-        };
+-        //DIMM C
+-        spd5118_2_2: spd@52,3C000000002 {
+-                reg = <0x52 0x3C0 0x00000002>;
+-                assigned-address = <0x52>;
+-        };
+-        pmic5xxx_2_2: pmic@4a,20400000002 {
+-                reg = <0x4a 0x204 0x00000002>;
+-                assigned-address = <0x4a>;
+-        };
+-        rcd_2_2: rcd@5a,2C000000002 {
+-                reg = <0x5a 0x2C0 0x00000002>;
+-                assigned-address = <0x5a>;
+-        };
+-        //DIMM D
+-        spd5118_2_3: spd@53,3C000000003 {
+-                reg = <0x53 0x3C0 0x00000003>;
+-                assigned-address = <0x53>;
+-        };
+-        pmic5xxx_2_3: pmic@4b,20400000003 {
+-                reg = <0x4b 0x204 0x00000003>;
+-                assigned-address = <0x4b>;
+-        };
+-        rcd_2_3: rcd@5b,2C000000003 {
+-                reg = <0x5b 0x2C0 0x00000003>;
+-                assigned-address = <0x5b>;
+-        };
+-        //DIMM E
+-        spd5118_2_4: spd@54,3C000000004 {
+-                reg = <0x54 0x3C0 0x00000004>;
+-                assigned-address = <0x54>;
+-        };
+-        pmic5xxx_2_4: pmic@4c,20400000004 {
+-                reg = <0x4c 0x204 0x00000004>;
+-                assigned-address = <0x4c>;
+-        };
+-        rcd_2_4: rcd@5c,2C000000004 {
+-                reg = <0x5c 0x2C0 0x00000004>;
+-                assigned-address = <0x5c>;
+-        };
+-        //DIMM F
+-        spd5118_2_5: spd@55,3C000000005 {
+-                reg = <0x55 0x3C0 0x00000005>;
+-                assigned-address = <0x55>;
+-        };
+-        pmic5xxx_2_5: pmic@4d,20400000005 {
+-                reg = <0x4d 0x204 0x00000005>;
+-                assigned-address = <0x4d>;
+-        };
+-        rcd_2_5: rcd@5d,2C000000005 {
+-                reg = <0x5d 0x2C0 0x00000005>;
+-                assigned-address = <0x5d>;
+-        };
++	//DIMM A
++	spd5118_2_0: spd@50,3C000000000 {
++		reg = <0x50 0x3C0 0x00000000>;
++		assigned-address = <0x50>;
++	};
++	pmic5xxx_2_0: pmic@48,20400000000 {
++		reg = <0x48 0x204 0x00000000>;
++		assigned-address = <0x48>;
++	};
++	rcd_2_0: rcd@58,2C000000000 {
++		reg = <0x58 0x2C0 0x00000000>;
++		assigned-address = <0x58>;
++	};
++	//DIMM B
++	spd5118_2_1: spd@51,3C000000001 {
++		reg = <0x51 0x3C0 0x00000001>;
++		assigned-address = <0x51>;
++	};
++	pmic5xxx_2_1: pmic@49,20400000001 {
++		reg = <0x49 0x204 0x00000001>;
++		assigned-address = <0x49>;
++	};
++	rcd_2_1: rcd@59,2C000000001 {
++		reg = <0x59 0x2C0 0x00000001>;
++		assigned-address = <0x59>;
++	};
++	//DIMM C
++	spd5118_2_2: spd@52,3C000000002 {
++		reg = <0x52 0x3C0 0x00000002>;
++		assigned-address = <0x52>;
++	};
++	pmic5xxx_2_2: pmic@4a,20400000002 {
++		reg = <0x4a 0x204 0x00000002>;
++		assigned-address = <0x4a>;
++	};
++	rcd_2_2: rcd@5a,2C000000002 {
++		reg = <0x5a 0x2C0 0x00000002>;
++		assigned-address = <0x5a>;
++	};
++	//DIMM D
++	spd5118_2_3: spd@53,3C000000003 {
++		reg = <0x53 0x3C0 0x00000003>;
++		assigned-address = <0x53>;
++	};
++	pmic5xxx_2_3: pmic@4b,20400000003 {
++		reg = <0x4b 0x204 0x00000003>;
++		assigned-address = <0x4b>;
++	};
++	rcd_2_3: rcd@5b,2C000000003 {
++		reg = <0x5b 0x2C0 0x00000003>;
++		assigned-address = <0x5b>;
++	};
++	//DIMM E
++	spd5118_2_4: spd@54,3C000000004 {
++		reg = <0x54 0x3C0 0x00000004>;
++		assigned-address = <0x54>;
++	};
++	pmic5xxx_2_4: pmic@4c,20400000004 {
++		reg = <0x4c 0x204 0x00000004>;
++		assigned-address = <0x4c>;
++	};
++	rcd_2_4: rcd@5c,2C000000004 {
++		reg = <0x5c 0x2C0 0x00000004>;
++		assigned-address = <0x5c>;
++	};
++	//DIMM F
++	spd5118_2_5: spd@55,3C000000005 {
++		reg = <0x55 0x3C0 0x00000005>;
++		assigned-address = <0x55>;
++	};
++	pmic5xxx_2_5: pmic@4d,20400000005 {
++		reg = <0x4d 0x204 0x00000005>;
++		assigned-address = <0x4d>;
++	};
++	rcd_2_5: rcd@5d,2C000000005 {
++		reg = <0x5d 0x2C0 0x00000005>;
++		assigned-address = <0x5d>;
++	};
+ };
+
+ &i3c3 {
+@@ -935,123 +938,136 @@ &i3c3 {
+ 	status = "okay";
+
+ 	jdec-spd;
++	bus_id = <0x03>;
+
+-        //DIMM G
+-        spd5118_3_0: spd@50,3C000000000 {
+-                reg = <0x50 0x3C0 0x00000000>;
+-                assigned-address = <0x50>;
+-        };
+-        pmic5xxx_3_0: pmic@48,20400000000 {
+-                reg = <0x48 0x204 0x00000000>;
+-                assigned-address = <0x48>;
+-        };
+-        rcd_3_0: rcd@58,2C000000000 {
+-                reg = <0x58 0x2C0 0x00000000>;
+-                assigned-address = <0x58>;
+-        };
+-        //DIMM H
+-        spd5118_3_1: spd@51,3C000000001 {
+-                reg = <0x51 0x3C0 0x00000001>;
+-                assigned-address = <0x51>;
+-        };
+-        pmic5xxx_3_1: pmic@49,20400000001 {
+-                reg = <0x49 0x204 0x00000001>;
+-                assigned-address = <0x49>;
+-        };
+-        rcd_3_1: rcd@59,2C000000001 {
+-                reg = <0x59 0x2C0 0x00000001>;
+-                assigned-address = <0x59>;
+-        };
+-        //DIMM I
+-        spd5118_3_2: spd@52,3C000000002 {
+-                reg = <0x52 0x3C0 0x00000002>;
+-                assigned-address = <0x52>;
+-        };
+-        pmic5xxx_3_2: pmic@4a,20400000002 {
+-                reg = <0x4a 0x204 0x00000002>;
+-                assigned-address = <0x4a>;
+-        };
+-        rcd_3_2: rcd@5a,2C000000002 {
+-                reg = <0x5a 0x2C0 0x00000002>;
+-                assigned-address = <0x5a>;
+-        };
+-        //DIMM J
+-        spd5118_3_3: spd@53,3C000000003 {
+-                reg = <0x53 0x3C0 0x00000003>;
+-                assigned-address = <0x53>;
+-        };
+-        pmic5xxx_3_3: pmic@4b,20400000003 {
+-                reg = <0x4b 0x204 0x00000003>;
+-                assigned-address = <0x4b>;
+-        };
+-        rcd_3_3: rcd@5b,2C000000003 {
+-                reg = <0x5b 0x2C0 0x00000003>;
+-                assigned-address = <0x5b>;
+-        };
+-        //DIMM K
+-        spd5118_3_4: spd@54,3C000000004 {
+-                reg = <0x54 0x3C0 0x00000004>;
+-                assigned-address = <0x54>;
+-        };
+-        pmic5xxx_3_4: pmic@4c,20400000004 {
+-                reg = <0x4c 0x204 0x00000004>;
+-                assigned-address = <0x4c>;
+-        };
+-        rcd_3_4: rcd@5c,2C000000004 {
+-                reg = <0x5c 0x2C0 0x00000004>;
+-                assigned-address = <0x5c>;
+-        };
+-        //DIMM L
+-        spd5118_3_5: spd@55,3C000000005 {
+-                reg = <0x55 0x3C0 0x00000005>;
+-                assigned-address = <0x55>;
+-        };
+-        pmic5xxx_3_5: pmic@4d,20400000005 {
+-                reg = <0x4d 0x204 0x00000005>;
+-                assigned-address = <0x4d>;
+-        };
+-        rcd_3_5: rcd@5d,2C000000005 {
+-                reg = <0x5d 0x2C0 0x00000005>;
+-                assigned-address = <0x5d>;
+-        };
++	//DIMM G
++	spd5118_3_0: spd@50,3C000000000 {
++		reg = <0x50 0x3C0 0x00000000>;
++		assigned-address = <0x50>;
++	};
++	pmic5xxx_3_0: pmic@48,20400000000 {
++		reg = <0x48 0x204 0x00000000>;
++		assigned-address = <0x48>;
++	};
++	rcd_3_0: rcd@58,2C000000000 {
++		reg = <0x58 0x2C0 0x00000000>;
++		assigned-address = <0x58>;
++	};
++	//DIMM H
++	spd5118_3_1: spd@51,3C000000001 {
++		reg = <0x51 0x3C0 0x00000001>;
++		assigned-address = <0x51>;
++	};
++	pmic5xxx_3_1: pmic@49,20400000001 {
++		reg = <0x49 0x204 0x00000001>;
++		assigned-address = <0x49>;
++	};
++	rcd_3_1: rcd@59,2C000000001 {
++		reg = <0x59 0x2C0 0x00000001>;
++		assigned-address = <0x59>;
++	};
++	//DIMM I
++	spd5118_3_2: spd@52,3C000000002 {
++		reg = <0x52 0x3C0 0x00000002>;
++		assigned-address = <0x52>;
++	};
++	pmic5xxx_3_2: pmic@4a,20400000002 {
++		reg = <0x4a 0x204 0x00000002>;
++		assigned-address = <0x4a>;
++	};
++	rcd_3_2: rcd@5a,2C000000002 {
++		reg = <0x5a 0x2C0 0x00000002>;
++		assigned-address = <0x5a>;
++	};
++	//DIMM J
++	spd5118_3_3: spd@53,3C000000003 {
++		reg = <0x53 0x3C0 0x00000003>;
++		assigned-address = <0x53>;
++	};
++	pmic5xxx_3_3: pmic@4b,20400000003 {
++		reg = <0x4b 0x204 0x00000003>;
++		assigned-address = <0x4b>;
++	};
++	rcd_3_3: rcd@5b,2C000000003 {
++		reg = <0x5b 0x2C0 0x00000003>;
++		assigned-address = <0x5b>;
++	};
++	//DIMM K
++	spd5118_3_4: spd@54,3C000000004 {
++		reg = <0x54 0x3C0 0x00000004>;
++		assigned-address = <0x54>;
++	};
++	pmic5xxx_3_4: pmic@4c,20400000004 {
++		reg = <0x4c 0x204 0x00000004>;
++		assigned-address = <0x4c>;
++	};
++	rcd_3_4: rcd@5c,2C000000004 {
++		reg = <0x5c 0x2C0 0x00000004>;
++		assigned-address = <0x5c>;
++	};
++	//DIMM L
++	spd5118_3_5: spd@55,3C000000005 {
++		reg = <0x55 0x3C0 0x00000005>;
++		assigned-address = <0x55>;
++	};
++	pmic5xxx_3_5: pmic@4d,20400000005 {
++		reg = <0x4d 0x204 0x00000005>;
++		assigned-address = <0x4d>;
++	};
++	rcd_3_5: rcd@5d,2C000000005 {
++		reg = <0x5d 0x2C0 0x00000005>;
++		assigned-address = <0x5d>;
++	};
+ };
++#endif  // ENABLE_I3C_DIMM
+
+ &i3c4 {
+-    // P0 APML
+-    status = "okay";
+-
+-    jdec-spd;
+-
+-    imx3112_p0: i3cmux@70,4CC00000000 {
+-        reg = <0x70 0x4CC 0x00000000>;
+-        assigned-address = <0x70>;
+-    };
+-    sbtsi_p0_0: sbtsi@4c,22400000000 {
+-        reg = <0x4c 0x224 0x00000000>;
+-        assigned-address = <0x4c>;
+-    };
++	// P0 APML
++	status = "okay";
++
++	jdec-spd;
++	set_dasa;
++	bus_id = <0x04>;
++
++	imx3112_p0: i3cmux@70,4CC00000000 {
++		reg = <0x70 0x4CC 0x00000000>;
++		assigned-address = <0x70>;
++	};
++	sbtsi_p0_0: sbtsi@4c,22400000001 {
++		reg = <0x4c 0x224 0x00000001>;
++		assigned-address = <0x4c>;
++	};
++	sbrmi_p0_1: sbrmi@3c,22400000002 {
++		reg = <0x3c 0x224 0x00000002>;
++		assigned-address = <0x3c>;
++	};
+ };
+
+ &i3c5 {
+-    // P1 APML
+-    status = "okay";
+-
+-    jdec-spd;
+-
+-    imx3112_P1: i3cmux@70,4CC00000000 {
+-        reg = <0x70 0x4CC 0x00000000>;
+-        assigned-address = <0x70>;
+-    };
+-    sbtsi_p1_0: sbtsi@4c,22400000000 {
+-        reg = <0x4c 0x224 0x00000000>;
+-        assigned-address = <0x4c>;
+-    };
+- };
++	// P1 APML
++	status = "okay";
+
+-#endif  // OPENBMC_I3C_ENABLE
++	jdec-spd;
++	set_dasa;
++	bus_id = <0x05>;
+
++	imx3112_P1: i3cmux@70,4CC00000000 {
++		reg = <0x70 0x4CC 0x00000000>;
++		assigned-address = <0x70>;
++	};
++	sbtsi_p1_0: sbtsi@48,22400000001 {
++		reg = <0x48 0x224 0x00000001>;
++		assigned-address = <0x48>;
++	};
++	sbrmi_p1_1: sbrmi@38,22400000002 {
++		reg = <0x38 0x224 0x00000002>;
++		assigned-address = <0x38>;
++	};
++ };
++
++#ifdef ENABLE_I2C_APML
+ &i2c2 {
+-	// P0 APML
++	// P0 APML - i2c10
+ 	status = "okay";
+ 	bus-frequency = <400000>;
+
+@@ -1062,7 +1078,7 @@ sbtsi@4c {
+ };
+
+ &i2c3 {
+-	// P1 APML
++	// P1 APML - i2c11
+ 	status = "okay";
+ 	bus-frequency = <400000>;
+
+@@ -1071,6 +1087,7 @@ sbtsi@48 {
+ 		reg = <0x48>;
+ 	};
+ };
++#endif  // ENABLE_I2C_APML
+
+ &espi_ctrl {
+ 	status = "okay";
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+index 655f408211cf..43a6eca1c844 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+@@ -440,197 +440,206 @@ &i2c15 {
+ 	status = "okay";
+ };
+
+-#ifdef OPENBMC_I3C_ENABLE
++#ifdef ENABLE_I3C_DIMM
+
+ &i3c0 {
+-        // P0 DIMM (A-F) SPD Access
+-        status = "okay";
+-
+-        jdec-spd;
+-
+-        //DIMM A
+-        spd5118_0_0: spd@50,3C000000000 {
+-                reg = <0x50 0x3C0 0x00000000>;
+-                assigned-address = <0x50>;
+-        };
+-        pmic5xxx_0_0: pmic@48,20400000000 {
+-                reg = <0x48 0x204 0x00000000>;
+-                assigned-address = <0x48>;
+-        };
+-        rcd_0_0: rcd@58,2C000000000 {
+-                reg = <0x58 0x2C0 0x00000000>;
+-                assigned-address = <0x58>;
+-        };
+-        //DIMM B
+-        spd5118_0_1: spd@51,3C000000001 {
+-                reg = <0x51 0x3C0 0x00000001>;
+-                assigned-address = <0x51>;
+-        };
+-        pmic5xxx_0_1: pmic@49,20400000001 {
+-                reg = <0x49 0x204 0x00000001>;
+-                assigned-address = <0x49>;
+-        };
+-        rcd_0_1: rcd@59,2C000000001 {
+-                reg = <0x59 0x2C0 0x00000001>;
+-                assigned-address = <0x59>;
+-        };
+-        //DIMM C
+-        spd5118_0_2: spd@52,3C000000002 {
+-                reg = <0x52 0x3C0 0x00000002>;
+-                assigned-address = <0x52>;
+-        };
+-        pmic5xxx_0_2: pmic@4a,20400000002 {
+-                reg = <0x4a 0x204 0x00000002>;
+-                assigned-address = <0x4a>;
+-        };
+-        rcd_0_2: rcd@5a,2C000000002 {
+-                reg = <0x5a 0x2C0 0x00000002>;
+-                assigned-address = <0x5a>;
+-        };
+-        //DIMM D
+-        spd5118_0_3: spd@53,3C000000003 {
+-                reg = <0x53 0x3C0 0x00000003>;
+-                assigned-address = <0x53>;
+-        };
+-        pmic5xxx_0_3: pmic@4b,20400000003 {
+-                reg = <0x4b 0x204 0x00000003>;
+-                assigned-address = <0x4b>;
+-        };
+-        rcd_0_3: rcd@5b,2C000000003 {
+-                reg = <0x5b 0x2C0 0x00000003>;
+-                assigned-address = <0x5b>;
+-        };
+-        //DIMM E
+-        spd5118_0_4: spd@54,3C000000004 {
+-                reg = <0x54 0x3C0 0x00000004>;
+-                assigned-address = <0x54>;
+-        };
+-        pmic5xxx_0_4: pmic@4c,20400000004 {
+-                reg = <0x4c 0x204 0x00000004>;
+-                assigned-address = <0x4c>;
+-        };
+-        rcd_0_4: rcd@5c,2C000000004 {
+-                reg = <0x5c 0x2C0 0x00000004>;
+-                assigned-address = <0x5c>;
+-        };
+-        //DIMM F
+-        spd5118_0_5: spd@55,3C000000005 {
+-                reg = <0x55 0x3C0 0x00000005>;
+-                assigned-address = <0x55>;
+-        };
+-        pmic5xxx_0_5: pmic@4d,20400000005 {
+-                reg = <0x4d 0x204 0x00000005>;
+-                assigned-address = <0x4d>;
+-        };
+-        rcd_0_5: rcd@5d,2C000000005 {
+-                reg = <0x5d 0x2C0 0x00000005>;
+-                assigned-address = <0x5d>;
+-        };
+- };
+-
+- &i3c1 {
++	// P0 DIMM (A-F) SPD Access
++	status = "okay";
++
++	jdec-spd;
++	bus_id = <0x00>;
++
++	//DIMM A
++	spd5118_0_0: spd@50,3C000000000 {
++		reg = <0x50 0x3C0 0x00000000>;
++		assigned-address = <0x50>;
++	};
++	pmic5xxx_0_0: pmic@48,20400000000 {
++		reg = <0x48 0x204 0x00000000>;
++		assigned-address = <0x48>;
++	};
++	rcd_0_0: rcd@58,2C000000000 {
++		reg = <0x58 0x2C0 0x00000000>;
++		assigned-address = <0x58>;
++	};
++	//DIMM B
++	spd5118_0_1: spd@51,3C000000001 {
++		reg = <0x51 0x3C0 0x00000001>;
++		assigned-address = <0x51>;
++	};
++	pmic5xxx_0_1: pmic@49,20400000001 {
++		reg = <0x49 0x204 0x00000001>;
++		assigned-address = <0x49>;
++	};
++	rcd_0_1: rcd@59,2C000000001 {
++		reg = <0x59 0x2C0 0x00000001>;
++		assigned-address = <0x59>;
++	};
++	//DIMM C
++	spd5118_0_2: spd@52,3C000000002 {
++		reg = <0x52 0x3C0 0x00000002>;
++		assigned-address = <0x52>;
++	};
++	pmic5xxx_0_2: pmic@4a,20400000002 {
++		reg = <0x4a 0x204 0x00000002>;
++		assigned-address = <0x4a>;
++	};
++	rcd_0_2: rcd@5a,2C000000002 {
++		reg = <0x5a 0x2C0 0x00000002>;
++		assigned-address = <0x5a>;
++	};
++	//DIMM D
++	spd5118_0_3: spd@53,3C000000003 {
++		reg = <0x53 0x3C0 0x00000003>;
++		assigned-address = <0x53>;
++	};
++	pmic5xxx_0_3: pmic@4b,20400000003 {
++		reg = <0x4b 0x204 0x00000003>;
++		assigned-address = <0x4b>;
++	};
++	rcd_0_3: rcd@5b,2C000000003 {
++		reg = <0x5b 0x2C0 0x00000003>;
++		assigned-address = <0x5b>;
++	};
++	//DIMM E
++	spd5118_0_4: spd@54,3C000000004 {
++		reg = <0x54 0x3C0 0x00000004>;
++		assigned-address = <0x54>;
++	};
++	pmic5xxx_0_4: pmic@4c,20400000004 {
++		reg = <0x4c 0x204 0x00000004>;
++		assigned-address = <0x4c>;
++	};
++	rcd_0_4: rcd@5c,2C000000004 {
++		reg = <0x5c 0x2C0 0x00000004>;
++		assigned-address = <0x5c>;
++	};
++	//DIMM F
++	spd5118_0_5: spd@55,3C000000005 {
++		reg = <0x55 0x3C0 0x00000005>;
++		assigned-address = <0x55>;
++	};
++	pmic5xxx_0_5: pmic@4d,20400000005 {
++		reg = <0x4d 0x204 0x00000005>;
++		assigned-address = <0x4d>;
++	};
++	rcd_0_5: rcd@5d,2C000000005 {
++		reg = <0x5d 0x2C0 0x00000005>;
++		assigned-address = <0x5d>;
++	};
++};
++
++&i3c1 {
+ 	// P0 DIMM (G-L) SPD Access
+ 	status = "okay";
+
+ 	jdec-spd;
++	bus_id = <0x01>;
+
+-        //DIMM G
+-        spd5118_1_0: spd@50,3C000000000 {
+-                reg = <0x50 0x3C0 0x00000000>;
+-                assigned-address = <0x50>;
+-        };
+-        pmic5xxx_1_0: pmic@48,20400000000 {
+-                reg = <0x48 0x204 0x00000000>;
+-                assigned-address = <0x48>;
+-        };
+-        rcd_1_0: rcd@58,2C000000000 {
+-                reg = <0x58 0x2C0 0x00000000>;
+-                assigned-address = <0x58>;
+-        };
+-        //DIMM H
+-        spd5118_1_1: spd@51,3C000000001 {
+-                reg = <0x51 0x3C0 0x00000001>;
+-                assigned-address = <0x51>;
+-        };
+-        pmic5xxx_1_1: pmic@49,20400000001 {
+-                reg = <0x49 0x204 0x00000001>;
+-                assigned-address = <0x49>;
+-        };
+-        rcd_1_1: rcd@59,2C000000001 {
+-                reg = <0x59 0x2C0 0x00000001>;
+-                assigned-address = <0x59>;
+-        };
+-        //DIMM I
+-        spd5118_1_2: spd@52,3C000000002 {
+-                reg = <0x52 0x3C0 0x00000002>;
+-                assigned-address = <0x52>;
+-        };
+-        pmic5xxx_1_2: pmic@4a,20400000002 {
+-                reg = <0x4a 0x204 0x00000002>;
+-                assigned-address = <0x4a>;
+-        };
+-        rcd_1_2: rcd@5a,2C000000002 {
+-                reg = <0x5a 0x2C0 0x00000002>;
+-                assigned-address = <0x5a>;
+-        };
+-        //DIMM J
+-        spd5118_1_3: spd@53,3C000000003 {
+-                reg = <0x53 0x3C0 0x00000003>;
+-                assigned-address = <0x53>;
+-        };
+-        pmic5xxx_1_3: pmic@4b,20400000003 {
+-                reg = <0x4b 0x204 0x00000003>;
+-                assigned-address = <0x4b>;
+-        };
+-        rcd_1_3: rcd@5b,2C000000003 {
+-                reg = <0x5b 0x2C0 0x00000003>;
+-                assigned-address = <0x5b>;
+-        };
+-        //DIMM K
+-        spd5118_1_4: spd@54,3C000000004 {
+-                reg = <0x54 0x3C0 0x00000004>;
+-                assigned-address = <0x54>;
+-        };
+-        pmic5xxx_1_4: pmic@4c,20400000004 {
+-                reg = <0x4c 0x204 0x00000004>;
+-                assigned-address = <0x4c>;
+-        };
+-        rcd_1_4: rcd@5c,2C000000004 {
+-                reg = <0x5c 0x2C0 0x00000004>;
+-                assigned-address = <0x5c>;
+-        };
+-        //DIMM L
+-        spd5118_1_5: spd@55,3C000000005 {
+-                reg = <0x55 0x3C0 0x00000005>;
+-                assigned-address = <0x55>;
+-        };
+-        pmic5xxx_1_5: pmic@4d,20400000005 {
+-                reg = <0x4d 0x204 0x00000005>;
+-                assigned-address = <0x4d>;
+-        };
+-        rcd_1_5: rcd@5d,2C000000005 {
+-                reg = <0x5d 0x2C0 0x00000005>;
+-                assigned-address = <0x5d>;
+-        };
+- };
++	//DIMM G
++	spd5118_1_0: spd@50,3C000000000 {
++		reg = <0x50 0x3C0 0x00000000>;
++		assigned-address = <0x50>;
++	};
++	pmic5xxx_1_0: pmic@48,20400000000 {
++		reg = <0x48 0x204 0x00000000>;
++		assigned-address = <0x48>;
++	};
++	rcd_1_0: rcd@58,2C000000000 {
++		reg = <0x58 0x2C0 0x00000000>;
++		assigned-address = <0x58>;
++	};
++	//DIMM H
++	spd5118_1_1: spd@51,3C000000001 {
++		reg = <0x51 0x3C0 0x00000001>;
++		assigned-address = <0x51>;
++	};
++	pmic5xxx_1_1: pmic@49,20400000001 {
++		reg = <0x49 0x204 0x00000001>;
++		assigned-address = <0x49>;
++	};
++	rcd_1_1: rcd@59,2C000000001 {
++		reg = <0x59 0x2C0 0x00000001>;
++		assigned-address = <0x59>;
++	};
++	//DIMM I
++	spd5118_1_2: spd@52,3C000000002 {
++		reg = <0x52 0x3C0 0x00000002>;
++		assigned-address = <0x52>;
++	};
++	pmic5xxx_1_2: pmic@4a,20400000002 {
++		reg = <0x4a 0x204 0x00000002>;
++		assigned-address = <0x4a>;
++	};
++	rcd_1_2: rcd@5a,2C000000002 {
++		reg = <0x5a 0x2C0 0x00000002>;
++		assigned-address = <0x5a>;
++	};
++	//DIMM J
++	spd5118_1_3: spd@53,3C000000003 {
++		reg = <0x53 0x3C0 0x00000003>;
++		assigned-address = <0x53>;
++	};
++	pmic5xxx_1_3: pmic@4b,20400000003 {
++		reg = <0x4b 0x204 0x00000003>;
++		assigned-address = <0x4b>;
++	};
++	rcd_1_3: rcd@5b,2C000000003 {
++		reg = <0x5b 0x2C0 0x00000003>;
++		assigned-address = <0x5b>;
++	};
++	//DIMM K
++	spd5118_1_4: spd@54,3C000000004 {
++		reg = <0x54 0x3C0 0x00000004>;
++		assigned-address = <0x54>;
++	};
++	pmic5xxx_1_4: pmic@4c,20400000004 {
++		reg = <0x4c 0x204 0x00000004>;
++		assigned-address = <0x4c>;
++	};
++	rcd_1_4: rcd@5c,2C000000004 {
++		reg = <0x5c 0x2C0 0x00000004>;
++		assigned-address = <0x5c>;
++	};
++	//DIMM L
++	spd5118_1_5: spd@55,3C000000005 {
++		reg = <0x55 0x3C0 0x00000005>;
++		assigned-address = <0x55>;
++	};
++	pmic5xxx_1_5: pmic@4d,20400000005 {
++		reg = <0x4d 0x204 0x00000005>;
++		assigned-address = <0x4d>;
++	};
++	rcd_1_5: rcd@5d,2C000000005 {
++		reg = <0x5d 0x2C0 0x00000005>;
++		assigned-address = <0x5d>;
++	};
++};
++#endif  // ENABLE_I3C_DIMM
+
+ &i3c4 {
+-    // P0 APML
+-    status = "okay";
++	// P0 APML
++	status = "okay";
+
+-    jdec-spd;
++	jdec-spd;
++	set_dasa;
++	bus_id = <0x04>;
+
+-    imx3112_p0: i3cmux@70,4CC00000000 {
+-        reg = <0x70 0x4CC 0x00000000>;
+-        assigned-address = <0x70>;
+-    };
+-    sbtsi_p0_0: sbtsi@4c,22400000000 {
+-        reg = <0x4c 0x224 0x00000000>;
+-        assigned-address = <0x4c>;
+-    };
++	imx3112_p0: i3cmux@70,4CC00000000 {
++		reg = <0x70 0x4CC 0x00000000>;
++		assigned-address = <0x70>;
++	};
++	sbtsi_p0_0: sbtsi@4c,22400000001 {
++		reg = <0x4c 0x224 0x00000001>;
++		assigned-address = <0x4c>;
++	};
++	sbrmi_p0_1: sbrmi@3c,22400000002 {
++		reg = <0x3c 0x224 0x00000002>;
++		assigned-address = <0x3c>;
++	};
+ };
+
+-#endif  // OPENBMC_I3C_ENABLE
++#ifdef ENABLE_I2C_APML
+
+ &i2c2 {
+ 	// P0 APML
+@@ -641,6 +650,7 @@ sbtsi@4c {
+ 		reg = <0x4c>;
+ 	};
+ };
++#endif  // OPENBMC_I2C_ENABLE
+
+ &espi_ctrl {
+ 	status = "okay";
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts b/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
+index 87ad302d7ebb..65adea9cdf0a 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
+@@ -167,385 +167,402 @@ &i2c1 {
+ 		//<TBD> Define LCD details here
+ };
+
+-#ifdef OPENBMC_I3C_ENABLE
++#ifdef ENABLE_I3C_DIMM
+
+ &i3c0 {
+-        // P0 DIMM (A-F) SPD Access
+-        status = "okay";
+-
+-        jdec-spd;
+-
+-        //DIMM A
+-        spd5118_0_0: spd@50,3C000000000 {
+-                reg = <0x50 0x3C0 0x00000000>;
+-                assigned-address = <0x50>;
+-        };
+-        pmic5xxx_0_0: pmic@48,20400000000 {
+-                reg = <0x48 0x204 0x00000000>;
+-                assigned-address = <0x48>;
+-        };
+-        rcd_0_0: rcd@58,2C000000000 {
+-                reg = <0x58 0x2C0 0x00000000>;
+-                assigned-address = <0x58>;
+-        };
+-        //DIMM B
+-        spd5118_0_1: spd@51,3C000000001 {
+-                reg = <0x51 0x3C0 0x00000001>;
+-                assigned-address = <0x51>;
+-        };
+-        pmic5xxx_0_1: pmic@49,20400000001 {
+-                reg = <0x49 0x204 0x00000001>;
+-                assigned-address = <0x49>;
+-        };
+-        rcd_0_1: rcd@59,2C000000001 {
+-                reg = <0x59 0x2C0 0x00000001>;
+-                assigned-address = <0x59>;
+-        };
+-        //DIMM C
+-        spd5118_0_2: spd@52,3C000000002 {
+-                reg = <0x52 0x3C0 0x00000002>;
+-                assigned-address = <0x52>;
+-        };
+-        pmic5xxx_0_2: pmic@4a,20400000002 {
+-                reg = <0x4a 0x204 0x00000002>;
+-                assigned-address = <0x4a>;
+-        };
+-        rcd_0_2: rcd@5a,2C000000002 {
+-                reg = <0x5a 0x2C0 0x00000002>;
+-                assigned-address = <0x5a>;
+-        };
+-        //DIMM D
+-        spd5118_0_3: spd@53,3C000000003 {
+-                reg = <0x53 0x3C0 0x00000003>;
+-                assigned-address = <0x53>;
+-        };
+-        pmic5xxx_0_3: pmic@4b,20400000003 {
+-                reg = <0x4b 0x204 0x00000003>;
+-                assigned-address = <0x4b>;
+-        };
+-        rcd_0_3: rcd@5b,2C000000003 {
+-                reg = <0x5b 0x2C0 0x00000003>;
+-                assigned-address = <0x5b>;
+-        };
+-        //DIMM E
+-        spd5118_0_4: spd@54,3C000000004 {
+-                reg = <0x54 0x3C0 0x00000004>;
+-                assigned-address = <0x54>;
+-        };
+-        pmic5xxx_0_4: pmic@4c,20400000004 {
+-                reg = <0x4c 0x204 0x00000004>;
+-                assigned-address = <0x4c>;
+-        };
+-        rcd_0_4: rcd@5c,2C000000004 {
+-                reg = <0x5c 0x2C0 0x00000004>;
+-                assigned-address = <0x5c>;
+-        };
+-        //DIMM F
+-        spd5118_0_5: spd@55,3C000000005 {
+-                reg = <0x55 0x3C0 0x00000005>;
+-                assigned-address = <0x55>;
+-        };
+-        pmic5xxx_0_5: pmic@4d,20400000005 {
+-                reg = <0x4d 0x204 0x00000005>;
+-                assigned-address = <0x4d>;
+-        };
+-        rcd_0_5: rcd@5d,2C000000005 {
+-                reg = <0x5d 0x2C0 0x00000005>;
+-                assigned-address = <0x5d>;
+-        };
+- };
++	// P0 DIMM (A-F) SPD Access
++	status = "okay";
++
++	jdec-spd;
++	bus_id = <0x00>;
++
++	//DIMM A
++	spd5118_0_0: spd@50,3C000000000 {
++		reg = <0x50 0x3C0 0x00000000>;
++		assigned-address = <0x50>;
++	};
++	pmic5xxx_0_0: pmic@48,20400000000 {
++		reg = <0x48 0x204 0x00000000>;
++		assigned-address = <0x48>;
++	};
++	rcd_0_0: rcd@58,2C000000000 {
++		reg = <0x58 0x2C0 0x00000000>;
++		assigned-address = <0x58>;
++	};
++	//DIMM B
++	spd5118_0_1: spd@51,3C000000001 {
++		reg = <0x51 0x3C0 0x00000001>;
++		assigned-address = <0x51>;
++	};
++	pmic5xxx_0_1: pmic@49,20400000001 {
++		reg = <0x49 0x204 0x00000001>;
++		assigned-address = <0x49>;
++	};
++	rcd_0_1: rcd@59,2C000000001 {
++		reg = <0x59 0x2C0 0x00000001>;
++		assigned-address = <0x59>;
++	};
++	//DIMM C
++	spd5118_0_2: spd@52,3C000000002 {
++		reg = <0x52 0x3C0 0x00000002>;
++		assigned-address = <0x52>;
++	};
++	pmic5xxx_0_2: pmic@4a,20400000002 {
++		reg = <0x4a 0x204 0x00000002>;
++		assigned-address = <0x4a>;
++	};
++	rcd_0_2: rcd@5a,2C000000002 {
++		reg = <0x5a 0x2C0 0x00000002>;
++		assigned-address = <0x5a>;
++	};
++	//DIMM D
++	spd5118_0_3: spd@53,3C000000003 {
++		reg = <0x53 0x3C0 0x00000003>;
++		assigned-address = <0x53>;
++	};
++	pmic5xxx_0_3: pmic@4b,20400000003 {
++		reg = <0x4b 0x204 0x00000003>;
++		assigned-address = <0x4b>;
++	};
++	rcd_0_3: rcd@5b,2C000000003 {
++		reg = <0x5b 0x2C0 0x00000003>;
++		assigned-address = <0x5b>;
++	};
++	//DIMM E
++	spd5118_0_4: spd@54,3C000000004 {
++		reg = <0x54 0x3C0 0x00000004>;
++		assigned-address = <0x54>;
++	};
++	pmic5xxx_0_4: pmic@4c,20400000004 {
++		reg = <0x4c 0x204 0x00000004>;
++		assigned-address = <0x4c>;
++	};
++	rcd_0_4: rcd@5c,2C000000004 {
++		reg = <0x5c 0x2C0 0x00000004>;
++		assigned-address = <0x5c>;
++	};
++	//DIMM F
++	spd5118_0_5: spd@55,3C000000005 {
++		reg = <0x55 0x3C0 0x00000005>;
++		assigned-address = <0x55>;
++	};
++	pmic5xxx_0_5: pmic@4d,20400000005 {
++		reg = <0x4d 0x204 0x00000005>;
++		assigned-address = <0x4d>;
++	};
++	rcd_0_5: rcd@5d,2C000000005 {
++		reg = <0x5d 0x2C0 0x00000005>;
++		assigned-address = <0x5d>;
++	};
++};
+
+- &i3c1 {
++&i3c1 {
+ 	// P0 DIMM (G-L) SPD Access
+ 	status = "okay";
+
+ 	jdec-spd;
++	bus_id = <0x01>;
+
+-        //DIMM G
+-        spd5118_1_0: spd@50,3C000000000 {
+-                reg = <0x50 0x3C0 0x00000000>;
+-                assigned-address = <0x50>;
+-        };
+-        pmic5xxx_1_0: pmic@48,20400000000 {
+-                reg = <0x48 0x204 0x00000000>;
+-                assigned-address = <0x48>;
+-        };
+-        rcd_1_0: rcd@58,2C000000000 {
+-                reg = <0x58 0x2C0 0x00000000>;
+-                assigned-address = <0x58>;
+-        };
+-        //DIMM H
+-        spd5118_1_1: spd@51,3C000000001 {
+-                reg = <0x51 0x3C0 0x00000001>;
+-                assigned-address = <0x51>;
+-        };
+-        pmic5xxx_1_1: pmic@49,20400000001 {
+-                reg = <0x49 0x204 0x00000001>;
+-                assigned-address = <0x49>;
+-        };
+-        rcd_1_1: rcd@59,2C000000001 {
+-                reg = <0x59 0x2C0 0x00000001>;
+-                assigned-address = <0x59>;
+-        };
+-        //DIMM I
+-        spd5118_1_2: spd@52,3C000000002 {
+-                reg = <0x52 0x3C0 0x00000002>;
+-                assigned-address = <0x52>;
+-        };
+-        pmic5xxx_1_2: pmic@4a,20400000002 {
+-                reg = <0x4a 0x204 0x00000002>;
+-                assigned-address = <0x4a>;
+-        };
+-        rcd_1_2: rcd@5a,2C000000002 {
+-                reg = <0x5a 0x2C0 0x00000002>;
+-                assigned-address = <0x5a>;
+-        };
+-        //DIMM J
+-        spd5118_1_3: spd@53,3C000000003 {
+-                reg = <0x53 0x3C0 0x00000003>;
+-                assigned-address = <0x53>;
+-        };
+-        pmic5xxx_1_3: pmic@4b,20400000003 {
+-                reg = <0x4b 0x204 0x00000003>;
+-                assigned-address = <0x4b>;
+-        };
+-        rcd_1_3: rcd@5b,2C000000003 {
+-                reg = <0x5b 0x2C0 0x00000003>;
+-                assigned-address = <0x5b>;
+-        };
+-        //DIMM K
+-        spd5118_1_4: spd@54,3C000000004 {
+-                reg = <0x54 0x3C0 0x00000004>;
+-                assigned-address = <0x54>;
+-        };
+-        pmic5xxx_1_4: pmic@4c,20400000004 {
+-                reg = <0x4c 0x204 0x00000004>;
+-                assigned-address = <0x4c>;
+-        };
+-        rcd_1_4: rcd@5c,2C000000004 {
+-                reg = <0x5c 0x2C0 0x00000004>;
+-                assigned-address = <0x5c>;
+-        };
+-        //DIMM L
+-        spd5118_1_5: spd@55,3C000000005 {
+-                reg = <0x55 0x3C0 0x00000005>;
+-                assigned-address = <0x55>;
+-        };
+-        pmic5xxx_1_5: pmic@4d,20400000005 {
+-                reg = <0x4d 0x204 0x00000005>;
+-                assigned-address = <0x4d>;
+-        };
+-        rcd_1_5: rcd@5d,2C000000005 {
+-                reg = <0x5d 0x2C0 0x00000005>;
+-                assigned-address = <0x5d>;
+-        };
++	//DIMM G
++	spd5118_1_0: spd@50,3C000000000 {
++		reg = <0x50 0x3C0 0x00000000>;
++		assigned-address = <0x50>;
++	};
++	pmic5xxx_1_0: pmic@48,20400000000 {
++		reg = <0x48 0x204 0x00000000>;
++		assigned-address = <0x48>;
++	};
++	rcd_1_0: rcd@58,2C000000000 {
++		reg = <0x58 0x2C0 0x00000000>;
++		assigned-address = <0x58>;
++	};
++	//DIMM H
++	spd5118_1_1: spd@51,3C000000001 {
++		reg = <0x51 0x3C0 0x00000001>;
++		assigned-address = <0x51>;
++	};
++	pmic5xxx_1_1: pmic@49,20400000001 {
++		reg = <0x49 0x204 0x00000001>;
++		assigned-address = <0x49>;
++	};
++	rcd_1_1: rcd@59,2C000000001 {
++		reg = <0x59 0x2C0 0x00000001>;
++		assigned-address = <0x59>;
++	};
++	//DIMM I
++	spd5118_1_2: spd@52,3C000000002 {
++		reg = <0x52 0x3C0 0x00000002>;
++		assigned-address = <0x52>;
++	};
++	pmic5xxx_1_2: pmic@4a,20400000002 {
++		reg = <0x4a 0x204 0x00000002>;
++		assigned-address = <0x4a>;
++	};
++	rcd_1_2: rcd@5a,2C000000002 {
++		reg = <0x5a 0x2C0 0x00000002>;
++		assigned-address = <0x5a>;
++	};
++	//DIMM J
++	spd5118_1_3: spd@53,3C000000003 {
++		reg = <0x53 0x3C0 0x00000003>;
++		assigned-address = <0x53>;
++	};
++	pmic5xxx_1_3: pmic@4b,20400000003 {
++		reg = <0x4b 0x204 0x00000003>;
++		assigned-address = <0x4b>;
++	};
++	rcd_1_3: rcd@5b,2C000000003 {
++		reg = <0x5b 0x2C0 0x00000003>;
++		assigned-address = <0x5b>;
++	};
++	//DIMM K
++	spd5118_1_4: spd@54,3C000000004 {
++		reg = <0x54 0x3C0 0x00000004>;
++		assigned-address = <0x54>;
++	};
++	pmic5xxx_1_4: pmic@4c,20400000004 {
++		reg = <0x4c 0x204 0x00000004>;
++		assigned-address = <0x4c>;
++	};
++	rcd_1_4: rcd@5c,2C000000004 {
++		reg = <0x5c 0x2C0 0x00000004>;
++		assigned-address = <0x5c>;
++	};
++	//DIMM L
++	spd5118_1_5: spd@55,3C000000005 {
++		reg = <0x55 0x3C0 0x00000005>;
++		assigned-address = <0x55>;
++	};
++	pmic5xxx_1_5: pmic@4d,20400000005 {
++		reg = <0x4d 0x204 0x00000005>;
++		assigned-address = <0x4d>;
++	};
++	rcd_1_5: rcd@5d,2C000000005 {
++		reg = <0x5d 0x2C0 0x00000005>;
++		assigned-address = <0x5d>;
++	};
+  };
+
+ &i3c2 {
+-        // P1 DIMM (A-F) SPD Access
+-        status = "okay";
++	// P1 DIMM (A-F) SPD Access
++	status = "okay";
+
+ 	jdec-spd;
++	bus_id = <0x02>;
+
+-        //DIMM A
+-        spd5118_2_0: spd@50,3C000000000 {
+-                reg = <0x50 0x3C0 0x00000000>;
+-                assigned-address = <0x50>;
+-        };
+-        pmic5xxx_2_0: pmic@48,20400000000 {
+-                reg = <0x48 0x204 0x00000000>;
+-                assigned-address = <0x48>;
+-        };
+-        rcd_2_0: rcd@58,2C000000000 {
+-                reg = <0x58 0x2C0 0x00000000>;
+-                assigned-address = <0x58>;
+-        };
+-        //DIMM B
+-        spd5118_2_1: spd@51,3C000000001 {
+-                reg = <0x51 0x3C0 0x00000001>;
+-                assigned-address = <0x51>;
+-        };
+-        pmic5xxx_2_1: pmic@49,20400000001 {
+-                reg = <0x49 0x204 0x00000001>;
+-                assigned-address = <0x49>;
+-        };
+-        rcd_2_1: rcd@59,2C000000001 {
+-                reg = <0x59 0x2C0 0x00000001>;
+-                assigned-address = <0x59>;
+-        };
+-        //DIMM C
+-        spd5118_2_2: spd@52,3C000000002 {
+-                reg = <0x52 0x3C0 0x00000002>;
+-                assigned-address = <0x52>;
+-        };
+-        pmic5xxx_2_2: pmic@4a,20400000002 {
+-                reg = <0x4a 0x204 0x00000002>;
+-                assigned-address = <0x4a>;
+-        };
+-        rcd_2_2: rcd@5a,2C000000002 {
+-                reg = <0x5a 0x2C0 0x00000002>;
+-                assigned-address = <0x5a>;
+-        };
+-        //DIMM D
+-        spd5118_2_3: spd@53,3C000000003 {
+-                reg = <0x53 0x3C0 0x00000003>;
+-                assigned-address = <0x53>;
+-        };
+-        pmic5xxx_2_3: pmic@4b,20400000003 {
+-                reg = <0x4b 0x204 0x00000003>;
+-                assigned-address = <0x4b>;
+-        };
+-        rcd_2_3: rcd@5b,2C000000003 {
+-                reg = <0x5b 0x2C0 0x00000003>;
+-                assigned-address = <0x5b>;
+-        };
+-        //DIMM E
+-        spd5118_2_4: spd@54,3C000000004 {
+-                reg = <0x54 0x3C0 0x00000004>;
+-                assigned-address = <0x54>;
+-        };
+-        pmic5xxx_2_4: pmic@4c,20400000004 {
+-                reg = <0x4c 0x204 0x00000004>;
+-                assigned-address = <0x4c>;
+-        };
+-        rcd_2_4: rcd@5c,2C000000004 {
+-                reg = <0x5c 0x2C0 0x00000004>;
+-                assigned-address = <0x5c>;
+-        };
+-        //DIMM F
+-        spd5118_2_5: spd@55,3C000000005 {
+-                reg = <0x55 0x3C0 0x00000005>;
+-                assigned-address = <0x55>;
+-        };
+-        pmic5xxx_2_5: pmic@4d,20400000005 {
+-                reg = <0x4d 0x204 0x00000005>;
+-                assigned-address = <0x4d>;
+-        };
+-        rcd_2_5: rcd@5d,2C000000005 {
+-                reg = <0x5d 0x2C0 0x00000005>;
+-                assigned-address = <0x5d>;
+-        };
+- };
++	//DIMM A
++	spd5118_2_0: spd@50,3C000000000 {
++		reg = <0x50 0x3C0 0x00000000>;
++		assigned-address = <0x50>;
++	};
++	pmic5xxx_2_0: pmic@48,20400000000 {
++		reg = <0x48 0x204 0x00000000>;
++		assigned-address = <0x48>;
++	};
++	rcd_2_0: rcd@58,2C000000000 {
++		reg = <0x58 0x2C0 0x00000000>;
++		assigned-address = <0x58>;
++	};
++	//DIMM B
++	spd5118_2_1: spd@51,3C000000001 {
++		reg = <0x51 0x3C0 0x00000001>;
++		assigned-address = <0x51>;
++	};
++	pmic5xxx_2_1: pmic@49,20400000001 {
++		reg = <0x49 0x204 0x00000001>;
++		assigned-address = <0x49>;
++	};
++	rcd_2_1: rcd@59,2C000000001 {
++		reg = <0x59 0x2C0 0x00000001>;
++		assigned-address = <0x59>;
++	};
++	//DIMM C
++	spd5118_2_2: spd@52,3C000000002 {
++		reg = <0x52 0x3C0 0x00000002>;
++		assigned-address = <0x52>;
++	};
++	pmic5xxx_2_2: pmic@4a,20400000002 {
++		reg = <0x4a 0x204 0x00000002>;
++		assigned-address = <0x4a>;
++	};
++	rcd_2_2: rcd@5a,2C000000002 {
++		reg = <0x5a 0x2C0 0x00000002>;
++		assigned-address = <0x5a>;
++	};
++	//DIMM D
++	spd5118_2_3: spd@53,3C000000003 {
++		reg = <0x53 0x3C0 0x00000003>;
++		assigned-address = <0x53>;
++	};
++	pmic5xxx_2_3: pmic@4b,20400000003 {
++		reg = <0x4b 0x204 0x00000003>;
++		assigned-address = <0x4b>;
++	};
++	rcd_2_3: rcd@5b,2C000000003 {
++		reg = <0x5b 0x2C0 0x00000003>;
++		assigned-address = <0x5b>;
++	};
++	//DIMM E
++	spd5118_2_4: spd@54,3C000000004 {
++		reg = <0x54 0x3C0 0x00000004>;
++		assigned-address = <0x54>;
++	};
++	pmic5xxx_2_4: pmic@4c,20400000004 {
++		reg = <0x4c 0x204 0x00000004>;
++		assigned-address = <0x4c>;
++	};
++	rcd_2_4: rcd@5c,2C000000004 {
++		reg = <0x5c 0x2C0 0x00000004>;
++		assigned-address = <0x5c>;
++	};
++	//DIMM F
++	spd5118_2_5: spd@55,3C000000005 {
++		reg = <0x55 0x3C0 0x00000005>;
++		assigned-address = <0x55>;
++	};
++	pmic5xxx_2_5: pmic@4d,20400000005 {
++		reg = <0x4d 0x204 0x00000005>;
++		assigned-address = <0x4d>;
++	};
++	rcd_2_5: rcd@5d,2C000000005 {
++		reg = <0x5d 0x2C0 0x00000005>;
++		assigned-address = <0x5d>;
++	};
++};
+
+ &i3c3 {
+ 	// P1 DIMM (G-L) SPD Access
+ 	status = "okay";
+
+ 	jdec-spd;
++	bus_id = <0x03>;
+
+-        //DIMM G
+-        spd5118_3_0: spd@50,3C000000000 {
+-                reg = <0x50 0x3C0 0x00000000>;
+-                assigned-address = <0x50>;
+-        };
+-        pmic5xxx_3_0: pmic@48,20400000000 {
+-                reg = <0x48 0x204 0x00000000>;
+-                assigned-address = <0x48>;
+-        };
+-        rcd_3_0: rcd@58,2C000000000 {
+-                reg = <0x58 0x2C0 0x00000000>;
+-                assigned-address = <0x58>;
+-        };
+-        //DIMM H
+-        spd5118_3_1: spd@51,3C000000001 {
+-                reg = <0x51 0x3C0 0x00000001>;
+-                assigned-address = <0x51>;
+-        };
+-        pmic5xxx_3_1: pmic@49,20400000001 {
+-                reg = <0x49 0x204 0x00000001>;
+-                assigned-address = <0x49>;
+-        };
+-        rcd_3_1: rcd@59,2C000000001 {
+-                reg = <0x59 0x2C0 0x00000001>;
+-                assigned-address = <0x59>;
+-        };
+-        //DIMM I
+-        spd5118_3_2: spd@52,3C000000002 {
+-                reg = <0x52 0x3C0 0x00000002>;
+-                assigned-address = <0x52>;
+-        };
+-        pmic5xxx_3_2: pmic@4a,20400000002 {
+-                reg = <0x4a 0x204 0x00000002>;
+-                assigned-address = <0x4a>;
+-        };
+-        rcd_3_2: rcd@5a,2C000000002 {
+-                reg = <0x5a 0x2C0 0x00000002>;
+-                assigned-address = <0x5a>;
+-        };
+-        //DIMM J
+-        spd5118_3_3: spd@53,3C000000003 {
+-                reg = <0x53 0x3C0 0x00000003>;
+-                assigned-address = <0x53>;
+-        };
+-        pmic5xxx_3_3: pmic@4b,20400000003 {
+-                reg = <0x4b 0x204 0x00000003>;
+-                assigned-address = <0x4b>;
+-        };
+-        rcd_3_3: rcd@5b,2C000000003 {
+-                reg = <0x5b 0x2C0 0x00000003>;
+-                assigned-address = <0x5b>;
+-        };
+-        //DIMM K
+-        spd5118_3_4: spd@54,3C000000004 {
+-                reg = <0x54 0x3C0 0x00000004>;
+-                assigned-address = <0x54>;
+-        };
+-        pmic5xxx_3_4: pmic@4c,20400000004 {
+-                reg = <0x4c 0x204 0x00000004>;
+-                assigned-address = <0x4c>;
+-        };
+-        rcd_3_4: rcd@5c,2C000000004 {
+-                reg = <0x5c 0x2C0 0x00000004>;
+-                assigned-address = <0x5c>;
+-        };
+-        //DIMM L
+-        spd5118_3_5: spd@55,3C000000005 {
+-                reg = <0x55 0x3C0 0x00000005>;
+-                assigned-address = <0x55>;
+-        };
+-        pmic5xxx_3_5: pmic@4d,20400000005 {
+-                reg = <0x4d 0x204 0x00000005>;
+-                assigned-address = <0x4d>;
+-        };
+-        rcd_3_5: rcd@5d,2C000000005 {
+-                reg = <0x5d 0x2C0 0x00000005>;
+-                assigned-address = <0x5d>;
+-        };
++	//DIMM G
++	spd5118_3_0: spd@50,3C000000000 {
++		reg = <0x50 0x3C0 0x00000000>;
++		assigned-address = <0x50>;
++	};
++	pmic5xxx_3_0: pmic@48,20400000000 {
++		reg = <0x48 0x204 0x00000000>;
++		assigned-address = <0x48>;
++	};
++	rcd_3_0: rcd@58,2C000000000 {
++		reg = <0x58 0x2C0 0x00000000>;
++		assigned-address = <0x58>;
++	};
++	//DIMM H
++	spd5118_3_1: spd@51,3C000000001 {
++		reg = <0x51 0x3C0 0x00000001>;
++		assigned-address = <0x51>;
++	};
++	pmic5xxx_3_1: pmic@49,20400000001 {
++		reg = <0x49 0x204 0x00000001>;
++		assigned-address = <0x49>;
++	};
++	rcd_3_1: rcd@59,2C000000001 {
++		reg = <0x59 0x2C0 0x00000001>;
++		assigned-address = <0x59>;
++	};
++	//DIMM I
++	spd5118_3_2: spd@52,3C000000002 {
++		reg = <0x52 0x3C0 0x00000002>;
++		assigned-address = <0x52>;
++	};
++	pmic5xxx_3_2: pmic@4a,20400000002 {
++		reg = <0x4a 0x204 0x00000002>;
++		assigned-address = <0x4a>;
++	};
++	rcd_3_2: rcd@5a,2C000000002 {
++		reg = <0x5a 0x2C0 0x00000002>;
++		assigned-address = <0x5a>;
++	};
++	//DIMM J
++	spd5118_3_3: spd@53,3C000000003 {
++		reg = <0x53 0x3C0 0x00000003>;
++		assigned-address = <0x53>;
++	};
++	pmic5xxx_3_3: pmic@4b,20400000003 {
++		reg = <0x4b 0x204 0x00000003>;
++		assigned-address = <0x4b>;
++	};
++	rcd_3_3: rcd@5b,2C000000003 {
++		reg = <0x5b 0x2C0 0x00000003>;
++		assigned-address = <0x5b>;
++	};
++	//DIMM K
++	spd5118_3_4: spd@54,3C000000004 {
++		reg = <0x54 0x3C0 0x00000004>;
++		assigned-address = <0x54>;
++	};
++	pmic5xxx_3_4: pmic@4c,20400000004 {
++		reg = <0x4c 0x204 0x00000004>;
++		assigned-address = <0x4c>;
++	};
++	rcd_3_4: rcd@5c,2C000000004 {
++		reg = <0x5c 0x2C0 0x00000004>;
++		assigned-address = <0x5c>;
++	};
++	//DIMM L
++	spd5118_3_5: spd@55,3C000000005 {
++		reg = <0x55 0x3C0 0x00000005>;
++		assigned-address = <0x55>;
++	};
++	pmic5xxx_3_5: pmic@4d,20400000005 {
++		reg = <0x4d 0x204 0x00000005>;
++		assigned-address = <0x4d>;
++	};
++	rcd_3_5: rcd@5d,2C000000005 {
++		reg = <0x5d 0x2C0 0x00000005>;
++		assigned-address = <0x5d>;
++	};
+ };
++#endif  // ENABLE_I3C_DIMM
+
+ &i3c4 {
+-    // P0 APML
+-    status = "okay";
++	// P0 APML
++	status = "okay";
+
+-    jdec-spd;
++	jdec-spd;
++	set_dasa;
++	bus_id = <0x04>;
+
+-    imx3112_p0: i3cmux@70,4CC00000000 {
+-        reg = <0x70 0x4CC 0x00000000>;
+-        assigned-address = <0x70>;
+-    };
+-    sbtsi_p0_0: sbtsi@4c,22400000000 {
+-        reg = <0x4c 0x224 0x00000000>;
+-        assigned-address = <0x4c>;
+-    };
++	imx3112_p0: i3cmux@70,4CC00000000 {
++		reg = <0x70 0x4CC 0x00000000>;
++		assigned-address = <0x70>;
++	};
++	sbtsi_p0_0: sbtsi@4c,22400000001 {
++		reg = <0x4c 0x224 0x00000001>;
++		assigned-address = <0x4c>;
++	};
++	sbrmi_p0_1: sbrmi@3c,22400000002 {
++		reg = <0x3c 0x224 0x00000002>;
++		assigned-address = <0x3c>;
++	};
+ };
+
+ &i3c5 {
+-    // P1 APML
+-    status = "okay";
+-
+-    jdec-spd;
+-
+-    imx3112_P1: i3cmux@70,4CC00000000 {
+-        reg = <0x70 0x4CC 0x00000000>;
+-        assigned-address = <0x70>;
+-    };
+-    sbtsi_p1_0: sbtsi@4c,22400000000 {
+-        reg = <0x4c 0x224 0x00000000>;
+-        assigned-address = <0x4c>;
+-    };
+- };
++	// P1 APML
++	status = "okay";
++
++	jdec-spd;
++	set_dasa;
++	bus_id = <0x05>;
++
++	imx3112_P1: i3cmux@70,4CC00000000 {
++		reg = <0x70 0x4CC 0x00000000>;
++		assigned-address = <0x70>;
++	};
++	sbtsi_p1_0: sbtsi@48,22400000001 {
++		reg = <0x48 0x224 0x00000001>;
++		assigned-address = <0x48>;
++	};
++	sbrmi_p1_1: sbrmi@38,22400000002 {
++		reg = <0x38 0x224 0x00000002>;
++		assigned-address = <0x38>;
++	};
++};
+
+-#endif  // OPENBMC_I3C_ENABLE
++#ifdef ENABLE_I2C_APML
+
+ &i2c2 {
+ 	// P0 APML - i2c10
+@@ -568,6 +585,7 @@ sbtsi@48 {
+ 		reg = <0x48>;
+ 	};
+ };
++#endif  // ENABLE_I2C_APML
+
+ // Misc Regulators
+ &i2c4 {
+--
+2.25.1
