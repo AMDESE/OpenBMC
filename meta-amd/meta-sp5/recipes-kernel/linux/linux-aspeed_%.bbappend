@@ -78,4 +78,6 @@ SRC_URI += "file://sp5.cfg \
             file://0078-linux-net-Modify-temp-fix-for-nc-si-tx-timeout-warni.patch \
             file://0079-ARM-dts-aspeed-Add-I3C-APML-devices.patch \
             file://0080-linux-aspeed-set-APML-devs-to-dynamic-addr.patch \
+            file://0081-hwmon-Add-support-for-sbrmi-driveri-over-I3C.patch \
+            file://0082-hwmon-Add-support-for-sbtsi-driver-over-I3C.patch \
             "
