@@ -4,12 +4,30 @@
 board_id=`/sbin/fw_printenv -n board_id`
 I3C_TOOL="/usr/bin/i3ctransfer"
 LOG_DIR="/home/root/DIMM_PMIC"
-num_socks=1
+num_of_cpu=1
 
-# If not onyx board or no board_id then we should set to 2 socket
-if [[ "$board_id" != "40" ]] && [[ "$board_id" != "41" ]] && [[ "$board_id" != "42" ]] && [[ "$board_id" != "ff" ]]; then
-    num_socks=2
-fi
+# If no board_id then set num of cpu to 2 socket
+case "$board_id" in
+    "40" | "41" | "42")
+        echo " Onyx 1 CPU"
+        num_of_cpu=1
+        ;;
+    "46" | "47" | "48")
+        echo " Ruby 1 CPU"
+        num_of_cpu=1
+        ;;
+    "43" | "44" | "45")
+        echo " Quartz 2 CPU"
+        num_of_cpu=2
+        ;;
+    "49" | "4A" |"4a" | "4B" | "4b")
+        echo " Titanite 2 CPU "
+        num_of_cpu=2
+        ;;
+    *)
+        num_of_cpu=2
+        ;;
+esac
 
 # <TBD>
 # Set BMC GPIO for I3C access
@@ -35,7 +53,7 @@ fi
 rm ${LOG_DIR}/* > /dev/null 2>&1
 
 # Generate DIMM PMIC data files
-while [[ $sock_id < $num_socks ]]
+while [[ $sock_id < $num_of_cpu ]]
 do
     for i3c_bus_per_soc in 1 2
     do
@@ -79,7 +97,7 @@ do
     done # END of i3c_bus_per_sock loop
     (( sock_id += 1 ))
 
-done # END of num_sock loop
+done # END of num_of_cpu loop
 
 # <TBD>
 # If BMC set any GPIO for I3C access then
