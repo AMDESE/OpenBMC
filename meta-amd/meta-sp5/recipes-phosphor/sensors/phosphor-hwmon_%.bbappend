@@ -3,7 +3,7 @@ EXTRA_OECONF_append_sp5 = " --enable-negative-errno-on-fail"
 
 # Onyx specific sensors
 CHIPS_ONYX = " \
-        bus@1e78a000/i2c-bus@180/sbtsi@4c \
+        bus@1e7a0000/i3c4@6000/sbtsi@4c,22400000001 \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@0/emc2305@4d \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@1/emc2305@4d \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@2/emc2305@4d \
@@ -27,8 +27,8 @@ CHIPS_ONYX = " \
 
 # Quartz specific sensors
 CHIPS_QUARTZ = " \
-        bus@1e78a000/i2c-bus@180/sbtsi@4c \
-        bus@1e78a000/i2c-bus@200/sbtsi@48 \
+        bus@1e7a0000/i3c4@6000/sbtsi@4c,22400000001 \
+        bus@1e7a0000/i3c5@7000/sbtsi@48,22400000001 \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@0/emc2305@4d \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@1/emc2305@4d \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@2/emc2305@4d \
@@ -58,7 +58,7 @@ CHIPS_QUARTZ = " \
 
 # Ruby specific sensors
 CHIPS_RUBY = " \
-        bus@1e78a000/i2c-bus@180/sbtsi@4c \
+        bus@1e7a0000/i3c4@6000/sbtsi@4c,22400000001 \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@0/emc2305@4d \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@48 \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@49 \
@@ -75,8 +75,8 @@ CHIPS_RUBY = " \
 
 # Titanite specific sensors
 CHIPS_TITANITE = " \
-        bus@1e78a000/i2c-bus@180/sbtsi@4c \
-        bus@1e78a000/i2c-bus@200/sbtsi@48 \
+        bus@1e7a0000/i3c4@6000/sbtsi@4c,22400000001 \
+        bus@1e7a0000/i3c5@7000/sbtsi@48,22400000001 \
         bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@0/i2cswitch@77/i2c@0/amd_cpld@28 \
         bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@0/i2cswitch@77/i2c@3/lm75a@4b \
         bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@1/lm75a@48 \
