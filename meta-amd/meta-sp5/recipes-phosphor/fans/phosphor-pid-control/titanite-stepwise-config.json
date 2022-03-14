@@ -5,7 +5,7 @@
             "name": "FAN_SYS0_0",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS0_0",
-            "writePath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a500.i2c-bus/i2c-9/i2c-16/i2c-17/17-0028/hwmon/**/pwm1",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS0_0",
             "min": 0,
             "max": 100
         },
@@ -13,7 +13,7 @@
             "name": "FAN_SYS0_1",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS0_1",
-            "writePath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a500.i2c-bus/i2c-9/i2c-16/i2c-17/17-0028/hwmon/**/pwm1",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS0_1",
             "min": 0,
             "max": 100
         },
@@ -21,7 +21,7 @@
             "name": "FAN_SYS1_0",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS1_0",
-            "writePath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a500.i2c-bus/i2c-9/i2c-16/i2c-17/17-0028/hwmon/**/pwm2",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS1_0",
             "min": 0,
             "max": 100
         },
@@ -29,7 +29,7 @@
             "name": "FAN_SYS1_1",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS1_1",
-            "writePath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a500.i2c-bus/i2c-9/i2c-16/i2c-17/17-0028/hwmon/**/pwm2",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS1_1",
             "min": 0,
             "max": 100
         },
@@ -37,7 +37,7 @@
             "name": "FAN_SYS2_0",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS2_0",
-            "writePath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a500.i2c-bus/i2c-9/i2c-16/i2c-17/17-0028/hwmon/**/pwm3",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS2_0",
             "min": 0,
             "max": 100
         },
@@ -45,7 +45,7 @@
             "name": "FAN_SYS2_1",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS2_1",
-            "writePath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a500.i2c-bus/i2c-9/i2c-16/i2c-17/17-0028/hwmon/**/pwm3",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS2_1",
             "min": 0,
             "max": 100
         },
@@ -53,7 +53,7 @@
             "name": "FAN_SYS3_0",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS3_0",
-            "writePath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a500.i2c-bus/i2c-9/i2c-16/i2c-17/17-0028/hwmon/**/pwm4",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS3_0",
             "min": 0,
             "max": 100
         },
@@ -61,7 +61,7 @@
             "name": "FAN_SYS3_1",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS3_1",
-            "writePath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a500.i2c-bus/i2c-9/i2c-16/i2c-17/17-0028/hwmon/**/pwm4",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS3_1",
             "min": 0,
             "max": 100
         },
@@ -69,7 +69,7 @@
             "name": "FAN_SYS4_0",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS4_0",
-            "writePath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a500.i2c-bus/i2c-9/i2c-16/i2c-17/17-0028/hwmon/**/pwm5",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS4_0",
             "min": 0,
             "max": 100
         },
@@ -77,7 +77,7 @@
             "name": "FAN_SYS4_1",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS4_1",
-            "writePath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a500.i2c-bus/i2c-9/i2c-16/i2c-17/17-0028/hwmon/**/pwm5",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS4_1",
             "min": 0,
             "max": 100
         },
@@ -85,7 +85,7 @@
             "name": "FAN_SYS5_0",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS5_0",
-            "writePath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a500.i2c-bus/i2c-9/i2c-16/i2c-17/17-0028/hwmon/**/pwm6",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS5_0",
             "min": 0,
             "max": 100
         },
@@ -93,7 +93,7 @@
             "name": "FAN_SYS5_1",
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS5_1",
-            "writePath": "/sys/devices/platform/ahb/ahb:apb/ahb:apb:bus@1e78a000/1e78a500.i2c-bus/i2c-9/i2c-16/i2c-17/17-0028/hwmon/**/pwm6",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS5_1",
             "min": 0,
             "max": 100
         },
@@ -142,8 +142,8 @@
                         "feedFwdGainCoeff": 1.0,
                         "integralLimit_min": 0.0,
                         "integralLimit_max": 0.0,
-                        "outLim_min": 10.0,
-                        "outLim_max": 90.0,
+                        "outLim_min": 0.0,
+                        "outLim_max": 100.0,
                         "slewNeg": 0.0,
                         "slewPos": 0.0
                     }

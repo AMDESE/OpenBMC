@@ -4,39 +4,39 @@
         {
             "name": "Chassis_Fan1",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon0/pwm1",
-            "writePath": "/sys/class/hwmon/hwmon0/pwm1",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan1",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan1",
             "min": 0,
             "max": 255
         },
         {
             "name": "Chassis_Fan2",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon0/pwm2",
-            "writePath": "/sys/class/hwmon/hwmon0/pwm2",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan2",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan2",
             "min": 0,
             "max": 255
         },
         {
             "name": "Chassis_Fan3",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon0/pwm3",
-            "writePath": "/sys/class/hwmon/hwmon0/pwm3",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan3",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan3",
             "min": 0,
             "max": 255
         },
         {
             "name": "Chassis_Fan4",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon0/pwm4",
-            "writePath": "/sys/class/hwmon/hwmon0/pwm4",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan4",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan4",
             "min": 0,
             "max": 255
         },
         {
-            "name": "CPU0",
+            "name": "CPU0_Temp",
             "type": "temp",
-            "readPath": "/sys/class/hwmon/hwmon9/temp1_input",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/CPU0_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         }
@@ -64,8 +64,8 @@
                         "feedFwdGainCoeff": 1.0,
                         "integralLimit_min": 0.0,
                         "integralLimit_max": 0.0,
-                        "outLim_min": 10.0,
-                        "outLim_max": 90.0,
+                        "outLim_min": 0.0,
+                        "outLim_max": 100.0,
                         "slewNeg": 0.0,
                         "slewPos": 0.0
                     }
@@ -73,7 +73,7 @@
                 {
                     "name": "CPU0",
                     "type": "stepwise",
-                    "inputs": ["CPU0"],
+                    "inputs": ["CPU0_Temp"],
                     "setpoint": 20.0,
                     "pid": {
                         "samplePeriod": 1.0,

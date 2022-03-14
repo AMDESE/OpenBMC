@@ -4,143 +4,143 @@
         {
             "name": "Chassis_Fan1",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon0/pwm1",
-            "writePath": "/sys/class/hwmon/hwmon0/pwm1",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan1",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan1",
             "min": 0,
             "max": 255
         },
         {
             "name": "Chassis_Fan2",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon0/pwm2",
-            "writePath": "/sys/class/hwmon/hwmon0/pwm2",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan2",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan2",
             "min": 0,
             "max": 255
         },
         {
             "name": "Chassis_Fan3",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon0/pwm3",
-            "writePath": "/sys/class/hwmon/hwmon0/pwm3",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan3",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan3",
             "min": 0,
             "max": 255
         },
         {
             "name": "Chassis_Fan4",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon0/pwm4",
-            "writePath": "/sys/class/hwmon/hwmon0/pwm4",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan4",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan4",
             "min": 0,
             "max": 255
         },
         {
             "name": "Chassis_Fan5",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon0/pwm5",
-            "writePath": "/sys/class/hwmon/hwmon0/pwm5",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan5",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan5",
             "min": 0,
             "max": 255
         },
         {
             "name": "Chassis_Fan6",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon1/pwm1",
-            "writePath": "/sys/class/hwmon/hwmon1/pwm1",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan6",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan6",
             "min": 0,
             "max": 255
         },
         {
             "name": "Chassis_Fan7",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon1/pwm2",
-            "writePath": "/sys/class/hwmon/hwmon1/pwm2",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan7",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan7",
             "min": 0,
             "max": 255
         },
         {
             "name": "Chassis_Fan8",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon1/pwm3",
-            "writePath": "/sys/class/hwmon/hwmon1/pwm3",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan8",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan8",
             "min": 0,
             "max": 255
         },
         {
             "name": "Chassis_Fan9",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon1/pwm4",
-            "writePath": "/sys/class/hwmon/hwmon1/pwm4",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan9",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan9",
             "min": 0,
             "max": 255
         },
         {
             "name": "Chassis_Fan10",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon1/pwm5",
-            "writePath": "/sys/class/hwmon/hwmon1/pwm5",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan10",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan10",
             "min": 0,
             "max": 255
         },
         {
             "name": "P0_CPU_Fan",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon2/pwm1",
-            "writePath": "/sys/class/hwmon/hwmon2/pwm1",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/P0_CPU_Fan",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/P0_CPU_Fan",
             "min": 0,
             "max": 255
         },
         {
             "name": "North_VR_Fan1",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon2/pwm2",
-            "writePath": "/sys/class/hwmon/hwmon2/pwm2",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/North_VR_Fan1",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/North_VR_Fan1",
             "min": 0,
             "max": 255
         },
         {
             "name": "North_VR_Fan2",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon2/pwm3",
-            "writePath": "/sys/class/hwmon/hwmon2/pwm3",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/North_VR_Fan2",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/North_VR_Fan2",
             "min": 0,
             "max": 255
         },
         {
             "name": "P0_GL_DIMM_Fan",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon2/pwm5",
-            "writePath": "/sys/class/hwmon/hwmon2/pwm5",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/P0_GL_DIMM_Fan",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/P0_GL_DIMM_Fan",
             "min":0,
             "max": 255
         },
         {
             "name": "South_VR_Fan1",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon3/pwm1",
-            "writePath": "/sys/class/hwmon/hwmon3/pwm1",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/South_VR_Fan1",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/South_VR_Fan1",
             "min": 0,
             "max": 255
         },
         {
             "name": "South_VR_Fan2",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon3/pwm2",
-            "writePath": "/sys/class/hwmon/hwmon3/pwm2",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/South_VR_Fan2",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/South_VR_Fan2",
             "min": 0,
             "max": 255
         },
         {
             "name": "P0_AF_DIMM_Fan",
             "type": "fan",
-            "readPath": "/sys/class/hwmon/hwmon3/pwm4",
-            "writePath": "/sys/class/hwmon/hwmon3/pwm4",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/P0_AF_DIMM_Fan",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/P0_AF_DIMM_Fan",
             "min": 0,
             "max": 255
         },
         {
-            "name": "CPU0",
+            "name": "CPU0_Temp",
             "type": "temp",
-            "readPath": "/sys/class/hwmon/hwmon12/temp1_input",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/CPU0_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         }
@@ -181,8 +181,8 @@
                         "feedFwdGainCoeff": 1.0,
                         "integralLimit_min": 0.0,
                         "integralLimit_max": 0.0,
-                        "outLim_min": 10.0,
-                        "outLim_max": 90.0,
+                        "outLim_min": 0.0,
+                        "outLim_max": 100.0,
                         "slewNeg": 0.0,
                         "slewPos": 0.0
                     }
@@ -190,7 +190,7 @@
                 {
                     "name": "CPU0",
                     "type": "stepwise",
-                    "inputs": ["CPU0"],
+                    "inputs": ["CPU0_Temp"],
                     "setpoint": 20.0,
                     "pid": {
                         "samplePeriod": 1.0,
