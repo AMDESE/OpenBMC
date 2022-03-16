@@ -1,0 +1,43 @@
+From 4c5c3cb3900e96e3d03270eb94ad71733b8200d7 Mon Sep 17 00:00:00 2001
+From: Mohsen Dolaty <mohsen.dolaty@amd.com>
+Date: Wed, 16 Mar 2022 16:18:15 -0500
+Subject: [PATCH 1/1] linux-aspeed: Set I3C SDA TX HOLD to 3
+
+Set SDA_TX_HOLD to 3 in I3C register
+SDA_HOLD_HOLD_DELAY_TIMING (0xD0)
+
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
+---
+ drivers/i3c/master/dw-i3c-master.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/drivers/i3c/master/dw-i3c-master.c b/drivers/i3c/master/dw-i3c-master.c
+index 2b811020b5a6..2711d61a900d 100644
+--- a/drivers/i3c/master/dw-i3c-master.c
++++ b/drivers/i3c/master/dw-i3c-master.c
+@@ -213,6 +213,9 @@
+ #define DEV_ADDR_TABLE_LOC_OFFSET    0x280
+ #define HW_RETRY_3_MASK              0x60000000
+ #define NUM_OF_APML_DEVICES          3
++#define SDA_DLY_TIMING_OFFSET        0xD0
++#define SDA_TX_HOLD                  0x00030000
++#define SDA_TX_MASK                  0xFFF8FFFF
+
+ #define MAX_DEVS 32
+
+@@ -1422,6 +1425,13 @@ static int dw_i3c_probe(struct platform_device *pdev)
+ 		i3c_data = i3c_data | HW_RETRY_3_MASK ;
+ 		writel(i3c_data, master->regs + i3c_reg);
+ 	}
++	//set SDA TX Hold time
++	i3c_reg = SDA_DLY_TIMING_OFFSET;
++	i3c_data = readl(master->regs + i3c_reg);
++	i3c_data = i3c_data & SDA_TX_MASK;
++	i3c_data = i3c_data | SDA_TX_HOLD;
++	writel(i3c_data, master->regs + i3c_reg);
++
+ 	return 0;
+
+ err_assert_rst:
+--
+2.25.1
