@@ -1,4 +1,4 @@
-From 873ae23413cc752b58bcda0c26649c269a9ea88c Mon Sep 17 00:00:00 2001
+From 6ffaf0b050134444a5dee7a2362853ff9d0cb09f Mon Sep 17 00:00:00 2001
 From: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
 Date: Tue, 15 Feb 2022 11:21:12 -0600
 Subject: [PATCH 1/1] amd-apml: Enable esmi oob library with i3c
@@ -79,7 +79,7 @@ index 0000000..0897313
 +#endif
 diff --git a/scripts/set-apml.sh b/scripts/set-apml.sh
 new file mode 100644
-index 0000000..452d31b
+index 0000000..a334de0
 --- /dev/null
 +++ b/scripts/set-apml.sh
 @@ -0,0 +1,194 @@
@@ -186,7 +186,7 @@ index 0000000..452d31b
 +            i3c_mux_present=0
 +        else
 +            echo "I3C Mux 0 present"
-+            i3c_mux_present=1
++            i3c_mux_present=0
 +        fi
 +    else
 +        i3c_mux_present=0
@@ -230,7 +230,7 @@ index 0000000..452d31b
 +                i3c_mux_present=0
 +            else
 +                echo "I3C Mux 1 present"
-+                i3c_mux_present=1
++                i3c_mux_present=0
 +            fi
 +        else
 +            i3c_mux_present=0
