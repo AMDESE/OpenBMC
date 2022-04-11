@@ -12,9 +12,13 @@ SRC_URI = "file://aspeed-espi.h  \
 	file://oob-pch-test.c \
 	file://safs-test.c \
 	file://mafs-test.c \
+	file://AMI_MG9100_001_Update_CFRU_S16_23_SATA.sh \
+	file://mg9100test_RL20220323_1709 \
+	file://ubm_fru_update \
 	"
+
 S = "${WORKDIR}"
-INSANE_SKIP_${PN} += "ldflags"
+INSANE_SKIP_${PN} += "ldflags already-stripped"
 
 do_compile() {
 	${CC} perif-test.c -o perif-test
@@ -33,4 +37,7 @@ do_install() {
 	install -m 0755 oob-pch-test ${D}${bindir}
 	install -m 0755 safs-test ${D}${bindir}
 	install -m 0755 mafs-test ${D}${bindir}
+	install -m 0755 AMI_MG9100_001_Update_CFRU_S16_23_SATA.sh ${D}${bindir}
+	install -m 0755 mg9100test_RL20220323_1709 ${D}${bindir}
+	install -m 0755 ubm_fru_update ${D}${bindir}
 }
