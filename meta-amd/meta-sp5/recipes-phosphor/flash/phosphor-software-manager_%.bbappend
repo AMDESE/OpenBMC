@@ -16,6 +16,7 @@ SRC_URI += "file://bios-update.sh \
             file://0010-recipes-phosphor-software-manager-Fixing-activation.patch \
             file://0011-add-support-for-retimer-update.patch \
             file://0012-read-HPM-FPGA-version-from-FPGA-i2c-slave.patch \
+            file://0013-add-host-factory-reset-to-resetAll-handler.patch \
             "
 DEPENDS += "amd-lcd-lib"
 
