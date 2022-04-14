@@ -83,4 +83,6 @@ SRC_URI += "file://sp5.cfg \
             file://0083-linux-aspeed-Set-I3C-SDA-TX-HOLD-to-3.patch \
             file://0084-linux-aspeed-Add-Aspeed-MCTP-over-PCIe-driver.patch \
             file://0085-linux-aspeed-Modify-device-trees-to-MCTP-enable.patch \
+            file://0086-i3c-Correct-the-macro-module_i3c_i2c_driver.patch \
+            file://0087-misc-amd-apml-Add-AMD-APML-interface-drivers.patch \
             "
