@@ -81,4 +81,5 @@ SRC_URI += "file://sp5.cfg \
             file://0081-hwmon-Add-support-for-sbrmi-driveri-over-I3C.patch \
             file://0082-hwmon-Add-support-for-sbtsi-driver-over-I3C.patch \
             file://0083-linux-aspeed-Set-I3C-SDA-TX-HOLD-to-3.patch \
+            file://0084-linux-aspeed-Add-Aspeed-MCTP-over-PCIe-driver.patch \
             "
