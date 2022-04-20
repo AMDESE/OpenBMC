@@ -596,7 +596,7 @@ int crc_check_verification(int argc, char* argv[],int crc_value)
     vr_context.i2c_slave_addr = strtoul(argv[6], NULL, 16);
 
     if ((strncmp(argv[7], "RAA229613", 9) == 0) || (strncmp(argv[7], "RAA229625", 9) == 0)
-        || ((strncmp(argv[7], "RAA229620", 9) == 0))
+        || ((strncmp(argv[7], "RAA229620", 9) == 0)))
         strncpy(vr_context.gen, "GEN3", 4);
     else if (strncmp(argv[7], "ISL68220", 9) == 0)
         strncpy(vr_context.gen, "GEN2", 4);
@@ -774,7 +774,7 @@ int renesas_vr_update(int argc, char* argv[])
     vr_context.update_file_path = argv[5];
 
     if ((strncmp(argv[6], "RAA229613", 9) == 0) || (strncmp(argv[6], "RAA229625", 9) == 0)
-        || ((strncmp(argv[7], "RAA229620", 9) == 0))
+        || ((strncmp(argv[7], "RAA229620", 9) == 0)))
         strncpy(vr_context.gen, "GEN3", 4);
     else if (strncmp(argv[6], "ISL68220", 9) == 0)
         strncpy(vr_context.gen, "GEN2", 4);
