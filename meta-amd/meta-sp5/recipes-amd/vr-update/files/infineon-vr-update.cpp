@@ -25,6 +25,8 @@ static int fd = -1;    // File Descriptor
 static int verbose = -1;    // Verbose Flag
 static int rc;    // Return Code Flag
 
+int find_next_usr_img_ptr(int *);
+
 int vr_update_open_dev(int i2c_bus, uint8_t i2c_addr)
 {
     char i2c_devname[FILEPATHSIZE];
@@ -33,19 +35,19 @@ int vr_update_open_dev(int i2c_bus, uint8_t i2c_addr)
         fd = open(i2c_devname, O_RDWR);
         if (fd < 0) {
             std::cout << "Error: Failed to open i2c device" << std::endl;
-            return (-1);
+            return FAILURE;
         }
 
         if (ioctl(fd, I2C_SLAVE, i2c_addr) < 0) {
             std::cout << "Error: Failed setting i2c dev addr" << std::endl;
-            return (-1);
+            return FAILURE;
         }
     } else {
         std::cout << "Error: failed to open VR device" << std::endl;
-        return (-1);
+        return FAILURE;
     }
     usleep(MINWAITTIME);
-    return (0);
+    return SUCCESS;
 }
 
 int vr_update_close_dev(void)
@@ -54,7 +56,7 @@ int vr_update_close_dev(void)
         close(fd);
     }
     fd = -1;
-    return (0);
+    return SUCCESS;
 }
 
 std::string getDeviceType()
@@ -68,7 +70,7 @@ std::string getDeviceType()
     wdata[2] = DDBD2;
     wdata[3] = DDBD3;
     rc = i2c_smbus_write_block_data(fd, RPTR, (uint8_t)LENGTHOFBLOCK, wdata);
-    if (rc != 0) {
+    if (rc != SUCCESS) {
         std::cout << "Error: Failed to write data" << std::endl;
         perror("Error");
         return "None";
@@ -97,16 +99,16 @@ int checkifSpaceAvailableOnOtp()
     int size;
     memset(wdata, 0x0, MAXBUFFERSIZE);
     rc = i2c_smbus_write_block_data(fd, BLOCK_PREFIX, (uint8_t)LENGTHOFBLOCK, wdata);
-    if (rc != 0) {
+    if (rc != SUCCESS) {
         std::cout << "Error: Failed to write data" << std::endl;
         perror("Error");
-        return (1);
+        return FAILURE;
     }
     rc = i2c_smbus_write_byte_data(fd, BYTE_PREFIX, AVAIL_SPACE_BYTE);
-    if (rc != 0) {
+    if (rc != SUCCESS) {
         std::cout << "Error: Failed to write data" << std::endl;
         perror("Error");
-        return (1);
+        return FAILURE;
     }
     length = i2c_smbus_read_block_data(fd, BLOCK_PREFIX, rdata);
     if (length > 0)
@@ -118,17 +120,17 @@ int checkifSpaceAvailableOnOtp()
     {
         std::cout << "Error: Failed to read data" << std::endl;
         perror("Error");
-        return (1);
+        return FAILURE;
     }
     if (size < MINOTPSIZE)
     {
         std::cout << "Available space is less, program manually" << std::endl;
-        return (1);
+        return FAILURE;
     }
     else
     {
         std::cout << "Proceeding with programming" << std::endl;
-        return (0);
+        return SUCCESS;
     }
 }
 
@@ -235,10 +237,10 @@ int invalidateOtp(uint8_t xv, uint8_t hc)
     }
     rc = i2c_smbus_write_block_data(fd, BLOCK_PREFIX, (uint8_t)LENGTHOFBLOCK, wdata);
     usleep(MINWAITTIME);
-    if(rc !=0)
+    if(rc != SUCCESS)
     {
         perror("Error while writing block data to invalidate OTP");
-        return (1);
+        return FAILURE;
     }
     if(verbose > 0)
     {
@@ -247,12 +249,12 @@ int invalidateOtp(uint8_t xv, uint8_t hc)
     }
     rc = i2c_smbus_write_byte_data(fd, BYTE_PREFIX, INVAL_BYTE);
     usleep(MINWAITTIME);
-    if( rc != 0)
+    if( rc != SUCCESS)
     {
         perror("Error while writing byte data to invalidate OTP");
-        return (1);
+        return FAILURE;
     }
-    return (0);
+    return SUCCESS;
 }
 
 int writeDataToScratchpad(std::vector<std::string> section)
@@ -269,10 +271,10 @@ int writeDataToScratchpad(std::vector<std::string> section)
     }
     rc = i2c_smbus_write_block_data(fd, RPTR, (uint8_t)LENGTHOFBLOCK, wdata);
     usleep(MINWAITTIME);
-    if(rc != 0)
+    if(rc != SUCCESS)
     {
         perror("Error while writing initial block data request to scratchpad");
-        return (1);
+        return FAILURE;
     }
     if(verbose > 0)
     {
@@ -292,13 +294,13 @@ int writeDataToScratchpad(std::vector<std::string> section)
         }
         rc = i2c_smbus_write_block_data(fd, MFR_REG_WRITE, (uint8_t)LENGTHOFBLOCK, sdata);
         usleep(MINWAITTIME);
-        if(rc !=0)
+        if(rc !=SUCCESS)
         {
             perror("Error while writing block data request to scratchpad");
-            return (1);
+            return FAILURE;
         }
     }
-    return (0);
+    return SUCCESS;
 }
 
 int uploadDataToOtp(std::string s_dword)
@@ -316,10 +318,10 @@ int uploadDataToOtp(std::string s_dword)
     }
     rc = i2c_smbus_write_block_data(fd, BLOCK_PREFIX, (uint8_t)LENGTHOFBLOCK, wdata);
     usleep(MINWAITTIME);
-    if ( rc != 0)
+    if ( rc != SUCCESS)
     {
         perror("Error while uploading block data from scratchpad to OTP");
-        return (1);
+        return FAILURE;
     }
     if (verbose > 0)
     {
@@ -328,17 +330,17 @@ int uploadDataToOtp(std::string s_dword)
     }
     rc = i2c_smbus_write_byte_data(fd, BYTE_PREFIX, UPLOAD_BYTE);
     usleep(MAXWAITTIME);
-    if ( rc != 0)
+    if ( rc != SUCCESS)
     {
         perror("Error while executing byte write command for uploading data from scratchpad to OTP");
-        return (1);
+        return FAILURE;
     }
-    return (0);
+    return SUCCESS;
 }
 
 int doCfgUpdate(const char *filename)
 {
-    int exit_status = 0;
+    int exit_status = SUCCESS;
     std::vector<std::vector<std::string>> sections = parseCfgFile(filename);
     std::string trim_header = "00000002";    // Trim header programming needs to be ignored according to Infineon FAE
     for(int i=0; i < sections.size(); i++)
@@ -349,14 +351,14 @@ int doCfgUpdate(const char *filename)
         }
         std::vector<uint8_t> xvhc = formatDword(sections[i][0]);
         exit_status=invalidateOtp(xvhc[1], xvhc[0]);
-        if(exit_status != 0) {
+        if(exit_status != SUCCESS) {
             std::cout << "Invalidate OTP Data has failed. Skipping other steps." << std::endl;
-            return (1);
+            return FAILURE;
         }
         exit_status=writeDataToScratchpad(sections[i]);
-        if(exit_status != 0) {
+        if(exit_status != SUCCESS) {
             std::cout << "Writing Data to Scratchpad has failed. Skipping other steps." << std::endl;
-            return (1);
+            return FAILURE;
         }
         exit_status=uploadDataToOtp(sections[i][1]);
     }
@@ -365,18 +367,18 @@ int doCfgUpdate(const char *filename)
 
 int doPatchUpdate(const char *filename)
 {
-    int exit_status = 0;
+    int exit_status = SUCCESS;
     return (exit_status);
 }
 
-int infineon_vr_update(int argc, char *argv[])
+int xdpe_vr_update(int argc, char *argv[])
 {
-    int exit_status = 0;
+    int exit_status = SUCCESS;
     std::fstream file;
-    int i2c_bus = atoi(argv[3]);
-    uint8_t i2c_addr = std::strtoul(argv[4], NULL, 16);
-    const char *file_name = argv[5];
-    std::string mode(argv[6]);
+    int i2c_bus = atoi(argv[ARGV_3]);
+    uint8_t i2c_addr = std::strtoul(argv[ARGV_4], NULL, 16);
+    const char *file_name = argv[ARGV_5];
+    std::string mode(argv[ARGV_6]);
 
     if(mode == "verbose")
     {
@@ -396,14 +398,14 @@ int infineon_vr_update(int argc, char *argv[])
         std::cout.rdbuf(stream_buffer_file);
     }
     exit_status = vr_update_open_dev(i2c_bus, i2c_addr);
-    if (exit_status != 0)
+    if (exit_status != SUCCESS)
     {
         std::cout << "Error: Failed to open file descriptor" << std::endl;
-        return (1);
+        return FAILURE;
     }
     std::string device_type = getDeviceType();
     exit_status = checkifSpaceAvailableOnOtp();
-    if(exit_status != 0)
+    if(exit_status != SUCCESS)
     {
         return (exit_status);
     }
@@ -422,4 +424,268 @@ int infineon_vr_update(int argc, char *argv[])
     }
     vr_update_close_dev();
     return (exit_status);
+}
+
+bool write_user_section_data(const char *filename)
+{
+
+   std::fstream newfile;
+   newfile.open(filename,std::ios::in);
+
+   if (newfile.is_open())
+   {
+      std::string tp;
+      int data_section = 0;
+      int current_page_num = -1;
+      while(getline(newfile, tp))
+      {
+            /*Starting of user section */
+            if (tp.find("[Config Data]") != std::string::npos) {
+                data_section = 1;
+                continue;
+            }
+
+            /*Ending of user section */
+            if (tp.find("[End Config Data]") != std::string::npos) {
+                break;
+            }
+
+            if(data_section == 1)
+            {
+                int index = 0;
+                int page_number = 0;
+                std::string page_num;
+                std::string word;
+                std::string starting_index;
+                std::string userdata;
+                int index_num = 0;
+                int user_data  = 0;
+                int index_range = 0;
+
+                std::stringstream iss(tp);
+                while (iss >> word)
+                {
+                    /*First word which containes page num and index*/
+                    if(index == 0 )
+                    {
+                            index_range = std::stoi(word, nullptr, 16);
+                            if(index_range < 0x40)
+                                continue;
+                            else if(index_range > 0x70 && index_range < 0x200)
+                                continue;
+                            else if(index_range > 0x2FF)
+                                continue;
+
+                            std::cout << word << std::endl;
+                            page_num = "";
+                            page_num.push_back(word[0]);
+                            page_num.push_back(word[1]);
+                            page_number = std::stoi(page_num, nullptr, 16);
+
+                            if(current_page_num != page_number)
+                            {
+                                current_page_num = page_number;
+                                std::cout << "Writing " << page_number << " to page number register" << std::endl;
+                                rc = i2c_smbus_write_byte_data(fd, PAGE_NUM_REG, page_number);
+                                if (rc != 0) {
+                                    std::cout << "Error: Failed to write data" << std::endl;
+                                    perror("Error");
+                                    return FAILURE;
+                                }
+                            }
+                            starting_index="";
+                            starting_index.push_back(word[2]);
+                            starting_index.push_back(word[3]);
+                            index_num = std::stoi(starting_index, nullptr, 16);
+
+                            index++;
+                            continue;
+                    }
+
+                    userdata = "";
+                    userdata.push_back(word[0]);
+                    userdata.push_back(word[1]);
+                    user_data = std::stoi(userdata, nullptr, 16);
+                    std::cout << "Index number = " << std::hex << index_num << " user_data = " << std::hex << user_data << std::endl;
+                    rc = i2c_smbus_write_byte_data(fd, index_num, user_data);
+                    if (rc != 0) {
+                        std::cout << "Error: Failed to write data" << std::endl;
+                        perror("Error");
+                        return FAILURE;
+                    }
+                    index_num++;
+                }
+            }
+      }
+      newfile.close();
+   }
+   return true;
+}
+
+int user_section_programming(const char *filename)
+{
+
+    uint16_t rdata = 0;
+    int exit_status = SUCCESS;
+    int next_img_ptr;
+
+    /* Change to page 0 by writing 0 to register 0xFF */
+    rc = i2c_smbus_write_byte_data(fd, PAGE_NUM_REG, 0);
+    if (rc != 0) {
+        std::cout << "Error: Failed to write data" << std::endl;
+        perror("Error");
+        return FAILURE;
+    }
+
+    /* Read register 0x0B4 [15:0] + 0x0B6 [15:0] + 0x0B8 [15:0]
+       to determine next USER image pointer*/
+
+    if(find_next_usr_img_ptr(&next_img_ptr) != 0)
+        return FAILURE;
+
+    std::cout << "Next image pointer = " << next_img_ptr << std::endl;
+    if(next_img_ptr > 40 )
+    {
+        std::cout << "OTP for user section is not available\n";
+        return FAILURE;
+    }
+    /* Write data 0x03 to register 0xD4 to
+       unlock i2 and PMBus address registers*/
+   rc = i2c_smbus_write_byte_data(fd, UNLOCK_REG, 0x03);
+    if (rc != 0) {
+        std::cout << "Error: Failed to write data" << std::endl;
+        perror("Error");
+        return FAILURE;
+    }
+
+    /*Write configuration data following
+      the order listed in the .xsf file*/
+    write_user_section_data(filename);
+
+    uint16_t user_prog_cmd = 0x42;
+
+    /*Write programming command 0xPP42 to register 0x00D6*/
+    user_prog_cmd = ( next_img_ptr << 8) | user_prog_cmd;
+
+    rc = i2c_smbus_write_word_data(fd, USER_PROG_CMD , user_prog_cmd);
+    if (rc < 0) {
+        std::cout << "Error: Failed to write data" << std::endl;
+        perror("Error");
+        return FAILURE;
+    }
+
+    /*Wait for 200ms */
+    usleep(200 * 1000);
+
+    /*Check register 0xD7 [7] for programming progress.
+      0 = fail. 1 = done*/
+
+    uint8_t read_data = 0;
+
+    read_data = i2c_smbus_read_byte_data(fd,PROG_STATUS_REG);
+    if (read_data < 0)
+    {
+        std::cout << "Error: Failed to read data" << std::endl;
+        perror("Error");
+        return FAILURE;
+    }
+
+    if(read_data & 0x80)
+        std::cout << "User section programming success" << std::endl;
+    else {
+        std::cout << "User section programming failed" << std::endl;
+        perror("Error");
+        return FAILURE;
+    }
+
+    return exit_status;
+}
+
+int find_next_usr_img_ptr(int *next_img_ptr)
+{
+
+    uint64_t user_img_ptr = 0;
+    uint64_t mask = 1;
+    uint16_t rdata = 0;
+    int exit_status = SUCCESS;
+    int i;
+
+    rdata = i2c_smbus_read_word_data(fd,USER_IMG_PTR3);
+    if (rdata < 0)
+    {
+        std::cout << "Error: Failed to read data" << std::endl;
+        perror("Error");
+        return FAILURE;
+    }
+
+    user_img_ptr = user_img_ptr | rdata;
+    rdata = i2c_smbus_read_word_data(fd,USER_IMG_PTR2);
+    if (rdata < 0)
+    {
+        std::cout << "Error: Failed to read data" << std::endl;
+        perror("Error");
+        return FAILURE;
+    }
+    user_img_ptr = user_img_ptr | ((uint64_t )rdata << 16) ;
+    rdata = i2c_smbus_read_word_data(fd,USER_IMG_PTR1);
+    if (rdata < 0)
+    {
+        std::cout << "Error: Failed to read data" << std::endl;
+        perror("Error");
+        return FAILURE;
+    }
+    user_img_ptr = user_img_ptr | ((uint64_t )rdata << 32) ;
+
+    for(i = 0 ; i < 48 ; i++)
+    {
+        if( (user_img_ptr & ( mask << i)) == 0)
+        {
+            break;
+        }
+    }
+    *next_img_ptr = i;
+    return exit_status;
+}
+
+int tda_vr_update(int argc, char *argv[])
+{
+
+    std::cout << "TDA VR update\n";
+
+    int exit_status = 0;
+    std::fstream file;
+    int i2c_bus = atoi(argv[ARGV_3]);
+    uint8_t i2c_addr = std::strtoul(argv[ARGV_4], NULL, 16);
+    const char *file_name = argv[ARGV_5];
+    int num_of_image = 0;
+
+    exit_status = vr_update_open_dev(i2c_bus, i2c_addr);
+    if (exit_status != SUCCESS)
+    {
+        std::cout << "Error: Failed to open file descriptor" << std::endl;
+        return FAILURE;
+    }
+
+    /*User section programming */
+    exit_status = user_section_programming(file_name);
+
+    vr_update_close_dev();
+    return (exit_status);
+
+}
+
+int infineon_vr_update(int argc, char *argv[])
+{
+    const char *file_name = argv[ARGV_5];
+    const char *file_extension = NULL;
+    int exit_status = SUCCESS;
+
+    file_extension = strrchr(file_name, '.');
+
+    if(strncmp(file_extension,".xsf",LENGTHOFBLOCK) == 0)
+        exit_status = tda_vr_update(argc,argv);
+    else
+        exit_status = xdpe_vr_update(argc,argv);
+
+    return exit_status;
 }
