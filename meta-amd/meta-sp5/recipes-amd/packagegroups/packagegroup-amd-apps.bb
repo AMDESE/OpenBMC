@@ -24,6 +24,8 @@ RPROVIDES_${PN}-system += "virtual-obmc-system-mgmt"
 SUMMARY_${PN}-chassis = "AMD Chassis"
 RDEPENDS_${PN}-chassis = " \
         amd-power-control \
+        phosphor-sel-logger \
+        phosphor-logging \
         "
 
 SUMMARY_${PN}-fans = "AMD Fans"
