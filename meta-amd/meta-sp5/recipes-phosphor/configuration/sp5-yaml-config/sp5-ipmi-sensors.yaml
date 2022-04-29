@@ -1,4 +1,4 @@
-1:
+0x01:
   sensorType: 0x01
   entityID: 0x20
   path: /xyz/openbmc_project/sensors/temperature/LM75A_48
@@ -18,7 +18,7 @@
           0xFF:
             type: double
 
-2:
+0x02:
   sensorType: 0x01
   entityID: 0x20
   path: /xyz/openbmc_project/sensors/temperature/LM75A_49
@@ -38,7 +38,7 @@
           0xFF:
             type: double
 
-3:
+0x03:
   sensorType: 0x01
   entityID: 0x20
   path: /xyz/openbmc_project/sensors/temperature/LM75A_4A
@@ -58,7 +58,7 @@
           0xFF:
             type: double
 
-4:
+0x04:
   sensorType: 0x01
   entityID: 0x20
   path: /xyz/openbmc_project/sensors/temperature/LM75A_4B
@@ -78,7 +78,7 @@
           0xFF:
             type: double
 
-5:
+0x05:
   sensorType: 0x01
   entityID: 0x20
   path: /xyz/openbmc_project/sensors/temperature/LM75A_4C
@@ -98,7 +98,7 @@
           0xFF:
             type: double
 
-6:
+0x06:
   sensorType: 0x01
   entityID: 0x20
   path: /xyz/openbmc_project/sensors/temperature/LM75A_4D
@@ -118,7 +118,7 @@
           0xFF:
             type: double
 
-7:
+0x07:
   sensorType: 0x01
   entityID: 0x20
   path: /xyz/openbmc_project/sensors/temperature/LM75A_4E
@@ -138,7 +138,7 @@
           0xFF:
             type: double
 
-8:
+0x08:
   sensorType: 0x01
   entityID: 0x20
   path: /xyz/openbmc_project/sensors/temperature/LM75A_4F
@@ -158,7 +158,7 @@
           0xFF:
             type: double
 
-9:
+0x09:
   sensorType: 0x02
   path: /xyz/openbmc_project/sensors/voltage/VDD_CORE0_VOUT
   sensorReadingType: 0x01
@@ -177,7 +177,7 @@
           0xFF:
             type: double
 
-10:
+0x0A:
   sensorType: 0x03
   path: /xyz/openbmc_project/sensors/current/VDD_CORE0_IOUT
   sensorReadingType: 0x01
@@ -196,7 +196,7 @@
           0xFF:
             type: double
 
-11:
+0x0B:
   sensorType: 0x08
   path: /xyz/openbmc_project/sensors/power/VDD_CORE0_POUT
   sensorReadingType: 0x01
@@ -215,7 +215,7 @@
           0xFF:
             type: double
 
-12:
+0x0C:
   sensorType: 0x01
   path: /xyz/openbmc_project/sensors/temperature/VDD_CORE0_TEMP
   sensorReadingType: 0x01
@@ -234,7 +234,7 @@
           0xFF:
             type: double
 
-13:
+0x0D:
   sensorType: 0x02
   path: /xyz/openbmc_project/sensors/voltage/VDD_CORE1_VOUT
   sensorReadingType: 0x01
@@ -253,7 +253,7 @@
           0xFF:
             type: double
 
-14:
+0x0E:
   sensorType: 0x03
   path: /xyz/openbmc_project/sensors/current/VDD_CORE1_IOUT
   sensorReadingType: 0x01
@@ -272,7 +272,7 @@
           0xFF:
             type: double
 
-15:
+0x0F:
   sensorType: 0x08
   path: /xyz/openbmc_project/sensors/power/VDD_CORE1_POUT
   sensorReadingType: 0x01
@@ -291,7 +291,7 @@
           0xFF:
             type: double
 
-16:
+0x10:
   sensorType: 0x01
   path: /xyz/openbmc_project/sensors/temperature/VDD_CORE1_TEMP
   sensorReadingType: 0x01
@@ -310,7 +310,7 @@
           0xFF:
             type: double
 
-17:
+0x11:
   sensorType: 0x02
   path: /xyz/openbmc_project/sensors/voltage/SOC_VOUT
   sensorReadingType: 0x01
@@ -329,7 +329,7 @@
           0xFF:
             type: double
 
-18:
+0x12:
   sensorType: 0x03
   path: /xyz/openbmc_project/sensors/current/SOC_IOUT
   sensorReadingType: 0x01
@@ -348,7 +348,7 @@
           0xFF:
             type: double
 
-19:
+0x13:
   sensorType: 0x08
   path: /xyz/openbmc_project/sensors/power/SOC_POUT
   sensorReadingType: 0x01
@@ -367,7 +367,7 @@
           0xFF:
             type: double
 
-20:
+0x14:
   sensorType: 0x01
   path: /xyz/openbmc_project/sensors/temperature/SOC_TEMP
   sensorReadingType: 0x01
@@ -386,7 +386,7 @@
           0xFF:
             type: double
 
-21:
+0x15:
   sensorType: 0x02
   path: /xyz/openbmc_project/sensors/voltage/VDDIO_VOUT
   sensorReadingType: 0x01
@@ -405,7 +405,7 @@
           0xFF:
             type: double
 
-22:
+0x16:
   sensorType: 0x03
   path: /xyz/openbmc_project/sensors/current/VDDIO_IOUT
   sensorReadingType: 0x01
@@ -424,7 +424,7 @@
           0xFF:
             type: double
 
-23:
+0x17:
   sensorType: 0x08
   path: /xyz/openbmc_project/sensors/power/VDDIO_POUT
   sensorReadingType: 0x01
@@ -443,7 +443,7 @@
           0xFF:
             type: double
 
-24:
+0x18:
   sensorType: 0x01
   path: /xyz/openbmc_project/sensors/temperature/VDDIO_TEMP
   sensorReadingType: 0x01
@@ -462,7 +462,7 @@
           0xFF:
             type: double
 
-25:
+0x19:
   sensorType: 0x02
   path: /xyz/openbmc_project/sensors/voltage/VDD33_DUAL_VOUT
   sensorReadingType: 0x01
@@ -481,7 +481,7 @@
           0xFF:
             type: double
 
-26:
+0x1A:
   sensorType: 0x03
   path: /xyz/openbmc_project/sensors/current/VDD33_DUAL_IOUT
   sensorReadingType: 0x01
@@ -500,7 +500,7 @@
           0xFF:
             type: double
 
-27:
+0x1B:
   sensorType: 0x08
   path: /xyz/openbmc_project/sensors/power/VDD33_DUAL_POUT
   sensorReadingType: 0x01
@@ -519,7 +519,7 @@
           0xFF:
             type: double
 
-28:
+0x1C:
   sensorType: 0x01
   path: /xyz/openbmc_project/sensors/temperature/VDD33_DUAL_TEMP
   sensorReadingType: 0x01
@@ -538,7 +538,7 @@
           0xFF:
             type: double
 
-29:
+0x1D:
   sensorType: 0x02
   path: /xyz/openbmc_project/sensors/voltage/VDD18_DUAL_VOUT
   sensorReadingType: 0x01
@@ -557,7 +557,7 @@
           0xFF:
             type: double
 
-30:
+0x1E:
   sensorType: 0x03
   path: /xyz/openbmc_project/sensors/current/VDD18_DUAL_IOUT
   sensorReadingType: 0x01
@@ -576,7 +576,7 @@
           0xFF:
             type: double
 
-31:
+0x1F:
   sensorType: 0x08
   path: /xyz/openbmc_project/sensors/power/VDD18_DUAL_POUT
   sensorReadingType: 0x01
@@ -595,7 +595,7 @@
           0xFF:
             type: double
 
-32:
+0x20:
   sensorType: 0x01
   path: /xyz/openbmc_project/sensors/temperature/VDD18_DUAL_TEMP
   sensorReadingType: 0x01
@@ -614,7 +614,7 @@
           0xFF:
             type: double
 
-33:
+0x21:
   sensorType: 0x02
   path: /xyz/openbmc_project/sensors/voltage/VDD11_SUS_VOUT
   sensorReadingType: 0x01
@@ -633,7 +633,7 @@
           0xFF:
             type: double
 
-34:
+0x22:
   sensorType: 0x03
   path: /xyz/openbmc_project/sensors/current/VDD11_SUS_IOUT
   sensorReadingType: 0x01
@@ -652,7 +652,7 @@
           0xFF:
             type: double
 
-35:
+0x23:
   sensorType: 0x08
   path: /xyz/openbmc_project/sensors/power/VDD11_SUS_POUT
   sensorReadingType: 0x01
@@ -671,7 +671,7 @@
           0xFF:
             type: double
 
-36:
+0x24:
   sensorType: 0x01
   path: /xyz/openbmc_project/sensors/temperature/VDD11_SUS_TEMP
   sensorReadingType: 0x01
@@ -690,7 +690,7 @@
           0xFF:
             type: double
 
-37:
+0x25:
   sensorType: 0x01
   entityID: 0x20
   path: /xyz/openbmc_project/sensors/temperature/CPU0_Temp
@@ -710,7 +710,7 @@
           0xFF:
             type: double
 
-38:
+0x26:
   sensorType: 0x01
   entityID: 0x20
   path: /xyz/openbmc_project/sensors/temperature/CPU1_Temp
