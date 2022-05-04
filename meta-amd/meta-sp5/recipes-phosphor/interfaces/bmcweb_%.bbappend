@@ -1,7 +1,7 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
 EXTRA_OEMESON_append_sp5 = " \
-    -Dredfish-dbus-log=enabled \
+    -Dredfish-dump-log=enabled \
     -Dredfish-bmc-journal=enabled \
     "
 SRC_URI += "file://0001-Reset-server-settings-only-changes-to-invoke-CMOS.patch \
