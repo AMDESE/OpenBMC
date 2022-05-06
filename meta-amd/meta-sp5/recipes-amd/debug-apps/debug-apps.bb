@@ -15,6 +15,7 @@ SRC_URI = "file://aspeed-espi.h  \
 	file://AMI_MG9100_001_Update_CFRU_S16_23_SATA.sh \
 	file://mg9100test_RL20220323_1709 \
 	file://ubm_fru_update \
+	file://AMI_MG9100_001_ALL_PCIE.sh \
 	"
 
 S = "${WORKDIR}"
@@ -40,4 +41,5 @@ do_install() {
 	install -m 0755 AMI_MG9100_001_Update_CFRU_S16_23_SATA.sh ${D}${bindir}
 	install -m 0755 mg9100test_RL20220323_1709 ${D}${bindir}
 	install -m 0755 ubm_fru_update ${D}${bindir}
+	install -m 0755 AMI_MG9100_001_ALL_PCIE.sh ${D}${bindir}
 }
