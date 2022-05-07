@@ -6,7 +6,7 @@ set +e
 
 IMAGE_FILE=$1
 BOARD=$2
-
+UNBIND_DRIVER=0
 echo "VR upgrade started at $(date)\n"
 
 
@@ -15,11 +15,19 @@ if [ -e "$IMAGE_FILE" ];
 then
     echo "VR image is $IMAGE_FILE"
     if [ "${IMAGE_FILE: -4}" == ".xsf" ];then
-        BUS=4
         ADDR=$3
+        if ([ "$ADDR" == "13" ] || [ "$ADDR" == "14" ] || [ "$ADDR" == "15" ]); then
+            BUS=4
+        else
+            UNBIND_DRIVER=1
+        fi
     else
         ADDR=`grep "PMBus Address : " $IMAGE_FILE | awk '{print $4}'`
         ADDR=${ADDR:2}
+        UNBIND_DRIVER=1
+    fi
+
+    if [ "$UNBIND_DRIVER" == "1" ] ; then
         BUS=`find /sys/bus/i2c/drivers/xdpe12284/ -name "*$ADDR" -exec basename {} \; | cut -d- -f 1`
         DEVICE_NAME=`find /sys/bus/i2c/drivers/xdpe12284/ -name "*$ADDR" -exec basename {} \;`
         echo $DEVICE_NAME > /sys/bus/i2c/drivers/xdpe12284/unbind
@@ -39,7 +47,8 @@ else
     echo "VR image $IMAGE_FILE doesn't exist\n"
 fi
 popd
-if [ "${IMAGE_FILE: -4}" != ".xsf" ];then
+
+if [ "$UNBIND_DRIVER" == "1" ] ; then
     echo $DEVICE_NAME > /sys/bus/i2c/drivers/xdpe12284/bind
     echo "xdpe12284 driver is binded back after VR telemetry"
 fi

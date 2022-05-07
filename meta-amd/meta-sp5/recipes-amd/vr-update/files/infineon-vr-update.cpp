@@ -21,8 +21,8 @@ extern "C"
 #include <linux/i2c-dev.h>
 }
 
-static int fd = -1;    // File Descriptor
-static int verbose = -1;    // Verbose Flag
+static int fd = FAILURE;    // File Descriptor
+static int verbose = FAILURE;    // Verbose Flag
 static int rc;    // Return Code Flag
 
 int find_next_usr_img_ptr(int *);
@@ -55,7 +55,7 @@ int vr_update_close_dev(void)
     if (fd >= 0) {
         close(fd);
     }
-    fd = -1;
+    fd = FAILURE;
     return SUCCESS;
 }
 
@@ -207,7 +207,7 @@ std::vector<uint8_t> formatDword(std::string s_dword)
     unsigned long ul;
     std::vector<uint8_t> v_dword;
     uint8_t dword[4] = {0};
-    ul = std::strtoul(s_dword.c_str(), NULL, 16);
+    ul = std::strtoul(s_dword.c_str(), NULL, BASE_16);
     memcpy(dword,&ul,4);
     for(int i=0; i<4; i++)
     {
@@ -376,7 +376,7 @@ int xdpe_vr_update(int argc, char *argv[])
     int exit_status = SUCCESS;
     std::fstream file;
     int i2c_bus = atoi(argv[ARGV_3]);
-    uint8_t i2c_addr = std::strtoul(argv[ARGV_4], NULL, 16);
+    uint8_t i2c_addr = std::strtoul(argv[ARGV_4], NULL, BASE_16);
     const char *file_name = argv[ARGV_5];
     std::string mode(argv[ARGV_6]);
 
@@ -445,8 +445,21 @@ bool write_user_section_data(const char *filename)
                 continue;
             }
 
+            /*Starting of user section */
+            if (tp.find("[Configuration Data]") != std::string::npos) {
+                data_section = 1;
+                continue;
+            }
+
             /*Ending of user section */
             if (tp.find("[End Config Data]") != std::string::npos) {
+                data_section = 1;
+                break;
+            }
+
+            /*Ending of user section */
+            if (tp.find("[End Configuration Data]") != std::string::npos) {
+                data_section = 1;
                 break;
             }
 
@@ -468,19 +481,19 @@ bool write_user_section_data(const char *filename)
                     /*First word which containes page num and index*/
                     if(index == 0 )
                     {
-                            index_range = std::stoi(word, nullptr, 16);
-                            if(index_range < 0x40)
-                                continue;
-                            else if(index_range > 0x70 && index_range < 0x200)
-                                continue;
-                            else if(index_range > 0x2FF)
-                                continue;
+                            index_range = std::stoi(word, nullptr, BASE_16);
+                            if(index_range < INDEX_40)
+                                break;
+                            else if(index_range > INDEX_70 && index_range < INDEX_200)
+                                break;
+                            else if(index_range > INDEX_2FF)
+                                break;
 
                             std::cout << word << std::endl;
                             page_num = "";
                             page_num.push_back(word[0]);
                             page_num.push_back(word[1]);
-                            page_number = std::stoi(page_num, nullptr, 16);
+                            page_number = std::stoi(page_num, nullptr, BASE_16);
 
                             if(current_page_num != page_number)
                             {
@@ -496,8 +509,7 @@ bool write_user_section_data(const char *filename)
                             starting_index="";
                             starting_index.push_back(word[2]);
                             starting_index.push_back(word[3]);
-                            index_num = std::stoi(starting_index, nullptr, 16);
-
+                            index_num = std::stoi(starting_index, nullptr, BASE_16);
                             index++;
                             continue;
                     }
@@ -505,7 +517,7 @@ bool write_user_section_data(const char *filename)
                     userdata = "";
                     userdata.push_back(word[0]);
                     userdata.push_back(word[1]);
-                    user_data = std::stoi(userdata, nullptr, 16);
+                    user_data = std::stoi(userdata, nullptr, BASE_16);
                     std::cout << "Index number = " << std::hex << index_num << " user_data = " << std::hex << user_data << std::endl;
                     rc = i2c_smbus_write_byte_data(fd, index_num, user_data);
                     if (rc != 0) {
@@ -626,7 +638,7 @@ int find_next_usr_img_ptr(int *next_img_ptr)
         perror("Error");
         return FAILURE;
     }
-    user_img_ptr = user_img_ptr | ((uint64_t )rdata << 16) ;
+    user_img_ptr = user_img_ptr | ((uint64_t )rdata << BASE_16) ;
     rdata = i2c_smbus_read_word_data(fd,USER_IMG_PTR1);
     if (rdata < 0)
     {
@@ -655,7 +667,7 @@ int tda_vr_update(int argc, char *argv[])
     int exit_status = 0;
     std::fstream file;
     int i2c_bus = atoi(argv[ARGV_3]);
-    uint8_t i2c_addr = std::strtoul(argv[ARGV_4], NULL, 16);
+    uint8_t i2c_addr = std::strtoul(argv[ARGV_4], NULL, BASE_16);
     const char *file_name = argv[ARGV_5];
     int num_of_image = 0;
 

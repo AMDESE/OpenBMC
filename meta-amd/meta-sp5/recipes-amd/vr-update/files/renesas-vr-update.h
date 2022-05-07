@@ -1,6 +1,30 @@
 #ifndef RENESAS_VR_UPDATE_H
 #define RENESAS_VR_UPDATE_H
 
+#define RENESAS_VR            ("Renesas")
+#define GEN2                  ("GEN2")
+#define GEN3                  ("GEN3")
+
+#define STATUS_BIT_0          (0)
+#define STATUS_BIT_1          (1)
+#define STATUS_BIT_2          (2)
+#define STATUS_BIT_3          (3)
+#define STATUS_BIT_4          (4)
+#define STATUS_BIT_5          (5)
+#define STATUS_BIT_6          (6)
+#define STATUS_BIT_7          (7)
+#define STATUS_BIT_8          (8)
+#define BIT_ENABLE            (1)
+
+#define DEVICE_REVISON        (0x2000003)
+#define INT_255               (0xFF)
+#define MAX_RETRY             (10)
+#define SLEEP                 (2500)
+#define RAA229613             ("RAA229613")
+#define RAA229625             ("RAA229625")
+#define RAA229620             ("RAA229620")
+#define ISL68220              ("ISL68220")
+
 #define MAX_CMD_LINE_ARGUMENT 6
 #define SUCCESS               0
 #define FAILURE              -1

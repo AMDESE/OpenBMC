@@ -1,6 +1,8 @@
 #ifndef INFINEON_VR_UPDATE_H
 #define INFINEON_VR_UPDATE_H
 
+#define INFINEON_VR   ("Infineon")
+
 #define MAXBUFFERSIZE     255
 #define LENGTHOFBLOCK 4
 #define MINOTPSIZE 6000
@@ -9,6 +11,11 @@
 #define MINARGS 4
 #define FAILURE  -1
 #define SUCCESS   0
+
+#define INDEX_40  0x40
+#define INDEX_70  0x70
+#define INDEX_200 0x200
+#define INDEX_2FF 0x2FF
 
 /* Applicable Digital Controllers */
 #define PART1 0x95

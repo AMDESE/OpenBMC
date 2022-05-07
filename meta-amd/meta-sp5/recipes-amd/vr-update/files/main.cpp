@@ -29,9 +29,10 @@ int main(int argc, char **argv)
         break;
     case '?':
         printf("unknown option: %c\n", optopt);
-        return 1;
+        return FAILURE;
     default:
         abort();
+        return FAILURE;
     }
 
     if (crc == 1) {
@@ -39,12 +40,18 @@ int main(int argc, char **argv)
         crc_check_verification(argc, argv, crc_value);
         return 0;
     }
-    if (strncmp(board, "Renesas", 7) == 0) {
+    if (strncmp(board, RENESAS_VR , strlen(RENESAS_VR)) == 0) {
+
         ret = renesas_vr_update(argc, argv);
-    } else if (strncmp(board, "Infineon", 8) == 0) {
+
+    } else if (strncmp(board, INFINEON_VR, strlen(INFINEON_VR)) == 0) {
+
         ret = infineon_vr_update(argc, argv);
+
     } else {
         std::cout << "Invalid manufacturer name provided " << board << std::endl;
+        ret = FAILURE;
     }
+
     return ret;
 }
