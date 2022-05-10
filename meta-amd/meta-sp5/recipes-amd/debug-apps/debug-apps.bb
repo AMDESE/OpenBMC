@@ -5,6 +5,8 @@ FILESEXTRAPATHS_prepend := "${THISDIR}:"
 
 LICENSE = "CLOSED"
 
+RDEPENDS_${PN} += "bash"
+
 SRC_URI = "file://aspeed-espi.h  \
 	file://perif-test.c \
 	file://vw-test.c \
