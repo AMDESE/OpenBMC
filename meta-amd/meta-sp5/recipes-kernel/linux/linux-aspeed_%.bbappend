@@ -85,4 +85,5 @@ SRC_URI += "file://sp5.cfg \
             file://0085-linux-aspeed-Modify-device-trees-to-MCTP-enable.patch \
             file://0086-i3c-Correct-the-macro-module_i3c_i2c_driver.patch \
             file://0087-misc-amd-apml-Add-AMD-APML-interface-drivers.patch \
+            file://0088-ARM-dts-aspeed-enable-I3C-DIMM-devices.patch \
             "

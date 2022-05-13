@@ -1,0 +1,125 @@
+From 8a944ac4a7651f337804ff8b1c265e824636207f Mon Sep 17 00:00:00 2001
+From: Mohsen Dolaty <mohsen.dolaty@amd.com>
+Date: Fri, 13 May 2022 16:57:03 -0500
+Subject: [PATCH 1/1] linux-aspeed:enable I3C DIMM devices
+
+Enable I3C DIMM devices in DTS
+Add pin control to i3c-2 and i3c-3
+
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts     | 3 +--
+ arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts   | 3 +--
+ arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts     | 3 +--
+ arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts | 3 +--
+ arch/arm/boot/dts/aspeed-g6.dtsi              | 4 ++++
+ 5 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+index d03fc4c8225f..22bb0b9feb5c 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+@@ -557,7 +557,7 @@ tmp468@48 {
+ 	};
+ };
+
+-#ifdef ENABLE_I3C_DIMM
++// i3c
+
+ &i3c0 {
+ 	// P0 DIMM (A-F) SPD Access
+@@ -732,7 +732,6 @@ rcd_1_5: rcd@5d,2C000000005 {
+ 		assigned-address = <0x5d>;
+ 	};
+ };
+-#endif  // ENABLE_I3C_DIMM
+
+ &i3c4 {
+ 	// P0 APML
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+index 31272f6f992c..d9f14f26349c 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+@@ -674,7 +674,7 @@ &i2c15 {
+ 	status = "okay";
+ };
+
+-#ifdef ENABLE_I3C_DIMM
++// i3c
+
+ &i3c0 {
+ 	// P0 DIMM (A-F) SPD Access
+@@ -1023,7 +1023,6 @@ rcd_3_5: rcd@5d,2C000000005 {
+ 		assigned-address = <0x5d>;
+ 	};
+ };
+-#endif  // ENABLE_I3C_DIMM
+
+ &i3c4 {
+ 	// P0 APML
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+index 82d7cbb62037..36d3fc0b8d22 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+@@ -444,7 +444,7 @@ &i2c15 {
+ 	status = "okay";
+ };
+
+-#ifdef ENABLE_I3C_DIMM
++// i3c
+
+ &i3c0 {
+ 	// P0 DIMM (A-F) SPD Access
+@@ -619,7 +619,6 @@ rcd_1_5: rcd@5d,2C000000005 {
+ 		assigned-address = <0x5d>;
+ 	};
+ };
+-#endif  // ENABLE_I3C_DIMM
+
+ &i3c4 {
+ 	// P0 APML
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts b/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
+index 5b8c6c8594f4..00f5397c3ced 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
+@@ -171,7 +171,7 @@ &i2c1 {
+ 		//<TBD> Define LCD details here
+ };
+
+-#ifdef ENABLE_I3C_DIMM
++// i3c
+
+ &i3c0 {
+ 	// P0 DIMM (A-F) SPD Access
+@@ -520,7 +520,6 @@ rcd_3_5: rcd@5d,2C000000005 {
+ 		assigned-address = <0x5d>;
+ 	};
+ };
+-#endif  // ENABLE_I3C_DIMM
+
+ &i3c4 {
+ 	// P0 APML
+diff --git a/arch/arm/boot/dts/aspeed-g6.dtsi b/arch/arm/boot/dts/aspeed-g6.dtsi
+index 5924542a5001..51abbf53fcb7 100644
+--- a/arch/arm/boot/dts/aspeed-g6.dtsi
++++ b/arch/arm/boot/dts/aspeed-g6.dtsi
+@@ -1128,6 +1128,8 @@ i3c2: i3c2@4000 {
+ 		i2c-scl-hz = <400000>;
+ 		i3c-scl-hz = <12500000>;
+ 		interrupts = <GIC_SPI 104 IRQ_TYPE_LEVEL_HIGH>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&pinctrl_i3c3_default>;
+
+ 		status = "disabled";
+ 	};
+@@ -1144,6 +1146,8 @@ i3c3: i3c3@5000 {
+ 		i2c-scl-hz = <400000>;
+ 		i3c-scl-hz = <12500000>;
+ 		interrupts = <GIC_SPI 105 IRQ_TYPE_LEVEL_HIGH>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&pinctrl_i3c4_default>;
+
+ 		status = "disabled";
+ 	};
+--
+2.25.1
