@@ -3,8 +3,14 @@ inherit obmc-phosphor-systemd
 DEPENDS_append_sp5 = " sp5-yaml-config"
 
 EXTRA_OECONF_sp5 = " \
-    YAML_GEN=${STAGING_DIR_HOST}${datadir}/sp5-yaml-config/ipmi-fru-read.yaml \
-    PROP_YAML=${STAGING_DIR_HOST}${datadir}/sp5-yaml-config/ipmi-extra-properties.yaml \
+    ONYX_YAML_GEN=${STAGING_DIR_HOST}${datadir}/sp5-yaml-config/onyx-ipmi-fru-read.yaml \
+    ONYX_PROP_YAML=${STAGING_DIR_HOST}${datadir}/sp5-yaml-config/onyx-ipmi-extra-properties.yaml \
+    QUARTZ_YAML_GEN=${STAGING_DIR_HOST}${datadir}/sp5-yaml-config/quartz-ipmi-fru-read.yaml \
+    QUARTZ_PROP_YAML=${STAGING_DIR_HOST}${datadir}/sp5-yaml-config/quartz-ipmi-extra-properties.yaml \
+    RUBY_YAML_GEN=${STAGING_DIR_HOST}${datadir}/sp5-yaml-config/ruby-ipmi-fru-read.yaml \
+    RUBY_PROP_YAML=${STAGING_DIR_HOST}${datadir}/sp5-yaml-config/ruby-ipmi-extra-properties.yaml \
+    TITANITE_YAML_GEN=${STAGING_DIR_HOST}${datadir}/sp5-yaml-config/titanite-ipmi-fru-read.yaml \
+    TITANITE_PROP_YAML=${STAGING_DIR_HOST}${datadir}/sp5-yaml-config/titanite-ipmi-extra-properties.yaml \
     "
 FILESEXTRAPATHS_prepend_sp5 := "${THISDIR}/${PN}:"
 
@@ -27,4 +33,8 @@ INSTFMT = "obmc-read-eeprom@{0}.service"
 FMT = "../${TMPL}:${TGT}.wants/${INSTFMT}"
 
 SYSTEMD_LINK_${PN}_append_sp5 := "${@compose_list(d, 'FMT', 'EEPROMS_ESCAPED')}"
+
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+
+SRC_URI += "file://0001-python-template-changes-for-sp5.patch file://0002-platformization-changes-for-sp5-fru.patch"
 
