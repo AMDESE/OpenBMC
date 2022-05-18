@@ -51,153 +51,218 @@
   sensorID: 0x08
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/voltage/VDD_CORE0_VOUT:
+/xyz/openbmc_project/sensors/voltage/VDDCR_SOC_VOUT1:
   eventReadingType: 1
   sensorID: 0x09
   sensorType: 2
   offset: 0xff
-/xyz/openbmc_project/sensors/current/VDD_CORE0_IOUT:
+/xyz/openbmc_project/sensors/current/VDDCR_SOC_IOUT1:
   eventReadingType: 1
   sensorID: 0x0A
   sensorType: 3
   offset: 0xff
-/xyz/openbmc_project/sensors/power/VDD_CORE0_POUT:
+/xyz/openbmc_project/sensors/power/VDDCR_SOC_POUT1:
   eventReadingType: 1
   sensorID: 0x0B
   sensorType: 0x0B
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/VDD_CORE0_TEMP:
+/xyz/openbmc_project/sensors/temperature/VDDCR_SOC_TEMP1:
   eventReadingType: 1
   sensorID: 0x0C
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/voltage/VDD_CORE1_VOUT:
+/xyz/openbmc_project/sensors/voltage/VDDCR_SOC_VOUT2:
   eventReadingType: 1
   sensorID: 0x0D
   sensorType: 2
   offset: 0xff
-/xyz/openbmc_project/sensors/current/VDD_CORE1_IOUT:
+/xyz/openbmc_project/sensors/current/VDDCR_SOC_IOUT2:
   eventReadingType: 1
   sensorID: 0x0E
   sensorType: 3
   offset: 0xff
-/xyz/openbmc_project/sensors/power/VDD_CORE1_POUT:
+/xyz/openbmc_project/sensors/power/VDDCR_SOC_POUT2:
   eventReadingType: 1
   sensorID: 0x0F
   sensorType: 0x0B
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/VDD_CORE1_TEMP:
+/xyz/openbmc_project/sensors/temperature/VDDCR_SOC_TEMP2:
   eventReadingType: 1
   sensorID: 0x10
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/voltage/SOC_VOUT:
+/xyz/openbmc_project/sensors/voltage/VDDCR_11_VOUT1:
   eventReadingType: 1
   sensorID: 0x11
   sensorType: 2
   offset: 0xff
-/xyz/openbmc_project/sensors/current/SOC_IOUT:
+/xyz/openbmc_project/sensors/current/VDDCR_11_IOUT1:
   eventReadingType: 1
   sensorID: 0x12
   sensorType: 3
   offset: 0xff
-/xyz/openbmc_project/sensors/power/SOC_POUT:
+/xyz/openbmc_project/sensors/power/VDDCR_11_POUT1:
   eventReadingType: 1
   sensorID: 0x13
   sensorType: 0x0B
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/SOC_TEMP:
+/xyz/openbmc_project/sensors/temperature/VDDCR_11_TEMP1:
   eventReadingType: 1
   sensorID: 0x14
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/voltage/VDDIO_VOUT:
+/xyz/openbmc_project/sensors/voltage/VDDCR_11_VOUT2:
   eventReadingType: 1
   sensorID: 0x15
   sensorType: 2
   offset: 0xff
-/xyz/openbmc_project/sensors/current/VDDIO_IOUT:
+/xyz/openbmc_project/sensors/current/VDDCR_11_IOUT2:
   eventReadingType: 1
   sensorID: 0x16
   sensorType: 3
   offset: 0xff
-/xyz/openbmc_project/sensors/power/VDDIO_POUT:
+/xyz/openbmc_project/sensors/power/VDDCR_11_POUT2:
   eventReadingType: 1
   sensorID: 0x17
   sensorType: 0x0B
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/VDDIO_TEMP:
+/xyz/openbmc_project/sensors/temperature/VDDCR_11_TEMP2:
   eventReadingType: 1
   sensorID: 0x18
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/voltage/VDD33_DUAL_VOUT:
+/xyz/openbmc_project/sensors/voltage/VDDCR_VDDIO33_VOUT1:
   eventReadingType: 1
   sensorID: 0x19
   sensorType: 2
   offset: 0xff
-/xyz/openbmc_project/sensors/current/VDD33_DUAL_IOUT:
+/xyz/openbmc_project/sensors/current/VDDCR_VDDIO33_IOUT1:
   eventReadingType: 1
   sensorID: 0x1A
   sensorType: 3
   offset: 0xff
-/xyz/openbmc_project/sensors/power/VDD33_DUAL_POUT:
+/xyz/openbmc_project/sensors/power/VDDCR_VDDIO33_POUT1:
   eventReadingType: 1
   sensorID: 0x1B
   sensorType: 0x0B
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/VDD33_DUAL_TEMP:
+/xyz/openbmc_project/sensors/temperature/VDDCR_VDDIO33_TEMP1:
   eventReadingType: 1
   sensorID: 0x1C
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/voltage/VDD18_DUAL_VOUT:
+/xyz/openbmc_project/sensors/voltage/VDDCR_VDDIO33_VOUT2:
   eventReadingType: 1
   sensorID: 0x1D
   sensorType: 2
   offset: 0xff
-/xyz/openbmc_project/sensors/current/VDD18_DUAL_IOUT:
+/xyz/openbmc_project/sensors/current/VDDCR_VDDIO33_IN:
   eventReadingType: 1
   sensorID: 0x1E
   sensorType: 3
   offset: 0xff
-/xyz/openbmc_project/sensors/power/VDD18_DUAL_POUT:
+/xyz/openbmc_project/sensors/power/VDDCR_VDDIO33_PIN:
   eventReadingType: 1
   sensorID: 0x1F
   sensorType: 0x0B
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/VDD18_DUAL_TEMP:
+/xyz/openbmc_project/sensors/temperature/VDDCR_VDDIO33_TEMP2:
   eventReadingType: 1
   sensorID: 0x20
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/voltage/VDD11_SUS_VOUT:
+/xyz/openbmc_project/sensors/voltage/VDDCR_VDDIO33_VIN:
   eventReadingType: 1
   sensorID: 0x21
   sensorType: 2
   offset: 0xff
-/xyz/openbmc_project/sensors/current/VDD11_SUS_IOUT:
+/xyz/openbmc_project/sensors/current/VDDCR_SOC_IIN:
   eventReadingType: 1
   sensorID: 0x22
   sensorType: 3
   offset: 0xff
-/xyz/openbmc_project/sensors/power/VDD11_SUS_POUT:
+/xyz/openbmc_project/sensors/power/VDDCR_SOC_PIN:
   eventReadingType: 1
   sensorID: 0x23
   sensorType: 0x0B
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/VDD11_SUS_TEMP:
+/xyz/openbmc_project/sensors/voltage/VDDCR_SOC_VIN:
   eventReadingType: 1
   sensorID: 0x24
-  sensorType: 1
+  sensorType: 2
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/VDDCR_11_VIN:
+  eventReadingType: 1
+  sensorID: 0x25
+  sensorType: 2
+  offset: 0xff
+/xyz/openbmc_project/sensors/current/VDDCR_11_IIN:
+  eventReadingType: 1
+  sensorID: 0x26
+  sensorType: 3
+  offset: 0xff
+/xyz/openbmc_project/sensors/power/VDDCR_11_PIN:
+  eventReadingType: 1
+  sensorID: 0x27
+  sensorType: 0x0B
   offset: 0xff
 /xyz/openbmc_project/sensors/temperature/CPU0_Temp:
   eventReadingType: 1
-  sensorID: 0x25
+  sensorID: 0x28
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/CPU1_Temp:
+/xyz/openbmc_project/sensors/voltage/ADC121C_50:
   eventReadingType: 1
-  sensorID: 0x26
-  sensorType: 1
+  sensorID: 0x29
+  sensorType: 2
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/ADC121C_51:
+  eventReadingType: 1
+  sensorID: 0x2A
+  sensorType: 2
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/ADC121C_52:
+  eventReadingType: 1
+  sensorID: 0x2B
+  sensorType: 2
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/ADC121C_53:
+  eventReadingType: 1
+  sensorID: 0x2C
+  sensorType: 2
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/ADC121C_54:
+  eventReadingType: 1
+  sensorID: 0x2D
+  sensorType: 2
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/ADC121C_55:
+  eventReadingType: 1
+  sensorID: 0x2E
+  sensorType: 2
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/ADC121C_56:
+  eventReadingType: 1
+  sensorID: 0x2F
+  sensorType: 2
+  offset: 0xff
+/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan1:
+  eventReadingType: 1
+  sensorID: 0x30
+  sensorType: 4
+  offset: 0xff
+/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan2:
+  eventReadingType: 1
+  sensorID: 0x31
+  sensorType: 4
+  offset: 0xff
+/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan3:
+  eventReadingType: 1
+  sensorID: 0x32
+  sensorType: 4
+  offset: 0xff
+/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan4:
+  eventReadingType: 1
+  sensorID: 0x33
+  sensorType: 4
   offset: 0xff
