@@ -8,7 +8,7 @@ num_of_cpu=1
 
 # If no board_id then set num of cpu to 2 socket
 case "$board_id" in
-    "40" | "41" | "42")
+    "3d" | "3D" | "40" | "41" | "42" | "52")
         echo " Onyx 1 CPU"
         num_of_cpu=1
         ;;
@@ -16,11 +16,11 @@ case "$board_id" in
         echo " Ruby 1 CPU"
         num_of_cpu=1
         ;;
-    "43" | "44" | "45")
+    "3e" | "3E" | "43" | "44" | "45" | "51")
         echo " Quartz 2 CPU"
         num_of_cpu=2
         ;;
-    "49" | "4A" |"4a" | "4B" | "4b")
+    "49" | "4A" | "4a" | "4B" | "4b" | "4C" |"4c" | "4D" | "4d" | "4E" | "4e")
         echo " Titanite 2 CPU "
         num_of_cpu=2
         ;;
@@ -71,18 +71,17 @@ do
         do
             # Driver generated I3C name for this dimm
             dev_name="/dev/i3c-${i3cid}-3c00000000${dimm}"
-            pmic_name="/dev/i3c-${i3cid}-2040000000${dimm}"
 
             # Check if DIMM is present
-            $I3C_TOOL -d ${pmic_name} -w 0x33 -r 0x1 > /dev/null 2>&1
+            $I3C_TOOL -d ${dev_name} -w 0x80,0x00 -r 0x1 > /dev/null 2>&1
             if [[ $? -ne 0 ]]
             then
                 # DIMM not present
                 continue
             fi
 
-            echo "DIMM in Socket " ${sock_id} " Ch " ${i3cid} " slot " ${dimm} "is present"
-
+            echo "----------------------------------"
+            echo "DIMM detected in S"${sock_id} "I3C_Bus" ${i3cid} "Ch"${dimm}""
             # DDR5 I3C DIMMs have 128 bytes of internal register
             # data and 1024 bytes of SPD EEPROM data
             id=$(( channel + dimm ))
