@@ -50,6 +50,7 @@ RDEPENDS_${PN}-system = " \
         fpga-tools \
         i3c-tools \
         ipmitool \
+	libmctp-intel \
         phosphor-hostlogger \
         phosphor-pid-control \
         phosphor-host-postd \
