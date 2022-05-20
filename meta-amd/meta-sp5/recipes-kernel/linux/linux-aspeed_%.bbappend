@@ -87,4 +87,5 @@ SRC_URI += "file://sp5.cfg \
             file://0087-misc-amd-apml-Add-AMD-APML-interface-drivers.patch \
             file://0088-ARM-dts-aspeed-enable-I3C-DIMM-devices.patch \
             file://0089-linux-aspeed-Add-group-for-DIMMs.patch \
+            file://0090-linux-aspeed-Modify-to-print-the-MCTP-payload-message.patch \
             "
