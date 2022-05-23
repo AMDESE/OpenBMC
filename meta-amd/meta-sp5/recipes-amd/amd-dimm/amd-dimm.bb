@@ -8,7 +8,6 @@ SRC_URI += " \
         file://dimm-spd-data.sh  \
         file://dimm-pmic-data.sh \
         file://dimm-re-bind.sh   \
-        file://dimm-pmic-temp.sh \
         file://dimm-info.sh \
         "
 RDEPENDS_${PN} += "bash"
@@ -19,7 +18,6 @@ do_install() {
   install -d ${D}/${sbindir}
   install -m 0755 ${S}/dimm-spd-data.sh ${D}/${sbindir}/
   install -m 0755 ${S}/dimm-pmic-data.sh ${D}/${sbindir}/
-  install -m 0755 ${S}/dimm-pmic-temp.sh ${D}/${sbindir}/
   install -m 0755 ${S}/dimm-re-bind.sh ${D}/${sbindir}/
   install -m 0755 ${S}/dimm-info.sh ${D}/${sbindir}/
 
