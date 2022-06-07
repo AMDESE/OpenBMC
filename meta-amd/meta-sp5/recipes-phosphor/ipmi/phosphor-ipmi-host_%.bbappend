@@ -20,5 +20,6 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 SRC_URI += "file://0001-set-BIOS-boot-type-to-EFI.patch \
             file://0002-script-changes-for-mako-templates-and-platforms.patch \
             file://0003-platformization-changes-for-sp5-platforms.patch \
+            file://0004-Add-Set-Sensor-threshold-IPMI-command.patch \
             "
 
