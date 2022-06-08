@@ -90,4 +90,5 @@ SRC_URI += "file://sp5.cfg \
             file://0090-linux-aspeed-Modify-to-print-the-MCTP-payload-message.patch \
             file://0091-apml_modules-add-WITH-Linux-syscall-note-to-SPDX-tag.patch \
             file://0092-linux-aspeed-change-i3c-error-to-info-message.patch \
+            file://0093-drivers-mtd-spi-nor-Add-support-for-Macronix-flash.patch \
             "
