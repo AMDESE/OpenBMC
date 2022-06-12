@@ -5,16 +5,18 @@ set +e
 PROCESSOR=$1
 ADDR=$2
 BOARD=$4
+CRC_VALIDATION=0
 
 if [ "$5" = "-c" ] ; then
+    CRC_VALIDATION=1
     MODEL_NUMBER=$3
+    echo "MODEL = $MODEL_NUMBER"
     CRC_VALUE=$6
 else
     HEX_FILE=$3
+    CRC=$5
     MODEL_NUMBER=`echo $HEX_FILE | cut -d- -f1 | cut -c3-`
 fi
-
-MODEL_NUMBER=`echo $HEX_FILE | cut -d- -f1 | cut -c3-`
 
 echo "Renesas VR upgrade started at $(date)"
 
@@ -51,10 +53,10 @@ quartz_vr_update()
     echo $DEVICE_NAME > /sys/bus/i2c/drivers/isl68137/unbind
     echo "isl68137 driver is unbinded for VR update to continue"
 
-    if [ "$5" = "-c" ] ; then
+    if [ $CRC_VALIDATION == 1 ] ; then
         /usr/bin/vr-update $BUS $ADDR  $MODEL_NUMBER -b $BOARD -c $CRC_VALUE
     else
-        /usr/bin/vr-update $BUS $ADDR $HEX_FILE $MODEL_NUMBER -b $BOARD
+        /usr/bin/vr-update $BUS $ADDR $HEX_FILE $MODEL_NUMBER -b $BOARD $CRC
 
         if [ "$?" -ne "0" ] ; then
             echo "VR upgrade has failed\n"
@@ -109,8 +111,8 @@ if [ "$PLAT" == "quartz" ] ; then
     echo "Quartz detected"
 
     BUS=`find /sys/bus/i2c/drivers/isl68137/ -name "*$ADDR" -exec basename {} \; | cut -d- -f 1`
-    P0=${BUS:0:2}
-    P1=${BUS:2:4}
+    P1=${BUS:0:2}
+    P0=${BUS:2:4}
 
     if [ "$PROCESSOR" == "P0" ] ; then
         BUS=$P0

@@ -53,12 +53,19 @@
 #define GEN2_CRC_ADDR        0x003F
 #define GEN3_CRC_ADDR        0x0094
 
+#define INDEX_0              (0)
+#define INDEX_1              (1)
+#define INDEX_2              (2)
+#define INDEX_3              (3)
+#define INDEX_4              (4)
+
 struct vr_update_context {
     int i2c_bus;
     int i2c_slave_addr;
     char *update_file_path;
     char *model_name;
     char gen[8];
+    u_int32_t crc;
 };
 
 int gen2_programming(void);

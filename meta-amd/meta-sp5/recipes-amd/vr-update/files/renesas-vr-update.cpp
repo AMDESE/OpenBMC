@@ -38,7 +38,7 @@ int vr_update_open_dev(void)
         printf("Error: failed to open VR device");
         return FAILURE;
     }
-    usleep(10 * 1000);
+    usleep(SLEEP_1000);
     return SUCCESS;
 }
 
@@ -96,7 +96,7 @@ int disable_packet_capture(void)
         return FAILURE;
     }
 
-    rdata[0] = rdata[0] & 0xDF;
+    rdata[INDEX_0] = rdata[INDEX_0] & 0xDF;
 
     ret = i2c_smbus_write_i2c_block_data(fd, DMA_READ, BYTE_COUNT_4, rdata);
     if (ret < SUCCESS) {
@@ -131,7 +131,9 @@ int check_available_nvm_slots(u_int16_t nvm_slot_addr)
     //read from DMA Address Register
     ret = i2c_smbus_read_i2c_block_data(fd,DMA_READ, BYTE_COUNT_4, rdata);
     if (ret > SUCCESS) {
-        nvm_slots = (rdata[3] << SHIFT_24) | (rdata[2] << SHIFT_16) | (rdata[1] << SHIFT_8) | rdata[0];
+        nvm_slots = (rdata[INDEX_3] << SHIFT_24) | (rdata[INDEX_2] << SHIFT_16)
+                    | (rdata[INDEX_1] << SHIFT_8) | rdata[INDEX_0];
+
         printf("Number of available NVM slots = %d \n", nvm_slots);
         if (nvm_slots <= 5) {
             printf("Available NVM slots are less than 5. Hence stopping the update\n");
@@ -165,7 +167,7 @@ int gen2_device_id_validation(void)
         return FAILURE;
     }
 
-    printf("Device id from the device = %x\n", rdata[2]);
+    printf("Device id from the device = %x\n", rdata[INDEX_2]);
 
     if (vr_update_header_file_open() != SUCCESS) {
         return FAILURE;
@@ -213,7 +215,8 @@ int gen3_device_id_validation(void)
     ret = i2c_smbus_read_i2c_block_data(fd, DEV_ID_CMD, BYTE_COUNT_5, rdata);
 
     if (ret > SUCCESS) {
-        device_id = (rdata[4] << SHIFT_24) | (rdata[3] << SHIFT_16) | (rdata[2] << SHIFT_8) | rdata[1];
+        device_id = (rdata[INDEX_4] << SHIFT_24) |
+                    (rdata[INDEX_3] << SHIFT_16) | (rdata[INDEX_2] << SHIFT_8) | rdata[INDEX_1];
     } else {
         printf("Read device_id from the device failed with ret value %d\n",ret);
         return FAILURE;
@@ -265,7 +268,8 @@ int device_revision_verification(void)
     ret = i2c_smbus_read_i2c_block_data(fd, DEV_REV_REV, BYTE_COUNT_5, rdata);
 
     if (ret > SUCCESS) {
-        device_rev = (rdata[4] << SHIFT_24) | (rdata[3] << SHIFT_16) | (rdata[2] << SHIFT_8) | rdata[1];
+        device_rev = (rdata[INDEX_4] << SHIFT_24) | (rdata[INDEX_3] << SHIFT_16)
+                     | (rdata[INDEX_2] << SHIFT_8) | rdata[INDEX_1];
     } else {
         printf("Read device revision from the device failed with ret value %d\n",ret);
         return FAILURE;
@@ -303,7 +307,7 @@ int device_revision_verification(void)
 
         if ((strncmp(vr_context.gen, GEN2, strlen(GEN2))) == SUCCESS)
         {
-            if ((file_rev & INT_255) == (device_rev & INT_255))
+            if ((file_rev & INT_255) == ((device_rev >> 24) & 0xFF))
             {
                 printf("Device revision from the device and the HEX file matched\n");
             }
@@ -316,8 +320,7 @@ int device_revision_verification(void)
         }
         if ((strncmp(vr_context.gen, GEN3, strlen(GEN3))) == SUCCESS)
         {
-            if (((file_rev & INT_255) == (device_rev & INT_255)) ||
-                (file_rev  >= device_rev)) // Dev v0 can use File v1
+            if (((file_rev & INT_255) >= ((device_rev >> 24) & 0xFF)))
             {
                     printf("Device revision from the device and the HEX file matched\n");
             }
@@ -402,7 +405,7 @@ int write_hex_file_to_device(void)
                 num = (int) strtol(str, NULL, BASE_16);
                 wdata[k] = num;
             }
-            ret = i2c_smbus_write_i2c_block_data(fd, data[3], BYTE_COUNT_4, wdata);
+            ret = i2c_smbus_write_i2c_block_data(fd, data[INDEX_3], BYTE_COUNT_4, wdata);
             if (ret < SUCCESS) {
                 printf("Writing block data to the device failed \n");
                 return FAILURE;
@@ -425,7 +428,7 @@ int gen2_poll_programmer_status_register(void)
     //Poll PROGRAMMER_STATUS Register
     while (timeout < MAX_RETRY) {
         timeout++;
-        usleep(SLEEP);
+        usleep(SLEEP_1000);
 
         if (i2c_smbus_write_word_data(fd,DMA_WRITE, GEN2_PRGM_STATUS) != SUCCESS) {
             printf("%s:Write to DMA Address Register failed\n", __func__);
@@ -449,13 +452,13 @@ int gen2_poll_programmer_status_register(void)
     if (status == FAILURE) {
         printf("Bit 0 of programmer status register is 0.Programming has failed. Decoding the bits\n");
 
-        if (((rdata[0] >> SHIFT_4) & STATUS_BIT_1) == BIT_ENABLE) {
+        if (((rdata[INDEX_0] >> SHIFT_4) & STATUS_BIT_1) == BIT_ENABLE) {
             printf("a CRC mismatch exists within the configuration data\n");
         }
-        if (((rdata[0] >> SHIFT_6) & STATUS_BIT_1) == BIT_ENABLE) {
+        if (((rdata[INDEX_0] >> SHIFT_6) & STATUS_BIT_1) == BIT_ENABLE) {
             printf("the CRC check fails on the OTP memory\n");
         }
-        if ((rdata[1] & STATUS_BIT_1) == BIT_ENABLE) {
+        if ((rdata[INDEX_1] & STATUS_BIT_1) == BIT_ENABLE) {
             printf("the HEX file contains more configurations than are available\n");
         }
     return FAILURE;
@@ -474,7 +477,7 @@ int gen3_poll_programmer_status_register(void)
     //Poll PROGRAMMER_STATUS Register
     while (timeout < 10) {
         timeout++;
-        usleep(2500);
+        usleep(SLEEP_2500);
 
         if (i2c_smbus_write_word_data(fd,DMA_WRITE, GEN3_PRGM_STATUS) != SUCCESS) {
             printf("%s:Write to DMA Address Register failed\n", __func__);
@@ -498,19 +501,19 @@ int gen3_poll_programmer_status_register(void)
     if (status == FAILURE) {
         printf("Bit 0 of programmer status register is 0.Programming has failed. Decoding the bits\n");
 
-        if (((rdata[0] >> STATUS_BIT_1) & STATUS_BIT_1) == BIT_ENABLE) {
+        if (((rdata[INDEX_0] >> STATUS_BIT_1) & STATUS_BIT_1) == BIT_ENABLE) {
             printf("Bit 1 is set\nProgramming has failed\n");
         }
-        if (((rdata[0] >> STATUS_BIT_2) & STATUS_BIT_1) == BIT_ENABLE) {
+        if (((rdata[INDEX_0] >> STATUS_BIT_2) & STATUS_BIT_1) == BIT_ENABLE) {
             printf("The HEX file contains more configurations than are available\n");
         }
-        if (((rdata[0] >> STATUS_BIT_3) & STATUS_BIT_1) == BIT_ENABLE) {
+        if (((rdata[INDEX_0] >> STATUS_BIT_3) & STATUS_BIT_1) == BIT_ENABLE) {
             printf("CRC mismatch exists within the configuration data\n");
         }
-        if (((rdata[0] >> STATUS_BIT_4) & STATUS_BIT_1) == BIT_ENABLE) {
+        if (((rdata[INDEX_0] >> STATUS_BIT_4) & STATUS_BIT_1) == BIT_ENABLE) {
             printf("CRC check fails on the OTP memory\n");
         }
-        if (((rdata[0] >> STATUS_BIT_5) & STATUS_BIT_1) == BIT_ENABLE) {
+        if (((rdata[INDEX_0] >> STATUS_BIT_5) & STATUS_BIT_1) == BIT_ENABLE) {
             printf("Programming has failed! OTP banks consumed\n");
         }
         return FAILURE;
@@ -564,35 +567,35 @@ int read_bank_status_register(u_int16_t bank_status_reg)
         bank = 8;
 
     //Bank 0/8 check
-    if (bank_status_bits(rdata[0] & 0x0F, STATUS_BIT_0 + bank) != SUCCESS)
+    if (bank_status_bits(rdata[INDEX_0] & 0x0F, STATUS_BIT_0 + bank) != SUCCESS)
         return FAILURE;
 
     //Bank 1/9 check
-    if (bank_status_bits(rdata[0] >> SHIFT_4, STATUS_BIT_1 + bank) != SUCCESS)
+    if (bank_status_bits(rdata[INDEX_0] >> SHIFT_4, STATUS_BIT_1 + bank) != SUCCESS)
         return FAILURE;
 
     //Bank 2/10 check
-    if (bank_status_bits(rdata[1] & 0x0F, STATUS_BIT_2 + bank) != SUCCESS)
+    if (bank_status_bits(rdata[INDEX_1] & 0x0F, STATUS_BIT_2 + bank) != SUCCESS)
         return FAILURE;
 
     //Bank 3/11 check
-    if (bank_status_bits(rdata[1] >> SHIFT_4, STATUS_BIT_3 + bank) != SUCCESS)
+    if (bank_status_bits(rdata[INDEX_1] >> SHIFT_4, STATUS_BIT_3 + bank) != SUCCESS)
         return FAILURE;
 
     //Bank 4/12 check
-    if (bank_status_bits(rdata[2] & 0x0F, STATUS_BIT_4 + bank) != SUCCESS)
+    if (bank_status_bits(rdata[INDEX_2] & 0x0F, STATUS_BIT_4 + bank) != SUCCESS)
         return FAILURE;
 
     //Bank 5/13 check
-    if (bank_status_bits(rdata[2] >> SHIFT_4, STATUS_BIT_5 + bank) != SUCCESS)
+    if (bank_status_bits(rdata[INDEX_2] >> SHIFT_4, STATUS_BIT_5 + bank) != SUCCESS)
         return FAILURE;
 
     //Bank 6/14 check
-    if (bank_status_bits(rdata[3] & 0x0F, STATUS_BIT_6 + bank) != SUCCESS)
+    if (bank_status_bits(rdata[INDEX_3] & 0x0F, STATUS_BIT_6 + bank) != SUCCESS)
         return FAILURE;
 
     //Bank 7/15 check
-    if (bank_status_bits(rdata[3] >> SHIFT_4, STATUS_BIT_7 + bank) != SUCCESS)
+    if (bank_status_bits(rdata[INDEX_3] >> SHIFT_4, STATUS_BIT_7 + bank) != SUCCESS)
         return FAILURE;
 
     return SUCCESS;
@@ -606,21 +609,21 @@ int crc_check_verification(int argc, char* argv[],int crc_value)
     u_int32_t device_crc;
     u_int16_t crc_data;
 
-    vr_context.i2c_bus = atoi(argv[5]);
-    vr_context.i2c_slave_addr = strtoul(argv[6], NULL, BASE_16);
+    vr_context.i2c_bus = atoi(argv[ARGV_5]);
+    vr_context.i2c_slave_addr = strtoul(argv[ARGV_6], NULL, BASE_16);
 
-    if ((strncmp(argv[7], RAA229613, strlen(RAA229613)) == SUCCESS)
-        || (strncmp(argv[7], RAA229625, strlen(RAA229625)) == SUCCESS)
-        || ((strncmp(argv[7], RAA229620, strlen(RAA229620)) == SUCCESS)))
+    if ((strncmp(argv[ARGV_7], RAA229613, strlen(RAA229613)) == SUCCESS)
+        || (strncmp(argv[ARGV_7], RAA229625, strlen(RAA229625)) == SUCCESS)
+        || ((strncmp(argv[ARGV_7], RAA229620, strlen(RAA229620)) == SUCCESS)))
     {
         strncpy(vr_context.gen, GEN3, strlen(GEN3));
     }
-    else if (strncmp(argv[7], ISL68220, strlen(ISL68220)) == SUCCESS)
+    else if (strncmp(argv[ARGV_7], ISL68220, strlen(ISL68220)) == SUCCESS)
     {
         strncpy(vr_context.gen, GEN2, strlen(GEN2));
     }
     else {
-        printf("Invalid model number %s\n",argv[7]);
+        printf("Invalid model number %s\n",argv[ARGV_7]);
         return -1;
     }
 
@@ -651,7 +654,8 @@ int crc_check_verification(int argc, char* argv[],int crc_value)
     //read from DMA Address Register
     ret = i2c_smbus_read_i2c_block_data(fd,DMA_READ, BYTE_COUNT_4, rdata);
     if (ret > SUCCESS) {
-        device_crc = (rdata[3] << SHIFT_24) | (rdata[2] << SHIFT_16) | (rdata[1] << SHIFT_8) | rdata[0];
+        device_crc = (rdata[INDEX_3] << SHIFT_24) | (rdata[INDEX_2] << SHIFT_16)
+                     | (rdata[INDEX_1] << SHIFT_8) | rdata[INDEX_0];
         printf("CRC value is 0x%x\n",device_crc);
     } else {
         printf("Read to DMA Address Register failed with ret value %d\n",ret);
@@ -669,6 +673,44 @@ clean_vr_update:
     return SUCCESS;
 }
 
+int validate_previous_image_crc(u_int16_t crc_data, u_int32_t config_file_crc)
+{
+
+    u_int8_t rdata[MAXIMUM_SIZE] = { 0 };
+    u_int32_t device_crc;
+    int ret = FAILURE;
+
+    //write to DMA Address Register
+    ret = i2c_smbus_write_word_data(fd,DMA_WRITE,crc_data );
+    if (ret < SUCCESS) {
+        printf("%s:write to DMA Address Register failed ret = %d\n",__func__, ret);
+        return FAILURE;
+    }
+
+    //read from DMA Address Register
+    ret = i2c_smbus_read_i2c_block_data(fd,DMA_READ, BYTE_COUNT_4, rdata);
+    if (ret > SUCCESS) {
+        device_crc = (rdata[INDEX_3] << SHIFT_24) | (rdata[INDEX_2] << SHIFT_16)
+                     | (rdata[INDEX_1] << SHIFT_8) | rdata[INDEX_0];
+        printf("CRC value is 0x%x\n",device_crc);
+    } else {
+        printf("Read to DMA Address Register failed with ret value %d\n",ret);
+        return FAILURE;
+    }
+    if(device_crc == config_file_crc)
+    {
+       printf("CRC matches with previous image. Skipping the update\n");
+       return FAILURE;
+    }
+    else
+    {
+        printf("CRC didnot match with previous image. Continuing the update\n");
+
+    }
+
+    return SUCCESS;
+}
+
 int gen2_programming(void)
 {
 
@@ -681,6 +723,14 @@ int gen2_programming(void)
         goto clean_vr_update;
     }
 
+    if(vr_context.crc != 0)
+    {
+        if(validate_previous_image_crc(GEN2_CRC_ADDR,vr_context.crc) != SUCCESS) {
+            ret = FAILURE;
+            goto clean_vr_update;
+        }
+    }
+
     nvm_slot_addr = GEN2_NVM_SLOT_ADDR;
 
     if (check_available_nvm_slots(nvm_slot_addr) != SUCCESS) {
@@ -689,7 +739,7 @@ int gen2_programming(void)
     }
 
     if (gen2_device_id_validation() != SUCCESS) {
-        ret = FAILURE;
+       ret = FAILURE;
         goto clean_vr_update;
     }
 
@@ -738,6 +788,14 @@ int gen3_programming(void)
     if (vr_update_open_dev() != SUCCESS) {
         ret = FAILURE;
         goto clean_vr_update;
+    }
+
+    if(vr_context.crc != 0)
+    {
+        if(validate_previous_image_crc(GEN3_CRC_ADDR,vr_context.crc) != SUCCESS) {
+            ret = FAILURE;
+            goto clean_vr_update;
+        }
     }
 
     if (disable_packet_capture() != SUCCESS) {
@@ -798,17 +856,21 @@ int renesas_vr_update(int argc, char* argv[])
         return FAILURE;
     }
 
-    vr_context.i2c_bus = atoi(argv[3]);
-    vr_context.i2c_slave_addr = strtoul(argv[4], NULL, BASE_16);
-    vr_context.update_file_path = argv[5];
+    vr_context.i2c_bus = atoi(argv[ARGV_3]);
+    vr_context.i2c_slave_addr = strtoul(argv[ARGV_4], NULL, BASE_16);
+    vr_context.update_file_path = argv[ARGV_5];
 
-    if ((strncmp(argv[6], RAA229613, strlen(RAA229613)) == SUCCESS) ||
-        (strncmp(argv[6], RAA229625, strlen(RAA229625)) == SUCCESS)
-        || ((strncmp(argv[6], RAA229620, strlen(RAA229620)) == SUCCESS)))
+    vr_context.crc = 0;
+    if(argv[ARGV_7] != NULL)
+        vr_context.crc = strtoul(argv[ARGV_7], NULL, 16);
+
+    if ((strncmp(argv[ARGV_6], RAA229613, strlen(RAA229613)) == SUCCESS) ||
+        (strncmp(argv[ARGV_6], RAA229625, strlen(RAA229625)) == SUCCESS)
+        || ((strncmp(argv[ARGV_6], RAA229620, strlen(RAA229620)) == SUCCESS)))
     {
         strncpy(vr_context.gen, GEN3, strlen(GEN3));
     }
-    else if (strncmp(argv[6], ISL68220, strlen(ISL68220)) == SUCCESS)
+    else if (strncmp(argv[ARGV_6], ISL68220, strlen(ISL68220)) == SUCCESS)
     {
         strncpy(vr_context.gen, GEN2, strlen(GEN2));
     }

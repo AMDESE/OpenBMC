@@ -40,6 +40,7 @@ int main(int argc, char **argv)
         crc_check_verification(argc, argv, crc_value);
         return 0;
     }
+
     if (strncmp(board, RENESAS_VR , strlen(RENESAS_VR)) == 0) {
 
         ret = renesas_vr_update(argc, argv);

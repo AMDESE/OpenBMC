@@ -6,6 +6,7 @@ set +e
 
 IMAGE_FILE=$1
 BOARD=$2
+CRC=''
 UNBIND_DRIVER=0
 echo "VR upgrade started at $(date)\n"
 
@@ -16,6 +17,7 @@ then
     echo "VR image is $IMAGE_FILE"
     if [ "${IMAGE_FILE: -4}" == ".xsf" ];then
         ADDR=$3
+        CRC=$4
         if ([ "$ADDR" == "13" ] || [ "$ADDR" == "14" ] || [ "$ADDR" == "15" ]); then
             BUS=4
         else
@@ -34,7 +36,12 @@ then
         echo "xdpe12284 driver is unbinded for VR telemetry to continue"
     fi
 
-    /usr/bin/vr-update $BUS $ADDR $IMAGE_FILE "debug" -b $BOARD
+    if [ -z "$CRC" ] ; then
+        /usr/bin/vr-update $BUS $ADDR $IMAGE_FILE "debug" -b $BOARD
+    else
+        /usr/bin/vr-update $BUS $ADDR $IMAGE_FILE "debug" -b $BOARD $CRC
+    fi
+
     if [ "$?" -ne "0" ];
     then
         echo "VR upgrade has failed\n"

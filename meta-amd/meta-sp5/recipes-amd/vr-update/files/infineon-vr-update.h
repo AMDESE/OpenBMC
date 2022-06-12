@@ -34,10 +34,13 @@
 #define USER_IMG_PTR1 0xB4
 #define USER_IMG_PTR2 0xB6
 #define USER_IMG_PTR3 0xB8
+#define CRC_REG_1 0xAE
+#define CRC_REG_2 0xB0
 #define CONFIG_IMG_PTR 0xB2
 #define UNLOCK_REG 0xD4
 #define USER_PROG_CMD 0x00D6
 #define PROG_STATUS_REG 0xD7
+#define USER_READ_CMD 0x41
 
 /* BYTE DATA */
 #define AVAIL_SPACE_BYTE 0x10
@@ -56,6 +59,7 @@
 #define SPBD2 0x05
 #define SPBD3 0x20
 
+#define USER_PROG_STATUS 0x80
 #endif
 
 int infineon_vr_update(int argc, char* argv[]);

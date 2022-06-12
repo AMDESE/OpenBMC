@@ -534,7 +534,96 @@ bool write_user_section_data(const char *filename)
    return true;
 }
 
-int user_section_programming(const char *filename)
+int check_program_status()
+{
+    /*Check register 0xD7 [7] for programming progress.
+      0 = fail. 1 = done*/
+
+    uint8_t read_data = 0;
+
+    read_data = i2c_smbus_read_byte_data(fd,PROG_STATUS_REG);
+    if (read_data < 0)
+    {
+        std::cout << "Error: Failed to read data" << std::endl;
+        perror("Error");
+        return FAILURE;
+    }
+
+    if(read_data & USER_PROG_STATUS)
+        std::cout << "User section programming success" << std::endl;
+    else {
+        std::cout << "User section programming failed" << std::endl;
+        perror("Error");
+        return FAILURE;
+    }
+
+    return SUCCESS;
+}
+
+int send_user_section_command(int img_ptr, int user_section_cmd)
+{
+    /*Write programming command 0xPP42 to register 0x00D6*/
+    user_section_cmd = ( img_ptr << 8) | user_section_cmd;
+
+    rc = i2c_smbus_write_word_data(fd, USER_PROG_CMD , user_section_cmd);
+    if (rc < 0) {
+        std::cout << "Error: Failed to write data" << std::endl;
+        perror("Error");
+        return FAILURE;
+    }
+    return SUCCESS;
+}
+
+int check_previous_image_crc(int next_img_ptr,int crc_value)
+{
+    int previous_img_ptr = --next_img_ptr;
+    uint16_t user_read_cmd = USER_READ_CMD;
+    uint16_t rdata = 0;
+    uint32_t device_crc_data = 0;
+    if(send_user_section_command(previous_img_ptr,user_read_cmd) != SUCCESS)
+        return FAILURE;
+
+    /*Wait for 200ms */
+    usleep(200 * 1000);
+
+    if(check_program_status() != SUCCESS)
+        return FAILURE;
+
+    rdata = i2c_smbus_read_word_data(fd,CRC_REG_1);
+    if (rdata < 0)
+    {
+        std::cout << "Error: Failed to read data" << std::endl;
+        perror("Error");
+        return FAILURE;
+    }
+
+    device_crc_data = device_crc_data | ((uint32_t )rdata << BASE_16) ;
+
+    rdata = i2c_smbus_read_word_data(fd,CRC_REG_2);
+    if (rdata < 0)
+    {
+        std::cout << "Error: Failed to read data" << std::endl;
+        perror("Error");
+        return FAILURE;
+    }
+    device_crc_data = device_crc_data | rdata;
+    std::cout << std::hex << "CRC from the device = " << device_crc_data << std::endl;
+    std::cout << std::hex << "CRC from the manifest file = " << crc_value << std::endl;
+
+    if(device_crc_data == crc_value)
+    {
+        std::cout << "CRC matches with previous image. Skipping the update";
+        return FAILURE;
+    }
+    else
+    {
+       std::cout << "CRC didnot match with previous image. Continuing the update";
+    }
+
+    return SUCCESS;
+
+}
+int user_section_programming(const char *filename,int crc_value)
 {
 
     uint16_t rdata = 0;
@@ -561,6 +650,13 @@ int user_section_programming(const char *filename)
         std::cout << "OTP for user section is not available\n";
         return FAILURE;
     }
+
+    if(crc_value != 0)
+    {
+        if(check_previous_image_crc(next_img_ptr,crc_value) != SUCCESS)
+            return FAILURE;
+    }
+
     /* Write data 0x03 to register 0xD4 to
        unlock i2 and PMBus address registers*/
    rc = i2c_smbus_write_byte_data(fd, UNLOCK_REG, 0x03);
@@ -576,39 +672,13 @@ int user_section_programming(const char *filename)
 
     uint16_t user_prog_cmd = 0x42;
 
-    /*Write programming command 0xPP42 to register 0x00D6*/
-    user_prog_cmd = ( next_img_ptr << 8) | user_prog_cmd;
-
-    rc = i2c_smbus_write_word_data(fd, USER_PROG_CMD , user_prog_cmd);
-    if (rc < 0) {
-        std::cout << "Error: Failed to write data" << std::endl;
-        perror("Error");
+    if(send_user_section_command(next_img_ptr,user_prog_cmd) != SUCCESS)
         return FAILURE;
-    }
 
     /*Wait for 200ms */
     usleep(200 * 1000);
 
-    /*Check register 0xD7 [7] for programming progress.
-      0 = fail. 1 = done*/
-
-    uint8_t read_data = 0;
-
-    read_data = i2c_smbus_read_byte_data(fd,PROG_STATUS_REG);
-    if (read_data < 0)
-    {
-        std::cout << "Error: Failed to read data" << std::endl;
-        perror("Error");
-        return FAILURE;
-    }
-
-    if(read_data & 0x80)
-        std::cout << "User section programming success" << std::endl;
-    else {
-        std::cout << "User section programming failed" << std::endl;
-        perror("Error");
-        return FAILURE;
-    }
+    exit_status = check_program_status();
 
     return exit_status;
 }
@@ -670,8 +740,13 @@ int tda_vr_update(int argc, char *argv[])
     uint8_t i2c_addr = std::strtoul(argv[ARGV_4], NULL, BASE_16);
     const char *file_name = argv[ARGV_5];
     int num_of_image = 0;
+    int crc_value = 0;
+
+    if(argv[7] != NULL)
+        crc_value = strtoul(argv[7], NULL, 16);
 
     exit_status = vr_update_open_dev(i2c_bus, i2c_addr);
+
     if (exit_status != SUCCESS)
     {
         std::cout << "Error: Failed to open file descriptor" << std::endl;
@@ -679,7 +754,7 @@ int tda_vr_update(int argc, char *argv[])
     }
 
     /*User section programming */
-    exit_status = user_section_programming(file_name);
+    exit_status = user_section_programming(file_name,crc_value);
 
     vr_update_close_dev();
     return (exit_status);
@@ -694,8 +769,9 @@ int infineon_vr_update(int argc, char *argv[])
 
     file_extension = strrchr(file_name, '.');
 
-    if(strncmp(file_extension,".xsf",LENGTHOFBLOCK) == 0)
+    if(strncmp(file_extension,".xsf",LENGTHOFBLOCK) == 0) {
         exit_status = tda_vr_update(argc,argv);
+    }
     else
         exit_status = xdpe_vr_update(argc,argv);
 
