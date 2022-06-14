@@ -7,7 +7,7 @@
         BuildDate:
           IPMIFruProperty: Mfg Date
           IPMIFruSection: Board
-        PartNumber:
+        Model:
           IPMIFruProperty: Part Number
           IPMIFruSection: Board
         Manufacturer:
