@@ -1,0 +1,125 @@
+From 1d060eb369f1cbfc4ec9e89fdaeae08e5b2647fa Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Wed, 15 Jun 2022 05:51:46 -0500
+Subject: [PATCH] drivers/misc/amd-apml/sbrmi: add dimm temperatures to SBRMI
+ hwmon
+
+Added DIMM temperature sensors to SBRMI hwmon driver
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+---
+ drivers/misc/amd-apml/sbrmi.c | 58 +++++++++++++++++++++++++++++++++--
+ 1 file changed, 55 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/misc/amd-apml/sbrmi.c b/drivers/misc/amd-apml/sbrmi.c
+index 1555a79468c8..ed355adf0aeb 100644
+--- a/drivers/misc/amd-apml/sbrmi.c
++++ b/drivers/misc/amd-apml/sbrmi.c
+@@ -28,11 +28,17 @@
+ /* Do not allow setting negative power limit */
+ #define SBRMI_PWR_MIN	0
+
++#define DIMM_BASE_ID		(0x80)
++#define DIMM_TEMP_OFFSET	(21)
++#define TITANITE_DIMM_13	(0x93)
++#define TITANITE_DIMM_14	(0x99)
++
+ enum sbrmi_msg_id {
+ 	SBRMI_READ_PKG_PWR_CONSUMPTION = 0x1,
+ 	SBRMI_WRITE_PKG_PWR_LIMIT,
+ 	SBRMI_READ_PKG_PWR_LIMIT,
+ 	SBRMI_READ_PKG_MAX_PWR_LIMIT,
++	SBRMI_READ_DIMM_THERMAL_SENSOR = 0x48,
+ };
+
+ static int sbrmi_get_max_pwr_limit(struct apml_sbrmi_device *rmi_dev)
+@@ -57,7 +63,7 @@ static int sbrmi_read(struct device *dev, enum hwmon_sensor_types type,
+ 	struct apml_message msg = { 0 };
+ 	int ret;
+
+-	if (type != hwmon_power)
++	if (type != hwmon_power && type != hwmon_temp)
+ 		return -EINVAL;
+
+ 	msg.data_in.reg_in[RD_FLAG_INDEX] = 1;
+@@ -71,6 +77,25 @@ static int sbrmi_read(struct device *dev, enum hwmon_sensor_types type,
+ 		msg.cmd = SBRMI_READ_PKG_PWR_LIMIT;
+ 		ret = rmi_mailbox_xfer(rmi_dev, &msg);
+ 		break;
++	case hwmon_temp_input:
++		msg.cmd = SBRMI_READ_DIMM_THERMAL_SENSOR;
++		switch (channel) {
++			case 0 ... 11:
++				msg.data_in.mb_in[RD_WR_DATA_INDEX] = (DIMM_BASE_ID + channel);
++				break;
++			case 12: //13th DIMM special case for Titanite :)
++				msg.data_in.mb_in[RD_WR_DATA_INDEX] = TITANITE_DIMM_13;
++				break;
++			case 13: //14th special case for Titanite again
++				msg.data_in.mb_in[RD_WR_DATA_INDEX] = TITANITE_DIMM_14;
++				break;
++			default:
++				return -EINVAL;
++		}
++		ret = rmi_mailbox_xfer(rmi_dev, &msg);
++		if (ret < 0)
++			return ret;
++		break;
+ 	case hwmon_power_cap_max:
+ 		/* Cache maximum power limit */
+ 		if (!rmi_dev->pwr_limit_max) {
+@@ -87,8 +112,14 @@ static int sbrmi_read(struct device *dev, enum hwmon_sensor_types type,
+ 	if (ret < 0)
+ 		return ret;
+ 	/* hwmon power attributes are in microWatt */
+-	*val = (long)msg.data_out.mb_out[RD_WR_DATA_INDEX] * 1000;
+-
++	if (type == hwmon_power) //power sensor
++		*val = (long)msg.data_out.mb_out[RD_WR_DATA_INDEX] * 1000;
++	/* sbrmi temp is floating point, convert to deg C rational num */
++	if (type == hwmon_temp)
++	{
++		*val = (msg.data_out.mb_out[RD_WR_DATA_INDEX] >> DIMM_TEMP_OFFSET) * 1000;
++		*val = ((*val-32000) * (5/9));
++	}
+ 	return ret;
+ }
+
+@@ -129,6 +160,12 @@ static umode_t sbrmi_is_visible(const void *data,
+ 			return 0644;
+ 		}
+ 		break;
++	case hwmon_temp:
++		switch (attr) {
++		case hwmon_temp_input:
++			return 0444;
++		}
++		break;
+ 	default:
+ 		break;
+ 	}
+@@ -138,6 +175,21 @@ static umode_t sbrmi_is_visible(const void *data,
+ static const struct hwmon_channel_info *sbrmi_info[] = {
+ 	HWMON_CHANNEL_INFO(power,
+ 			   HWMON_P_INPUT | HWMON_P_CAP | HWMON_P_CAP_MAX),
++	HWMON_CHANNEL_INFO(temp,
++			   HWMON_T_INPUT,
++			   HWMON_T_INPUT,
++			   HWMON_T_INPUT,
++			   HWMON_T_INPUT,
++			   HWMON_T_INPUT,
++			   HWMON_T_INPUT,
++			   HWMON_T_INPUT,
++			   HWMON_T_INPUT,
++			   HWMON_T_INPUT,
++			   HWMON_T_INPUT,
++			   HWMON_T_INPUT,
++			   HWMON_T_INPUT,
++			   HWMON_T_INPUT,
++			   HWMON_T_INPUT),
+ 	NULL
+ };
+
+--
+2.17.1
+
