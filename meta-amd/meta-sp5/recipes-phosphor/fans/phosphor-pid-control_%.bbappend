@@ -9,6 +9,7 @@ SRC_URI_append += " file://onyx-stepwise-config.json \
                     file://set-platform-json-config.sh \
                     file://phosphor-pid-control.service \
                     file://0001-phosphor-pid-control-Add-CPU-Temp-simulation-code.patch \
+                    file://0002-phosphor-pid-control-Modify-Sensor-based-Temp-simulation.patch \
                   "
 
 FILES_${PN}_append = " ${datadir}/swampd/onyx-stepwise-config.json \
