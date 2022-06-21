@@ -42,6 +42,7 @@ RDEPENDS_${PN}-system = " \
         amd-clear-cmos \
         amd-dimm \
         amd-lcd-lib \
+        amd-mctp-tool \
         amd-ras \
         amd-yaap \
         bmcweb \
@@ -50,7 +51,6 @@ RDEPENDS_${PN}-system = " \
         fpga-tools \
         i3c-tools \
         ipmitool \
-	libmctp-intel \
         phosphor-hostlogger \
         phosphor-pid-control \
         phosphor-host-postd \
