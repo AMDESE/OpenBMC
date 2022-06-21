@@ -4,7 +4,7 @@ DESCRIPTION = "Implementation of MCTP(DMTF DSP0236)"
 SRC_URI = "git://github.com/Intel-BMC/libmctp.git;protocol=ssh"
 SRCREV = "d530c2271e1f9ff5d76a170c0abd64bd03ef40fd"
 
-SRC_URI_append += " file://0001-libmctp-intel-Add-MCTP-discovery-and-cmd-test-tool.patch \
+SRC_URI_append += " file://0001-libmctp-intel-Modify-code-changed-to-support-AMD-MCTP.patch \
 	          "
 S = "${WORKDIR}/git"
 
