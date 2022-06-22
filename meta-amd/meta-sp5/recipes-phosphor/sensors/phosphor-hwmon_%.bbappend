@@ -1,6 +1,8 @@
 FILESEXTRAPATHS_prepend_sp5 := "${THISDIR}/${PN}:"
 EXTRA_OECONF_append_sp5 = " --enable-negative-errno-on-fail"
 
+SRC_URI += "file://0001-Add-power-on-monitor-mechanism.patch \
+	   "
 # Onyx specific sensors
 CHIPS_ONYX = " \
         bus@1e7a0000/i3c4@6000/sbtsi@4c,22400000001 \
