@@ -100,7 +100,9 @@
         {
             "name": "CPU0_Temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/CPU0_Temp"
+            "readPath": "/xyz/openbmc_project/sensors/temperature/CPU0_Temp",
+            "ignoreDbusMinMax": true,
+            "timeout": 0
         },
         {
             "name": "CPU1_Temp",
@@ -282,7 +284,6 @@
     "zones" : [
         {
             "id": 0,
-            "name":"SYS_FANS",
             "minThermalOutput": 10.0,
             "failsafePercent": 30.0,
             "pids": [

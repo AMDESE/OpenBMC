@@ -341,7 +341,7 @@
                                "P0_DIMM9_Temp",
                                "P0_DIMM10_Temp",
                                "P0_DIMM11_Temp",
-                               "P1_DIMM12_Temp"
+                               "P0_DIMM12_Temp"
                                ],
                     "setpoint": 20.0,
                     "pid": {
