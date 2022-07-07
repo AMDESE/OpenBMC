@@ -92,4 +92,5 @@ SRC_URI += "file://sp5.cfg \
             file://0092-linux-aspeed-change-i3c-error-to-info-message.patch \
             file://0093-drivers-mtd-spi-nor-Add-support-for-Macronix-flash.patch \
             file://0094-drivers-misc-amd-apml-sbrmi-add-dimm-temperatures.patch \
+            file://0095-ARM-dts-aspeed-Add-new-GPIO-for-PMIC-Error.patch \
             "
