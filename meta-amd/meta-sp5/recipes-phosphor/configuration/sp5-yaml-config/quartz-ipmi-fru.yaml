@@ -1,4 +1,124 @@
 0x00:
+  /system/chassis/motherboard/P0_DIMM_A:
+    entityID: 8
+    entityInstance: 1
+    interfaces:
+        xyz.openbmc_project.Inventory.Item.Dimm:
+  /system/chassis/motherboard/P0_DIMM_B:
+    entityID: 8
+    entityInstance: 2
+    interfaces:
+        xyz.openbmc_project.Inventory.Item.Dimm:
+  /system/chassis/motherboard/P0_DIMM_C:
+    entityID: 8
+    entityInstance: 3
+    interfaces:
+        xyz.openbmc_project.Inventory.Item.Dimm:
+  /system/chassis/motherboard/P0_DIMM_D:
+    entityID: 8
+    entityInstance: 4
+    interfaces:
+        xyz.openbmc_project.Inventory.Item.Dimm:
+  /system/chassis/motherboard/P0_DIMM_E:
+    entityID: 8
+    entityInstance: 5
+    interfaces:
+        xyz.openbmc_project.Inventory.Item.Dimm:
+  /system/chassis/motherboard/P0_DIMM_F:
+    entityID: 8
+    entityInstance: 6
+    interfaces:
+        xyz.openbmc_project.Inventory.Item.Dimm:
+  /system/chassis/motherboard/P0_DIMM_G:
+    entityID: 8
+    entityInstance: 7
+    interfaces:
+        xyz.openbmc_project.Inventory.Item.Dimm:
+  /system/chassis/motherboard/P0_DIMM_H:
+    entityID: 8
+    entityInstance: 8
+    interfaces:
+        xyz.openbmc_project.Inventory.Item.Dimm:
+  /system/chassis/motherboard/P0_DIMM_I:
+    entityID: 8
+    entityInstance: 9
+    interfaces:
+        xyz.openbmc_project.Inventory.Item.Dimm:
+  /system/chassis/motherboard/P0_DIMM_J:
+    entityID: 8
+    entityInstance: 10
+    interfaces:
+        xyz.openbmc_project.Inventory.Item.Dimm:
+  /system/chassis/motherboard/P0_DIMM_K:
+    entityID: 8
+    entityInstance: 11
+    interfaces:
+        xyz.openbmc_project.Inventory.Item.Dimm:
+  /system/chassis/motherboard/P0_DIMM_L:
+    entityID: 8
+    entityInstance: 12
+    interfaces:
+        xyz.openbmc_project.Inventory.Item.Dimm:
+  /system/chassis/motherboard/P1_DIMM_A:
+    entityID: 8
+    entityInstance: 13
+    interfaces:
+        xyz.openbmc_project.Inventory.Item.Dimm:
+  /system/chassis/motherboard/P1_DIMM_B:
+    entityID: 8
+    entityInstance: 14
+    interfaces:
+        xyz.openbmc_project.Inventory.Item.Dimm:
+  /system/chassis/motherboard/P1_DIMM_C:
+    entityID: 8
+    entityInstance: 15
+    interfaces:
+        xyz.openbmc_project.Inventory.Item.Dimm:
+  /system/chassis/motherboard/P1_DIMM_D:
+    entityID: 8
+    entityInstance: 16
+    interfaces:
+        xyz.openbmc_project.Inventory.Item.Dimm:
+  /system/chassis/motherboard/P1_DIMM_E:
+    entityID: 8
+    entityInstance: 17
+    interfaces:
+        xyz.openbmc_project.Inventory.Item.Dimm:
+  /system/chassis/motherboard/P1_DIMM_F:
+    entityID: 8
+    entityInstance: 18
+    interfaces:
+        xyz.openbmc_project.Inventory.Item.Dimm:
+  /system/chassis/motherboard/P1_DIMM_G:
+    entityID: 8
+    entityInstance: 19
+    interfaces:
+        xyz.openbmc_project.Inventory.Item.Dimm:
+  /system/chassis/motherboard/P1_DIMM_H:
+    entityID: 8
+    entityInstance: 20
+    interfaces:
+        xyz.openbmc_project.Inventory.Item.Dimm:
+  /system/chassis/motherboard/P1_DIMM_I:
+    entityID: 8
+    entityInstance: 21
+    interfaces:
+        xyz.openbmc_project.Inventory.Item.Dimm:
+  /system/chassis/motherboard/P1_DIMM_J:
+    entityID: 8
+    entityInstance: 22
+    interfaces:
+        xyz.openbmc_project.Inventory.Item.Dimm:
+  /system/chassis/motherboard/P1_DIMM_K:
+    entityID: 8
+    entityInstance: 23
+    interfaces:
+        xyz.openbmc_project.Inventory.Item.Dimm:
+  /system/chassis/motherboard/P1_DIMM_L:
+    entityID: 8
+    entityInstance: 24
+    interfaces:
+        xyz.openbmc_project.Inventory.Item.Dimm:
   /system/chassis/motherboard:
     entityID: 7
     entityInstance: 1
