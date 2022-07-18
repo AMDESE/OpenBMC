@@ -8,5 +8,6 @@ SRC_URI += "file://0001-Reset-server-settings-only-changes-to-invoke-CMOS.patch 
             file://0002-show-only-latest-boot-entries.patch \
             file://0003-added-cpuInfo-in-Redfish-API.patch \
             file://0004-increase-update-task-timeouts.patch \
+            file://0005-Add-DIMM-info-to-Redfish-API.patch \
             "
 
