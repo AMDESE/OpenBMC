@@ -4,6 +4,7 @@ SRC_URI += "file://bios-update.sh \
             file://hpm-fpga-update.sh \
             file://vr-update.sh \
             file://retimer-update.sh \
+            file://amd-reset-u-boot-env.sh \
             file://0001-Add-support-for-SCM-FPGA-firmware-update.patch \
             file://0002-Add-support-for-HPM-FPGA-firmware-update.patch \
             file://0003-save-version-to-persistent-store.patch \
@@ -17,6 +18,7 @@ SRC_URI += "file://bios-update.sh \
             file://0011-add-support-for-retimer-update.patch \
             file://0012-read-HPM-FPGA-version-from-FPGA-i2c-slave.patch \
             file://0013-add-host-factory-reset-to-resetAll-handler.patch \
+            file://0014-phosphor-software-manager-Modify-to-call-u-boot-env-script.patch \
             "
 DEPENDS += "amd-lcd-lib"
 
@@ -32,4 +34,5 @@ do_install_append() {
     install -m 0755 ${WORKDIR}/hpm-fpga-update.sh ${D}/${sbindir}/
     install -m 0755 ${WORKDIR}/vr-update.sh ${D}/${sbindir}/
     install -m 0755 ${WORKDIR}/retimer-update.sh ${D}/${sbindir}/
+    install -m 0755 ${WORKDIR}/amd-reset-u-boot-env.sh ${D}/${sbindir}/
 }
