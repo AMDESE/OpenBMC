@@ -16,5 +16,6 @@ SRC_URI += "file://0001-Add-Initial-u-boot-configuration.patch \
             file://0013-fix-str2hex-function.patch \
             file://0014-u-boot-aspeed-sdk-Modify-MAC-address-assignment-for-nc_si.patch \
             file://0015-u-boot-aspeed-sdk-Add-systemd.hostname-as-kernel-par.patch \
+            file://0016-u-boot-add-support-to-report-BMC-Boot-Cause.patch \
             file://sp5-u-boot.cfg \
             "
