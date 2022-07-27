@@ -64,7 +64,7 @@
 /xyz/openbmc_project/sensors/power/VDDCR_SOC_POUT1:
   eventReadingType: 1
   sensorID: 0x0B
-  sensorType: 0x0B
+  sensorType: 0x08
   offset: 0xff
 /xyz/openbmc_project/sensors/temperature/VDDCR_SOC_TEMP1:
   eventReadingType: 1
@@ -84,7 +84,7 @@
 /xyz/openbmc_project/sensors/power/VDDCR_SOC_POUT2:
   eventReadingType: 1
   sensorID: 0x0F
-  sensorType: 0x0B
+  sensorType: 0x08
   offset: 0xff
 /xyz/openbmc_project/sensors/temperature/VDDCR_SOC_TEMP2:
   eventReadingType: 1
@@ -104,7 +104,7 @@
 /xyz/openbmc_project/sensors/power/VDDCR_11_POUT1:
   eventReadingType: 1
   sensorID: 0x13
-  sensorType: 0x0B
+  sensorType: 0x08
   offset: 0xff
 /xyz/openbmc_project/sensors/temperature/VDDCR_11_TEMP1:
   eventReadingType: 1
@@ -124,7 +124,7 @@
 /xyz/openbmc_project/sensors/power/VDDCR_11_POUT2:
   eventReadingType: 1
   sensorID: 0x17
-  sensorType: 0x0B
+  sensorType: 0x08
   offset: 0xff
 /xyz/openbmc_project/sensors/temperature/VDDCR_11_TEMP2:
   eventReadingType: 1
@@ -144,7 +144,7 @@
 /xyz/openbmc_project/sensors/power/VDDCR_VDDIO33_POUT1:
   eventReadingType: 1
   sensorID: 0x1B
-  sensorType: 0x0B
+  sensorType: 0x08
   offset: 0xff
 /xyz/openbmc_project/sensors/temperature/VDDCR_VDDIO33_TEMP1:
   eventReadingType: 1
@@ -161,11 +161,6 @@
   sensorID: 0x1E
   sensorType: 3
   offset: 0xff
-/xyz/openbmc_project/sensors/power/VDDCR_VDDIO33_PIN:
-  eventReadingType: 1
-  sensorID: 0x1F
-  sensorType: 0x0B
-  offset: 0xff
 /xyz/openbmc_project/sensors/temperature/VDDCR_VDDIO33_TEMP2:
   eventReadingType: 1
   sensorID: 0x20
@@ -181,11 +176,6 @@
   sensorID: 0x22
   sensorType: 3
   offset: 0xff
-/xyz/openbmc_project/sensors/power/VDDCR_SOC_PIN:
-  eventReadingType: 1
-  sensorID: 0x23
-  sensorType: 0x0B
-  offset: 0xff
 /xyz/openbmc_project/sensors/voltage/VDDCR_SOC_VIN:
   eventReadingType: 1
   sensorID: 0x24
@@ -200,11 +190,6 @@
   eventReadingType: 1
   sensorID: 0x26
   sensorType: 3
-  offset: 0xff
-/xyz/openbmc_project/sensors/power/VDDCR_11_PIN:
-  eventReadingType: 1
-  sensorID: 0x27
-  sensorType: 0x0B
   offset: 0xff
 /xyz/openbmc_project/sensors/temperature/CPU0_Temp:
   eventReadingType: 1
@@ -224,11 +209,6 @@
 /xyz/openbmc_project/sensors/voltage/ADC121C_52:
   eventReadingType: 1
   sensorID: 0x2B
-  sensorType: 2
-  offset: 0xff
-/xyz/openbmc_project/sensors/voltage/ADC121C_53:
-  eventReadingType: 1
-  sensorID: 0x2C
   sensorType: 2
   offset: 0xff
 /xyz/openbmc_project/sensors/voltage/ADC121C_54:

@@ -64,7 +64,7 @@
 /xyz/openbmc_project/sensors/power/VDD_CORE0_POUT:
   eventReadingType: 1
   sensorID: 0x0B
-  sensorType: 0x0B
+  sensorType: 0x08
   offset: 0xff
 /xyz/openbmc_project/sensors/temperature/VDD_CORE0_TEMP:
   eventReadingType: 1
@@ -84,7 +84,7 @@
 /xyz/openbmc_project/sensors/power/VDD_CORE1_POUT:
   eventReadingType: 1
   sensorID: 0x0F
-  sensorType: 0x0B
+  sensorType: 0x08
   offset: 0xff
 /xyz/openbmc_project/sensors/temperature/VDD_CORE1_TEMP:
   eventReadingType: 1
@@ -104,7 +104,7 @@
 /xyz/openbmc_project/sensors/power/SOC_POUT:
   eventReadingType: 1
   sensorID: 0x13
-  sensorType: 0x0B
+  sensorType: 0x08
   offset: 0xff
 /xyz/openbmc_project/sensors/temperature/SOC_TEMP:
   eventReadingType: 1
@@ -124,7 +124,7 @@
 /xyz/openbmc_project/sensors/power/VDDIO_POUT:
   eventReadingType: 1
   sensorID: 0x17
-  sensorType: 0x0B
+  sensorType: 0x08
   offset: 0xff
 /xyz/openbmc_project/sensors/temperature/VDDIO_TEMP:
   eventReadingType: 1
@@ -141,11 +141,6 @@
   sensorID: 0x1A
   sensorType: 3
   offset: 0xff
-/xyz/openbmc_project/sensors/power/VDD33_DUAL_POUT:
-  eventReadingType: 1
-  sensorID: 0x1B
-  sensorType: 0x0B
-  offset: 0xff
 /xyz/openbmc_project/sensors/temperature/VDD33_DUAL_TEMP:
   eventReadingType: 1
   sensorID: 0x1C
@@ -160,11 +155,6 @@
   eventReadingType: 1
   sensorID: 0x1E
   sensorType: 3
-  offset: 0xff
-/xyz/openbmc_project/sensors/power/VDD18_DUAL_POUT:
-  eventReadingType: 1
-  sensorID: 0x1F
-  sensorType: 0x0B
   offset: 0xff
 /xyz/openbmc_project/sensors/temperature/VDD18_DUAL_TEMP:
   eventReadingType: 1
@@ -184,7 +174,7 @@
 /xyz/openbmc_project/sensors/power/VDD11_SUS_POUT:
   eventReadingType: 1
   sensorID: 0x23
-  sensorType: 0x0B
+  sensorType: 0x08
   offset: 0xff
 /xyz/openbmc_project/sensors/temperature/VDD11_SUS_TEMP:
   eventReadingType: 1
@@ -214,11 +204,6 @@
 /xyz/openbmc_project/sensors/voltage/ADC_LOM_VDD_12:
   eventReadingType: 1
   sensorID: 0x29
-  sensorType: 2
-  offset: 0xff
-/xyz/openbmc_project/sensors/voltage/ADC_LOM_VDD_33:
-  eventReadingType: 1
-  sensorID: 0x2A
   sensorType: 2
   offset: 0xff
 /xyz/openbmc_project/sensors/voltage/ADC_VDD_12_DUAL:
