@@ -5,10 +5,11 @@ LICENSE = "CLOSED"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}:"
 
+inherit phosphor-mapper
 inherit cmake pkgconfig systemd
 
 def get_service(d):
-    return "amd-ras.service"
+    return "com.amd.crashdump.service"
 
 SYSTEMD_SERVICE_${PN} = "${@get_service(d)}"
 SRC_URI = "git://git@github.com:/AMDESE/amd-bmc-ras.git;branch=main;protocol=ssh"
@@ -26,4 +27,4 @@ DEPENDS += " \
     boost \
     "
 
-FILES_${PN} += "${systemd_unitdir}/system/amd-ras.service"
+FILES_${PN} += "${systemd_unitdir}/system/com.amd.crashdump.service"
