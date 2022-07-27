@@ -23,7 +23,6 @@
                     "/xyz/openbmc_project/sensors/voltage/ADC_FPGA_VDD_18",
                     "/xyz/openbmc_project/sensors/voltage/ADC_FPGA_VDD_33",
                     "/xyz/openbmc_project/sensors/voltage/ADC_LOM_VDD_12",
-                    "/xyz/openbmc_project/sensors/voltage/ADC_LOM_VDD_33",
                     "/xyz/openbmc_project/sensors/voltage/ADC_VDD_12_DUAL",
 
                     "/xyz/openbmc_project/sensors/current/VDD_CORE0_IOUT",
@@ -39,8 +38,6 @@
                     "/xyz/openbmc_project/sensors/power/SOC_POUT",
                     "/xyz/openbmc_project/sensors/power/VDDIO_POUT",
                     "/xyz/openbmc_project/sensors/power/VDD11_SUS_POUT",
-                    "/xyz/openbmc_project/sensors/power/VDD33_DUAL_POUT",
-                    "/xyz/openbmc_project/sensors/power/VDD18_DUAL_POUT",
 
                     "/xyz/openbmc_project/sensors/temperature/VDD_CORE0_TEMP",
                     "/xyz/openbmc_project/sensors/temperature/VDD_CORE1_TEMP",
@@ -129,7 +126,6 @@
                     "/xyz/openbmc_project/sensors/voltage/ADC_FPGA_VDD_18",
                     "/xyz/openbmc_project/sensors/voltage/ADC_FPGA_VDD_33",
                     "/xyz/openbmc_project/sensors/voltage/ADC_LOM_VDD_12",
-                    "/xyz/openbmc_project/sensors/voltage/ADC_LOM_VDD_33",
                     "/xyz/openbmc_project/sensors/voltage/ADC_VDD_12_DUAL",
 
                     "/xyz/openbmc_project/sensors/current/VDD_CORE0_IOUT",
@@ -145,8 +141,6 @@
                     "/xyz/openbmc_project/sensors/power/SOC_POUT",
                     "/xyz/openbmc_project/sensors/power/VDDIO_POUT",
                     "/xyz/openbmc_project/sensors/power/VDD11_SUS_POUT",
-                    "/xyz/openbmc_project/sensors/power/VDD33_DUAL_POUT",
-                    "/xyz/openbmc_project/sensors/power/VDD18_DUAL_POUT",
 
                     "/xyz/openbmc_project/sensors/temperature/VDD_CORE0_TEMP",
                     "/xyz/openbmc_project/sensors/temperature/VDD_CORE1_TEMP",
