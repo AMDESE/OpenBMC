@@ -201,170 +201,170 @@
             "timeout": 0
         },
         {
-            "name": "P0_DIMM_C",
+            "name": "P0_DIMM_C_Temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_C",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_C_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
-            "name": "P0_DIMM_E",
+            "name": "P0_DIMM_E_Temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_E",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_E_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
-            "name": "P0_DIMM_F",
+            "name": "P0_DIMM_F_Temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_F",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_F_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
-            "name": "P0_DIMM_A",
+            "name": "P0_DIMM_A_Temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_A",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_A_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
-            "name": "P0_DIMM_B",
+            "name": "P0_DIMM_B_Temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_B",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_B_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
-            "name": "P0_DIMM_D",
+            "name": "P0_DIMM_D_Temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_D",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_D_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
-            "name": "P0_DIMM_I",
+            "name": "P0_DIMM_I_Temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_I",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_I_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
-            "name": "P0_DIMM_K",
+            "name": "P0_DIMM_K_Temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_K",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_K_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
-            "name": "P0_DIMM_L",
+            "name": "P0_DIMM_L_Temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_L",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_L_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
-            "name": "P0_DIMM_G",
+            "name": "P0_DIMM_G_Temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_G",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_G_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
-            "name": "P0_DIMM_H",
+            "name": "P0_DIMM_H_Temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_H",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_H_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
-            "name": "P0_DIMM_J",
+            "name": "P0_DIMM_J_Temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_J",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_J_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
-            "name": "P1_DIMM_C",
+            "name": "P1_DIMM_C_Temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_C",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_C_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
-            "name": "P1_DIMM_E",
+            "name": "P1_DIMM_E_Temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_E",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_E_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
-            "name": "P1_DIMM_F",
+            "name": "P1_DIMM_F_Temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_F",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_F_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
-            "name": "P1_DIMM_A",
+            "name": "P1_DIMM_A_Temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_A",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_A_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
-            "name": "P1_DIMM_B",
+            "name": "P1_DIMM_B_Temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_B",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_B_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
-            "name": "P1_DIMM_D",
+            "name": "P1_DIMM_D_Temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_D",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_D_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
-            "name": "P1_DIMM_I",
+            "name": "P1_DIMM_I_Temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_I",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_I_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
-            "name": "P1_DIMM_K",
+            "name": "P1_DIMM_K_Temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_K",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_K_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
-            "name": "P1_DIMM_L",
+            "name": "P1_DIMM_L_Temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_L",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_L_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
-            "name": "P1_DIMM_G",
+            "name": "P1_DIMM_G_Temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_G",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_G_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
-            "name": "P1_DIMM_H",
+            "name": "P1_DIMM_H_Temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_H",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_H_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
-            "name": "P1_DIMM_J",
+            "name": "P1_DIMM_J_Temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_J",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_J_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         }
@@ -476,30 +476,30 @@
                 {
                     "name": "DIMM1-24",
                     "type": "stepwise",
-                    "inputs": ["P0_DIMM_C",
-                               "P0_DIMM_E",
-                               "P0_DIMM_F",
-                               "P0_DIMM_A",
-                               "P0_DIMM_B",
-                               "P0_DIMM_D",
-                               "P0_DIMM_I",
-                               "P0_DIMM_K",
-                               "P0_DIMM_L",
-                               "P0_DIMM_G",
-                               "P0_DIMM_H",
-                               "P0_DIMM_J",
-                               "P1_DIMM_C",
-                               "P1_DIMM_E",
-                               "P1_DIMM_F",
-                               "P1_DIMM_A",
-                               "P1_DIMM_B",
-                               "P1_DIMM_D",
-                               "P1_DIMM_I",
-                               "P1_DIMM_K",
-                               "P1_DIMM_L",
-                               "P1_DIMM_G",
-                               "P1_DIMM_H",
-                               "P1_DIMM_J"
+                    "inputs": ["P0_DIMM_C_Temp",
+                               "P0_DIMM_E_Temp",
+                               "P0_DIMM_F_Temp",
+                               "P0_DIMM_A_Temp",
+                               "P0_DIMM_B_Temp",
+                               "P0_DIMM_D_Temp",
+                               "P0_DIMM_I_Temp",
+                               "P0_DIMM_K_Temp",
+                               "P0_DIMM_L_Temp",
+                               "P0_DIMM_G_Temp",
+                               "P0_DIMM_H_Temp",
+                               "P0_DIMM_J_Temp",
+                               "P1_DIMM_C_Temp",
+                               "P1_DIMM_E_Temp",
+                               "P1_DIMM_F_Temp",
+                               "P1_DIMM_A_Temp",
+                               "P1_DIMM_B_Temp",
+                               "P1_DIMM_D_Temp",
+                               "P1_DIMM_I_Temp",
+                               "P1_DIMM_K_Temp",
+                               "P1_DIMM_L_Temp",
+                               "P1_DIMM_G_Temp",
+                               "P1_DIMM_H_Temp",
+                               "P1_DIMM_J_Temp"
                                ],
                     "setpoint": 20.0,
                     "pid": {
