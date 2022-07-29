@@ -136,122 +136,122 @@
   sensorID: 0x19
   sensorType: 4
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/P0_DIMM_C:
+/xyz/openbmc_project/sensors/temperature/P0_DIMM_C_Temp:
   eventReadingType: 1
   sensorID: 0x1A
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/P0_DIMM_E:
+/xyz/openbmc_project/sensors/temperature/P0_DIMM_E_Temp:
   eventReadingType: 1
   sensorID: 0x1B
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/P0_DIMM_F:
+/xyz/openbmc_project/sensors/temperature/P0_DIMM_F_Temp:
   eventReadingType: 1
   sensorID: 0x1C
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/P0_DIMM_A:
+/xyz/openbmc_project/sensors/temperature/P0_DIMM_A_Temp:
   eventReadingType: 1
   sensorID: 0x1D
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/P0_DIMM_B:
+/xyz/openbmc_project/sensors/temperature/P0_DIMM_B_Temp:
   eventReadingType: 1
   sensorID: 0x1E
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/P0_DIMM_D:
+/xyz/openbmc_project/sensors/temperature/P0_DIMM_D_Temp:
   eventReadingType: 1
   sensorID: 0x1F
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/P0_DIMM_I:
+/xyz/openbmc_project/sensors/temperature/P0_DIMM_I_Temp:
   eventReadingType: 1
   sensorID: 0x20
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/P0_DIMM_K:
+/xyz/openbmc_project/sensors/temperature/P0_DIMM_K_Temp:
   eventReadingType: 1
   sensorID: 0x21
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/P0_DIMM_L:
+/xyz/openbmc_project/sensors/temperature/P0_DIMM_L_Temp:
   eventReadingType: 1
   sensorID: 0x22
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/P0_DIMM_G:
+/xyz/openbmc_project/sensors/temperature/P0_DIMM_G_Temp:
   eventReadingType: 1
   sensorID: 0x23
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/P0_DIMM_H:
+/xyz/openbmc_project/sensors/temperature/P0_DIMM_H_Temp:
   eventReadingType: 1
   sensorID: 0x24
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/P0_DIMM_J:
+/xyz/openbmc_project/sensors/temperature/P0_DIMM_J_Temp:
   eventReadingType: 1
   sensorID: 0x25
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/P1_DIMM_C:
+/xyz/openbmc_project/sensors/temperature/P1_DIMM_C_Temp:
   eventReadingType: 1
   sensorID: 0x26
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/P1_DIMM_E:
+/xyz/openbmc_project/sensors/temperature/P1_DIMM_E_Temp:
   eventReadingType: 1
   sensorID: 0x27
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/P1_DIMM_F:
+/xyz/openbmc_project/sensors/temperature/P1_DIMM_F_Temp:
   eventReadingType: 1
   sensorID: 0x28
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/P1_DIMM_A:
+/xyz/openbmc_project/sensors/temperature/P1_DIMM_A_Temp:
   eventReadingType: 1
   sensorID: 0x29
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/P1_DIMM_B:
+/xyz/openbmc_project/sensors/temperature/P1_DIMM_B_Temp:
   eventReadingType: 1
   sensorID: 0x2A
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/P1_DIMM_D:
+/xyz/openbmc_project/sensors/temperature/P1_DIMM_D_Temp:
   eventReadingType: 1
   sensorID: 0x2B
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/P1_DIMM_I:
+/xyz/openbmc_project/sensors/temperature/P1_DIMM_I_Temp:
   eventReadingType: 1
   sensorID: 0x2C
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/P1_DIMM_K:
+/xyz/openbmc_project/sensors/temperature/P1_DIMM_K_Temp:
   eventReadingType: 1
   sensorID: 0x2D
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/P1_DIMM_L:
+/xyz/openbmc_project/sensors/temperature/P1_DIMM_L_Temp:
   eventReadingType: 1
   sensorID: 0x2E
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/P1_DIMM_G:
+/xyz/openbmc_project/sensors/temperature/P1_DIMM_G_Temp:
   eventReadingType: 1
   sensorID: 0x2F
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/P1_DIMM_H:
+/xyz/openbmc_project/sensors/temperature/P1_DIMM_H_Temp:
   eventReadingType: 1
   sensorID: 0x30
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/P1_DIMM_J:
+/xyz/openbmc_project/sensors/temperature/P1_DIMM_J_Temp:
   eventReadingType: 1
   sensorID: 0x31
   sensorType: 1
@@ -296,19 +296,9 @@
   sensorID: 0x39
   sensorType: 3
   offset: 0xff
-/xyz/openbmc_project/sensors/current/PVDDCR_SOC_P0_IIN:
-  eventReadingType: 1
-  sensorID: 0x3A
-  sensorType: 3
-  offset: 0xff
 /xyz/openbmc_project/sensors/current/PVDDCR_SOC_P0_IOUT1:
   eventReadingType: 1
   sensorID: 0x3B
-  sensorType: 3
-  offset: 0xff
-/xyz/openbmc_project/sensors/current/PVDDIO_P0_IIN:
-  eventReadingType: 1
-  sensorID: 0x3C
   sensorType: 3
   offset: 0xff
 /xyz/openbmc_project/sensors/current/PVDDIO_P0_IOUT1:
@@ -401,19 +391,9 @@
   sensorID: 0x51
   sensorType: 3
   offset: 0xff
-/xyz/openbmc_project/sensors/current/PVDDCR_SOC_P1_IIN:
-  eventReadingType: 1
-  sensorID: 0x52
-  sensorType: 3
-  offset: 0xff
 /xyz/openbmc_project/sensors/current/PVDDCR_SOC_P1_IOUT1:
   eventReadingType: 1
   sensorID: 0x53
-  sensorType: 3
-  offset: 0xff
-/xyz/openbmc_project/sensors/current/PVDDIO_P1_IIN:
-  eventReadingType: 1
-  sensorID: 0x54
   sensorType: 3
   offset: 0xff
 /xyz/openbmc_project/sensors/current/PVDDIO_P1_IOUT1:

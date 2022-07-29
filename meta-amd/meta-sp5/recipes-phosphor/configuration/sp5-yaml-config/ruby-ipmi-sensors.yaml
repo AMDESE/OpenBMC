@@ -919,7 +919,7 @@
 0x34:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_C
+  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_C_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -939,7 +939,7 @@
 0x35:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_E
+  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_E_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -959,7 +959,7 @@
 0x36:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_F
+  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_F_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -979,7 +979,7 @@
 0x37:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_A
+  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_A_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -999,7 +999,7 @@
 0x38:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_B
+  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_B_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -1019,7 +1019,7 @@
 0x39:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_D
+  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_D_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -1039,7 +1039,7 @@
 0x3A:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_I
+  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_I_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -1059,7 +1059,7 @@
 0x3B:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_K
+  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_K_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -1079,7 +1079,7 @@
 0x3C:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_L
+  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_L_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -1099,7 +1099,7 @@
 0x3D:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_G
+  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_G_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -1119,7 +1119,7 @@
 0x3E:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_H
+  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_H_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -1139,7 +1139,7 @@
 0x3F:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_J
+  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_J_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -1155,4 +1155,3 @@
         Offsets:
           0xFF:
             type: double
-

@@ -520,7 +520,7 @@
 0x1A:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_C
+  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_C_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -540,7 +540,7 @@
 0x1B:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_E
+  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_E_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -560,7 +560,7 @@
 0x1C:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_F
+  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_F_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -580,7 +580,7 @@
 0x1D:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_A
+  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_A_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -600,7 +600,7 @@
 0x1E:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_B
+  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_B_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -620,7 +620,7 @@
 0x1F:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_D
+  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_D_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -640,7 +640,7 @@
 0x20:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_I
+  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_I_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -660,7 +660,7 @@
 0x21:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_K
+  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_K_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -680,7 +680,7 @@
 0x22:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_L
+  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_L_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -700,7 +700,7 @@
 0x23:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_G
+  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_G_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -720,7 +720,7 @@
 0x24:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_H
+  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_H_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -740,7 +740,7 @@
 0x25:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_J
+  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_J_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -760,7 +760,7 @@
 0x26:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P1_DIMM_C
+  path: /xyz/openbmc_project/sensors/temperature/P1_DIMM_C_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -780,7 +780,7 @@
 0x27:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P1_DIMM_E
+  path: /xyz/openbmc_project/sensors/temperature/P1_DIMM_E_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -800,7 +800,7 @@
 0x28:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P1_DIMM_F
+  path: /xyz/openbmc_project/sensors/temperature/P1_DIMM_F_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -820,7 +820,7 @@
 0x29:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P1_DIMM_A
+  path: /xyz/openbmc_project/sensors/temperature/P1_DIMM_A_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -840,7 +840,7 @@
 0x2A:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P1_DIMM_B
+  path: /xyz/openbmc_project/sensors/temperature/P1_DIMM_B_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -860,7 +860,7 @@
 0x2B:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P1_DIMM_D
+  path: /xyz/openbmc_project/sensors/temperature/P1_DIMM_D_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -880,7 +880,7 @@
 0x2C:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P1_DIMM_I
+  path: /xyz/openbmc_project/sensors/temperature/P1_DIMM_I_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -900,7 +900,7 @@
 0x2D:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P1_DIMM_K
+  path: /xyz/openbmc_project/sensors/temperature/P1_DIMM_K_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -920,7 +920,7 @@
 0x2E:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P1_DIMM_L
+  path: /xyz/openbmc_project/sensors/temperature/P1_DIMM_L_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -940,7 +940,7 @@
 0x2F:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P1_DIMM_G
+  path: /xyz/openbmc_project/sensors/temperature/P1_DIMM_G_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -960,7 +960,7 @@
 0x30:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P1_DIMM_H
+  path: /xyz/openbmc_project/sensors/temperature/P1_DIMM_H_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -980,7 +980,7 @@
 0x31:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P1_DIMM_J
+  path: /xyz/openbmc_project/sensors/temperature/P1_DIMM_J_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -1149,47 +1149,9 @@
           0xFF:
             type: double
 
-0x3A:
-  sensorType: 0x03
-  path: /xyz/openbmc_project/sensors/current/PVDDCR_SOC_P0_IIN
-  sensorReadingType: 0x01
-  unit: xyz.openbmc_project.Sensor.Value.Unit.Amperes
-  scale: 0
-  multiplierM: 1
-  offsetB: 0
-  bExp: 0
-  rExp: 0
-  serviceInterface: org.freedesktop.DBus.Properties
-  readingType: readingData
-  interfaces:
-    xyz.openbmc_project.Sensor.Value:
-      Value:
-        Offsets:
-          0xFF:
-            type: double
-
 0x3B:
   sensorType: 0x03
   path: /xyz/openbmc_project/sensors/current/PVDDCR_SOC_P0_IOUT1
-  sensorReadingType: 0x01
-  unit: xyz.openbmc_project.Sensor.Value.Unit.Amperes
-  scale: 0
-  multiplierM: 1
-  offsetB: 0
-  bExp: 0
-  rExp: 0
-  serviceInterface: org.freedesktop.DBus.Properties
-  readingType: readingData
-  interfaces:
-    xyz.openbmc_project.Sensor.Value:
-      Value:
-        Offsets:
-          0xFF:
-            type: double
-
-0x3C:
-  sensorType: 0x03
-  path: /xyz/openbmc_project/sensors/current/PVDDIO_P0_IIN
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.Amperes
   scale: 0
@@ -1557,47 +1519,9 @@
           0xFF:
             type: double
 
-0x52:
-  sensorType: 0x03
-  path: /xyz/openbmc_project/sensors/current/PVDDCR_SOC_P1_IIN
-  sensorReadingType: 0x01
-  unit: xyz.openbmc_project.Sensor.Value.Unit.Amperes
-  scale: 0
-  multiplierM: 1
-  offsetB: 0
-  bExp: 0
-  rExp: 0
-  serviceInterface: org.freedesktop.DBus.Properties
-  readingType: readingData
-  interfaces:
-    xyz.openbmc_project.Sensor.Value:
-      Value:
-        Offsets:
-          0xFF:
-            type: double
-
 0x53:
   sensorType: 0x03
   path: /xyz/openbmc_project/sensors/current/PVDDCR_SOC_P1_IOUT1
-  sensorReadingType: 0x01
-  unit: xyz.openbmc_project.Sensor.Value.Unit.Amperes
-  scale: 0
-  multiplierM: 1
-  offsetB: 0
-  bExp: 0
-  rExp: 0
-  serviceInterface: org.freedesktop.DBus.Properties
-  readingType: readingData
-  interfaces:
-    xyz.openbmc_project.Sensor.Value:
-      Value:
-        Offsets:
-          0xFF:
-            type: double
-
-0x54:
-  sensorType: 0x03
-  path: /xyz/openbmc_project/sensors/current/PVDDIO_P1_IIN
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.Amperes
   scale: 0
