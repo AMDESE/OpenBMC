@@ -36,6 +36,7 @@ elif [ -e *.bin ] ; then
     IMAGE_FILE=$(find -type f -name '*.bin')
 elif [ -e *.txt ] ; then
     IMAGE_FILE=$(find -type f -name '*.txt')
+    CRC=$(sed '5!d' $MANIFEST_FILE | awk -F= '{print $NF}')
 elif [ -e *.xsf ] ; then
     IMAGE_FILE=$(find -type f -name '*.xsf')
     slave_addr=$(sed '3!d' $MANIFEST_FILE | awk -F= '{print $NF}')
@@ -56,20 +57,23 @@ if [ "$Manufacturer" == "Renesas" ]; then
         echo "Renesas VR update failed"
         exit -1
     fi
-
 elif [ "$Manufacturer" == "Infineon" ]; then
-    IMAGE_FILE=$(find -type f -name '*.xsf')
-    if [ -e "$IMAGE_FILE" ]; then
+
+    XSF_IMAGE_FILE=$(find -type f -name '*.xsf')
+
+    if [ -e "$XSF_IMAGE_FILE" ]; then
         /usr/bin/infineon-vr-update.sh $IMAGE_FILE $Manufacturer $slave_addr $CRC
     else
-        /usr/bin/infineon-vr-update.sh $IMAGE_FILE $Manufacturer
-        if [ $? -eq 0 ]; then
-            echo "Infineon VR update Successful"
-        else
-            echo "Infineon VR update failed"
-            exit -1
-        fi
+        /usr/bin/infineon-vr-update.sh $IMAGE_FILE $Manufacturer $CRC
     fi
+
+    if [ $? -eq 0 ]; then
+        echo "Infineon VR update Successful"
+    else
+        echo "Infineon VR update failed"
+        exit -1
+    fi
+
 else
     echo "Not a valid Manufacturer Name. Aborting the update"
     exit -1
