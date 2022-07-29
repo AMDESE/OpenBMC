@@ -1,7 +1,7 @@
 0x01:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/SYS_OUTLET
+  path: /xyz/openbmc_project/sensors/temperature/SYS_OUTLET_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -21,7 +21,7 @@
 0x02:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/OCP_INLET
+  path: /xyz/openbmc_project/sensors/temperature/OCP_INLET_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -41,7 +41,7 @@
 0x03:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/SCM_INLET
+  path: /xyz/openbmc_project/sensors/temperature/SCM_INLET_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -61,7 +61,7 @@
 0x04:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/CPU0_INLET
+  path: /xyz/openbmc_project/sensors/temperature/CPU0_INLET_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -81,7 +81,7 @@
 0x05:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/CPU1_INLET
+  path: /xyz/openbmc_project/sensors/temperature/CPU1_INLET_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0

@@ -11,27 +11,27 @@
 # DO NOT EDIT above entries for system and motherboard.
 # map non-IPMI-SEL to the system event sensor as "Undetermined system hardware failure."
 # Non-IPMI (OEM SELs) are grouped under above inventory sensor by default
-/xyz/openbmc_project/sensors/temperature/SYS_OUTLET:
+/xyz/openbmc_project/sensors/temperature/SYS_OUTLET_Temp:
   eventReadingType: 1
   sensorID: 0x01
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/OCP_INLET:
+/xyz/openbmc_project/sensors/temperature/OCP_INLET_Temp:
   eventReadingType: 1
   sensorID: 0x02
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/SCM_INLET:
+/xyz/openbmc_project/sensors/temperature/SCM_INLET_Temp:
   eventReadingType: 1
   sensorID: 0x03
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/CPU0_INLET:
+/xyz/openbmc_project/sensors/temperature/CPU0_INLET_Temp:
   eventReadingType: 1
   sensorID: 0x04
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/CPU1_INLET:
+/xyz/openbmc_project/sensors/temperature/CPU1_INLET_Temp:
   eventReadingType: 1
   sensorID: 0x05
   sensorType: 1
