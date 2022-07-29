@@ -26,6 +26,7 @@ then
     else
         ADDR=`grep "PMBus Address : " $IMAGE_FILE | awk '{print $4}'`
         ADDR=${ADDR:2}
+        CRC=$3
         UNBIND_DRIVER=1
     fi
 
@@ -45,9 +46,10 @@ then
     if [ "$?" -ne "0" ];
     then
         echo "VR upgrade has failed\n"
-        exit -1
+        EXIT_STATUS=-1
     else
         echo "VR upgrade has succeeded! Please AC cycle for the changes to take effect.\n"
+        EXIT_STATUS=0
     fi
 
 else
@@ -59,3 +61,8 @@ if [ "$UNBIND_DRIVER" == "1" ] ; then
     echo $DEVICE_NAME > /sys/bus/i2c/drivers/xdpe12284/bind
     echo "xdpe12284 driver is binded back after VR telemetry"
 fi
+
+if [ $EXIT_STATUS -lt 0  ] ; then
+    exit -1
+fi
+

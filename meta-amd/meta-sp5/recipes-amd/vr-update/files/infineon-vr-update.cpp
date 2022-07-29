@@ -25,6 +25,9 @@ static int fd = FAILURE;    // File Descriptor
 static int verbose = FAILURE;    // Verbose Flag
 static int rc;    // Return Code Flag
 
+int partial_pmbus_section_count_number = 0;
+uint16_t partial_crc = 0;
+
 int find_next_usr_img_ptr(int *);
 
 int vr_update_open_dev(int i2c_bus, uint8_t i2c_addr)
@@ -161,6 +164,9 @@ std::vector<std::vector<std::string>> get_each_section_data(std::string data)
     size_t end_delim = data.find(end_pat);
     data = data.substr(start_delim + start_pat.length(), end_delim - start_delim - start_pat.length());
     unsigned first = data.find("//XV");
+    int section_count = 0;
+    bool partial_section_found = false;
+    std::string crc;
     while(first <= data.length())
     {
         unsigned second = data.find("//XV", first + 2);    // Adjust position of index to get required data
@@ -172,7 +178,14 @@ std::vector<std::vector<std::string>> get_each_section_data(std::string data)
         {
             if(size_t foundxv = line.find("XV") != std::string::npos)
             {
+                section_count++;
                 blob.erase(foundxv - 1, line.length());
+                if(size_t foundxv = line.find("XV0 Partial") != std::string::npos) {
+                   partial_pmbus_section_count_number = section_count;
+                   partial_section_found = true;
+                } else {
+                   partial_section_found = false;
+                }
             }
             else
             {
@@ -181,6 +194,11 @@ std::vector<std::vector<std::string>> get_each_section_data(std::string data)
                 {
                     line.erase(foundrn - 1, row_num.length());
                     n_blob.append(line + " ");
+                    if(partial_section_found == true && (row_num.compare("000 ") == 0))
+                    {
+                        std::string crc = line.substr(13,4);
+                        partial_crc = partial_crc + std::stoi(crc, NULL, BASE_16);
+                    }
                 }
             }
         }
@@ -199,6 +217,9 @@ std::vector<std::vector<std::string>> get_each_section_data(std::string data)
         }
         matrix.push_back(row);
     }
+    std::cout << "Partial section number = " <<
+           partial_pmbus_section_count_number <<
+           " Partial CRC = " << partial_crc << std::endl;
     return matrix;
 }
 
@@ -303,14 +324,18 @@ int writeDataToScratchpad(std::vector<std::string> section)
     return SUCCESS;
 }
 
-int uploadDataToOtp(std::string s_dword)
+int uploadDataToOtp(std::string s_dword, bool pmbus_section)
 {
-    uint8_t wdata[MAXBUFFERSIZE];
-    std::vector<uint8_t> dword = formatDword(s_dword);
-    wdata[0] = dword[0];
-    wdata[1] = dword[1];
-    wdata[2] = 0x00;
-    wdata[3] = 0x00;
+    uint8_t wdata[MAXBUFFERSIZE] = {0};
+    if(pmbus_section == false)
+    {
+        std::vector<uint8_t> dword = formatDword(s_dword);
+        wdata[INDEX_0] = dword[INDEX_0];
+        wdata[1] = dword[1];
+    }  else {
+        wdata[INDEX_0] = partial_crc & INT_255;
+        wdata[INDEX_1] = (partial_crc >> SHIFT_8 ) & INT_255;
+    }
     if(verbose > 0)
     {
         std::cout << "Upload Block Data to OTP with cmd 0xfd" << std::endl;
@@ -345,6 +370,7 @@ int doCfgUpdate(const char *filename)
     std::string trim_header = "00000002";    // Trim header programming needs to be ignored according to Infineon FAE
     for(int i=0; i < sections.size(); i++)
     {
+        bool pmbus_section = false;
         if(sections[i][0] == trim_header)
         {
             continue;
@@ -360,7 +386,9 @@ int doCfgUpdate(const char *filename)
             std::cout << "Writing Data to Scratchpad has failed. Skipping other steps." << std::endl;
             return FAILURE;
         }
-        exit_status=uploadDataToOtp(sections[i][1]);
+        if(partial_pmbus_section_count_number == (i+1))
+            pmbus_section = true;
+        exit_status=uploadDataToOtp(sections[i][1],pmbus_section);
     }
     return(exit_status);
 }
@@ -371,6 +399,53 @@ int doPatchUpdate(const char *filename)
     return (exit_status);
 }
 
+int xdpe_crc_check(int config_crc)
+{
+    uint8_t wdata[MAXBUFFERSIZE];
+    uint8_t rdata[MAXBUFFERSIZE];
+    int length;
+    int size;
+    memset(wdata, 0x0, MAXBUFFERSIZE);
+    uint32_t device_crc = 0;
+    rc = i2c_smbus_write_block_data(fd, BLOCK_PREFIX, (uint8_t)LENGTHOFBLOCK, wdata);
+    if (rc != SUCCESS) {
+        std::cout << "Error: Failed to write data" << std::endl;
+        perror("Error");
+        return FAILURE;
+    }
+    rc = i2c_smbus_write_byte_data(fd, BYTE_PREFIX, GET_CRC);
+    if (rc != SUCCESS) {
+        std::cout << "Error: Failed to write data" << std::endl;
+        perror("Error");
+        return FAILURE;
+    }
+    /*Wait for 200ms */
+    usleep(200000);
+
+    length = i2c_smbus_read_block_data(fd, BLOCK_PREFIX, rdata);
+    if (length > 0)
+    {
+        device_crc = ((uint32_t)rdata[3] << 24) | ((uint32_t)rdata[2] << 16)
+                     | ((uint32_t)rdata[1] << 8) | (uint32_t)rdata[0];
+    }
+    else
+    {
+        std::cout << "Error: Failed to read data" << std::endl;
+        perror("Error");
+        return FAILURE;
+    }
+    std::cout << "Device CRC = " << std::hex << device_crc << std::endl;
+    std::cout << "Config CRC = " << std::hex << config_crc << std::endl;
+    if(config_crc == device_crc)  {
+       std::cout << "CRC from the config file and device is matched. Skipping the update" << std::endl;
+       return FAILURE;
+    } else {
+       std::cout << "CRC from the config file and device is not matched . Updating the VR firmware" << std::endl;
+       return SUCCESS;
+    }
+    return FAILURE;
+}
+
 int xdpe_vr_update(int argc, char *argv[])
 {
     int exit_status = SUCCESS;
@@ -379,6 +454,10 @@ int xdpe_vr_update(int argc, char *argv[])
     uint8_t i2c_addr = std::strtoul(argv[ARGV_4], NULL, BASE_16);
     const char *file_name = argv[ARGV_5];
     std::string mode(argv[ARGV_6]);
+    uint32_t config_crc = 0;
+
+    if(argv[7] != NULL)
+        config_crc = strtoul(argv[7], NULL, 16);
 
     if(mode == "verbose")
     {
@@ -403,12 +482,16 @@ int xdpe_vr_update(int argc, char *argv[])
         std::cout << "Error: Failed to open file descriptor" << std::endl;
         return FAILURE;
     }
+    if(xdpe_crc_check(config_crc) != SUCCESS)
+        return FAILURE;
+
     std::string device_type = getDeviceType();
     exit_status = checkifSpaceAvailableOnOtp();
     if(exit_status != SUCCESS)
     {
         return (exit_status);
     }
+
     std::cout << "The detected device type is " << device_type << std::endl;
     std::string update_type = getUpdateType(file_name);
     if (update_type == "cfg")
@@ -625,7 +708,6 @@ int check_previous_image_crc(int next_img_ptr,int crc_value)
 }
 int user_section_programming(const char *filename,int crc_value)
 {
-
     uint16_t rdata = 0;
     int exit_status = SUCCESS;
     int next_img_ptr;
@@ -754,7 +836,8 @@ int tda_vr_update(int argc, char *argv[])
     }
 
     /*User section programming */
-    exit_status = user_section_programming(file_name,crc_value);
+    if(user_section_programming(file_name,crc_value) != SUCCESS)
+        return FAILURE;
 
     vr_update_close_dev();
     return (exit_status);

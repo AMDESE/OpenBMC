@@ -17,12 +17,12 @@
 #define BIT_ENABLE            (1)
 
 #define DEVICE_REVISON        (0x2000003)
-#define INT_255               (0xFF)
 #define MAX_RETRY             (10)
 #define SLEEP                 (2500)
 #define RAA229613             ("RAA229613")
 #define RAA229625             ("RAA229625")
 #define RAA229620             ("RAA229620")
+#define RAA229621             ("RAA229621")
 #define ISL68220              ("ISL68220")
 
 #define MAX_CMD_LINE_ARGUMENT 6

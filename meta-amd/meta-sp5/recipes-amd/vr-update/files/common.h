@@ -11,6 +11,7 @@
 #define ARGV_6    (6)
 #define ARGV_7    (7)
 
+#define INT_255               (0xFF)
 #define BASE_16               (16)
 #define BYTE_COUNT_2          (2)
 #define BYTE_COUNT_4          (4)

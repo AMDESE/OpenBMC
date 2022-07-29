@@ -614,7 +614,8 @@ int crc_check_verification(int argc, char* argv[],int crc_value)
 
     if ((strncmp(argv[ARGV_7], RAA229613, strlen(RAA229613)) == SUCCESS)
         || (strncmp(argv[ARGV_7], RAA229625, strlen(RAA229625)) == SUCCESS)
-        || ((strncmp(argv[ARGV_7], RAA229620, strlen(RAA229620)) == SUCCESS)))
+        || ((strncmp(argv[ARGV_7], RAA229620, strlen(RAA229620))) == SUCCESS)
+        || ((strncmp(argv[ARGV_7], RAA229621, strlen(RAA229620))) == SUCCESS))
     {
         strncpy(vr_context.gen, GEN3, strlen(GEN3));
     }

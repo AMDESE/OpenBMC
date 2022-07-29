@@ -44,6 +44,7 @@
 
 /* BYTE DATA */
 #define AVAIL_SPACE_BYTE 0x10
+#define GET_CRC 0x2d
 #define UPLOAD_BYTE 0x11
 #define INVAL_BYTE 0x12
 
