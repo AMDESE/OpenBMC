@@ -1,0 +1,369 @@
+From a0625478ca79a3efa60bbc42e6d25150f6a69624 Mon Sep 17 00:00:00 2001
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Mon, 22 Nov 2021 17:21:16 -0600
+Subject: [PATCH 1/1] linux/drivers: Add fan driver for titanite
+
+- Driver addtion for Titanite Fans using CPLD as fan controller
+- DTS: Fan nodes, Temp node for Fan BD and  sb-rmi sensor nods are added
+
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts |  30 ++-
+ drivers/hwmon/Kconfig                         |   9 +
+ drivers/hwmon/Makefile                        |   1 +
+ drivers/hwmon/amd_cpld.c                      | 243 ++++++++++++++++++
+ 4 files changed, 280 insertions(+), 3 deletions(-)
+ create mode 100644 drivers/hwmon/amd_cpld.c
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts b/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
+index c8283b31f912..e9af777e4b5e 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
+@@ -138,6 +138,12 @@
+ 		compatible = "amd,sbtsi";
+ 		reg = <0x4c>;
+ 	};
++
++	// sbrmi
++	sbrmi@3c {
++		compatible = "amd,sbrmi";
++		reg = <0x3c>;
++	};
+ };
+
+ &i2c3 {
+@@ -148,6 +154,12 @@
+ 		compatible = "amd,sbtsi";
+ 		reg = <0x48>;
+ 	};
++
++	// sbrmi
++	sbrmi@38 {
++		compatible = "amd,sbrmi";
++		reg = <0x38>;
++	};
+ };
+
+ // Misc Regulators
+@@ -190,9 +202,9 @@
+ 	// Net name i2c6
+ 	status = "okay";
+
+-	i2cswitch@70 {
++	i2cswitch@71 {
+ 		compatible = "nxp,pca9548";
+-		reg = <0x70>;
++		reg = <0x71>;
+ 		#address-cells = <1>;
+ 		#size-cells = <0>;
+
+@@ -208,12 +220,24 @@
+ 				#size-cells = <0>;
+ 				reg = <0x77>;
+
++				//  port 0 connected to CPLD on FAN BD
++				i2c@0 {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					reg = <0>;
++
++					// 6 dual rotter Fans are controlled by cpld
++					amd_cpld@28 {
++						compatible="amd_cpld,amd_cpld";
++						reg = <0x28>;
++					};
++				};
+ 				i2c@3 {
+ 					#address-cells = <1>;
+ 					#size-cells = <0>;
+ 					reg = <3>;
+
+-					lm75a@4b {
++					lm75a@4b {	// FAN BD
+ 						compatible = "national,lm75a";
+ 						reg = <0x4b>;
+ 					};
+diff --git a/drivers/hwmon/Kconfig b/drivers/hwmon/Kconfig
+index 530230b9281a..e04f9f4aefd7 100644
+--- a/drivers/hwmon/Kconfig
++++ b/drivers/hwmon/Kconfig
+@@ -1644,6 +1644,15 @@ config SENSORS_EMC6W201
+ 	  This driver can also be built as a module. If so, the module
+ 	  will be called emc6w201.
+
++config SENSORS_AMD_CPLD_FANS
++	tristate "AMD CPLD FANS"
++	depends on I2C
++	help
++	  If you say yes here you get support for fan sensors of the AMD cpld fans.
++
++	  This driver can also be built as a module. If so, the module
++	  will be called amd_cpld_fans.
++
+ config SENSORS_SMSC47M1
+ 	tristate "SMSC LPC47M10x and compatibles"
+ 	depends on !PPC
+diff --git a/drivers/hwmon/Makefile b/drivers/hwmon/Makefile
+index cb10ac9800c4..a8e1031c0205 100644
+--- a/drivers/hwmon/Makefile
++++ b/drivers/hwmon/Makefile
+@@ -179,6 +179,7 @@ obj-$(CONFIG_SENSORS_STTS751)	+= stts751.o
+ obj-$(CONFIG_SENSORS_AMC6821)	+= amc6821.o
+ obj-$(CONFIG_SENSORS_TC74)	+= tc74.o
+ obj-$(CONFIG_SENSORS_THMC50)	+= thmc50.o
++obj-$(CONFIG_SENSORS_AMD_CPLD_FANS)	+= amd_cpld.o
+ obj-$(CONFIG_SENSORS_TMP102)	+= tmp102.o
+ obj-$(CONFIG_SENSORS_TMP103)	+= tmp103.o
+ obj-$(CONFIG_SENSORS_TMP108)	+= tmp108.o
+diff --git a/drivers/hwmon/amd_cpld.c b/drivers/hwmon/amd_cpld.c
+new file mode 100644
+index 000000000000..270e10a7a7cd
+--- /dev/null
++++ b/drivers/hwmon/amd_cpld.c
+@@ -0,0 +1,243 @@
++/*
++ * Driver for the AMD's CPLD based Fan controller
++ *
++ * Copyright (C) 2021 Advanced Micro Devices
++ * Author: Vinu Vaghasia <vinu.vaghasia@amd.com>
++ *
++ * SPDX-License-Identifier: GPL-2.0
++ *
++ */
++
++#include <linux/err.h>
++#include <linux/hwmon.h>
++#include <linux/hwmon-sysfs.h>
++#include <linux/i2c.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/version.h>
++#include <linux/thermal.h>
++#include <linux/byteorder/little_endian.h>
++
++#if LINUX_VERSION_CODE <= KERNEL_VERSION(5,2,0)
++#define HWMON_CHANNEL_INFO(stype, ...)  \
++    (&(struct hwmon_channel_info) { \
++        .type     = hwmon_##stype,  \
++        .config =     (u32 []) {    \
++            __VA_ARGS__,       0  \
++        }               \
++    })
++#endif
++
++#define AMD_CPLD_REG_FAN_PWM(n)         (0X18 + n)
++#define AMD_CPLD_REG_FAN_RPM_H(n)       (0X20 + (2*n))
++
++#define AMD_CPLD_NUM_OF_FANS            12
++#define RPM_MULTIPLIER					(100)
++
++static bool register_cdev = 1;
++module_param(register_cdev, bool, 0);
++
++struct amd_cpld_data {
++    struct device *dev;
++    struct i2c_client *i2c;
++    u8 num_fans;
++};
++
++static int amd_cpld_set_pwm_input(struct amd_cpld_data *devdata, int channel, long val)
++{
++    i2c_smbus_write_byte_data(devdata->i2c, AMD_CPLD_REG_FAN_PWM(channel), val);
++
++    return   0;
++}
++
++static int amd_cpld_read_pwm_input(struct amd_cpld_data *devdata, int channel, long *val)
++{
++    *val =   i2c_smbus_read_byte_data(devdata->i2c, AMD_CPLD_REG_FAN_PWM(channel));
++
++    return   0;
++}
++
++static int amd_cpld_read_fan_rpm(struct amd_cpld_data *devdata, int channel, long *val)
++{
++    u16 fan_rpm;
++
++	fan_rpm = i2c_smbus_read_word_data(devdata->i2c, AMD_CPLD_REG_FAN_RPM_H(channel));
++	/* swap bytes */
++	fan_rpm = __cpu_to_be16(fan_rpm);
++
++    *val = fan_rpm * RPM_MULTIPLIER;
++
++    return   0;
++}
++
++static int amd_cpld_read(struct device *dev, enum hwmon_sensor_types type,
++                        u32 attr,     int channel, long *val)
++{
++    struct   amd_cpld_data *data = dev_get_drvdata(dev);
++    if   (channel > data->num_fans)
++    {
++        return -ENOTSUPP;
++    }
++
++    switch   (type) {
++        case hwmon_fan :
++            switch(attr)       {
++                case hwmon_fan_input:
++                    return   amd_cpld_read_fan_rpm(data, channel, val);
++                default:
++                    return   -ENOTSUPP;
++                break;
++            }
++        case hwmon_pwm :
++            switch(attr)       {
++                case hwmon_pwm_input:
++                    return   amd_cpld_read_pwm_input(data, channel, val);
++                default:
++                    return   -ENOTSUPP;
++                break;
++            }
++    }
++    return   0;
++}
++
++static int amd_cpld_write(struct device *dev, enum hwmon_sensor_types type,
++                         u32 attr, int channel, long val)
++{
++    struct   amd_cpld_data *data = dev_get_drvdata(dev);
++
++    if (channel > data->num_fans)
++    {
++        return -EINVAL;
++    }
++
++    switch (type)
++    {
++        case hwmon_pwm:
++            switch (attr)
++            {
++                case hwmon_pwm_input:
++                    return   amd_cpld_set_pwm_input(data, channel, val);
++                default:
++                    return   -EOPNOTSUPP;
++            }
++        default:
++            return -EOPNOTSUPP;
++            break;
++    }
++    return   -EOPNOTSUPP;
++}
++
++static const struct hwmon_channel_info *amd_cpld_info[] = {
++    HWMON_CHANNEL_INFO(fan,
++        HWMON_F_INPUT,
++        HWMON_F_INPUT,
++        HWMON_F_INPUT,
++        HWMON_F_INPUT,
++        HWMON_F_INPUT,
++        HWMON_F_INPUT,
++        HWMON_F_INPUT,
++        HWMON_F_INPUT,
++        HWMON_F_INPUT,
++        HWMON_F_INPUT,
++        HWMON_F_INPUT,
++        HWMON_F_INPUT),
++    HWMON_CHANNEL_INFO(pwm,
++        HWMON_PWM_INPUT,
++        HWMON_PWM_INPUT,
++        HWMON_PWM_INPUT,
++        HWMON_PWM_INPUT,
++        HWMON_PWM_INPUT,
++        HWMON_PWM_INPUT),
++    NULL
++};
++
++static umode_t amd_cpld_is_visible(const void *drvdata, enum hwmon_sensor_types type, u32 attr, int channel)
++{
++    switch   (type)
++    {
++    case hwmon_fan:
++        switch (attr)
++        {
++        case hwmon_fan_input:
++            return S_IRUGO;
++        default:
++            break;
++        }
++        break;
++
++    case hwmon_pwm:
++        switch (attr)
++        {
++        case hwmon_pwm_input:
++            return S_IRUGO|S_IWUSR;
++        default:
++            break;
++        }
++        break;
++    default:
++        break;
++    }
++    return   0;
++}
++
++static const struct hwmon_ops amd_cpld_ops = {
++    .is_visible = amd_cpld_is_visible,
++    .read = amd_cpld_read,
++    .write   = amd_cpld_write,
++};
++
++static const struct hwmon_chip_info amd_cpld_chip_info = {
++    .ops =   &amd_cpld_ops,
++    .info = amd_cpld_info,
++};
++
++static int amd_cpld_i2c_probe (struct i2c_client *i2c,
++                 const struct i2c_device_id *id)
++{
++    struct   device *hwmon_dev;
++    struct   amd_cpld_data *data;
++
++    if   (!i2c_check_functionality(i2c->adapter, I2C_FUNC_SMBUS_BYTE_DATA |
++                     I2C_FUNC_SMBUS_WORD_DATA))
++        return -ENODEV;
++
++    data =   devm_kzalloc(&i2c->dev, sizeof(struct amd_cpld_data), GFP_KERNEL);
++    if   (unlikely(!data))
++        return -ENODEV;
++
++    data->dev = &i2c->dev;
++    data->i2c = i2c;
++
++    data->num_fans = AMD_CPLD_NUM_OF_FANS;
++
++    hwmon_dev = devm_hwmon_device_register_with_info(&i2c->dev,
++        i2c->name, data, &amd_cpld_chip_info, NULL );
++
++    if   (IS_ERR(hwmon_dev))
++        return PTR_ERR(hwmon_dev);
++
++    dev_info(&i2c->dev, "%s: sensor '%s'\n", dev_name(hwmon_dev), i2c->name);
++
++    return   PTR_ERR_OR_ZERO(hwmon_dev);
++}
++
++static const struct i2c_device_id amd_cpld_i2c_id[] = {
++    { "amd_cpld", 0   },
++    {}
++};
++
++MODULE_DEVICE_TABLE(i2c, amd_cpld_i2c_id);
++
++static struct i2c_driver amd_cpld_i2c_driver = {
++    .driver = {
++        .name     = "amd_cpld",
++    },
++    .probe      = amd_cpld_i2c_probe,
++    .id_table = amd_cpld_i2c_id,
++};
++
++module_i2c_driver(amd_cpld_i2c_driver);
++
++MODULE_DESCRIPTION("AMD's CPLD Fan controller driver");
++MODULE_AUTHOR("Vinu Vaghasia <vinu.vaghasia@amd.com>");
++MODULE_LICENSE("GPL v2");
+--
+2.17.1
+

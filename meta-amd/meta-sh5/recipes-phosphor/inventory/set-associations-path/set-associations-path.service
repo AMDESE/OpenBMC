@@ -1,0 +1,12 @@
+[Unit]
+Description=Phosphor-Inventory associations config path setting
+Wants=op-vpd-parser.service
+After=op-vpd-parser.service
+
+[Service]
+ExecStart=/usr/bin/set-associations-path.sh
+Type=oneshot
+RemainAfterExit=Yes
+
+[Install]
+WantedBy=multi-user.target

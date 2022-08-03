@@ -1,0 +1,32 @@
+From 3013f311819a0698c5e1e4a60b14da3934f06f8a Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Thu, 6 Jan 2022 00:48:00 -0600
+Subject: [PATCH] change defaults for SOL buffering
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+---
+ sol/sol_manager.hpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/sol/sol_manager.hpp b/sol/sol_manager.hpp
+index 4e797d4..4b85971 100644
+--- a/sol/sol_manager.hpp
++++ b/sol/sol_manager.hpp
+@@ -118,7 +118,7 @@ class Manager
+      *  parameter value is accumulateInterval/5. The accumulateInterval
+      *  needs to be a multiple of 5.
+      */
+-    std::chrono::milliseconds accumulateInterval = 100ms;
++    std::chrono::milliseconds accumulateInterval = 200ms;
+
+     /** @brief Character Send Threshold
+      *
+@@ -132,7 +132,7 @@ class Manager
+      *  character was received. This parameter can be modified by the set
+      *  SOL configuration parameters command.
+      */
+-    uint8_t sendThreshold = 1;
++    uint8_t sendThreshold = 200;
+
+     /** @brief Retry Count
+      *

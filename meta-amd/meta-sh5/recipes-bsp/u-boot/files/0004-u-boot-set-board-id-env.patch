@@ -1,0 +1,81 @@
+From 17b10bd19fcff4219a555e3a5bd76e6bad0669f3 Mon Sep 17 00:00:00 2001
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Thu, 24 Jun 2021 13:57:33 -0500
+Subject: [PATCH] u-boot set board id env
+
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ common/main.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 44 insertions(+)
+
+diff --git a/common/main.c b/common/main.c
+index 07b34bf2b0..7841cc2e5a 100644
+--- a/common/main.c
++++ b/common/main.c
+@@ -11,12 +11,53 @@
+ #include <cli.h>
+ #include <console.h>
+ #include <version.h>
++#include <i2c.h>
++
++
++#define EEPROM_I2C_BUS 7
++#define EEPROM_DEV_ADDR 0X50
++#define EEPROM_BOARD_ID_OFFSET 0X1F
++#define EEPROM_ADDR_LEN 2
++#define BOARD_ID_LEN 1
+
+ /*
+  * Board-specific Platform code can reimplement show_boot_progress () if needed
+  */
+ __weak void show_boot_progress(int val) {}
+
++/*
++ * Read board ID from mother board eeprom and set as an env
++ */
++void set_board_id()
++{
++	char *s;
++	unsigned char board_id [BOARD_ID_LEN];
++	int ret;
++	char brdid[2];
++
++	/* Check if the board_id env is set */
++	s = env_get("board_id");
++
++	/* Read board_id from eeprom */
++	i2c_set_bus_num(EEPROM_I2C_BUS);
++	ret = i2c_read(EEPROM_DEV_ADDR, EEPROM_BOARD_ID_OFFSET, EEPROM_ADDR_LEN, board_id, BOARD_ID_LEN);
++	if (ret < 0) {
++		printf("Error : Retrieving board_id from EEPROM Failed\n");
++	}
++	else {
++		/* if the env is not set OR env id  and eeprom id are different, then set from eeprom id */
++		sprintf(brdid, "%x", board_id[0]);
++
++		if ( (s == NULL) || (strcmp(s, brdid) !=0 ) ) {
++			env_set("board_id", brdid);
++			env_save();
++		}
++	}
++
++	printf("Board_id : %s\n", env_get("board_id"));
++	return;
++}
++
+ static void run_preboot_environment_command(void)
+ {
+ #ifdef CONFIG_PREBOOT
+@@ -54,6 +95,9 @@ void main_loop(void)
+	if (IS_ENABLED(CONFIG_UPDATE_TFTP))
+		update_tftp(0UL, NULL, NULL);
+
++	/* Read board id from eerpom and set env */
++	set_board_id();
++
+	s = bootdelay_process();
+	if (cli_process_fdt(&s))
+		cli_secure_boot_cmd(s);
+--
+2.17.1
+

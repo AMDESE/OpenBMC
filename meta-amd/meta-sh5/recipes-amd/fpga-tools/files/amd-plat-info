@@ -1,0 +1,69 @@
+#!/bin/bash
+
+set +e
+exec 2> /dev/null # remove on debug
+function read_reg()
+{
+    local DATA=$(i2cget -y $1 $2 $(printf "0x%x" $3))
+    echo -ne $((DATA))
+}
+function get_board_info ()
+{
+    local name
+    # Read Board ID from u-boot env
+    boardID=`fw_printenv board_id | sed -n "s/^board_id=//p"`
+    case $boardID in
+       "3D"|"40"|"41"|"42"|"52")  # Onyx board_ids
+            name="onyx"
+       ;;
+       "3E"|"43"|"44"|"45"|"51")  # Quartz board_ids
+            name="quartz"
+       ;;
+       "46"|"47"|"48")  # Ruby board_ids
+            name="ruby"
+       ;;
+       "49"|"4A"|"4B"|"4C"|"4D"|"4E"|"4F")  # Titanite board_ids
+            name="titanite"
+       ;;
+       *)  # Default
+            name="sp5"
+    esac
+    if [ "$1" == "name" ]; then
+        echo -ne $name
+    fi
+    if [ "$1" == "rev" ]; then
+        revID=`hexdump -c /sys/bus/i2c/devices/7-0050/eeprom -s 24 -n 1 | head -n 1| awk '{ print $2}'`
+        echo -ne $revID
+    fi
+    if [ "$1" == "id" ]; then
+        echo -ne $boardID
+    fi
+}
+
+function get_hpm_fpga_ver()
+{
+    local plat
+    plat=$(get_board_info name)
+    if [ "$plat" == "onyx" ]; then
+        MAJOR=$(read_reg 0 0x50 3)
+        MINOR=$(read_reg 0 0x50 4)
+        REV=$(printf "\x$(printf %x $(read_reg 0 0x50 5))")
+        if [ "$MAJOR" == "0" ] && [ "$MINOR" == "0" ]; then
+            echo -ne Unknown
+        else
+            echo -ne $MAJOR.$MINOR.$REV
+        fi
+    fi
+    if [ "$plat" == "titanite" ]; then
+        MAJOR=$(printf "%X" $(read_reg 0 0x20 0))
+        MINOR=$(read_reg 0 0x20 1)
+        echo -ne $MAJOR.$MINOR
+    fi
+    if [ "$plat" == "ruby" ] || [ "$plat" == "quartz" ] || [ "$plat" == "sp5" ]; then
+        echo -ne Unknown
+    fi
+}
+# all arguments are function names. invoke directly
+if [ ! -z "$1" ] ; then
+    $@
+fi

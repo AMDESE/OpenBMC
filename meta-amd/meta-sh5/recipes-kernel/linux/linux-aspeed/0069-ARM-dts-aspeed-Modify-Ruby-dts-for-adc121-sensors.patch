@@ -1,0 +1,92 @@
+From 3f1bcaef44e7714b65ec4545b8c432bdf9681302 Mon Sep 17 00:00:00 2001
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Fri, 14 Jan 2022 11:50:47 -0600
+Subject: [PATCH 1/1] ARM:dts:aspeed: Modify  Ruby dts for adc121 sensors
+
+adc121c sensor configuration modified to bridge with iio-hwmon
+
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts | 42 +++++++++++++++++++----
+ 1 file changed, 36 insertions(+), 6 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+index 73cc5e0c050e..9865ba754622 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+@@ -55,6 +55,18 @@
+ 		};
+ 	};
+
++	iio-hwmon-adc121c {
++		compatible = "iio-hwmon";
++		oemname0 = "ADC121C_50";
++		oemname1 = "ADC121C_51";
++		oemname2 = "ADC121C_52";
++		oemname3 = "ADC121C_53";
++		oemname4 = "ADC121C_54";
++		oemname5 = "ADC121C_55";
++		oemname6 = "ADC121C_56";
++		io-channels = <&adc0 0>, <&adc1 0>, <&adc2 0>, <&adc3 0>,
++					  <&adc4 0>, <&adc5 0>, <&adc6 0>;
++	};
+ };
+
+ &mdio0 {
+@@ -319,29 +331,47 @@
+ 			#size-cells = <0>;
+ 			reg = <6>;
+
+-			adc121c@50 {
++			adc0: adc121c_50@50 {
+ 				compatible = "ti,adc121c";
+ 				reg = <0x50>;
++				#io-channel-cells = <1>;
++				label = "adc121c_50";
+ 			};
+-			adc121c@51 {
++			adc1: adc121c_51@51 {
+ 				compatible = "ti,adc121c";
+ 				reg = <0x51>;
++				#io-channel-cells = <1>;
++				label = "adc121c_51";
+ 			};
+-			adc121c@52 {
++			adc2: adc121c_52@52 {
+ 				compatible = "ti,adc121c";
+ 				reg = <0x52>;
++				#io-channel-cells = <1>;
++				label = "adc121c_52";
+ 			};
+-			adc121c@53 {
++			adc3: adc121c_53@53 {
+ 				compatible = "ti,adc121c";
+ 				reg = <0x53>;
++				#io-channel-cells = <1>;
++				label = "adc121c_53";
+ 			};
+-			adc121c@54 {
++			adc4: adc121c_54@54 {
+ 				compatible = "ti,adc121c";
+ 				reg = <0x54>;
++				#io-channel-cells = <1>;
++				label = "adc121c_54";
+ 			};
+-			adc121c@55 {
++			adc5: adc121c_55@55 {
+ 				compatible = "ti,adc121c";
+ 				reg = <0x55>;
++				#io-channel-cells = <1>;
++				label = "adc121c_55";
++			};
++			adc6: adc121c_56@56 {
++				compatible = "ti,adc121c";
++				reg = <0x56>;
++				#io-channel-cells = <1>;
++				label = "adc121c_56";
+ 			};
+ 		};
+ 	};
+--
+2.17.1
+

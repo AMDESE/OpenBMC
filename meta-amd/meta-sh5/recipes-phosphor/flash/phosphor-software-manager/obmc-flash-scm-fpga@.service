@@ -1,0 +1,7 @@
+[Unit]
+Description=Flash SCM FPGA image %I to SCM FPGA SPI flash
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/usr/sbin/scm-fpga-update.sh /tmp/images/%i

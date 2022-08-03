@@ -1,0 +1,46 @@
+From 91ec3bfb479b57da428892ea7eca7cea7e5af347 Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Sun, 10 Jul 2022 22:49:25 -0500
+Subject: [PATCH] increase update task timeouts
+
+doubled the max timeout from 5 to 10 minutes.
+SP5 platforms have two SPIs for each BIOS update which takes around
+6 mins to program both.
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+
+---
+ redfish-core/lib/update_service.hpp | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/redfish-core/lib/update_service.hpp b/redfish-core/lib/update_service.hpp
+index ca1234f..472d815 100644
+--- a/redfish-core/lib/update_service.hpp
++++ b/redfish-core/lib/update_service.hpp
+@@ -22,6 +22,8 @@
+
+ #include <variant>
+
++#define UPDATE_TIMER_TIMEOUT	(10)
++
+ namespace redfish
+ {
+
+@@ -226,7 +228,7 @@ static void
+                                         // if we're getting status updates it's
+                                         // still alive, update timer
+                                         taskData->extendTimer(
+-                                            std::chrono::minutes(5));
++                                            std::chrono::minutes(UPDATE_TIMER_TIMEOUT));
+                                     }
+
+                                     // as firmware update often results in a
+@@ -239,7 +241,7 @@ static void
+                                 "Properties',"
+                                 "member='PropertiesChanged',path='" +
+                                     objPath.str + "'");
+-                        task->startTimer(std::chrono::minutes(5));
++                        task->startTimer(std::chrono::minutes(UPDATE_TIMER_TIMEOUT));
+                         task->populateResp(asyncResp->res);
+                         task->payload.emplace(req);
+                     }

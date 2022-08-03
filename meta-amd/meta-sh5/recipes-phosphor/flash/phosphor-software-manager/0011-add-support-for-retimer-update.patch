@@ -1,0 +1,343 @@
+From dddfcfe44ffce1a564f84a042a24f97b9e8abc69 Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Tue, 1 Feb 2022 04:56:37 -0600
+Subject: [PATCH] add support for retimer update
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+
+---
+ activation.cpp                 | 108 +++++++++++++++++++++++++++++++++
+ activation.hpp                 |   7 +++
+ item_updater.cpp               |  38 ++++++++++++
+ item_updater.hpp               |  21 +++++++
+ meson.build                    |  10 ++-
+ meson_options.txt              |   9 +++
+ obmc-flash-retimer@.service.in |   7 +++
+ 7 files changed, 199 insertions(+), 1 deletion(-)
+ create mode 100644 obmc-flash-retimer@.service.in
+
+diff --git a/activation.cpp b/activation.cpp
+index 9e86137..bc49789 100644
+--- a/activation.cpp
++++ b/activation.cpp
+@@ -216,6 +216,28 @@ auto Activation::activation(Activations value) -> Activations
+             return softwareServer::Activation::activation(value);
+         }
+ #endif
++
++#ifdef RETIMER_UPGRADE
++        if (purpose == VersionPurpose::RETIMER)
++        {
++            if (!activationProgress)
++            {
++                activationProgress =
++                    std::make_unique<ActivationProgress>(bus, path);
++            }
++
++            // Enable systemd signals
++            subscribeToSystemdSignals();
++
++            // Set initial progress
++            activationProgress->progress(20);
++
++            // Initiate image writing to flash
++            flashWriteRetimer();
++
++            return softwareServer::Activation::activation(value);
++        }
++#endif
+         auto versionStr = parent.versions.find(versionId)->second->version();
+
+         if (!minimum_ship_level::verify(versionStr))
+@@ -431,6 +453,14 @@ void Activation::unitStateChange(sdbusplus::message::message& msg)
+     }
+ #endif
+
++#ifdef RETIMER_UPGRADE
++    if (purpose == VersionPurpose::RETIMER)
++    {
++        onStateChangesRetimer(msg);
++        return;
++    }
++#endif
++
+     onStateChanges(msg);
+
+     return;
+@@ -833,6 +863,84 @@ void Activation::onStateChangesVr(sdbusplus::message::message& msg)
+
+ #endif
+
++#ifdef RETIMER_UPGRADE
++void Activation::flashWriteRetimer()
++{
++    auto method = bus.new_method_call(SYSTEMD_BUSNAME, SYSTEMD_PATH,
++                                      SYSTEMD_INTERFACE, "StartUnit");
++    auto retimerServiceFile = "obmc-flash-retimer@" + versionId + ".service";
++    method.append(retimerServiceFile, "replace");
++    try
++    {
++        auto reply = bus.call(method);
++    }
++    catch (const SdBusError& e)
++    {
++        log<level::ERR>("Error in trying to upgrade VR.");
++        report<InternalFailure>();
++    }
++}
++
++void Activation::onStateChangesRetimer(sdbusplus::message::message& msg)
++{
++    uint32_t newStateID{};
++    sdbusplus::message::object_path newStateObjPath;
++    std::string newStateUnit{};
++    std::string newStateResult{};
++
++    // Read the msg and populate each variable
++    msg.read(newStateID, newStateObjPath, newStateUnit, newStateResult);
++
++    auto retimerServiceFile = "obmc-flash-retimer@" + versionId + ".service";
++
++    if (newStateUnit == retimerServiceFile)
++    {
++        // unsubscribe to systemd signals
++        unsubscribeFromSystemdSignals();
++
++        if (newStateResult == "done")
++        {
++            // Remove version object from image manager
++            deleteImageManagerObject();
++
++            // Set activation progress to 100
++            activationProgress->progress(100);
++
++            // Set Activation value to active
++            activation(softwareServer::Activation::Activations::Active);
++
++            log<level::INFO>("Retimer upgrade completed successfully.");
++            parent.retimerVersion->version(
++                parent.versions.find(versionId)->second->version());
++            SET_VER(RETIMER_VER_FILE);
++            parent.versions.find(versionId)->second->version("--");
++
++            // Delete the uploaded activation
++            boost::asio::post(getIOContext(), [this]() {
++                this->parent.erase(this->versionId);
++            });
++
++        }
++        else if (newStateResult == "failed")
++        {
++            // Remove version object from image manager
++            deleteImageManagerObject();
++            // Delete the uploaded activation
++            boost::asio::post(getIOContext(), [this]() {
++                this->parent.erase(this->versionId);
++            });
++
++            // Set Activation value to Failed
++            activation(softwareServer::Activation::Activations::Failed);
++
++            log<level::ERR>("Retimer upgrade failed.");
++        }
++    }
++
++    return;
++}
++
++#endif
+
+ void Activation::rebootBmc()
+ {
+diff --git a/activation.hpp b/activation.hpp
+index 4ee4a27..28ce62c 100644
+--- a/activation.hpp
++++ b/activation.hpp
+@@ -271,6 +271,13 @@ class Activation : public ActivationInherit, public Flash
+     void onStateChangesVr(sdbusplus::message::message&);
+ #endif
+
++#ifdef RETIMER_UPGRADE
++    /* @brief write to HPM FPGA flash function */
++    void flashWriteRetimer();
++
++    /** @brief Function that acts on HPM FPGA upgrade service file state changes */
++    void onStateChangesRetimer(sdbusplus::message::message&);
++#endif
+
+     /** @brief Overloaded function that acts on service file state changes */
+     void onStateChanges(sdbusplus::message::message&) override;
+diff --git a/item_updater.cpp b/item_updater.cpp
+index dc7c702..b00dbe0 100644
+--- a/item_updater.cpp
++++ b/item_updater.cpp
+@@ -95,6 +95,9 @@ void ItemUpdater::createActivation(sdbusplus::message::message& msg)
+ #ifdef VR_UPGRADE
+                         value == VersionPurpose::VR ||
+ #endif
++#ifdef RETIMER_UPGRADE
++                        value == VersionPurpose::RETIMER ||
++#endif
+
+                         value == VersionPurpose::System)
+                     {
+@@ -919,6 +922,41 @@ void ItemUpdater::createVRObject()
+                                                               *vrVersion);
+ }
+ #endif
++#ifdef RETIMER_UPGRADE
++void ItemUpdater::createRetimerObject()
++{
++    std::string path = RETIMER_OBJPATH;
++    // Get version id from last item in the path
++    auto pos = path.rfind("/");
++    if (pos == std::string::npos)
++    {
++        log<level::ERR>("No version id found in object path",
++                        entry("RETIMER_OBJPATH=%s", path.c_str()));
++        return;
++    }
++
++    createActiveAssociation(path);
++    createFunctionalAssociation(path);
++
++    auto versionId = path.substr(pos + 1);
++    std::string version = "Unknown";
++    GET_VER(RETIMER_VER_FILE);
++
++    AssociationList assocs = {};
++    retimerActivation = std::make_unique<Activation>(
++        bus, path, *this, versionId, server::Activation::Activations::Active,
++        assocs);
++    auto dummyErase = [](std::string /*entryId*/) {
++        // Do nothing;
++    };
++    retimerVersion = std::make_unique<VersionClass>(
++        bus, path, version, VersionPurpose::RETIMER, "", "",
++        std::bind(dummyErase, std::placeholders::_1));
++    retimerVersion->deleteObject =
++        std::make_unique<phosphor::software::manager::Delete>(bus, path,
++                                                              *retimerVersion);
++}
++#endif
+
+ } // namespace updater
+ } // namespace software
+diff --git a/item_updater.hpp b/item_updater.hpp
+index 4a08cd4..8021be0 100644
+--- a/item_updater.hpp
++++ b/item_updater.hpp
+@@ -25,6 +25,9 @@
+ #ifdef VR_UPGRADE
+ #define VR_VER_FILE    "vr_ver"
+ #endif
++#ifdef RETIMER_UPGRADE
++#define RETIMER_VER_FILE    "retimer_ver"
++#endif
+ #define ACTIVE_VER_KEY	"active"
+
+ namespace phosphor
+@@ -87,6 +90,9 @@ class ItemUpdater : public ItemUpdaterInherit
+ #endif
+ #ifdef VR_UPGRADE
+         createVRObject();
++#endif
++#ifdef RETIMER_UPGRADE
++        createRetimerObject();
+ #endif
+         emit_object_added();
+     };
+@@ -343,6 +349,21 @@ class ItemUpdater : public ItemUpdaterInherit
+     /** @brief Persistent Version D-Bus object for HPM FPGA */
+     std::unique_ptr<VersionClass> vrVersion;
+ #endif
++#ifdef RETIMER_UPGRADE
++    /** @brief Create the Retimer object without knowing the version.
++     *
++     *  The object is created only to provide the DBus access so that an
++     *  external service could set the correct Retimer version.
++     *  On retimer code update, the version is updated accordingly.
++     */
++    void createRetimerObject();
++
++    /** @brief Persistent Activation D-Bus object for HPM FPGA */
++    std::unique_ptr<Activation> retimerActivation;
++  public:
++    /** @brief Persistent Version D-Bus object for HPM FPGA */
++    std::unique_ptr<VersionClass> retimerVersion;
++#endif
+ };
+
+ } // namespace updater
+diff --git a/meson.build b/meson.build
+index 9f319c4..a9d52a8 100644
+--- a/meson.build
++++ b/meson.build
+@@ -73,7 +73,7 @@ conf.set('WANT_SIGNATURE_FULL_VERIFY', get_option('verify-full-signature').enabl
+ conf.set('SCM_FPGA_UPGRADE', get_option('scm-fpga-upgrade').enabled())
+ conf.set('HPM_FPGA_UPGRADE', get_option('hpm-fpga-upgrade').enabled())
+ conf.set('VR_UPGRADE', get_option('vr-upgrade').enabled())
+-
++conf.set('RETIMER_UPGRADE', get_option('retimer-upgrade').enabled())
+
+ # Configurable variables
+ conf.set('ACTIVE_BMC_MAX_ALLOWED', get_option('active-bmc-max-allowed'))
+@@ -111,6 +111,10 @@ if get_option('vr-upgrade').enabled()
+     conf.set_quoted('VR_OBJPATH', get_option('vr-object-path'))
+ endif
+
++if get_option('retimer-upgrade').enabled()
++    conf.set_quoted('RETIMER_OBJPATH', get_option('retimer-object-path'))
++endif
++
+ configure_file(output: 'config.h', configuration: conf)
+
+ deps = [
+@@ -202,6 +206,10 @@ if get_option('vr-upgrade').enabled()
+     unit_files += 'obmc-flash-vr@.service.in'
+ endif
+
++if get_option('retimer-upgrade').enabled()
++    unit_files += 'obmc-flash-retimer@.service.in'
++endif
++
+ if get_option('sync-bmc-files').enabled()
+     executable(
+         'phosphor-sync-software-manager',
+diff --git a/meson_options.txt b/meson_options.txt
+index 8b85637..b2d9bd4 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -21,6 +21,9 @@ option('hpm-fpga-upgrade', type: 'feature',
+ option('vr-upgrade', type: 'feature',
+     description: 'Enable vr upgrade support.')
+
++option('retimer-upgrade', type: 'feature',
++    description: 'Enable retimer upgrade support.')
++
+ option('sync-bmc-files', type: 'feature',
+     description: 'Enable sync of filesystem files.')
+
+@@ -137,3 +140,9 @@ option(
+     value: '/xyz/openbmc_project/software/vr_active',
+     description: 'The VR DBus object path.',
+ )
++
++option(
++    'retimer-object-path', type: 'string',
++    value: '/xyz/openbmc_project/software/retimer_active',
++    description: 'The Retimer DBus object path.',
++)
+diff --git a/obmc-flash-retimer@.service.in b/obmc-flash-retimer@.service.in
+new file mode 100644
+index 0000000..d8f1586
+--- /dev/null
++++ b/obmc-flash-retimer@.service.in
+@@ -0,0 +1,7 @@
++[Unit]
++Description=Flash retimer image %I to retimer
++
++[Service]
++Type=oneshot
++RemainAfterExit=no
++ExecStart=echo Please add custom command for flashing image /tmp/image/%i

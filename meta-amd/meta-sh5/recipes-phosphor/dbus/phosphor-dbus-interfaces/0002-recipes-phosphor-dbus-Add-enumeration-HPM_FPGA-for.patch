@@ -1,0 +1,28 @@
+From d8c16a2bffc73c5a4581bf3bc21fe3e8c5cf4e40 Mon Sep 17 00:00:00 2001
+From: Sreedhar Govardhana <srgovard@amd.com>
+Date: Tue, 13 Jul 2021 20:26:05 -0500
+Subject: [PATCH] recipes-phosphor/dbus: Add enumeration "HPM_FPGA" for 
+ version property
+
+Adds enumeration "HPM_FPGA" for version property to support HPM_FPGA
+firmware update.
+
+Signed-off-by: Sreedhar Govardhana <srgovard@amd.com>
+---
+ xyz/openbmc_project/Software/Version.interface.yaml | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/xyz/openbmc_project/Software/Version.interface.yaml b/xyz/openbmc_project/Software/Version.interface.yaml
+index aa16a8b..2d9089f 100644
+--- a/xyz/openbmc_project/Software/Version.interface.yaml
++++ b/xyz/openbmc_project/Software/Version.interface.yaml
+@@ -41,3 +41,6 @@ enumerations:
+         - name: SCM_FPGA
+           description: >
+             The version is a version for a SCM FPGA.
++        - name: HPM_FPGA
++          description: >
++            The version is a version for a HPM FPGA.
+--
+2.25.1
+

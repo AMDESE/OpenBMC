@@ -1,0 +1,73 @@
+From 0c4ffbced991c566f6d5418a5784f7d910ea445a Mon Sep 17 00:00:00 2001
+From: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
+Date: Wed, 25 Aug 2021 18:25:30 -0500
+Subject: [PATCH 1/1] led: Replace upstream yaml file with AMD specific yaml
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+Replaces upstream LED yaml file with AMD specific LED yaml file which
+includes only fault and identify LEDs.
+
+Signed-off-by: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
+---
+ led.yaml | 41 ++++++-----------------------------------
+ 1 file changed, 6 insertions(+), 35 deletions(-)
+ mode change 100755 => 100644 led.yaml
+
+diff --git a/led.yaml b/led.yaml
+old mode 100755
+new mode 100644
+index 6e90c5f..fdb1aca
+--- a/led.yaml
++++ b/led.yaml
+@@ -1,41 +1,12 @@
+-bmc_booted:
+-    heartbeat:
+-        Action: 'On'
+-power_on:
+-    power:
+-        Action: 'On'
+-        Priority: 'On'
+ enclosure_fault:
+-    front_fault:
+-        Action: 'On'
+-    rear_fault:
++    fault:
+         Action: 'On'
+-enclosure_identify:
+-    front_id:
+-        Action: 'Blink'
+         DutyOn: 50
+-        Period: 1000
+-    rear_id:
+-        Action: 'Blink'
+-        DutyOn: 50
+-        Period: 1000
+-fan_fault:
+-    front_fault:
+-        Action: 'On'
+-    fan0:
+-        Action: 'On'
+-    rear_fault:
+-        Action: 'On'
+-fan_identify:
+-    front_id:
+-        Action: 'Blink'
+-        DutyOn: 50
+-        Period: 1000
+-    rear_id:
+-        Action: 'Blink'
+-        DutyOn: 50
+-        Period: 1000
+-    fan0:
++        Period: 0
++        Priority: 'Blink'
++
++enclosure_identify:
++    identify:
+         Action: 'Blink'
+         DutyOn: 50
+         Period: 1000
+--
+2.17.1
+

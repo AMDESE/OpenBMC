@@ -1,0 +1,12 @@
+[Unit]
+Description=Hwmon config path set
+Wants=op-vpd-parser.service
+After=op-vpd-parser.service
+
+[Service]
+ExecStart=/usr/bin/first-boot-set-hwmon-path.sh
+Type=oneshot
+RemainAfterExit=Yes
+
+[Install]
+WantedBy=multi-user.target
