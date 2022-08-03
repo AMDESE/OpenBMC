@@ -1,0 +1,571 @@
+From 330fe6b5d26db44fbb03b682c317ac2be95735c6 Mon Sep 17 00:00:00 2001
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Fri, 12 Aug 2022 14:38:03 -0500
+Subject: [PATCH 1/1] u-boot-aspeed-sdk: Add merged changes from SP5 code base
+
+- Squashed all changes from SP5 code base
+- Modified for SH5 platforms
+
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ arch/arm/mach-aspeed/ast2600/scu_info.c |   6 +
+ common/image-fit.c                      |  72 +++++++++++-
+ common/main.c                           | 149 ++++++++++++++++++++++++
+ drivers/mtd/spi/spi-nor-core.c          |  76 ++++++++++++
+ include/linux/mtd/spi-nor.h             |   3 +
+ net/eth-uclass.c                        |  21 +++-
+ tools/Makefile                          |   5 +
+ 7 files changed, 327 insertions(+), 5 deletions(-)
+
+diff --git a/arch/arm/mach-aspeed/ast2600/scu_info.c b/arch/arm/mach-aspeed/ast2600/scu_info.c
+index fe26f743c0..838b2b9588 100644
+--- a/arch/arm/mach-aspeed/ast2600/scu_info.c
++++ b/arch/arm/mach-aspeed/ast2600/scu_info.c
+@@ -12,6 +12,9 @@
+ /* SoC mapping Table */
+ #define SOC_ID(str, rev) { .name = str, .rev_id = rev, }
+
++/* Sys Scratch reg SCU1FC */
++#define ASPEED_SYS_SCRATCH_1FC 0x1e6e21fc
++
+ struct soc_id {
+ 	const char *name;
+ 	u64 rev_id;
+@@ -217,6 +220,9 @@ void aspeed_print_sysrst_info(void)
+ 	u32 rest = readl(ASPEED_SYS_RESET_CTRL);
+ 	u32 rest3 = readl(ASPEED_SYS_RESET_CTRL3);
+
++	/* Save ASPEED_SYS_RESET_CTRL value in scratch reg */
++	writel(rest, ASPEED_SYS_SCRATCH_1FC);
++
+ 	if (rest & SYS_PWR_RESET_FLAG) {
+ 		printf("RST: Power On \n");
+ 		writel(rest, ASPEED_SYS_RESET_CTRL);
+diff --git a/common/image-fit.c b/common/image-fit.c
+index 3c8667f93d..dc4e3d9858 100644
+--- a/common/image-fit.c
++++ b/common/image-fit.c
+@@ -11,10 +11,13 @@
+ #ifdef USE_HOSTCC
+ #include "mkimage.h"
+ #include <time.h>
++#include "env/fw_env.h"
++#define env_get fw_getenv
+ #else
+ #include <linux/compiler.h>
+ #include <linux/kconfig.h>
+ #include <common.h>
++#include <u-boot/crc.h>
+ #include <errno.h>
+ #include <mapmem.h>
+ #include <asm/io.h>
+@@ -24,11 +27,25 @@ DECLARE_GLOBAL_DATA_PTR;
+
+ #include <image.h>
+ #include <bootstage.h>
+-#include <u-boot/crc.h>
+ #include <u-boot/md5.h>
+ #include <u-boot/sha1.h>
+ #include <u-boot/sha256.h>
+ #include <u-boot/sha512.h>
++#include <linux/ctype.h>
++
++#define ONYX_SLT        61 //0x3D
++#define ONYX_1          64 //0x40
++#define ONYX_2          65 //0x41
++#define ONYX_3          66 //0x42
++#define ONYX_FR4        82 //0x52
++
++#define SH5_1P_PWR      92  //0x5C
++#define SH5_1P_OEM      93  //0x5D
++#define SH5_1P_SLT      94  //0x5E
++#define SH5_SIDLEY      95  //0x5F
++#define SH5_PARRY_PEAK  96  //0x60
++#define SH5_2P_CABLED   108 //0x6C
++#define SH5_1P_OEM_P    109 //0x6D
+
+ /*****************************************************************************/
+ /* New uImage format routines */
+@@ -1784,6 +1801,24 @@ static const char *fit_get_image_type_property(int type)
+ 	return "unknown";
+ }
+
++#define HEX_BASE	16
++#define DECIMAL_BASE	10
++
++uint32_t str2hex(const char *str)
++{
++	uint32_t val = 0;
++	char *str1 = strdup(str);
++	for (int i = 0; i < strlen(str1); i++) {
++		if (isxdigit(str1[i])) {
++			if (isdigit(str1[i])) str1[i] = str1[i] - '0';
++			else str1[i] = toupper(str1[i]) - 'A'+ DECIMAL_BASE;
++		}
++		val = (val * HEX_BASE) | (str1[i] & 0xF);
++	}
++	free(str1);
++	return val;
++}
++
+ int fit_image_load(bootm_headers_t *images, ulong addr,
+ 		   const char **fit_unamep, const char **fit_uname_configp,
+ 		   int arch, int image_type, int bootstage_id,
+@@ -1795,6 +1830,11 @@ int fit_image_load(bootm_headers_t *images, ulong addr,
+ 	const char *fit_base_uname_config;
+ 	const void *fit;
+ 	const void *buf;
++	const int conf_name_size = 64;
++	char *conf_name;
++	char *platform_id;
++	int board_id;
++
+ 	size_t size;
+ 	int type_ok, os_ok;
+ 	ulong load, data, len;
+@@ -1811,7 +1851,6 @@ int fit_image_load(bootm_headers_t *images, ulong addr,
+ 	fit_base_uname_config = NULL;
+ 	prop_name = fit_get_image_type_property(image_type);
+ 	printf("## Loading %s from FIT Image at %08lx ...\n", prop_name, addr);
+-
+ 	bootstage_mark(bootstage_id + BOOTSTAGE_SUB_FORMAT);
+ 	if (!fit_check_format(fit)) {
+ 		printf("Bad FIT %s image format!\n", prop_name);
+@@ -1833,6 +1872,33 @@ int fit_image_load(bootm_headers_t *images, ulong addr,
+ 		if (IMAGE_ENABLE_BEST_MATCH && !fit_uname_config) {
+ 			cfg_noffset = fit_conf_find_compat(fit, gd_fdt_blob());
+ 		} else {
++			fit_uname_config = (char *) malloc(conf_name_size);
++
++			// Reading board_id from ENV
++			platform_id = env_get("board_id");
++			// Convert bd_id string to integer
++			board_id = str2hex(platform_id);
++			// select the  device tree configuration based on board_id
++			switch (board_id) {
++				case ONYX_SLT:
++				case ONYX_1 ... ONYX_3:
++				case ONYX_FR4:
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-onyx.dtb");
++					break;
++				case SH5_SIDLEY:
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-sidely.dtb");
++					break;
++				case SH5_PARRY_PEAK:
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-parrypeak.dtb");
++					break;
++				case SH5_1P_PWR ... SH5_1P_SLT:
++				case SH5_1P_OEM_P:
++				case SH5_2P_CABLED:
++				default:
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-sh5d807.dtb");
++					break;
++			} // switch
++
+ 			cfg_noffset = fit_conf_get_node(fit,
+ 							fit_uname_config);
+ 		}
+@@ -1842,7 +1908,6 @@ int fit_image_load(bootm_headers_t *images, ulong addr,
+ 					BOOTSTAGE_SUB_NO_UNIT_NAME);
+ 			return -ENOENT;
+ 		}
+-
+ 		fit_base_uname_config = fdt_get_name(fit, cfg_noffset, NULL);
+ 		printf("   Using '%s' configuration\n", fit_base_uname_config);
+ 		/* Remember this config */
+@@ -2064,7 +2129,6 @@ int boot_get_fdt_fit(bootm_headers_t *images, ulong addr,
+ 		if (next_config - 1 > fit_uname_config_copy)
+ 			fit_uname_config = fit_uname_config_copy;
+ 	}
+-
+ 	fdt_noffset = fit_image_load(images,
+ 		addr, &fit_uname, &fit_uname_config,
+ 		arch, IH_TYPE_FLATDT,
+diff --git a/common/main.c b/common/main.c
+index 07b34bf2b0..9b6f91386e 100644
+--- a/common/main.c
++++ b/common/main.c
+@@ -7,16 +7,153 @@
+ /* #define	DEBUG	*/
+
+ #include <common.h>
++#include <errno.h>
++#include <asm/io.h>
+ #include <autoboot.h>
+ #include <cli.h>
+ #include <console.h>
+ #include <version.h>
++#include <i2c.h>
++#include <linux/ctype.h>
++#include <string.h>
++
++#define EEPROM_I2C_BUS          7
++#define EEPROM_DEV_ADDR         0X50
++#define EEPROM_BOARD_ID_OFFSET  0X10
++#define EEPROM_ADDR_LEN         2
++#define BOARD_ID_LEN            1
++#define BOARD_ID_BUFF_LEN       2
++
++/* Sys Scratch reg that holds sys_rst info */
++#define ASPEED_SYS_SCRATCH_1FC 	0x1e6e21
++
++#define HOSTNAME_BUFF_LEN       32
++#define CMD_BOOT_ARGS_BUFF_LEN  512
++#define HEX_BASE                16
++#define OCTATE_5_OFFSET         12
++#define OCTATE_6_OFFSET         15
++#define MAC_ADDR_ARRAY_SIZE     17
++
++#define ONYX_SLT        61 //0x3D
++#define ONYX_1          64 //0x40
++#define ONYX_2          65 //0x41
++#define ONYX_3          66 //0x42
++#define ONYX_FR4        82 //0x52
++
++#define SH5_1P_PWR      92  //0x5C
++#define SH5_1P_OEM      93  //0x5D
++#define SH5_1P_SLT      94  //0x5E
++#define SH5_SIDLEY      95  //0x5F
++#define SH5_PARRY_PEAK  96  //0x60
++#define SH5_2P_CABLED   108 //0x6C
++#define SH5_1P_OEM_P    109 //0x6D
+
+ /*
+  * Board-specific Platform code can reimplement show_boot_progress () if needed
+  */
+ __weak void show_boot_progress(int val) {}
+
++/*
++ * Read board_id env, Read ethaddr env
++ * set the hostname as Kernel cmd args
++ */
++void set_hostname()
++{
++    char *board_id;
++    char *ethaddr;
++    char hostname[HOSTNAME_BUFF_LEN];
++    char *cur_bootargs;
++    char new_bootargs[CMD_BOOT_ARGS_BUFF_LEN];
++    int octate_5, octate_6;
++
++    /*  Read Kernel cmd line args */
++    cur_bootargs =  env_get("bootargs");
++
++    /*  Check whether 'bootargs' alrady contains hostname parameter */
++    if  ( !(strstr(cur_bootargs, "systemd.hostname")) )
++    {
++        /* Read the board_id from   env */
++        board_id = env_get("board_id");
++        /* Read the eth0 MAC address from env */
++        ethaddr = env_get("ethaddr");
++
++        if ( board_id != NULL && ethaddr != NULL && strlen(ethaddr) >= MAC_ADDR_ARRAY_SIZE)
++        {
++            octate_5 = (int)simple_strtol(&ethaddr[OCTATE_5_OFFSET], NULL, HEX_BASE);
++            octate_6 = (int)simple_strtol(&ethaddr[OCTATE_6_OFFSET], NULL, HEX_BASE);
++
++            switch ((int)simple_strtol(board_id, NULL, HEX_BASE))
++            {
++                case ONYX_SLT:
++                case ONYX_1 ... ONYX_3:
++                case ONYX_FR4:
++                    sprintf(hostname, "onyx-%02x%02x", octate_5, octate_6);
++                    break;
++                case SH5_SIDLEY:
++                    sprintf(hostname, "sidley-%02x%02x", octate_5, octate_6);
++                    break;
++                case SH5_PARRY_PEAK:
++                    sprintf(hostname, "parrypeak-%02x%02x", octate_5, octate_6);
++                    break;
++                case SH5_1P_PWR ... SH5_1P_SLT:
++                case SH5_1P_OEM_P:
++                case SH5_2P_CABLED:
++                default:
++                    sprintf(hostname, "sh5d807-%02x%02x", octate_5, octate_6);
++                    break;
++            }
++            /* Append bootargs with hostname */
++            sprintf(new_bootargs, "%s systemd.hostname=%s", cur_bootargs, hostname);
++            env_set("bootargs", new_bootargs);
++            env_save();
++            printf("Hostname set to '%s'\n", hostname);
++        }
++        else
++            printf("Failed setting hostname, board_id or ethaddr is not set\n");
++    }
++    else
++        printf("Hostname is already set with bootargs\n");
++
++    return;
++}
++
++/*
++ * Read board ID from mother board eeprom and set as an env
++ */
++void set_board_id()
++{
++    char *s;
++    unsigned char board_id [BOARD_ID_LEN];
++    int ret, i=0;
++    char brdid[BOARD_ID_BUFF_LEN];
++
++    /* Check if the board_id env is set */
++    s = env_get("board_id");
++
++    /* Read board_id from eeprom */
++    i2c_set_bus_num(EEPROM_I2C_BUS);
++    ret = i2c_read(EEPROM_DEV_ADDR, EEPROM_BOARD_ID_OFFSET, EEPROM_ADDR_LEN, board_id, BOARD_ID_LEN);
++    if (ret < 0) {
++        printf("Error : Retrieving board_id from EEPROM Failed\n");
++    }
++    else {
++        sprintf(brdid, "%x", board_id[0]);
++        /* Convert char to upper case */
++        for ( i=0; i < BOARD_ID_BUFF_LEN; i++) {
++            brdid[i]= toupper(brdid[i]);
++        }
++
++        /* if the env is not set OR env id  and eeprom id are different, then set from eeprom id */
++        if ( (s == NULL) || (strcmp(s, brdid) !=0 ) ) {
++            env_set("board_id", brdid);
++            env_save();
++        }
++    }
++
++    printf("Board_id : %s\n", env_get("board_id"));
++    return;
++}
++
+ static void run_preboot_environment_command(void)
+ {
+ #ifdef CONFIG_PREBOOT
+@@ -41,6 +178,7 @@ static void run_preboot_environment_command(void)
+ void main_loop(void)
+ {
+ 	const char *s;
++	u32 por_rst = readl(ASPEED_SYS_SCRATCH_1FC);
+
+ 	bootstage_mark_name(BOOTSTAGE_ID_MAIN_LOOP, "main_loop");
+
+@@ -54,6 +192,17 @@ void main_loop(void)
+ 	if (IS_ENABLED(CONFIG_UPDATE_TFTP))
+ 		update_tftp(0UL, NULL, NULL);
+
++	/* set reset reason env */
++	printf("Scratch register value: 0x%08x\n", por_rst);
++	if (por_rst & (u32)0x1)
++		env_set("por_rst", "true");
++	else
++		env_set("por_rst", "false");
++	env_save();
++
++	/* Read board id from eerpom and set env */
++	set_board_id();
++	set_hostname();
+ 	s = bootdelay_process();
+ 	if (cli_process_fdt(&s))
+ 		cli_secure_boot_cmd(s);
+diff --git a/drivers/mtd/spi/spi-nor-core.c b/drivers/mtd/spi/spi-nor-core.c
+index a8f5b61582..e1fe91712e 100644
+--- a/drivers/mtd/spi/spi-nor-core.c
++++ b/drivers/mtd/spi/spi-nor-core.c
+@@ -595,6 +595,78 @@ erase_err:
+ 	return ret;
+ }
+
++static int micron_read_nvcr(struct spi_nor *nor)
++{
++	int ret;
++	int val;
++
++	ret = nor->read_reg(nor, SPINOR_OP_MICRON_RDNVCR, (u8 *)&val, 2);
++	if (ret < 0) {
++		dev_err(nor->dev, "[Micron] error %d reading NVCR\n", ret);
++		return ret;
++	}
++
++	return val;
++}
++
++static int micron_write_nvcr(struct spi_nor *nor, int val)
++{
++	int ret;
++
++	write_enable(nor);
++
++	nor->cmd_buf[0] = val & 0xff;
++	nor->cmd_buf[1] = (val >> 8) & 0xff;
++
++	ret = nor->write_reg(nor, SPINOR_OP_MICRON_WRNVCR, nor->cmd_buf, 2);
++	if (ret < 0) {
++		dev_err(nor->dev,
++			"[Micron] error while writing configuration register\n");
++		return -EINVAL;
++	}
++
++	ret = spi_nor_wait_till_ready(nor);
++	if (ret) {
++		dev_err(nor->dev,
++			"[Micron] timeout while writing configuration register\n");
++		return ret;
++	}
++
++	return 0;
++}
++
++static int micron_read_cr_quad_enable(struct spi_nor *nor)
++{
++	int ret;
++
++	/* Check current Quad Enable bit value. */
++	ret = micron_read_nvcr(nor);
++	if (ret < 0) {
++		dev_err(dev, "[Micron] error while reading nonvolatile configuration register\n");
++		return -EINVAL;
++	}
++
++	if ((ret & MICRON_RST_HOLD_CTRL) == 0)
++		return 0;
++
++	ret &= ~MICRON_RST_HOLD_CTRL;
++
++	/* Keep the current value of the Status Register. */
++	ret = micron_write_nvcr(nor, ret);
++	if (ret < 0) {
++		dev_err(dev, "[Micron] error while writing nonvolatile configuration register\n");
++		return -EINVAL;
++	}
++
++	ret = micron_read_nvcr(nor);
++	if (ret > 0 && (ret & MICRON_RST_HOLD_CTRL)) {
++		dev_err(nor->dev, "[Micron] Quad bit not set\n");
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
+ #ifdef CONFIG_SPI_FLASH_SPANSION
+ /*
+  * Erase for Spansion/Cypress Flash devices that has overlaid 4KB sectors at
+@@ -2165,6 +2237,10 @@ static int spi_nor_init_params(struct spi_nor *nor,
+ 			}
+ #endif
+ 		}
++
++		/* need to disable hold/reset pin feature */
++		if (JEDEC_MFR(info) == SNOR_MFR_ST)
++			params->quad_enable = micron_read_cr_quad_enable;
+ 	}
+
+ 	return 0;
+diff --git a/include/linux/mtd/spi-nor.h b/include/linux/mtd/spi-nor.h
+index 8abaac65b0..0aab424ad6 100644
+--- a/include/linux/mtd/spi-nor.h
++++ b/include/linux/mtd/spi-nor.h
+@@ -115,6 +115,8 @@
+ /* Used for Micron flashes only. */
+ #define SPINOR_OP_RD_EVCR      0x65    /* Read EVCR register */
+ #define SPINOR_OP_WD_EVCR      0x61    /* Write EVCR register */
++#define SPINOR_OP_MICRON_RDNVCR 0xB5   /* Read nonvolatile configuration register */
++#define SPINOR_OP_MICRON_WRNVCR 0xB1   /* Write nonvolatile configuration register */
+
+ /* Status Register bits. */
+ #define SR_WIP			BIT(0)	/* Write in progress */
+@@ -133,6 +135,7 @@
+
+ /* Enhanced Volatile Configuration Register bits */
+ #define EVCR_QUAD_EN_MICRON	BIT(7)	/* Micron Quad I/O */
++#define MICRON_RST_HOLD_CTRL BIT(4)
+
+ /* Flag Status Register bits */
+ #define FSR_READY		BIT(7)	/* Device status, 0 = Busy, 1 = Ready */
+diff --git a/net/eth-uclass.c b/net/eth-uclass.c
+index a7f8792710..98d09c628f 100644
+--- a/net/eth-uclass.c
++++ b/net/eth-uclass.c
+@@ -12,9 +12,12 @@
+ #include <dm/device-internal.h>
+ #include <dm/uclass-internal.h>
+ #include "eth_internal.h"
++#include <i2c.h>
+
+ DECLARE_GLOBAL_DATA_PTR;
+
++#define I2C_MAC_OFFSET 0x8
++
+ /**
+  * struct eth_device_priv - private structure for each Ethernet device
+  *
+@@ -465,6 +468,7 @@ static int eth_post_probe(struct udevice *dev)
+ 	struct eth_device_priv *priv = dev->uclass_priv;
+ 	struct eth_pdata *pdata = dev->platdata;
+ 	unsigned char env_enetaddr[ARP_HLEN];
++	int ret;
+
+ #if defined(CONFIG_NEEDS_MANUAL_RELOC)
+ 	struct eth_ops *ops = eth_get_ops(dev);
+@@ -498,7 +502,21 @@ static int eth_post_probe(struct udevice *dev)
+ 	if (eth_get_ops(dev)->read_rom_hwaddr)
+ 		eth_get_ops(dev)->read_rom_hwaddr(dev);
+
+-	eth_env_get_enetaddr_by_index("eth", dev->seq, env_enetaddr);
++	if (!eth_env_get_enetaddr_by_index("eth", dev->seq, env_enetaddr)) {
++		i2c_set_bus_num(CONFIG_SYS_I2C_EEPROM_BUS);
++		ret = i2c_read(CONFIG_SYS_I2C_EEPROM_ADDR, I2C_MAC_OFFSET, CONFIG_SYS_I2C_EEPROM_ADDR_LEN, env_enetaddr, ARP_HLEN);
++		if (ret < 0) {
++			printf("Error : Retrieving MAC from EEPROM Failed\n");
++		}
++		else {
++			if (is_valid_ethaddr(env_enetaddr)) {
++				eth_env_set_enetaddr_by_index("eth", dev->seq, env_enetaddr);
++				/* Once we have board ID env save working, we might not need to save here */
++				env_save();
++			}
++		}
++	}
++
+ 	if (!is_zero_ethaddr(env_enetaddr)) {
+ 		if (!is_zero_ethaddr(pdata->enetaddr) &&
+ 		    memcmp(pdata->enetaddr, env_enetaddr, ARP_HLEN)) {
+@@ -512,6 +530,7 @@ static int eth_post_probe(struct udevice *dev)
+
+ 		/* Override the ROM MAC address */
+ 		memcpy(pdata->enetaddr, env_enetaddr, ARP_HLEN);
++		printf("Using ENV MAC address: %pM\n", env_enetaddr);
+ 	} else if (is_valid_ethaddr(pdata->enetaddr)) {
+ 		eth_env_set_enetaddr_by_index("eth", dev->seq, pdata->enetaddr);
+ 		printf("\nWarning: %s using MAC address from ROM\n",
+diff --git a/tools/Makefile b/tools/Makefile
+index 81aa374a32..64e5c6230f 100644
+--- a/tools/Makefile
++++ b/tools/Makefile
+@@ -77,6 +77,9 @@ RSA_OBJS-$(CONFIG_FIT_SIGNATURE) := $(addprefix lib/rsa/, \
+
+ ROCKCHIP_OBS = lib/rc4.o rkcommon.o rkimage.o rksd.o rkspi.o
+
++ENV_OBJS = $(addprefix env/, fw_env.o ctype.o linux_string.o \
++				env_attr.o env_flags.o )
++
+ # common objs for dumpimage and mkimage
+ dumpimage-mkimage-objs := aisimage.o \
+ 			atmelimage.o \
+@@ -88,6 +91,7 @@ dumpimage-mkimage-objs := aisimage.o \
+ 			lib/fdtdec.o \
+ 			fit_common.o \
+ 			fit_image.o \
++			$(ENV_OBJS) \
+ 			common/image-fit.o \
+ 			image-host.o \
+ 			common/image.o \
+@@ -254,6 +258,7 @@ HOST_EXTRACFLAGS += -include $(srctree)/include/compiler.h \
+ 		$(patsubst -I%,-idirafter%, $(filter -I%, $(UBOOTINCLUDE))) \
+ 		-I$(srctree)/scripts/dtc/libfdt \
+ 		-I$(srctree)/tools \
++		-I$(srctree)/tools/env \
+ 		-DUSE_HOSTCC \
+ 		-D__KERNEL_STRICT_NAMES \
+ 		-D_GNU_SOURCE \
+--
+2.17.1
+
