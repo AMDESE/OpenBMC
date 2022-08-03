@@ -87,8 +87,8 @@ index 867ea19905..bc3404c3aa 100644
 
 -                if (enoent)
 -                        log_info("No hostname configured.");
-+    /* If the /etc/hostnam == 'sp5', then update it from bootargs */
-+    if ( (etc_hn == NULL) || (streq(etc_hn,"sp5")) ) {
++    /* If the /etc/hostnam == 'sh5', then update it from bootargs */
++    if ( (etc_hn == NULL) || (streq(etc_hn,"sh5")) ) {
 +        /* Set hostname from bootargs */
 +        hn = cmdl_hn;
 +        /* Update hostname to /etc/hostname file */
