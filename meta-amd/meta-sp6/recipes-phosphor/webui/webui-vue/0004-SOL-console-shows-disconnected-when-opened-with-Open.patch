@@ -1,0 +1,79 @@
+From 6f1666462267c7ce4e02443992ab9377134f9dc6 Mon Sep 17 00:00:00 2001
+From: Abinaya <abinaya.dhandapani@amd.com>
+Date: Wed, 6 Oct 2021 08:23:35 -0500
+Subject: [PATCH] SOL console shows disconnected when opened with "Open in new
+ tab"
+
+---
+ .../SerialOverLan/SerialOverLanConsole.vue    | 36 ++++++++++++++-----
+ 1 file changed, 28 insertions(+), 8 deletions(-)
+
+diff --git a/src/views/Operations/SerialOverLan/SerialOverLanConsole.vue b/src/views/Operations/SerialOverLan/SerialOverLanConsole.vue
+index 0bda43d..26f1d98 100644
+--- a/src/views/Operations/SerialOverLan/SerialOverLanConsole.vue
++++ b/src/views/Operations/SerialOverLan/SerialOverLanConsole.vue
+@@ -31,6 +31,10 @@ import { throttle } from 'lodash';
+ import IconLaunch from '@carbon/icons-vue/es/launch/20';
+ import StatusIcon from '@/components/Global/StatusIcon';
+
++const Connecting = 0;
++const Connected = 1;
++const Disconnected = 2;
++
+ export default {
+   name: 'SerialOverLanConsole',
+   components: {
+@@ -46,19 +50,23 @@ export default {
+   data() {
+     return {
+       resizeConsoleWindow: null,
++      status: Connecting,
+     };
+   },
+   computed: {
+-    serverStatus() {
+-      return this.$store.getters['global/serverStatus'];
+-    },
+     serverStatusIcon() {
+-      return this.serverStatus === 'on' ? 'success' : 'danger';
++      if (this.status === Connected) {
++        return 'success';
++      } else {
++        return 'danger';
++      }
+     },
+     connectionStatus() {
+-      return this.serverStatus === 'on'
+-        ? this.$t('pageSerialOverLan.connected')
+-        : this.$t('pageSerialOverLan.disconnected');
++      if (this.status === Connected) {
++        return this.$t('pageSerialOverLan.connected');
++      } else {
++        return this.$t('pageSerialOverLan.disconnected');
++      }
+     },
+   },
+   created() {
+@@ -71,9 +79,21 @@ export default {
+     window.removeEventListener('resize', this.resizeConsoleWindow);
+   },
+   methods: {
++    setServerState() {
++      const that = this;
++      fetch('/redfish/v1/Systems/system')
++        .then((response) => response.json())
++        .then((data) => {
++          if (data.PowerState === 'On') {
++            that.status = Connected;
++          } else {
++            that.status = Disconnected;
++          }
++        });
++    },
+     openTerminal() {
+       const token = this.$store.getters['authentication/token'];
+-
++      this.setServerState();
+       const ws = new WebSocket(`wss://${window.location.host}/console0`, [
+         token,
+       ]);

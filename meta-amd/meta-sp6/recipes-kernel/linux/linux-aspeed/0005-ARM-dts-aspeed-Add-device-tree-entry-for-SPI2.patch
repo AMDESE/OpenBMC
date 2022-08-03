@@ -1,0 +1,72 @@
+From 873598547680de43fb89e3884d31b6b7cdbd989f Mon Sep 17 00:00:00 2001
+From: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
+Date: Mon, 12 Jul 2021 20:52:23 -0500
+Subject: [PATCH 1/1] ARM:dts:aspeed: Add device tree entry for SPI2
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+Adds device tree entry for SPI2, which will enable local SPI rom update
+from BMC for BIOS images.
+
+Signed-off-by: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts  | 15 +++++++++++++++
+ arch/arm/boot/dts/aspeed-g6-pinctrl.dtsi   |  2 +-
+ drivers/pinctrl/aspeed/pinctrl-aspeed-g6.c |  2 +-
+ 3 files changed, 17 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+index d9a7490b8407..22d6586b99b7 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+@@ -76,6 +76,21 @@
+
+ };
+
++&spi2 {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_spi2_default &pinctrl_qspi2_default>;
++	fmc-spi-user-mode;
++	compatible = "aspeed,ast2600-spi";
++
++	flash@0 {
++		compatible = "jedec,spi-nor";
++		label = "pnor";
++		status = "okay";
++	};
++
++};
++
+ &uart1 {
+ 	//Host console
+ 	status = "okay";
+diff --git a/arch/arm/boot/dts/aspeed-g6-pinctrl.dtsi b/arch/arm/boot/dts/aspeed-g6-pinctrl.dtsi
+index 8cf8d5314d22..b0bc0d607928 100644
+--- a/arch/arm/boot/dts/aspeed-g6-pinctrl.dtsi
++++ b/arch/arm/boot/dts/aspeed-g6-pinctrl.dtsi
+@@ -658,7 +658,7 @@
+ 	};
+
+ 	pinctrl_qspi2_default: qspi2_default {
+-		function = "QSPI2";
++		function = "SPI2";
+ 		groups = "QSPI2";
+ 	};
+
+diff --git a/drivers/pinctrl/aspeed/pinctrl-aspeed-g6.c b/drivers/pinctrl/aspeed/pinctrl-aspeed-g6.c
+index 31528184a5d0..6077e3be2375 100644
+--- a/drivers/pinctrl/aspeed/pinctrl-aspeed-g6.c
++++ b/drivers/pinctrl/aspeed/pinctrl-aspeed-g6.c
+@@ -1189,7 +1189,7 @@ SIG_EXPR_LIST_DECL_SEMG(AB10, RXD12, UART12G1, UART12,
+ 			SIG_DESC_SET(SCU4D4, 31));
+ PIN_DECL_2(AB10, GPIOX7, SPI2DQ3, RXD12);
+
+-GROUP_DECL(QSPI2, AE8, AF8, AB9, AD9, AF9, AB10);
++GROUP_DECL(QSPI2, AF9, AB10);
+ FUNC_DECL_2(SPI2, SPI2, QSPI2);
+
+ GROUP_DECL(UART12G1, AF9, AB10);
+--
+2.17.1
+

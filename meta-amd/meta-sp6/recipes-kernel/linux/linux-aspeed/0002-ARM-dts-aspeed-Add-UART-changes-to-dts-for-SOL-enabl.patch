@@ -1,0 +1,32 @@
+From 96a04d6db613bf250724b2ca0881e43dc783b420 Mon Sep 17 00:00:00 2001
+From: Sreedhar Govardhana <srgovard@amd.com>
+Date: Thu, 1 Jul 2021 16:19:42 -0500
+Subject: [PATCH] ARM:dts:aspeed: Add UART changes to dts for SOL enablement
+
+Onyx SoC UART1 is connected to BMC UART1 to provide SOL. This patch
+adds UART1 to the dts.
+
+Signed-off-by: Sreedhar Govardhana <srgovard@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+index 38c53c49232b..fd3c8aa27c00 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+@@ -76,6 +76,11 @@ flash@0 {
+
+ };
+
++&uart1 {
++	//Host console
++	status = "okay";
++};
++
+ //BMC Console
+ &uart5 {
+ 	status = "okay";
+--
+2.25.1
+

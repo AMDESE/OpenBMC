@@ -1,0 +1,68 @@
+From f45eb86738a242264ccde2ec9e1fdbf2dfb27c8d Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Fri, 17 Sep 2021 04:35:15 -0500
+Subject: [PATCH] ARM dts aspeed enable kcs interface for SP5 platforms
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts     | 5 +++++
+ arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts   | 5 +++++
+ arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts     | 5 +++++
+ arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts | 5 +++++
+ 4 files changed, 20 insertions(+)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+index 5e32d9326521..d9c8e00deaba 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+@@ -702,3 +702,8 @@
+ 	dma-mode;
+ 	status = "okay";
+ };
++
++&kcs3 {
++	status = "okay";
++	aspeed,lpc-io-reg = <0xCA2>;
++};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+index d872a9601eba..a450d969a0a3 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+@@ -822,3 +822,8 @@
+ 	dma-mode;
+ 	status = "okay";
+ };
++
++&kcs3 {
++	status = "okay";
++	aspeed,lpc-io-reg = <0xCA2>;
++};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+index 291fd3c470fa..85e296c38f9a 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+@@ -430,3 +430,8 @@
+ 	dma-mode;
+ 	status = "okay";
+ };
++
++&kcs3 {
++	status = "okay";
++	aspeed,lpc-io-reg = <0xCA2>;
++};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts b/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
+index 3e74314a02bd..3daeae16da35 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
+@@ -411,3 +411,8 @@
+ 	dma-mode;
+ 	status = "okay";
+ };
++
++&kcs3 {
++	status = "okay";
++	aspeed,lpc-io-reg = <0xCA2>;
++};
+--
+2.17.1
+

@@ -1,0 +1,97 @@
+From b76aad09b47f4eebdf2a3fcde13fda7f4491a2fc Mon Sep 17 00:00:00 2001
+From: Sreedhar Govardhana <srgovard@amd.com>
+Date: Mon, 16 Aug 2021 01:03:38 -0500
+Subject: [PATCH] ARM:dts:aspeed: Adding DIMM SPD slaves to the device tree
+
+This patch will add each DIMMs SPDhub slave to the device tree. Note
+that these slaves added as I2C devices.
+
+Signed-off-by: Sreedhar Govardhana <srgovard@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts | 65 +++++++++++++++++++++++
+ 1 file changed, 65 insertions(+)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+index 97902e8577b8..3f314da914cc 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+@@ -346,11 +346,76 @@ adc121c@55 {
+ &i3c0 {
+ 	// P0 DIMM (A-F) SPD Access
+ 	status = "okay";
++
++	jdec-spd;
++
++	//DIMM A
++	spd5118_0_0: spd@50 {
++		compatible = "idt,spd";
++		reg = <0x50 0x0 0x00000000>;
++	};
++	//DIMM B
++	spd5118_0_1: spd@51 {
++		compatible = "idt,spd";
++		reg = <0x51 0x0 0x00000000>;
++	};
++	//DIMM C
++	spd5118_0_2: spd@52 {
++		compatible = "idt,spd";
++		reg = <0x52 0x0 0x00000000>;
++	};
++	//DIMM D
++	spd5118_0_3: spd@53 {
++		compatible = "idt,spd";
++		reg = <0x53 0x0 0x00000000>;
++	};
++	//DIMM E
++	spd5118_0_4: spd@54 {
++		compatible = "idt,spd";
++		reg = <0x54 0x0 0x00000000>;
++	};
++	//DIMM F
++	spd5118_0_5: spd@55 {
++		compatible = "idt,spd";
++		reg = <0x55 0x0 0x00000000>;
++	};
+ };
+
+ &i3c1 {
+ 	// P0 DIMM (G-L) SPD Access
+ 	status = "okay";
++
++	jdec_spd;
++	//DIMM G
++	spd5118_1_0: spd@50 {
++		compatible = "idt,spd";
++		reg = <0x50 0x0 0x00000000>;
++	};
++	//DIMM H
++	spd5118_1_1: spd@51 {
++		compatible = "idt,spd";
++		reg = <0x51 0x0 0x00000000>;
++	};
++	//DIMM I
++	spd5118_1_2: spd@52 {
++		compatible = "idt,spd";
++		reg = <0x52 0x0 0x00000000>;
++	};
++	//DIMM J
++	spd5118_1_3: spd@53 {
++		compatible = "idt,spd";
++		reg = <0x53 0x0 0x00000000>;
++	};
++	//DIMM K
++	spd5118_1_4: spd@54 {
++		compatible = "idt,spd";
++		reg = <0x54 0x0 0x00000000>;
++	};
++	//DIMM L
++	spd5118_1_5: spd@55 {
++		compatible = "idt,spd";
++		reg = <0x55 0x0 0x00000000>;
++	};
+ };
+
+ &i3c4 {
+--
+2.25.1
+

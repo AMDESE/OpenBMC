@@ -1,0 +1,127 @@
+From e73f07960b2ee4b69f96e784577f3119ad5de33d Mon Sep 17 00:00:00 2001
+From: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
+Date: Wed, 25 Aug 2021 20:59:31 -0500
+Subject: [PATCH 1/1] ARM:dts:aspeed: Add led definitions for fault and
+ identify
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+Adds led definitions for fault and identify in Onyx, Quartz and Ruby
+device tree.
+Also, rectifies the total number of GPIOs in GPIO0 bank.
+
+Signed-off-by: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts   | 17 +++++++++++++----
+ arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts | 17 +++++++++++++----
+ arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts   | 17 +++++++++++++----
+ 3 files changed, 39 insertions(+), 12 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+index 690e0b86ca89..0b47dfa83a7b 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+@@ -21,6 +21,18 @@
+ 		bootargs = "console=ttyS4,115200 earlycon vmalloc=512MB";
+ 	};
+
++	leds {
++		compatible = "gpio-leds";
++
++		fault {
++			gpios = <&gpio0 ASPEED_GPIO(O, 6) GPIO_ACTIVE_HIGH>;
++		};
++
++		identify {
++			gpios = <&gpio0 ASPEED_GPIO(O, 7) GPIO_ACTIVE_HIGH>;
++		};
++	};
++
+ 	memory@80000000 {
+ 		device_type = "memory";
+ 		reg = <0x80000000 0x80000000>;
+@@ -477,10 +489,7 @@
+ 	/*W0-W7*/	"","","","","","","","",
+ 	/*X0-X7*/	"","","","","","","","",
+ 	/*Y0-Y7*/	"","","","","","","","",
+-	/*Z0-Z7*/	"","","","","","","","",
+-	/*AA0-AA7*/	"","","","","","","","",
+-	/*AB0-AB7*/	"","","","","","","","",
+-	/*AC0-AC7*/	"","","","","","","","";
++	/*Z0-Z7*/	"","","","","","","","";
+ };
+
+ &jtag1 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+index b1ee0ce2d794..e31e0ee9404c 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+@@ -20,6 +20,18 @@
+ 		bootargs = "console=ttyS4,115200 earlycon vmalloc=512MB";
+ 	};
+
++	leds {
++		compatible = "gpio-leds";
++
++		fault {
++			gpios = <&gpio0 ASPEED_GPIO(O, 6) GPIO_ACTIVE_HIGH>;
++		};
++
++		identify {
++			gpios = <&gpio0 ASPEED_GPIO(O, 7) GPIO_ACTIVE_HIGH>;
++		};
++	};
++
+ 	memory@80000000 {
+ 		device_type = "memory";
+ 		reg = <0x80000000 0x80000000>;
+@@ -513,10 +525,7 @@
+ 	/*W0-W7*/	"","","","","","","","",
+ 	/*X0-X7*/	"","","","","","","","",
+ 	/*Y0-Y7*/	"","","","","","","","",
+-	/*Z0-Z7*/	"","","","","","","","",
+-	/*AA0-AA7*/	"","","","","","","","",
+-	/*AB0-AB7*/	"","","","","","","","",
+-	/*AC0-AC7*/	"","","","","","","","";
++	/*Z0-Z7*/	"","","","","","","","";
+ };
+
+ &jtag1 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+index e656bf2a066f..f38c241fe97f 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+@@ -20,6 +20,18 @@
+ 		bootargs = "console=ttyS4,115200 earlycon vmalloc=512MB";
+ 	};
+
++	leds {
++		compatible = "gpio-leds";
++
++		fault {
++			gpios = <&gpio0 ASPEED_GPIO(O, 6) GPIO_ACTIVE_HIGH>;
++		};
++
++		identify {
++			gpios = <&gpio0 ASPEED_GPIO(O, 7) GPIO_ACTIVE_HIGH>;
++		};
++	};
++
+ 	memory@80000000 {
+ 		device_type = "memory";
+ 		reg = <0x80000000 0x80000000>;
+@@ -358,10 +370,7 @@
+ 	/*W0-W7*/	"","","","","","","","",
+ 	/*X0-X7*/	"","","","","","","","",
+ 	/*Y0-Y7*/	"","","","","","","","",
+-	/*Z0-Z7*/	"","","","","","","","",
+-	/*AA0-AA7*/	"","","","","","","","",
+-	/*AB0-AB7*/	"","","","","","","","",
+-	/*AC0-AC7*/	"","","","","","","","";
++	/*Z0-Z7*/	"","","","","","","","";
+ };
+
+ &jtag1 {
+--
+2.17.1
+

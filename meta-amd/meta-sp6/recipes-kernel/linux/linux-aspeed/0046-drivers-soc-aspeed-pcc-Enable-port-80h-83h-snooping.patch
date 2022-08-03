@@ -1,0 +1,32 @@
+From 74e06b4943da6e4df2a261286af3c8a8b0eb9089 Mon Sep 17 00:00:00 2001
+From: Chia-Wei Wang <chiawei_wang@aspeedtech.com>
+Date: Wed, 13 Oct 2021 10:38:59 +0800
+Subject: [PATCH] soc/aspeed: pcc: Enable port 80h~83h snooping
+
+For AMD port 80h~83h snooping use.
+
+Signed-off-by: Chia-Wei Wang <chiawei_wang@aspeedtech.com>
+Change-Id: Ib58cfaa13a9d9a16ade2f28f50819253f7a399dc
+---
+ drivers/soc/aspeed/aspeed-lpc-pcc.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/drivers/soc/aspeed/aspeed-lpc-pcc.c b/drivers/soc/aspeed/aspeed-lpc-pcc.c
+index 86a5f631a0b4..dff92f80579e 100644
+--- a/drivers/soc/aspeed/aspeed-lpc-pcc.c
++++ b/drivers/soc/aspeed/aspeed-lpc-pcc.c
+@@ -424,6 +424,11 @@ static int aspeed_pcc_enable(struct aspeed_pcc *pcc, struct device *dev)
+ 			PCCR0_EN_RX_OVR_INT | PCCR0_EN_RX_TMOUT_INT | PCCR0_EN_RX_AVAIL_INT);
+ 	}
+
++	/* For AMD: let eSPI respond ACCEPT to port 80h ~ 83h write from the Host */
++	regmap_update_bits(pcc->regmap, 0x84, BIT(19), BIT(19));
++	regmap_update_bits(pcc->regmap, 0x100, BIT(15) | BIT(14), BIT(15) | BIT(14));
++	regmap_write(pcc->regmap, 0x90, 0x00820080);
++
+ 	regmap_update_bits(pcc->regmap, PCCR0, PCCR0_EN, PCCR0_EN);
+ 	return 0;
+
+--
+2.17.1
+

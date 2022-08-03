@@ -1,0 +1,68 @@
+From 2ac6ed84990364a30e813b5319b951b398f7bfb8 Mon Sep 17 00:00:00 2001
+From: Mohsen Dolaty <mohsen.dolaty@amd.com>
+Date: Fri, 3 Jun 2022 18:18:01 -0500
+Subject: [PATCH 1/1] linux-aspeed: change error to info message
+
+Change I3C initialization messages from error to info
+
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
+---
+ drivers/i3c/master.c               | 6 +++---
+ drivers/i3c/master/dw-i3c-master.c | 4 ++--
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/i3c/master.c b/drivers/i3c/master.c
+index 6b88bf5167de..4e7aacc3c7d3 100644
+--- a/drivers/i3c/master.c
++++ b/drivers/i3c/master.c
+@@ -1524,7 +1524,7 @@ static int i3c_master_pre_assign_dyn_addr(struct i3c_dev_desc *dev)
+ 		if(master->set_dasa) {
+ 			if(dev->info.static_addr !=  I3C_MUX_SA) { // Do Not issue SET DASA for I3C Mux
+ 				i3c_master_setdasa_locked(master, dev->info.static_addr, dev->boardinfo->init_dyn_addr);
+-				pr_err( "i3c_master_pre_assign_dyn_addr: Reattach Bus %x SA %x to DA %x\n",
++				pr_info( "i3c_master_pre_assign_dyn_addr: Reattach Bus %x SA %x to DA %x\n",
+ 				master->bus.id, dev->info.static_addr, dev->boardinfo->init_dyn_addr );
+ 			}
+ 		}
+@@ -1772,7 +1772,7 @@ static int i3c_master_bus_init(struct i3c_master_controller *master)
+ 	 * First attach all devices with static definitions provided by the
+ 	 * FW.
+ 	 */
+-	pr_err( "i3c_master_bus_init: Start " "bus %d\n",master->bus.id );
++	pr_info( "i3c_master_bus_init: Start " "bus %d\n",master->bus.id );
+ 	list_for_each_entry(i2cboardinfo, &master->boardinfo.i2c, node) {
+ 		status = i3c_bus_get_addr_slot_status(&master->bus,
+ 						      i2cboardinfo->base.addr);
+@@ -1891,7 +1891,7 @@ static int i3c_master_bus_init(struct i3c_master_controller *master)
+ 	 * know it is a pure I2C bus.
+ 	*/
+     if ((master->jdec_spd) && (n_i3cdev == 0)) {
+-        pr_err( "i3c_master_bus_init: " " bus %d, return n_i3cdev %d\n",master->bus.id, n_i3cdev);
++        pr_debug( "i3c_master_bus_init: " " bus %d, return n_i3cdev %d\n",master->bus.id, n_i3cdev);
+ 		return 0;
+ 	}
+
+diff --git a/drivers/i3c/master/dw-i3c-master.c b/drivers/i3c/master/dw-i3c-master.c
+index 77ce783d2fd4..50f1d932f09f 100644
+--- a/drivers/i3c/master/dw-i3c-master.c
++++ b/drivers/i3c/master/dw-i3c-master.c
+@@ -1007,7 +1007,7 @@ static int dw_i3c_master_send_ccc_cmd(struct i3c_master_controller *m,
+ 		ret = dw_i3c_ccc_get(master, ccc);
+ 	else
+ 		ret = dw_i3c_ccc_set(master, ccc);
+-	pr_err( "dw_i3c_master_send_ccc_cmd: " "bus %d, cmd 0x%x r/w %d ret %d\n",m->bus.id, ccc->id , ccc->rnw, ret);
++	pr_info( "dw_i3c_master_send_ccc_cmd: " "bus %d, cmd 0x%x r/w %d ret %d\n",m->bus.id, ccc->id , ccc->rnw, ret);
+ 	if ((ccc->id == I3C_CCC_SETAASA) || (ccc->id == I3C_CCC_SETHID)) {
+ 		writel(i3c_pp_timing, master->regs + SCL_I3C_PP_TIMING);
+ 	}
+@@ -1630,7 +1630,7 @@ static int dw_i3c_probe(struct platform_device *pdev)
+ 			 dev_name(&pdev->dev), master->base.bus.id, ret );
+ 		goto err_assert_rst;
+ 	}
+-	pr_err( "dw_i3c_probe: Done " "Register dev %s, bus %d\n",
++	pr_info( "dw_i3c_probe: Done " "Register dev %s, bus %d\n",
+                 dev_name(&pdev->dev), master->base.bus.id );
+ 	// set HW Retry to 3 times for NAK
+ 	for(i=0; i<NUM_OF_I3C_DEVICES; i++) {
+--
+2.25.1

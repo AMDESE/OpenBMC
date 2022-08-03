@@ -1,0 +1,26 @@
+From 72a3e42dd62b4319ef8285d0e1c26501988d09ae Mon Sep 17 00:00:00 2001
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Fri, 29 Oct 2021 18:00:16 -0500
+Subject: [PATCH 1/1] u-boot: Modify default dts selection to quartz
+
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ common/image-fit.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/common/image-fit.c b/common/image-fit.c
+index 08dcce0760..61746e841c 100644
+--- a/common/image-fit.c
++++ b/common/image-fit.c
+@@ -1872,7 +1872,7 @@ int fit_image_load(bootm_headers_t *images, ulong addr,
+ 				case 0x4E:
+ 					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-titanite.dtb"); break;
+ 				default :
+-					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-onyx.dtb"); break;
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-quartz.dtb"); break;
+ 			} // switch
+
+ 			cfg_noffset = fit_conf_get_node(fit,
+--
+2.17.1
+

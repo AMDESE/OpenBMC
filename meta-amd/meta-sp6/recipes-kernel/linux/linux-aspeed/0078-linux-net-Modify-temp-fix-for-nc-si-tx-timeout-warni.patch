@@ -1,0 +1,40 @@
+From 8817b10d76a96ba1700e0d385d9e18d6a25769ae Mon Sep 17 00:00:00 2001
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Thu, 17 Feb 2022 14:40:34 -0600
+Subject: [PATCH 1/1] linux/net : Modify temp fix for nc-si tx timeout warning
+ msg suppress
+
+Termporary fix for suppessing the nc-si packet transmit timeout warrning
+oops msg.
+Mostly it looks Braodcom LOM compatibility issue, once we get solution
+this fix will be removed.
+
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ net/sched/sch_generic.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
+index 49eae93d1489..ef87fb966175 100644
+--- a/net/sched/sch_generic.c
++++ b/net/sched/sch_generic.c
+@@ -438,10 +438,12 @@ static void dev_watchdog(struct timer_list *t)
+ 			}
+
+ 			if (some_queue_timedout) {
+-				trace_net_dev_xmit_timeout(dev, i);
+-				WARN_ONCE(1, KERN_INFO "NETDEV WATCHDOG: %s (%s): transmit queue %u timed out\n",
+-				       dev->name, netdev_drivername(dev), i);
+-				dev->netdev_ops->ndo_tx_timeout(dev, i);
++				if (strcmp(dev->name, "eth1")!=0) {
++					trace_net_dev_xmit_timeout(dev, i);
++					WARN_ONCE(1, KERN_INFO "NETDEV WATCHDOG: %s (%s): transmit queue %u timed out\n",
++						   dev->name, netdev_drivername(dev), i);
++					dev->netdev_ops->ndo_tx_timeout(dev, i);
++				}
+ 			}
+ 			if (!mod_timer(&dev->watchdog_timer,
+ 				       round_jiffies(jiffies +
+--
+2.17.1
+

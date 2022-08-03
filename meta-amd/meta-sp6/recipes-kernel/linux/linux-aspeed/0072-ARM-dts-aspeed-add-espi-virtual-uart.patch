@@ -1,0 +1,68 @@
+From 4cac362bc9f93a04777547b151e20b9499c32154 Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Fri, 21 Jan 2022 02:42:56 -0600
+Subject: [PATCH] ARM:dts:aspeed: add espi virtual uart
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts     | 5 +++++
+ arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts   | 5 +++++
+ arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts     | 5 +++++
+ arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts | 5 +++++
+ 4 files changed, 20 insertions(+)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+index f300522ba7ff..23b98d9bf122 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+@@ -710,3 +710,8 @@
+ 	status = "okay";
+ 	aspeed,lpc-io-reg = <0xCA2>;
+ };
++
++// eSPI Virtual UART - 0x3F8
++&vuart1 {
++	status = "okay";
++};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+index 50e0f1c493ef..2efdd0057a44 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+@@ -864,3 +864,8 @@
+ 	status = "okay";
+ 	aspeed,lpc-io-reg = <0xCA2>;
+ };
++
++// eSPI Virtual UART - 0x3F8
++&vuart1 {
++	status = "okay";
++};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+index 15134d5d4209..b04f0ae663f6 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+@@ -490,3 +490,8 @@
+ 	status = "okay";
+ 	aspeed,lpc-io-reg = <0xCA2>;
+ };
++
++// eSPI Virtual UART - 0x3F8
++&vuart1 {
++	status = "okay";
++};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts b/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
+index 8a6cb5286e1a..6b8b817128d0 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
+@@ -451,3 +451,8 @@
+ 	status = "okay";
+ 	aspeed,lpc-io-reg = <0xCA2>;
+ };
++
++// eSPI Virtual UART - 0x3F8
++&vuart1 {
++	status = "okay";
++};
+--
+2.17.1
+

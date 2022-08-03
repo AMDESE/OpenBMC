@@ -1,0 +1,80 @@
+From f7b8a5406c02ba26a1a29412cda6780abc1800d4 Mon Sep 17 00:00:00 2001
+From: Sreedhar Govardhana <srgovard@amd.com>
+Date: Tue, 20 Jul 2021 18:01:36 -0500
+Subject: [PATCH] ARM:dts:aspeed: Adding device tree entries for Voltage
+ Regulators
+
+This patch will add device tree entries for SoC voltage regulators hanging
+off a mux.
+
+Signed-off-by: Sreedhar Govardhana <srgovard@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts | 50 ++++++++++++++++++++---
+ 1 file changed, 44 insertions(+), 6 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+index fda4630f41ca..3d4c655c3cdd 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+@@ -130,14 +130,52 @@ &i2c4 {
+ 	status = "okay";
+ };
+
+-&i2c5 {
+-	// Net name i2c2
++// BMC Onyx VRs
++&i2c5 {
++	// Net name i2c2 (SCM_I2C2)
+ 	status = "okay";
+
+-	tca9546a@70 {
+-	compatible = "nxp,pca9546";
+-	reg = <0x70>;
+-	//<TBD> P0 VRM controllers
++	i2cswitch@71 {
++		compatible = "nxp,pca9546";
++		reg = <0x71>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		i2c@0 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0>;
++			core0socvrm@40 {
++				//VDD core0/soc VRM
++				compatible = "infineon,xdpe12284";
++				reg = <0x40>;
++			};
++			iovrm@41 {
++				//VDD io VRM
++				compatible = "infineon,xdpe12284";
++				reg = <0x41>;
++			};
++			core1vrm@42 {
++				//VDD core1 VRM
++				compatible = "infineon,xdpe12284";
++				reg = <0x42>;
++			};
++			vdd11susvrm@70 {
++				//VDD core1 VRM
++				compatible = "infineon,xdpe12284";
++				reg = <0x70>;
++			};
++			vdd33dualvrm@16 {
++				//VDD 33 DUAL VRM
++				compatible = "infineon,xdpe12284";
++				reg = <0x16>;
++			};
++			vdd18dualvrm@17 {
++				//VDD 18 DUAL VRM
++				compatible = "infineon,xdpe12284";
++				reg = <0x17>;
++			};
++		};
+ 	};
+ };
+
+--
+2.25.1
+

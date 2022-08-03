@@ -1,0 +1,187 @@
+From 8f44de1283935110479fc14085a43f8a013cb43b Mon Sep 17 00:00:00 2001
+From: Abinaya <abinaya.dhandapani@amd.com>
+Date: Tue, 18 Jan 2022 04:43:15 -0600
+Subject: [PATCH] Webui Changes to integrate VR update from GUI
+
+---
+ src/locales/en-US.json                        |  1 +
+ src/store/modules/Operations/FirmwareStore.js | 12 ++++++
+ src/views/Operations/Firmware/Firmware.vue    |  5 +++
+ .../Operations/Firmware/FirmwareCardsHPM.vue  |  2 +-
+ .../Operations/Firmware/FirmwareCardsVR.vue   | 40 +++++++++++++++++++
+ 5 files changed, 59 insertions(+), 1 deletion(-)
+ create mode 100644 src/views/Operations/Firmware/FirmwareCardsVR.vue
+
+diff --git a/src/locales/en-US.json b/src/locales/en-US.json
+index adf6b78..a5ec2d0 100644
+--- a/src/locales/en-US.json
++++ b/src/locales/en-US.json
+@@ -325,6 +325,7 @@
+     "sectionTitleHostCards": "Host",
+     "sectionTitleSCMCards": "SCM FPGA",
+     "sectionTitleHPMCards": "HPM FPGA",
++    "sectionTitleVRCards" : "VR",
+     "sectionTitleUpdateFirmware": "Update firmware",
+     "alert": {
+       "operationInProgress": "Server power operation in progress.",
+diff --git a/src/store/modules/Operations/FirmwareStore.js b/src/store/modules/Operations/FirmwareStore.js
+index 7b8f06c..f8dc0c5 100644
+--- a/src/store/modules/Operations/FirmwareStore.js
++++ b/src/store/modules/Operations/FirmwareStore.js
+@@ -8,10 +8,12 @@ const FirmwareStore = {
+     hostFirmware: [],
+     scmFirmware: [],
+     hpmFirmware: [],
++    vrFirmware: [],
+     bmcActiveFirmwareId: null,
+     hostActiveFirmwareId: null,
+     scmActiveFirmwareId: null,
+     hpmActiveFirmwareId: null,
++    vrActiveFirmwareId: null,
+     applyTime: null,
+     tftpAvailable: false,
+     taskId: null,
+@@ -38,6 +40,9 @@ const FirmwareStore = {
+     activeHpmFirmware: (state) => {
+       return state.hpmFirmware.find((firmware) => firmware.id !== null);
+     },
++    activeVrFirmware: (state) => {
++      return state.vrFirmware.find((firmware) => firmware.id !== null);
++    },
+     backupBmcFirmware: (state) => {
+       return state.bmcFirmware.find(
+         (firmware) => firmware.id !== state.bmcActiveFirmwareId
+@@ -54,10 +59,12 @@ const FirmwareStore = {
+     setActiveHostFirmwareId: (state, id) => (state.hostActiveFirmwareId = id),
+     setActiveScmFimwareId: (state, id) => (state.scmActiveFirmwareID = id),
+     setActiveHpmFimwareId: (state, id) => (state.hpmActiveFirmwareID = id),
++    setActiveVrFimwareId: (state, id) => (state.vrActiveFirmwareID = id),
+     setBmcFirmware: (state, firmware) => (state.bmcFirmware = firmware),
+     setHostFirmware: (state, firmware) => (state.hostFirmware = firmware),
+     setScmFirmware: (state, firmware) => (state.scmFirmware = firmware),
+     setHpmFirmware: (state, firmware) => (state.hpmFirmware = firmware),
++    setVrFirmware: (state, firmware) => (state.vrFirmware = firmware),
+     setApplyTime: (state, applyTime) => (state.applyTime = applyTime),
+     setTftpUploadAvailable: (state, tftpAvailable) =>
+       (state.tftpAvailable = tftpAvailable),
+@@ -70,6 +77,7 @@ const FirmwareStore = {
+       dispatch('getActiveBmcFirmware');
+       dispatch('getActiveScmFirmware');
+       dispatch('getActiveHpmFirmware');
++      dispatch('getActiveVrFirmware');
+       return await dispatch('getFirmwareInventory');
+     },
+     getActiveBmcFirmware({ commit }) {
+@@ -104,6 +112,7 @@ const FirmwareStore = {
+           const hostFirmware = [];
+           const scmFirmware = [];
+           const hpmFirmware = [];
++          const vrFirmware = [];
+           response.forEach(({ data }) => {
+             const firmwareType = data?.RelatedItem?.[0]?.['@odata.id']
+               .split('/')
+@@ -124,12 +133,15 @@ const FirmwareStore = {
+               hpmFirmware.push(item);
+             } else if (descType === 'SCM_FPGA image') {
+               scmFirmware.push(item);
++            } else if (descType === 'VR image') {
++              vrFirmware.push(item);
+             }
+           });
+           commit('setBmcFirmware', bmcFirmware);
+           commit('setHostFirmware', hostFirmware);
+           commit('setScmFirmware', scmFirmware);
+           commit('setHpmFirmware', hpmFirmware);
++          commit('setVrFirmware', vrFirmware);
+         })
+         .catch((error) => {
+           console.log(error);
+diff --git a/src/views/Operations/Firmware/Firmware.vue b/src/views/Operations/Firmware/Firmware.vue
+index 584ad8e..87df6ab 100644
+--- a/src/views/Operations/Firmware/Firmware.vue
++++ b/src/views/Operations/Firmware/Firmware.vue
+@@ -20,6 +20,9 @@
+
+         <!-- HPM Firmware -->
+         <hpm-cards v-if="!isSingleFileUploadEnabled" />
++
++        <!-- VR Firmware -->
++        <vr-cards v-if="!isSingleFileUploadEnabled" />
+       </b-col>
+     </b-row>
+
+@@ -47,6 +50,7 @@ import FormUpdate from './FirmwareFormUpdate';
+ import HostCards from './FirmwareCardsHost';
+ import ScmCards from './FirmwareCardsSCM';
+ import HpmCards from './FirmwareCardsHPM';
++import VrCards from './FirmwareCardsVR';
+ import PageSection from '@/components/Global/PageSection';
+ import PageTitle from '@/components/Global/PageTitle';
+
+@@ -61,6 +65,7 @@ export default {
+     HostCards,
+     ScmCards,
+     HpmCards,
++    VrCards,
+     PageSection,
+     PageTitle,
+   },
+diff --git a/src/views/Operations/Firmware/FirmwareCardsHPM.vue b/src/views/Operations/Firmware/FirmwareCardsHPM.vue
+index 841f8c6..9cddd13 100644
+--- a/src/views/Operations/Firmware/FirmwareCardsHPM.vue
++++ b/src/views/Operations/Firmware/FirmwareCardsHPM.vue
+@@ -27,7 +27,7 @@ export default {
+       return this.$store.getters['firmware/activeHpmFirmware'];
+     },
+     runningVersion() {
+-      return this.running?.version || '1-';
++      return this.running?.version || '-1';
+     },
+   },
+ };
+diff --git a/src/views/Operations/Firmware/FirmwareCardsVR.vue b/src/views/Operations/Firmware/FirmwareCardsVR.vue
+new file mode 100644
+index 0000000..e3e6acb
+--- /dev/null
++++ b/src/views/Operations/Firmware/FirmwareCardsVR.vue
+@@ -0,0 +1,40 @@
++<template>
++  <page-section :section-title="$t('pageFirmware.sectionTitleVRCards')">
++    <b-card-group deck>
++      <!-- Running image -->
++      <b-card>
++        <template #header>
++          <p class="font-weight-bold m-0">
++            {{ $t('pageFirmware.cardTitleRunning') }}
++          </p>
++        </template>
++        <dl class="mb-0">
++          <dt>{{ $t('pageFirmware.cardBodyVersion') }}</dt>
++          <dd class="mb-0">{{ runningVersion }}</dd>
++        </dl>
++      </b-card>
++    </b-card-group>
++  </page-section>
++</template>
++
++<script>
++import PageSection from '@/components/Global/PageSection';
++
++export default {
++  components: { PageSection },
++  computed: {
++    running() {
++      return this.$store.getters['firmware/activeVrFirmware'];
++    },
++    runningVersion() {
++      return this.running?.version || '-1';
++    },
++  },
++};
++</script>
++
++<style lang="scss" scoped>
++.page-section {
++  margin-top: -$spacer * 1.5;
++}
++</style>
