@@ -34,7 +34,7 @@
 #MACHINE ?= "edgerouter"
 #
 # This sets the default machine to be qemux86 if no other machine is selected:
-MACHINE ??= "sp5"
+MACHINE ??= "sh5"
 
 #
 # Where to place downloads
@@ -47,7 +47,7 @@ MACHINE ??= "sp5"
 #
 # The default is a downloads directory under TOPDIR which is the build directory.
 #
-#DL_DIR ?= "${TOPDIR}/downloads"
+DL_DIR ?= "${HOME}/sh5_downloads"
 
 #
 # Where to place shared-state files

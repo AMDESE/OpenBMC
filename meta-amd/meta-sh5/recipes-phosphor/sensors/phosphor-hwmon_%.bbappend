@@ -1,5 +1,5 @@
-FILESEXTRAPATHS_prepend_sp5 := "${THISDIR}/${PN}:"
-EXTRA_OECONF_append_sp5 = " --enable-negative-errno-on-fail"
+FILESEXTRAPATHS_prepend_sh5 := "${THISDIR}/${PN}:"
+EXTRA_OECONF_append_sh5 = " --enable-negative-errno-on-fail"
 
 SRC_URI += "file://0001-Add-power-on-monitor-mechanism.patch \
 	   "
