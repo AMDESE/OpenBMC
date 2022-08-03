@@ -1,0 +1,123 @@
+From e1440059aceeb93a9573439ceef819697fb2e408 Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Mon, 1 Aug 2022 00:37:48 -0500
+Subject: [PATCH] uboot-aspeed-sdk: Add Sp6 platforms to uboot
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+---
+ common/image-fit.c | 24 ++++++++++------------
+ common/main.c      | 50 +++++++++++++++++-----------------------------
+ 2 files changed, 29 insertions(+), 45 deletions(-)
+
+diff --git a/common/image-fit.c b/common/image-fit.c
+index 3bdcc86130..b23c0f45ec 100644
+--- a/common/image-fit.c
++++ b/common/image-fit.c
+@@ -1866,20 +1866,18 @@ int fit_image_load(bootm_headers_t *images, ulong addr,
+ 			board_id = str2hex(platform_id);
+ 			// select the  device tree configuration based on board_id
+ 			switch (board_id) {
+-				case 0x3D:
+-				case 0x40 ... 0x42:
+-				case 0x52:
+-					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-onyx.dtb"); break;
+-				case 0x3E:
+-				case 0x43 ... 0x45:
+-				case 0x51:
+-					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-quartz.dtb"); break;
+-				case 0x46 ... 0x48:
+-					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-ruby.dtb"); break;
+-				case 0x49 ... 0x4E:
+-					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-titanite.dtb"); break;
++				case 0x61:
++				case 0x64:
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-sunstone.dtb"); break;
++				case 0x62:
++				case 0x65:
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-shale96.dtb"); break;
++				case 0x59:
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-shale64.dtb"); break;
++				case 0x63:
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-cinnabar.dtb"); break;
+ 				default :
+-					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-quartz.dtb"); break;
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-sunstone.dtb"); break;
+ 			} // switch
+
+ 			cfg_noffset = fit_conf_get_node(fit,
+diff --git a/common/main.c b/common/main.c
+index f3b8ee65d8..d5a9352d5b 100644
+--- a/common/main.c
++++ b/common/main.c
+@@ -26,25 +26,13 @@
+ /* Sys Scratch reg that holds sys_rst info */
+ #define ASPEED_SYS_SCRATCH_1FC 0x1e6e21fc
+
+-#define ONYX_SLT        61  //0x3D
+-#define ONYX_1          64  //0x40
+-#define ONYX_2          65  //0x41
+-#define ONYX_3          66  //0x42
+-#define ONYX_FR4        82  //0x52
+-#define QUARTZ_DAP      62  //0x3E
+-#define QUARTZ_1        67  //0x43
+-#define QUARTZ_2        68  //0x44
+-#define QUARTZ_3        69  //0x45
+-#define QUARTZ_FR4      81  //0x51
+-#define RUBY_1          70  //0x46
+-#define RUBY_2          71  //0x47
+-#define RUBY_3          72  //0x48
+-#define TITANITE_1      73  //0x49
+-#define TITANITE_2      74  //0x4A
+-#define TITANITE_3      75  //0x4B
+-#define TITANITE_4      76  //0x4C
+-#define TITANITE_5      77  //0x4D
+-#define TITANITE_6      78  //0x4E
++/* SP6 Platform IDs */
++#define SHALE_64        (0x59)
++#define SUNSTONE_DAP    (0x61)
++#define SHALE_SLT       (0x62)
++#define CINNABAR        (0x63)
++#define SUNSTONE        (0x64)
++#define SHALE           (0x65)
+
+ #define HOSTNAME_BUFF_LEN       32
+ #define CMD_BOOT_ARGS_BUFF_LEN  512
+@@ -89,24 +77,22 @@ void set_hostname()
+
+             switch ((int)simple_strtol(board_id, NULL, HEX_BASE))
+             {
+-                case ONYX_SLT:
+-                case ONYX_FR4:
+-                case ONYX_1 ... ONYX_3:
+-                    sprintf(hostname, "onyx-%02x%02x", octate_5, octate_6);
++                case SUNSTONE:
++                case SUNSTONE_DAP:
++                    sprintf(hostname, "sunstone-%02x%02x", octate_5, octate_6);
+                     break;
+-                case QUARTZ_DAP:
+-                case QUARTZ_FR4:
+-                case QUARTZ_1 ... QUARTZ_3:
+-                    sprintf(hostname, "quartz-%02x%02x", octate_5, octate_6);
++                case SHALE:
++                case SHALE_SLT:
++                    sprintf(hostname, "shale-%02x%02x", octate_5, octate_6);
+                     break;
+-                case RUBY_1 ... RUBY_3:
+-                    sprintf(hostname, "ruby-%02x%02x", octate_5, octate_6);
++                case SHALE_64:
++                    sprintf(hostname, "shale-%02x%02x", octate_5, octate_6);
+                     break;
+-                case TITANITE_1 ... TITANITE_6:
+-                    sprintf(hostname, "titanite-%02x%02x", octate_5, octate_6);
++                case CINNABAR:
++                    sprintf(hostname, "cinnabar-%02x%02x", octate_5, octate_6);
+                     break;
+                 default:
+-                    sprintf(hostname, "sp5-%02x%02x", octate_5, octate_6);
++                    sprintf(hostname, "sp6-%02x%02x", octate_5, octate_6);
+                     break;
+             }
+             /* Append bootargs with hostname */
+--
+2.17.1
+
