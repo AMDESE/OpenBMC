@@ -1,6 +1,6 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/linux-aspeed:"
 
-SRC_URI += "file://sp5.cfg \
+SRC_URI += "file://sh5.cfg \
             file://0001-ARM-dts-aspeed-Initial-device-tree-for-AMD-Onyx-Plat.patch \
             file://0002-ARM-dts-aspeed-Add-UART-changes-to-dts-for-SOL-enabl.patch \
             file://0003-ARM-dts-aspeed-Add-I2C-updates-to-dts-for-sensors.patch \
@@ -96,4 +96,7 @@ SRC_URI += "file://sp5.cfg \
             file://0096-ARM-dts-aspeed-Add-DIMM-devices-for-CH2-in-Ruby.patch \
             file://0097-linux-aspeed-Sensor-threshold-tuned-as-per-provided.patch \
             file://0098-Linux-aspeed-Fix-for-PVDD11_S3_P1-VR-Titanite-sensor.patch \
+            file://0101-linux-aspeed-Add-Initial-device-tree-for-sh5d807-platform.patch \
+            file://0102-linux-aspeed-Add-Initail-device-tree-for-Sidley-platform.patch \
+            file://0103-linux-aspeed-Add-Initial-device-tree-for-Parry-Peak-platform.patch \
             "

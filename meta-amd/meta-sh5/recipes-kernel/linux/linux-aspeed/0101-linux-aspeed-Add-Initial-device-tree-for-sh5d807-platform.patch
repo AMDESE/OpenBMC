@@ -1,0 +1,510 @@
+From 5f147d0fde903b7e274587f43ff1d825bf482f72 Mon Sep 17 00:00:00 2001
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Thu, 11 Aug 2022 15:17:45 -0500
+Subject: [PATCH 1/3] linux-aspeed : Add Initial device tree for sh5d807
+ platform
+
+Device tree addition for sh5d807 platform
+
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-sh5d807.dts | 487 +++++++++++++++++++
+ 1 file changed, 487 insertions(+)
+ create mode 100644 arch/arm/boot/dts/aspeed-bmc-amd-sh5d807.dts
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-sh5d807.dts b/arch/arm/boot/dts/aspeed-bmc-amd-sh5d807.dts
+new file mode 100644
+index 000000000000..828bcc25e1f5
+--- /dev/null
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-sh5d807.dts
+@@ -0,0 +1,487 @@
++// SPDX-License-Identifier: GPL-2.0
++// Copyright (c) 2022 AMD Inc.
++// Author: Vinu Vaghasia <vinu.vaghasia@amd.com>
++
++/dts-v1/;
++
++#include "aspeed-g6.dtsi"
++#include "dt-bindings/gpio/aspeed-gpio.h"
++
++/ {
++	model = "AMD SH5D807 BMC";
++	compatible = "amd,sh5d807 ", "aspeed,ast2600";
++
++	aliases {
++		serial4 = &uart5;
++		ethernet0 = &mac3;
++	};
++
++	chosen {
++		stdout-path = &uart5;
++		bootargs = "console=ttyS4,115200 earlycon vmalloc=512MB";
++	};
++
++	leds {
++		compatible = "gpio-leds";
++
++		fault {
++			gpios = <&gpio0 ASPEED_GPIO(O, 6) GPIO_ACTIVE_HIGH>;
++		};
++
++		identify {
++			gpios = <&gpio0 ASPEED_GPIO(O, 7) GPIO_ACTIVE_HIGH>;
++		};
++	};
++
++	memory@80000000 {
++		device_type = "memory";
++		reg = <0x80000000 0x80000000>;
++	};
++
++	reserved-memory {
++		#address-cells = <1>;
++		#size-cells = <1>;
++		ranges;
++	};
++
++};
++
++&mdio0 {
++	status = "okay";
++
++	ethphy0: ethernet-phy@0 {
++		compatible = "ethernet-phy-ieee802.3-c22";
++		reg = <0>;
++	};
++};
++
++&mac3 {
++	status = "okay";
++	phy-mode = "rgmii";
++	phy-handle = <&ethphy0>;
++
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_rgmii4_default>;
++};
++
++&fmc {
++	status = "okay";
++	fmc-spi-user-mode;
++	flash@0 {
++		compatible = "jedec,spi-nor";
++		status = "okay";
++		label = "bmc";
++		spi-tx-bus-width = <4>;
++		spi-rx-bus-width = <4>;
++		#include "openbmc-flash-layout-128.dtsi"
++	};
++};
++
++//BMC Console
++&uart5 {
++	status = "okay";
++};
++
++&gpio0 {
++	gpio-line-names =
++	/*A0-A7*/	"","","","","","","","",
++	/*B0-B7*/	"","","","","","","","",
++	/*C0-C7*/	"","","","","","","","",
++	/*D0-D7*/	"","","","","","","","",
++	/*E0-E7*/	"","","","","","","","",
++	/*F0-F7*/	"","","","","","","","",
++	/*G0-G7*/	"","","","","","","","",
++	/*H0-H7*/	"","ASSERT_WARM_RST_BTN_L","","","","","","",
++	/*I0-I7*/	"","","","","","","","",
++	/*J0-J7*/	"","","","","","","","",
++	/*K0-K7*/	"","","","","","","","",
++	/*L0-L7*/	"","","","","","","","",
++	/*M0-M7*/	"","","","","","","","",
++	/*N0-N7*/	"","","","","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
++	/*O0-O7*/	"","","HDT_SEL","HDT_XTRIG5","HDT_XTRIG6","JTAG_TRST_N","","",
++	/*P0-P7*/	"MON_RST_BTN_L","ASSERT_RST_BTN_L","MON_PWR_BTN_L","ASSERT_PWR_BTN_L","","ASSERT_NMI_BTN_L","MON_PWR_GOOD","",
++	/*Q0-Q7*/	"","","HDT_DBREQ_L","","","","","",
++	/*R0-R7*/	"","","","","","","","",
++	/*S0-S7*/	"","","","","","","","",
++	/*T0-T7*/	"","","","","","","","",
++	/*U0-U7*/	"","","","","","","","",
++	/*V0-V7*/	"","","","","","","","",
++	/*W0-W7*/	"","","","","","","","",
++	/*X0-X7*/	"","","","","","","","",
++	/*Y0-Y7*/	"","","","","","","","",
++	/*Z0-Z7*/	"","","","","","","","";
++};
++
++&i2c0 { // SCM_I2C0 SCM FPGA
++	status = "okay";
++
++};
++
++&i2c1 { // SCM_I2C1 - Misc VRs, PMbus
++	status = "okay";
++
++	vdd_33_run@13 {
++		compatible = "infineon,xdpe12284";
++		reg = <0x13>;
++	};
++
++	vdd_33_dual@14 {
++		compatible = "infineon,xdpe12284";
++		reg = <0x14>;
++	};
++
++	vdd_5_dual@15 {
++		compatible = "infineon,xdpe12284";
++		reg = <0x15>;
++	};
++};
++
++&i2c2 { // SCM_I2C2 - P0 VRs
++	status = "okay";
++
++	i2cswitch@77 {
++		compatible = "nxp,pca9546";
++		reg = <0x77>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		i2c@0 {
++			reg = <0>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			vdd_io_e32@30 {
++				compatible = "infineon,xdpe12284";
++				reg = <0x30>;
++			};
++
++			vdd_33_s5@36 {
++				compatible = "infineon,xdpe12284";
++				reg = <0x36>;
++			};
++
++			vddcr_socio_a@3C {
++				compatible = "infineon,xdpe12284";
++				reg = <0x3C>;
++			};
++			vddcr_socio_c@41 {
++				compatible = "infineon,xdpe12284";
++				reg = <0x41>;
++			};
++
++			vddio_04_hbm_b@44 {
++				compatible = "infineon,xdpe12284";
++				reg = <0x44>;
++			};
++		};
++
++		i2c@1 {
++			reg = <1>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			vdd_18@33 {
++				compatible = "infineon,xdpe12284";
++				reg = <0x33>;
++			};
++
++			vdd_18_s5@39 {
++				compatible = "infineon,xdpe12284";
++				reg = <0x39>;
++			};
++
++			vddio_04_hbm_d@47 {
++				compatible = "infineon,xdpe12284";
++				reg = <0x47>;
++			};
++			vdd_075_usr@4A {
++				compatible = "infineon,xdpe12284";
++				reg = <0x4A>;
++			};
++		};
++	};
++};
++
++&i2c3 { // SCM_I2C3- P1 VRs, Note: not used on 1P system
++	status = "okay";
++
++};
++
++&i2c4 { // SCM_I2C4 - Board Rev ID
++	status = "okay";
++	brdid_eeprom@50 {
++		compatible = "microchip,24lc256","atmel,24c256";
++		reg = <0x50>;
++	};
++};
++
++&i2c5 { // SCM_I2C5 - PSU Power Supply
++	status = "okay";
++
++};
++
++&i2c6 {
++	status = "okay";
++
++	i2cswitch@70 {
++		compatible = "nxp,pca9548";
++		reg = <0x77>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		i2c@0 { // Fan controller
++			reg = <0>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			emc2305@4d {
++				compatible = "smsc,emc2305";
++				reg = <0x4d>;
++				#cooling-cells = <0x02>;
++
++				fan@0 { // Chassis_Fan1
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@1 { // Chassis_Fan2
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@2 { // Chassis_Fan3
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@3 { // Chassis_Fan4
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@4 { // Chassis_Fan5
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++			};
++		};
++
++		i2c@1 { // Fan controller
++			reg = <1>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			emc2305@4d {
++				compatible = "smsc,emc2305";
++				reg = <0x4d>;
++				#cooling-cells = <0x02>;
++
++				fan@0 { // Chassis_Fan6
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@1 { // Chassis_Fan7
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@2 { // Chassis_Fan8
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@3 { // Chassis_Fan9
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@4 { // Chassis_Fan10
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++			};
++		};
++
++		i2c@2 { // Fan controller
++			reg = <2>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			emc2305@4d {
++				compatible = "smsc,emc2305";
++				reg = <0x4d>;
++				#cooling-cells = <0x02>;
++
++				fan@0 { // P0_CPU_Fan
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@1 { // P0_Water_Pump_Fan
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++			};
++		};
++
++		i2c@5 { // Temp sensor
++			reg = <5>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			lm75a@48 {
++				compatible = "national,lm75a";
++				reg = <0x48>;
++			};
++
++			lm75a@49 {
++				compatible = "national,lm75a";
++				reg = <0x49>;
++			};
++
++			lm75a@4a {
++				compatible = "national,lm75a";
++				reg = <0x4a>;
++			};
++
++			lm75a@4b {
++				compatible = "national,lm75a";
++				reg = <0x4b>;
++			};
++
++			lm75a@4c {
++				compatible = "national,lm75a";
++				reg = <0x4c>;
++			};
++
++			lm75a@4d {
++				compatible = "national,lm75a";
++				reg = <0x4d>;
++			};
++
++			lm75a@4e {
++				compatible = "national,lm75a";
++				reg = <0x4e>;
++			};
++
++			lm75a@4f {
++				compatible = "national,lm75a";
++				reg = <0x4f>;
++			};
++		};
++
++		i2c@6 { // ADC controller
++			reg = <6>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			adc0: fpga_vdd_core@50 {
++				compatible = "ti,adc121c";
++				reg = <0x50>;
++				#io-channel-cells = <1>;
++				label = "fpga_vdd_core";
++			};
++			adc1: fpga_vdd_18@51 {
++				compatible = "ti,adc121c";
++				reg = <0x51>;
++				#io-channel-cells = <1>;
++				label = "fpga_vdd_18";
++			};
++			adc2: fpga_vdd_33@52 {
++				compatible = "ti,adc121c";
++				reg = <0x52>;
++				#io-channel-cells = <1>;
++				label = "fpga_vdd_33";
++			};
++			adc3: lom_vdd_33@53 {
++				compatible = "ti,adc121c";
++				reg = <0x54>;
++				#io-channel-cells = <1>;
++				label = "lom_vdd_33";
++			};
++			adc4: lom_vdd_12@54 {
++				compatible = "ti,adc121c";
++				reg = <0x55>;
++				#io-channel-cells = <1>;
++				label = "lom_vdd_12";
++			};
++			adc5: vdd_12_dual@55 {
++				compatible = "ti,adc121c";
++				reg = <0x56>;
++				#io-channel-cells = <1>;
++				label = "vdd_12_dual";
++			};
++		};
++
++		i2c@7 { // Thermal diode
++			reg = <7>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			tmp468@48 {
++				compatible = "ti,tmp468";
++				reg = <0x48>;
++			};
++
++			tmp468@49 {
++				compatible = "ti,tmp468";
++				reg = <0x49>;
++			};
++		};
++
++	};
++};
++
++&i2c7 { // SCM_I2C7 - HPM BRD ID
++	status = "okay";
++
++	mbeeprom@50 {
++		compatible = "microchip,24lc256","atmel,24c256";
++		reg = <0x50>;
++	};
++};
++
++&i2c8 { // SCM_I2C8  BCM5720 LOM
++	status = "okay";
++
++};
++
++&i2c9 {
++	status = "okay";
++
++};
++
++&i2c10 {
++	status = "okay";
++
++};
++
++&i2c11 {
++	status = "okay";
++
++};
++
++&i2c12 {
++	status = "okay";
++
++};
++
++&i2c13 {
++	status = "okay";
++
++};
++
++&i2c14 { // DC-SCM - EEPROM
++	status = "okay";
++	bmceeprom@50 {
++	compatible = "microchip,24lc512","atmel,24c512";
++	reg = <0x50>;
++	};
++};
++
++&i2c15 {
++	status = "okay";
++
++};
++
+--
+2.17.1
+

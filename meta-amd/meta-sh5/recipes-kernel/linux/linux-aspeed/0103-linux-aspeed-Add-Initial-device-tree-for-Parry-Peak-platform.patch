@@ -1,0 +1,221 @@
+From 314b0a10bedeba566b3a044c1264a7d8139d6f1a Mon Sep 17 00:00:00 2001
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Thu, 11 Aug 2022 15:38:01 -0500
+Subject: [PATCH 3/3] linux-aspeed: Add Initial device tree for Parry Peak
+ platform
+
+Base device tree addition for Parry Peak platform
+
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ .../arm/boot/dts/aspeed-bmc-amd-parrypeak.dts | 198 ++++++++++++++++++
+ 1 file changed, 198 insertions(+)
+ create mode 100644 arch/arm/boot/dts/aspeed-bmc-amd-parrypeak.dts
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-parrypeak.dts b/arch/arm/boot/dts/aspeed-bmc-amd-parrypeak.dts
+new file mode 100644
+index 000000000000..8fc919401ddc
+--- /dev/null
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-parrypeak.dts
+@@ -0,0 +1,198 @@
++// SPDX-License-Identifier: GPL-2.0
++// Copyright (c) 2022 AMD Inc.
++// Author: Vinu Vaghasia <vinu.vaghasia@amd.com>
++
++/dts-v1/;
++
++#include "aspeed-g6.dtsi"
++#include "dt-bindings/gpio/aspeed-gpio.h"
++
++/ {
++	model = "AMD PARRY PEAK BMC";
++	compatible = "amd,parrypeak ", "aspeed,ast2600";
++
++	aliases {
++		serial4 = &uart5;
++		ethernet0 = &mac3;
++	};
++
++	chosen {
++		stdout-path = &uart5;
++		bootargs = "console=ttyS4,115200 earlycon vmalloc=512MB";
++	};
++
++	leds {
++		compatible = "gpio-leds";
++
++		fault {
++			gpios = <&gpio0 ASPEED_GPIO(O, 6) GPIO_ACTIVE_HIGH>;
++		};
++
++		identify {
++			gpios = <&gpio0 ASPEED_GPIO(O, 7) GPIO_ACTIVE_HIGH>;
++		};
++	};
++
++	memory@80000000 {
++		device_type = "memory";
++		reg = <0x80000000 0x80000000>;
++	};
++
++	reserved-memory {
++		#address-cells = <1>;
++		#size-cells = <1>;
++		ranges;
++	};
++
++};
++
++&mdio0 {
++	status = "okay";
++
++	ethphy0: ethernet-phy@0 {
++		compatible = "ethernet-phy-ieee802.3-c22";
++		reg = <0>;
++	};
++};
++
++&mac3 {
++	status = "okay";
++	phy-mode = "rgmii";
++	phy-handle = <&ethphy0>;
++
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_rgmii4_default>;
++};
++
++&fmc {
++	status = "okay";
++	fmc-spi-user-mode;
++	flash@0 {
++		compatible = "jedec,spi-nor";
++		status = "okay";
++		label = "bmc";
++		spi-tx-bus-width = <4>;
++		spi-rx-bus-width = <4>;
++		#include "openbmc-flash-layout-128.dtsi"
++	};
++};
++
++//BMC Console
++&uart5 {
++	status = "okay";
++};
++
++&gpio0 {
++	gpio-line-names =
++	/*A0-A7*/	"","","","","","","","",
++	/*B0-B7*/	"","","","","","","","",
++	/*C0-C7*/	"","","","","","","","",
++	/*D0-D7*/	"","","","","","","","",
++	/*E0-E7*/	"","","","","","","","",
++	/*F0-F7*/	"","","","","","","","",
++	/*G0-G7*/	"","","","","","","","",
++	/*H0-H7*/	"","ASSERT_WARM_RST_BTN_L","","","","","","",
++	/*I0-I7*/	"","","","","","","","",
++	/*J0-J7*/	"","","","","","","","",
++	/*K0-K7*/	"","","","","","","","",
++	/*L0-L7*/	"","","","","","","","",
++	/*M0-M7*/	"","","","","","","","",
++	/*N0-N7*/	"","","","","","","","ASSERT_BMC_READY",
++	/*O0-O7*/	"","","","","","","","",
++	/*P0-P7*/	"MON_RST_BTN_L","ASSERT_RST_BTN_L","MON_PWR_BTN_L","ASSERT_PWR_BTN_L","","ASSERT_NMI_BTN_L","MON_PWR_GOOD","",
++	/*Q0-Q7*/	"","","","","","","","",
++	/*R0-R7*/	"","","","","","","","",
++	/*S0-S7*/	"","","","","","","","",
++	/*T0-T7*/	"","","","","","","","",
++	/*U0-U7*/	"","","","","","","","",
++	/*V0-V7*/	"","","","","","","","",
++	/*W0-W7*/	"","","","","","","","",
++	/*X0-X7*/	"","","","","","","","",
++	/*Y0-Y7*/	"","","","","","","","",
++	/*Z0-Z7*/	"","","","","","","","";
++};
++
++&i2c1 {
++	status = "okay";
++
++};
++
++&i2c2 {
++	status = "okay";
++
++};
++
++&i2c3 {
++	status = "okay";
++
++};
++
++&i2c4 {
++	status = "okay";
++
++};
++
++&i2c5 {
++	status = "okay";
++
++};
++
++&i2c6 {
++	status = "okay";
++
++};
++
++&i2c7 {
++	// Net name i2c4 (SCM_I2C4) - HPM BRD ID
++	status = "okay";
++
++	mbeeprom@50 {
++		compatible = "microchip,24lc256","atmel,24c256";
++		reg = <0x50>;
++	};
++};
++
++&i2c8 {
++	status = "okay";
++
++};
++
++&i2c9 {
++	status = "okay";
++
++};
++
++&i2c10 {
++	status = "okay";
++
++};
++
++&i2c11 {
++	status = "okay";
++
++};
++
++&i2c12 {
++	status = "okay";
++
++};
++
++&i2c13 {
++	status = "okay";
++
++};
++
++&i2c14 {
++	// LOCAL MGMT - EEPROM, RTC
++	status = "okay";
++	bmceeprom@50 {
++	compatible = "microchip,24lc512","atmel,24c512";
++	reg = <0x50>;
++	};
++};
++
++&i2c15 {
++	status = "okay";
++
++};
++
+--
+2.17.1
+
