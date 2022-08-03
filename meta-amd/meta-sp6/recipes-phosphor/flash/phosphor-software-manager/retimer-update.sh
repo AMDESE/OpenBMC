@@ -14,20 +14,20 @@ mux=0
 boardID=`fw_printenv board_id | sed -n "s/^board_id=//p"`
 revID=`hexdump -c /sys/bus/i2c/devices/7-0050/eeprom -s 24 -n 1 | head -n 1 | awk '{ print $2}'`
 case $boardID in
-   "3D"|"40"|"41"|"42"|"52")  # Onyx board_ids
-        echo "Retimer update not supported for Onyx"
+   "61"|"64")  # Sunstone board_ids
+        echo "Retimer update not supported for Sunstone"
         mux=70
    ;;
-   "3e" | "3E" | "43" | "44" | "45" | "51")  # Quartz board_ids
-        echo "Retimer update not supported for Quartz"
+   "63")  # Cinnabar board_ids
+        echo "Retimer update not supported for Cinnabar"
         mux=70
    ;;
-   "46"|"47"|"48")  # Ruby board_ids
-        echo "Retimer update not supported for Ruby"
+   "59")  # Shale64 board_ids
+        echo "Retimer update not supported for Shale64"
         mux=70
    ;;
-   "49" | "4A" | "4a" | "4B" | "4b" | "4C" |"4c" | "4D" | "4d" | "4E" | "4e")  # Titanite board_ids
-        echo "Titnanite Platform Rev $revID"
+   "62"|"65")  # Shale96 board_ids
+        echo "Shale96 Platform Rev $revID"
         mux=71
    ;;
    *)  # Default

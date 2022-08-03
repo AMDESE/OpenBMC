@@ -1,0 +1,460 @@
+{
+    "version" : "AMD-Sunstone-Stepwise-v01",
+    "sensors" : [
+        {
+            "name": "FAN_SYS0_0",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS0_0",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS0_0",
+            "min": 0,
+            "max": 100
+        },
+        {
+            "name": "FAN_SYS0_1",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS0_1",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS0_1",
+            "min": 0,
+            "max": 100
+        },
+        {
+            "name": "FAN_SYS1_0",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS1_0",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS1_0",
+            "min": 0,
+            "max": 100
+        },
+        {
+            "name": "FAN_SYS1_1",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS1_1",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS1_1",
+            "min": 0,
+            "max": 100
+        },
+        {
+            "name": "FAN_SYS2_0",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS2_0",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS2_0",
+            "min": 0,
+            "max": 100
+        },
+        {
+            "name": "FAN_SYS2_1",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS2_1",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS2_1",
+            "min": 0,
+            "max": 100
+        },
+        {
+            "name": "FAN_SYS3_0",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS3_0",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS3_0",
+            "min": 0,
+            "max": 100
+        },
+        {
+            "name": "FAN_SYS3_1",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS3_1",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS3_1",
+            "min": 0,
+            "max": 100
+        },
+        {
+            "name": "FAN_SYS4_0",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS4_0",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS4_0",
+            "min": 0,
+            "max": 100
+        },
+        {
+            "name": "FAN_SYS4_1",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS4_1",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS4_1",
+            "min": 0,
+            "max": 100
+        },
+        {
+            "name": "FAN_SYS5_0",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS5_0",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS5_0",
+            "min": 0,
+            "max": 100
+        },
+        {
+            "name": "FAN_SYS5_1",
+            "type": "fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS5_1",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS5_1",
+            "min": 0,
+            "max": 100
+        },
+        {
+            "name": "CPU0_Temp",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/CPU0_Temp",
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "CPU1_Temp",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/CPU1_Temp",
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "P0_DIMM_C_Temp",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_C_Temp",
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "P0_DIMM_E_Temp",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_E_Temp",
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "P0_DIMM_F_Temp",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_F_Temp",
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "P0_DIMM_A_Temp",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_A_Temp",
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "P0_DIMM_B_Temp",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_B_Temp",
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "P0_DIMM_D_Temp",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_D_Temp",
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "P0_DIMM_I_Temp",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_I_Temp",
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "P0_DIMM_K_Temp",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_K_Temp",
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "P0_DIMM_L_Temp",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_L_Temp",
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "P0_DIMM_G_Temp",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_G_Temp",
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "P0_DIMM_H_Temp",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_H_Temp",
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "P0_DIMM_J_Temp",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_J_Temp",
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "P1_DIMM_C_Temp",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_C_Temp",
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "P1_DIMM_E_Temp",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_E_Temp",
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "P1_DIMM_F_Temp",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_F_Temp",
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "P1_DIMM_A_Temp",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_A_Temp",
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "P1_DIMM_B_Temp",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_B_Temp",
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "P1_DIMM_D_Temp",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_D_Temp",
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "P1_DIMM_I_Temp",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_I_Temp",
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "P1_DIMM_K_Temp",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_K_Temp",
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "P1_DIMM_L_Temp",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_L_Temp",
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "P1_DIMM_G_Temp",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_G_Temp",
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "P1_DIMM_H_Temp",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_H_Temp",
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        },
+        {
+            "name": "P1_DIMM_J_Temp",
+            "type": "temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P1_DIMM_J_Temp",
+            "ignoreDbusMinMax": true,
+            "timeout": 0
+        }
+    ],
+
+    "zones" : [
+        {
+            "id": 0,
+            "minThermalOutput": 10.0,
+            "failsafePercent": 30.0,
+            "pids": [
+                {
+                    "name": "FAN_SYS0_0-5_1",
+                    "type": "fan",
+                    "inputs": ["FAN_SYS0_0",
+                               "FAN_SYS0_1",
+                               "FAN_SYS1_0",
+                               "FAN_SYS1_1",
+                               "FAN_SYS2_0",
+                               "FAN_SYS2_1",
+                               "FAN_SYS3_0",
+                               "FAN_SYS3_1",
+                               "FAN_SYS4_0",
+                               "FAN_SYS4_1",
+                               "FAN_SYS5_0",
+                               "FAN_SYS5_1"],
+                    "setpoint": 20.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "proportionalCoeff": 0.0,
+                        "integralCoeff": 0.0,
+                        "feedFwdOffsetCoeff": 0.0,
+                        "feedFwdGainCoeff": 1.0,
+                        "integralLimit_min": 0.0,
+                        "integralLimit_max": 0.0,
+                        "outLim_min": 0.0,
+                        "outLim_max": 100.0,
+                        "slewNeg": 0.0,
+                        "slewPos": 0.0
+                    }
+                },
+                {
+                    "name": "CPU0-1",
+                    "type": "stepwise",
+                    "inputs": ["CPU0_Temp", "CPU1_Temp"],
+                    "setpoint": 20.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0,
+                        "isCeiling": false,
+                        "reading": {
+                            "0": 10,
+                            "1": 20,
+                            "2": 30,
+                            "3": 40,
+                            "4": 50,
+                            "5": 60,
+                            "6": 70,
+                            "7": 73,
+                            "8": 77,
+                            "9": 80,
+                            "10": 82,
+                            "11": 85,
+                            "12": 90,
+                            "13": 95,
+                            "14": 100,
+                            "15": 105,
+                            "16": 110,
+                            "17": 115,
+                            "18": 120,
+                            "19": 125
+                        },
+                        "output": {
+                            "0": 30,
+                            "1": 30,
+                            "2": 30,
+                            "3": 30,
+                            "4": 30,
+                            "5": 30,
+                            "6": 30,
+                            "7": 40,
+                            "8": 50,
+                            "9": 60,
+                            "10": 70,
+                            "11": 75,
+                            "12": 75,
+                            "13": 75,
+                            "14": 100,
+                            "15": 100,
+                            "16": 100,
+                            "17": 100,
+                            "18": 100,
+                            "19": 100
+                        }
+                    }
+                },
+                {
+                    "name": "DIMM1-24",
+                    "type": "stepwise",
+                    "inputs": ["P0_DIMM_C_Temp",
+                               "P0_DIMM_E_Temp",
+                               "P0_DIMM_F_Temp",
+                               "P0_DIMM_A_Temp",
+                               "P0_DIMM_B_Temp",
+                               "P0_DIMM_D_Temp",
+                               "P0_DIMM_I_Temp",
+                               "P0_DIMM_K_Temp",
+                               "P0_DIMM_L_Temp",
+                               "P0_DIMM_G_Temp",
+                               "P0_DIMM_H_Temp",
+                               "P0_DIMM_J_Temp",
+                               "P1_DIMM_C_Temp",
+                               "P1_DIMM_E_Temp",
+                               "P1_DIMM_F_Temp",
+                               "P1_DIMM_A_Temp",
+                               "P1_DIMM_B_Temp",
+                               "P1_DIMM_D_Temp",
+                               "P1_DIMM_I_Temp",
+                               "P1_DIMM_K_Temp",
+                               "P1_DIMM_L_Temp",
+                               "P1_DIMM_G_Temp",
+                               "P1_DIMM_H_Temp",
+                               "P1_DIMM_J_Temp"
+                               ],
+                    "setpoint": 20.0,
+                    "pid": {
+                        "samplePeriod": 1.0,
+                        "positiveHysteresis": 0.0,
+                        "negativeHysteresis": 0.0,
+                        "isCeiling": false,
+                        "reading": {
+                            "0": 10,
+                            "1": 20,
+                            "2": 30,
+                            "3": 40,
+                            "4": 50,
+                            "5": 60,
+                            "6": 70,
+                            "7": 75,
+                            "8": 80,
+                            "9": 85,
+                            "10": 90,
+                            "11": 95,
+                            "12": 100,
+                            "13": 105,
+                            "14": 110,
+                            "15": 115,
+                            "16": 120,
+                            "17": 125,
+                            "18": 130,
+                            "19": 135
+                        },
+                        "output": {
+                            "0": 30,
+                            "1": 30,
+                            "2": 30,
+                            "3": 30,
+                            "4": 30,
+                            "5": 30,
+                            "6": 30,
+                            "7": 45,
+                            "8": 60,
+                            "9": 80,
+                            "10": 100,
+                            "11": 100,
+                            "12": 100,
+                            "13": 100,
+                            "14": 100,
+                            "15": 100,
+                            "16": 100,
+                            "17": 100,
+                            "18": 100,
+                            "19": 100
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
+

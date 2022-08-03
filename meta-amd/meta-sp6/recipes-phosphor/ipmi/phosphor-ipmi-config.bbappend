@@ -1,1 +1,1 @@
-FILESEXTRAPATHS_prepend_sp5 := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS_prepend_sp6 := "${THISDIR}/${PN}:"

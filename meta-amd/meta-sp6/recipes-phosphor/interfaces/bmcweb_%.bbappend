@@ -1,6 +1,6 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
-EXTRA_OEMESON_append_sp5 = " \
+EXTRA_OEMESON_append_sp6 = " \
     -Dredfish-dump-log=enabled \
     -Dredfish-bmc-journal=enabled \
     -Dredfish-cpu-log=enabled \

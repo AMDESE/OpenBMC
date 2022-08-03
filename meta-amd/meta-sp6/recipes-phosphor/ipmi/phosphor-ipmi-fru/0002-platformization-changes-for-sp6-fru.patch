@@ -1,0 +1,285 @@
+From 679809c898bbd74e73e69ae65bce4e2ad18b5b6b Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Wed, 18 May 2022 04:47:37 -0500
+Subject: [PATCH] platformization changes for sp5 fru
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+---
+ Makefile.am      |  40 ++++++++++++++---
+ configure.ac     |  33 +++++++++++---
+ frup.hpp         |   5 +++
+ types.hpp        |   5 +++
+ writefrudata.cpp | 109 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 5 files changed, 177 insertions(+), 15 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 2288a3b..19f7f65 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,4 +1,12 @@
+-BUILT_SOURCES=fru-gen.cpp extra-properties-gen.cpp
++BUILT_SOURCES= shale96-fru-gen.cpp \
++	shale96-extra-properties-gen.cpp \
++	shale64-fru-gen.cpp \
++	shale64-extra-properties-gen.cpp \
++	cinnabar-fru-gen.cpp \
++	cinnabar-extra-properties-gen.cpp \
++	sunstone-fru-gen.cpp \
++	sunstone-extra-properties-gen.cpp
++
+ AM_DEFAULT_SOURCE_EXT = .cpp
+
+ CLEANFILES=$(BUILT_SOURCES)
+@@ -16,10 +24,16 @@ phosphor_read_eeprom_LDADD = libwritefrudata.la
+
+ lib_LTLIBRARIES = libwritefrudata.la
+ libwritefrudata_la_SOURCES = frup.cpp \
+-	fru-gen.cpp \
++	shale96-fru-gen.cpp \
++	shale64-fru-gen.cpp \
++	cinnabar-fru-gen.cpp \
++	sunstone-fru-gen.cpp \
+ 	fru_area.cpp \
+ 	writefrudata.cpp \
+-	extra-properties-gen.cpp
++	shale96-extra-properties-gen.cpp \
++	shale64-extra-properties-gen.cpp \
++	cinnabar-extra-properties-gen.cpp \
++	sunstone-extra-properties-gen.cpp
+ libwritefrudata_la_LDFLAGS = $(SYSTEMD_LIBS) \
+ 	$(libmapper_LIBS) \
+ 	$(SDBUSPLUS_LIBS) \
+@@ -41,7 +55,19 @@ libstrgfnhandler_la_LIBADD = libwritefrudata.la
+ libstrgfnhandler_la_CXXFLAGS = $(PHOSPHOR_LOGGING_CFLAGS) \
+ 	$(LIBIPMID_CFLAGS)
+
+-fru-gen.cpp:
+-	$(AM_V_GEN)@FRUGEN@ -o $(top_builddir) generate-cpp
+-extra-properties-gen.cpp:
+-	$(AM_V_GEN)@PROPGEN@
++shale96-fru-gen.cpp:
++	$(AM_V_GEN)@SHALE96_FRUGEN@ -o $(top_builddir) -p shale96 generate-cpp
++shale96-extra-properties-gen.cpp:
++	$(AM_V_GEN)@SHALE96_PROPGEN@ -p shale96
++shale64-fru-gen.cpp:
++	$(AM_V_GEN)@SHALE64_FRUGEN@ -o $(top_builddir) -p shale64 generate-cpp
++shale64-extra-properties-gen.cpp:
++	$(AM_V_GEN)@SHALE64_PROPGEN@ -p shale64
++cinnabar-fru-gen.cpp:
++	$(AM_V_GEN)@CINNABAR_FRUGEN@ -o $(top_builddir) -p cinnabar generate-cpp
++cinnabar-extra-properties-gen.cpp:
++	$(AM_V_GEN)@CINNABAR_PROPGEN@ -p cinnabar
++sunstone-fru-gen.cpp:
++	$(AM_V_GEN)@SUNSTONE_FRUGEN@ -o $(top_builddir) -p sunstone generate-cpp
++sunstone-extra-properties-gen.cpp:
++	$(AM_V_GEN)@SUNSTONE_PROPGEN@ -p sunstone
+diff --git a/configure.ac b/configure.ac
+index 47c31bb..884e49b 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -64,12 +64,33 @@ AS_IF([test "x$enable_oe_sdk" == "xyes"],
+     AC_SUBST([OESDK_TESTCASE_FLAGS], [$testcase_flags])
+ )
+
+-AS_IF([test "x$YAML_GEN" == "x"], [YAML_GEN="example.yaml"])
+-FRUGEN="$PYTHON $srcdir/scripts/fru_gen.py -i $YAML_GEN"
+-AC_SUBST(FRUGEN)
+-AS_IF([test "x$PROP_YAML" == "x"], [PROP_YAML="extra-properties-example.yaml"])
+-PROPGEN="$PYTHON $srcdir/scripts/extra-properties.py -e $PROP_YAML"
+-AC_SUBST(PROPGEN)
++AS_IF([test "x$SHALE96_YAML_GEN" == "x"], [SHALE96_YAML_GEN="example.yaml"])
++SHALE96_FRUGEN="$PYTHON $srcdir/scripts/fru_gen.py -i $SHALE96_YAML_GEN"
++AC_SUBST(SHALE96_FRUGEN)
++AS_IF([test "x$SHALE96_PROP_YAML" == "x"], [SHALE96_PROP_YAML="extra-properties-example.yaml"])
++SHALE96_PROPGEN="$PYTHON $srcdir/scripts/extra-properties.py -e $SHALE96_PROP_YAML"
++AC_SUBST(SHALE96_PROPGEN)
++
++AS_IF([test "x$SHALE64_YAML_GEN" == "x"], [SHALE64_YAML_GEN="example.yaml"])
++SHALE64_FRUGEN="$PYTHON $srcdir/scripts/fru_gen.py -i $SHALE64_YAML_GEN"
++AC_SUBST(SHALE64_FRUGEN)
++AS_IF([test "x$SHALE64_PROP_YAML" == "x"], [SHALE64_PROP_YAML="extra-properties-example.yaml"])
++SHALE64_PROPGEN="$PYTHON $srcdir/scripts/extra-properties.py -e $SHALE64_PROP_YAML"
++AC_SUBST(SHALE64_PROPGEN)
++
++AS_IF([test "x$CINNABAR_YAML_GEN" == "x"], [CINNABAR_YAML_GEN="example.yaml"])
++CINNABAR_FRUGEN="$PYTHON $srcdir/scripts/fru_gen.py -i $CINNABAR_YAML_GEN"
++AC_SUBST(CINNABAR_FRUGEN)
++AS_IF([test "x$CINNABAR_PROP_YAML" == "x"], [CINNABAR_PROP_YAML="extra-properties-example.yaml"])
++CINNABAR_PROPGEN="$PYTHON $srcdir/scripts/extra-properties.py -e $CINNABAR_PROP_YAML"
++AC_SUBST(CINNABAR_PROPGEN)
++
++AS_IF([test "x$SUNSTONE_YAML_GEN" == "x"], [SUNSTONE_YAML_GEN="example.yaml"])
++SUNSTONE_FRUGEN="$PYTHON $srcdir/scripts/fru_gen.py -i $SUNSTONE_YAML_GEN"
++AC_SUBST(SUNSTONE_FRUGEN)
++AS_IF([test "x$SUNSTONE_PROP_YAML" == "x"], [SUNSTONE_PROP_YAML="extra-properties-example.yaml"])
++SUNSTONE_PROPGEN="$PYTHON $srcdir/scripts/extra-properties.py -e $SUNSTONE_PROP_YAML"
++AC_SUBST(SUNSTONE_PROPGEN)
+
+ # Create configured output
+ AC_CONFIG_FILES([Makefile])
+diff --git a/frup.hpp b/frup.hpp
+index 6afd621..2d10e38 100644
+--- a/frup.hpp
++++ b/frup.hpp
+@@ -112,4 +112,9 @@ int parse_fru(const void* msgbuf, sd_bus_message* vpdtbl);
+ int parse_fru_area(const uint8_t area, const void* msgbuf, const size_t len,
+                    IPMIFruInfo& info);
+
++extern FruMap frus;
++extern const FruMap shale96_frus;
++extern const FruMap shale64_frus;
++extern const FruMap cinnabar_frus;
++extern const FruMap sunstone_frus;
+ #endif
+diff --git a/types.hpp b/types.hpp
+index 46abfe0..04c92f9 100644
+--- a/types.hpp
++++ b/types.hpp
+@@ -33,5 +33,10 @@ using InterfaceMap = std::map<Interface, PropertyMap>;
+ using Object = sdbusplus::message::object_path;
+ using ObjectMap = std::map<Object, InterfaceMap>;
+
++extern std::map<Path, InterfaceMap> extras;
++extern const std::map<Path, InterfaceMap> shale96_extras;
++extern const std::map<Path, InterfaceMap> shale64_extras;
++extern const std::map<Path, InterfaceMap> cinnabar_extras;
++extern const std::map<Path, InterfaceMap> sunstone_extras;
+ } // namespace vpd
+ } // namespace ipmi
+diff --git a/writefrudata.cpp b/writefrudata.cpp
+index eca66d6..1ab63e5 100644
+--- a/writefrudata.cpp
++++ b/writefrudata.cpp
+@@ -20,11 +20,35 @@
+ #include <sstream>
+ #include <vector>
+
++// Platform Type
++constexpr auto SHALE_64        =0x59;
++constexpr auto SUNSTONE_DAP    =0x61;
++constexpr auto SHALE_SLT       =0x62;
++constexpr auto CINNABAR        =0x63;
++constexpr auto SUNSTONE        =0x64;
++constexpr auto SHALE           =0x65;
++constexpr auto SHALE64_1     = 67;   //0x43
++constexpr auto SHALE64_2     = 68;   //0x44
++constexpr auto SHALE64_3     = 69;   //0x45
++constexpr auto SHALE64_FR4   = 81;   //0x51
++constexpr auto CINNABAR_1       = 70;   //0x46
++constexpr auto CINNABAR_2       = 71;   //0x47
++constexpr auto CINNABAR_3       = 72;   //0x48
++constexpr auto SUNSTONE_1   = 73;   //0x49
++constexpr auto SUNSTONE_2   = 74;   //0x4A
++constexpr auto SUNSTONE_3   = 75;   //0x4B
++constexpr auto SUNSTONE_4   = 76;   //0x4C
++constexpr auto SUNSTONE_5   = 77;   //0x4D
++constexpr auto SUNSTONE_6   = 78;   //0x4E
++
++#define COMMAND_BOARD_ID    ("/sbin/fw_printenv -n board_id")
++#define COMMAND_LEN         3
++
+ using namespace ipmi::vpd;
+ using namespace phosphor::logging;
+
+-extern const FruMap frus;
+-extern const std::map<Path, InterfaceMap> extras;
++FruMap frus;
++std::map<Path, InterfaceMap> ipmi::vpd::extras;
+
+ using FruAreaVector = std::vector<std::unique_ptr<IPMIFruArea>>;
+
+@@ -158,6 +182,54 @@ auto getService(sdbusplus::bus::bus& bus, const std::string& intf,
+
+     return mapperResponse.begin()->first;
+ }
++std::string getPlatformID()
++{
++    FILE *pf;
++    char data[COMMAND_LEN] = {0};
++    std::stringstream ss;
++    unsigned int board_id = 0;
++
++    // Setup pipe for reading and execute to get u-boot environment
++    // variable board_id.
++    pf = popen(COMMAND_BOARD_ID,"r");
++
++    if(pf > 0)
++    {   // no error
++        if (fgets(data, COMMAND_LEN , pf) != NULL)
++        {
++            ss << std::hex << (std::string)data;
++            ss >> board_id;
++        }
++        pclose(pf);
++        if ( board_id > 0 || board_id < 0xFF )
++        {
++            switch (board_id)
++            {
++                case SHALE:
++                case SHALE_SLT:
++               
++                    return "shale96";
++                case CINNABAR:
++                    return "cinnabar";
++                case SUNSTONE:
++                case SUNSTONE_DAP:
++                
++                    return "sunstone";
++                case SHALE_64:
++                    return "shale64";
++                default:
++                    return "sunstone";
++            }//switch
++        }
++    }
++    else
++    {
++        log<level::DEBUG>("Unable to determine platform",
++                          entry("Defaulting to 2P"));
++    }
++
++    return "sunstone";
++}
+
+ /**
+  * Takes FRU data, invokes Parser for each FRU record area and updates
+@@ -174,6 +246,39 @@ int updateInventory(FruAreaVector& areaVector, sdbusplus::bus::bus& bus)
+     uint8_t fruid = 0;
+     IPMIFruInfo fruData;
+
++    // Load platform data structure
++    std::string platform = getPlatformID();
++    if (platform.compare("shale64") == 0)
++    {
++        log<level::INFO>("Loading Shale64 configuration");
++        frus = shale64_frus;
++        extras = shale64_extras;
++    }
++    else if (platform.compare("shale96") == 0)
++    {
++        log<level::INFO>("Loading Shale96 configuration");
++        frus = shale96_frus;
++        extras = shale96_extras;
++    }
++    else if (platform.compare("cinnabar") == 0)
++    {
++        log<level::INFO>("Loading Cinnabar configuration");
++        frus = cinnabar_frus;
++        extras = cinnabar_extras;
++    }
++    else if (platform.compare("sunstone") == 0)
++    {
++        log<level::INFO>("Loading Sunstone configuration");
++        frus = sunstone_frus;
++        extras = sunstone_extras;
++    }
++    else
++    {
++        log<level::ERR>("Unknown platform?!",
++                          entry("Registration failed"));
++    }
++
++
+     // For each FRU area, extract the needed data , get it parsed and update
+     // the Inventory.
+     for (const auto& fruArea : areaVector)

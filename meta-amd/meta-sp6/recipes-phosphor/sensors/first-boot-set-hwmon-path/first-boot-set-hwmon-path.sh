@@ -8,22 +8,21 @@ sync_hwmon_path() {
 
     # Read Board ID from u-boot env
     boardID=`fw_printenv board_id | sed -n "s/^board_id=//p"`
-
     case $boardID in
-           "3D"|"40"|"41"|"42"|"52")  # Onyx board_ids
-                ln -s  /etc/default/obmc/hwmon_onyx/ /etc/default/obmc/hwmon
+       "61"|"64")  # Sunstone board_ids
+                ln -s  /etc/default/obmc/hwmon_sunstone/ /etc/default/obmc/hwmon
            ;;
-           "3E"|"43"|"44"|"45"|"51")  # Quartz board_ids
-                ln -s  /etc/default/obmc/hwmon_quartz/ /etc/default/obmc/hwmon
+       "63")  # Cinnabar board_ids
+                ln -s  /etc/default/obmc/hwmon_cinnabar/ /etc/default/obmc/hwmon
            ;;
-           "46"|"47"|"48")  # Ruby board_ids
-                ln -s  /etc/default/obmc/hwmon_ruby/ /etc/default/obmc/hwmon
+       "59")  # Shale64 board_ids
+                ln -s  /etc/default/obmc/hwmon_shale64/ /etc/default/obmc/hwmon
            ;;
-           "49"|"4A"|"4B"|"4C"|"4D"|"4E")  # Titanite board_ids
-                ln -s  /etc/default/obmc/hwmon_titanite/ /etc/default/obmc/hwmon
+       "62"|"65")  # Shale96 board_ids
+                ln -s  /etc/default/obmc/hwmon_shale96/ /etc/default/obmc/hwmon
            ;;
-           *)  # Default set to Onyx board
-                ln -s  /etc/default/obmc/hwmon_onyx/ /etc/default/obmc/hwmon
+           *)  # Default set to Sunstone board
+                ln -s  /etc/default/obmc/hwmon_sunstone/ /etc/default/obmc/hwmon
     esac
 
 }
