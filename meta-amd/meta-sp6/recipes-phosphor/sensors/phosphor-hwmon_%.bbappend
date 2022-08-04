@@ -43,7 +43,7 @@ CHIPS_SHALE64 = " \
 CHIPS_CINNABAR = " \
         bus@1e7a0000/i3c4@6000/sbtsi@4c,22400000001 \
         bus@1e7a0000/i3c4@6000/sbrmi@3c,22400000002 \
-        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@0/emc2305@4d \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@0/emc2305_1_ap@4d \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@48 \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@49 \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4a \
@@ -52,6 +52,11 @@ CHIPS_CINNABAR = " \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4d \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4e \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4f \
+        bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/p0_vdd_11_sus@62 \
+        bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/p0_vdd_18_dual@64 \
+        bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/p0_vdd_33_dual@65 \
+        bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/p0_vdd_soc_run@61 \
+        bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/p0_vdd_vddio_run@63 \
         "
 
 # Sunstone specific sensors
