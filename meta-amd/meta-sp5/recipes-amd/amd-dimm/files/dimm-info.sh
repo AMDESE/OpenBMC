@@ -5,32 +5,39 @@ board_id=`/sbin/fw_printenv -n board_id`
 por_rst=`/sbin/fw_printenv -n por_rst`
 I3C_TOOL="/usr/bin/i3ctransfer"
 LOG_DIR="/var/lib/dimm"
-dimm_info="${LOG_DIR}/dimm.sh"
-dimm_info2="${LOG_DIR}/dimm_info.txt"
+dimm_sh="${LOG_DIR}/dimm.sh"
+dimm_info="${LOG_DIR}/dimm_info.txt"
 num_of_cpu=1
-pwr_on=0
-i3c_gpio=`gpioget 0 132`
 SET_PROP="busctl set-property xyz.openbmc_project.Inventory.Manager /xyz/openbmc_project/inventory/system/chassis/motherboard/"
 ITEM_DIMM="xyz.openbmc_project.Inventory.Item.Dimm"
+power_status() {
+        st=$(busctl get-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis CurrentPowerState | cut -d"." -f6)
+        if [ "$st" == "On\"" ]; then
+                echo "on"
+        else
+                echo "off"
+        fi
+}
 
-# check for Power On Reset due to AC Cycle
-pwr_state=$(busctl get-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis CurrentPowerState |cut -d"." -f6)
-
-echo "POR Reset " $por_rst
+# check for POR
 if [ "$por_rst" != "true" ]; then
-        echo "Not Power On Reset (AC Cycle), Run dimm.sh"
-        echo "Not Power On Reset (AC Cycle), Run dimm.sh" >> $dimm_info2
-    $dimm_info
+    echo "Not Power On Reset (AC Cycle), Run dimm.sh"
+    echo "Not Power On Reset (AC Cycle), Run dimm.sh" >> $dimm_info
+    $dimm_sh
     exit
-else
-    if [ "$pwr_state" == "On\"" ]; then
-        echo "Chassis Power is On after AC Cycle"
-        echo "Chassis Power is On after AC Cycle" >> $dimm_info2
-        busctl set-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis RequestedPowerTransition s "xyz.openbmc_project.State.Chassis.Transition.Off"
-        pwr_on=1
-        sleep 6
-    fi
 fi
+
+# check for Power State
+power_state=$(power_status)
+if [ "$power_state" == "on" ]; then
+    echo "DIMMs not re-scanned because Host Power is On (S0 State) "
+    echo "Retrieving existing DIMM information from BMC file system "
+    $dimm_sh
+    exit
+fi
+
+# re-bind I3C buses
+dimm-re-bind.sh
 
 # check for LOG Dir
 if [ -d "$LOG_DIR" ]; then
@@ -39,47 +46,31 @@ else
     mkdir $LOG_DIR
 fi
 
-#does BMC own i3c
-if [[ $i3c_gpio -ne 0 ]]; then
-    echo " BMC does not own DIMM I3C Bus, Run dimm.sh "
-    $dimm_info
-    exit
-fi
-
-#check Power State
-pwr_state=$(busctl get-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis CurrentPowerState |cut -d"." -f6)
-if [ "$pwr_state" == "On\"" ]; then
-    echo " System Power is On, BMC does not own DIMM I3C Bus, Run dimm.sh"
-    $dimm_info
-    exit
-fi
-
-
 # If no board_id then set num of cpu to 2 socket
 case "$board_id" in
     "3d" | "3D" | "40" | "41" | "42" | "52")
         echo " Onyx 1 CPU"
-        echo " Onyx 1 CPU" >> $dimm_info2
+        echo " Onyx 1 CPU" >> $dimm_info
         num_of_cpu=1
         ;;
     "46" | "47" | "48")
         echo " Ruby 1 CPU"
-        echo " Ruby 1 CPU" >> $dimm_info2
-        num_of_cpu=1
+        echo " Ruby 1 CPU" >> $dimm_info
+        num_of_cpu=2
         ;;
     "3e" | "3E" | "43" | "44" | "45" | "51")
         echo " Quartz 2 CPU"
-        echo " Quartz 2 CPU" >> $dimm_info2
+        echo " Quartz 2 CPU" >> $dimm_info
         num_of_cpu=2
         ;;
     "49" | "4A" | "4a" | "4B" | "4b" | "4C" |"4c" | "4D" | "4d" | "4E" | "4e")
         echo " Titanite 2 CPU "
-        echo " Titanite 2 CPU " >> $dimm_info2
+        echo " Titanite 2 CPU " >> $dimm_info
         num_of_cpu=2
         ;;
     *)
         echo " Unknown 2 CPU "
-        echo " Unknown 2 CPU " >> $dimm_info2
+        echo " Unknown 2 CPU " >> $dimm_info
         num_of_cpu=2
         ;;
 esac
@@ -97,10 +88,10 @@ num_ranks=0
 vendor=0
 
 #remove DIMM info files from prev read
+rm $dimm_sh
 rm $dimm_info
-rm $dimm_info2
-echo "#!/bin/bash" >> $dimm_info
-chmod 777 $dimm_info
+echo "#!/bin/bash" >> $dimm_sh
+chmod 777 $dimm_sh
 
 while [[ $sock_id < $num_of_cpu ]]
 do
@@ -111,7 +102,7 @@ do
         if [[ $? -ne 0 ]]
         then
             echo "No dimms detected on S"${sock_id} "I3C_Bus"${i3cid}
-            echo "No dimms detected on S"${sock_id} "I3C_Bus"${i3cid} >> $dimm_info2
+            echo "No dimms detected on S"${sock_id} "I3C_Bus"${i3cid} >> $dimm_info
             # No DIMMs on this I3C bus
             (( i3cid += 1))
             (( channel += 6 ))
@@ -200,28 +191,28 @@ do
             ;;
             *)
                 echo "wrong DIMM Number " $dimmNum
-                echo "wrong DIMM Number " $dimmNum >> $dimm_info2
+                echo "wrong DIMM Number " $dimmNum >> $dimm_info
                 exit
             ;;
             esac
 
             echo "--------------------------"
             echo $dimmID
-            echo "--------------------------" >> $dimm_info2
-            echo $dimmID                   >> $dimm_info2
+            echo "--------------------------" >> $dimm_info
+            echo $dimmID                   >> $dimm_info
             # Check if DIMM is present
             $I3C_TOOL -d ${spd_name} -w 0x80,0x00 -r 0x1 > /dev/null 2>&1
             if [[ $? -ne 0 ]]
             then
                 # DIMM not present
                 echo "\"Status\" : \"Absent\""
-                echo "\"Status\" : \"Absent\"" >> $dimm_info2
-                echo $SET_PROP$dimmID $ITEM_DIMM "MemorySizeInKB u 0" >> $dimm_info
+                echo "\"Status\" : \"Absent\"" >> $dimm_info
+                echo $SET_PROP$dimmID $ITEM_DIMM "MemorySizeInKB u 0" >> $dimm_sh
                 $SET_PROP$dimmID $ITEM_DIMM MemorySizeInKB u 0
                 continue
             fi
             echo "\"Status\" : \"Enabled\""
-            echo "\"Status\" : \"Enabled\"" >> $dimm_info2
+            echo "\"Status\" : \"Enabled\"" >> $dimm_info
 
             # DDR5 I3C DIMMs info
             id=$(( channel + dimm ))
@@ -232,9 +223,9 @@ do
             then
                 bus_type=DDR5
                 $SET_PROP$dimmID $ITEM_DIMM MemoryType s "xyz.openbmc_project.Inventory.Item.Dimm.DeviceType.DDR5"
-                echo $SET_PROP$dimmID $ITEM_DIMM "MemoryType s \"xyz.openbmc_project.Inventory.Item.Dimm.DeviceType.DDR5\"" >> $dimm_info
+                echo $SET_PROP$dimmID $ITEM_DIMM "MemoryType s \"xyz.openbmc_project.Inventory.Item.Dimm.DeviceType.DDR5\"" >> $dimm_sh
                 $SET_PROP$dimmID $ITEM_DIMM ECC s "xyz.openbmc_project.Inventory.Item.Dimm.Ecc.SingleBitECC"
-                echo $SET_PROP$dimmID $ITEM_DIMM "ECC s \"xyz.openbmc_project.Inventory.Item.Dimm.Ecc.SingleBitECC\"" >> $dimm_info
+                echo $SET_PROP$dimmID $ITEM_DIMM "ECC s \"xyz.openbmc_project.Inventory.Item.Dimm.Ecc.SingleBitECC\"" >> $dimm_sh
             else
                 bus_type=unsupported
             fi
@@ -244,12 +235,12 @@ do
             then
                 module_type=RDIMM
                 $SET_PROP$dimmID $ITEM_DIMM FormFactor s "xyz.openbmc_project.Inventory.Item.Dimm.FormFactor.RDIMM"
-                echo $SET_PROP$dimmID $ITEM_DIMM "FormFactor s \"xyz.openbmc_project.Inventory.Item.Dimm.FormFactor.RDIMM\"" >> $dimm_info
+                echo $SET_PROP$dimmID $ITEM_DIMM "FormFactor s \"xyz.openbmc_project.Inventory.Item.Dimm.FormFactor.RDIMM\"" >> $dimm_sh
             elif [[ ${spd_data[3]} -eq "0x04" ]]
             then
                 module_type=LRDIMM
                 $SET_PROP$dimmID $ITEM_DIMM FormFactor s "xyz.openbmc_project.Inventory.Item.Dimm.FormFactor.LRDIMM"
-                echo $SET_PROP$dimmID $ITEM_DIMM "FormFactor s \"xyz.openbmc_project.Inventory.Item.Dimm.FormFactor.LRDIMM\"" >> $dimm_info
+                echo $SET_PROP$dimmID $ITEM_DIMM "FormFactor s \"xyz.openbmc_project.Inventory.Item.Dimm.FormFactor.LRDIMM\"" >> $dimm_sh
             else
                 module_type=Reserved
             fi
@@ -325,7 +316,7 @@ do
             fi
 
             $SET_PROP$dimmID $ITEM_DIMM MemoryDataWidth q $spd_iowidth
-            echo $SET_PROP$dimmID $ITEM_DIMM " MemoryDataWidth q " $spd_iowidth >> $dimm_info
+            echo $SET_PROP$dimmID $ITEM_DIMM " MemoryDataWidth q " $spd_iowidth >> $dimm_sh
 
             # Read Number of Ranks
             mapfile -s 3  -t spd_data < <($I3C_TOOL -d ${spd_name} -w 0xC0,0x01 -r 0x40)
@@ -341,7 +332,7 @@ do
                 busWidth=64
             fi
             $SET_PROP$dimmID $ITEM_DIMM MemoryTotalWidth q $busWidth
-            echo $SET_PROP$dimmID $ITEM_DIMM MemoryTotalWidth q $busWidth >> $dimm_info
+            echo $SET_PROP$dimmID $ITEM_DIMM MemoryTotalWidth q $busWidth >> $dimm_sh
             pmic1Mfg1=${spd_data[6]}
             pmic1Mfg2=${spd_data[7]}
             pmic1Type=${spd_data[8]}
@@ -352,7 +343,7 @@ do
             pmic3Mfg2=${spd_data[15]}
             pmic3Type=${spd_data[16]}
             $SET_PROP$dimmID $ITEM_DIMM MemoryTypeDetail s "PMIC1:$pmic1Mfg1,$pmic1Mfg2,$pmic1Type PMIC2:$pmic2Mfg1,$pmic2Mfg2,$pmic2Type PMIC3:$pmic3Mfg1,$pmic3Mfg2,$pmic3Type"
-            echo $SET_PROP$dimmID $ITEM_DIMM " MemoryTypeDetail s  " \"PMIC1:$pmic1Mfg1,$pmic1Mfg2,$pmic1Type PMIC2:$pmic2Mfg1,$pmic2Mfg2,$pmic2Type PMIC3:$pmic3Mfg1,$pmic3Mfg2,$pmic3Type\" >> $dimm_info
+            echo $SET_PROP$dimmID $ITEM_DIMM " MemoryTypeDetail s  " \"PMIC1:$pmic1Mfg1,$pmic1Mfg2,$pmic1Type PMIC2:$pmic2Mfg1,$pmic2Mfg2,$pmic2Type PMIC3:$pmic3Mfg1,$pmic3Mfg2,$pmic3Type\" >> $dimm_sh
 
             num_ranks=$((${spd_data[42]} >> 3))
 
@@ -472,7 +463,7 @@ do
                 capacity=0
             fi
 
-            echo $SET_PROP$dimmID $ITEM_DIMM "MemorySizeInKB u " $capacity  >> $dimm_info
+            echo $SET_PROP$dimmID $ITEM_DIMM "MemorySizeInKB u " $capacity  >> $dimm_sh
             $SET_PROP$dimmID $ITEM_DIMM MemorySizeInKB u $capacity
 
             # Read DIMM Vendor
@@ -513,21 +504,22 @@ do
             fi
             rcd_rev=${spd_data[51]}
 
-            echo $SET_PROP$dimmID $ITEM_DIMM "MemoryDeviceLocator s" \"$dimmID\" >> $dimm_info
+            echo $SET_PROP$dimmID $ITEM_DIMM "MemoryDeviceLocator s" \"$dimmID\" >> $dimm_sh
             $SET_PROP$dimmID $ITEM_DIMM MemoryDeviceLocator s $dimmID
 
             $SET_PROP$dimmID $ITEM_DIMM MemoryConfiguredSpeedInMhz q $speed
-            echo $SET_PROP$dimmID $ITEM_DIMM " MemoryConfiguredSpeedInMhz q " $speed >> $dimm_info
+            echo $SET_PROP$dimmID $ITEM_DIMM " MemoryConfiguredSpeedInMhz q " $speed >> $dimm_sh
 
             $SET_PROP$dimmID $ITEM_DIMM Manufacturer s $vendor1
-            echo $SET_PROP$dimmID $ITEM_DIMM " Manufacturer s " $vendor1 >> $dimm_info
+            echo $SET_PROP$dimmID $ITEM_DIMM " Manufacturer s " $vendor1 >> $dimm_sh
 
             $SET_PROP$dimmID $ITEM_DIMM MemoryAttributes y $num_ranks
-            echo $SET_PROP$dimmID $ITEM_DIMM "MemoryAttributes y " $num_ranks  >> $dimm_info
+            echo $SET_PROP$dimmID $ITEM_DIMM "MemoryAttributes y " $num_ranks  >> $dimm_sh
 
             modelRcd=$(printf '%s 0x%2x' $rcd  $rcd_rev)
             $SET_PROP$dimmID $ITEM_DIMM Model s "RCD: $rcd $rcd_rev"
-            echo $SET_PROP$dimmID $ITEM_DIMM " Model s " \"RCD: $rcd $rcd_rev\"  >> $dimm_info
+            echo $SET_PROP$dimmID $ITEM_DIMM " Model s " \"RCD: $rcd $rcd_rev\"  >> $dimm_sh
+            echo "\"RCD\"" ":" \"$rcd $rcd_rev\" >> $dimm_info
 
             # Read DIMM Part Number
             mapfile -s 3  -t spd_data < <($I3C_TOOL -d ${spd_name} -w 0x80,0x04 -r 0x40)
@@ -549,25 +541,26 @@ do
             spdPN16=$(echo -e  "${spd_data[24]}" | awk '{printf "%c",$1}')
             spdPN=$spdPN1$spdPN2$spdPN3$spdPN4$spdPN5$spdPN6$spdPN7$spdPN8$spdPN9$spdPN10$spdPN11$spdPN12$spdPN13$spdPN14$spdPN15$spdPN16
             $SET_PROP$dimmID $ITEM_DIMM PartNumber s $spdPN
-            echo $SET_PROP$dimmID $ITEM_DIMM PartNumber s $spdPN  >> $dimm_info
+            echo $SET_PROP$dimmID $ITEM_DIMM PartNumber s $spdPN  >> $dimm_sh
 
             # Read DIMM Serial Number
             spdSN=$(printf '%02x%02x%02x%02x' ${spd_data[5]} ${spd_data[6]} ${spd_data[7]} ${spd_data[8]})
             $SET_PROP$dimmID $ITEM_DIMM SerialNumber s $spdSN
-            echo $SET_PROP$dimmID $ITEM_DIMM " SerialNumber s " $spdSN >> $dimm_info
+            echo $SET_PROP$dimmID $ITEM_DIMM " SerialNumber s " $spdSN >> $dimm_sh
 
             # Read DIMM date code
             dc0=${spd_data[3]}
             dc1=${spd_data[4]}
             spdDate=$(printf '%02x%02x' $dc0 $dc1)
             $SET_PROP$dimmID $ITEM_DIMM RevisionCode q $spdDate
-            echo $SET_PROP$dimmID $ITEM_DIMM " RevisionCode q " $spdDate >> $dimm_info
+            echo $SET_PROP$dimmID $ITEM_DIMM " RevisionCode q " $spdDate >> $dimm_sh
 
             # Print dimm info
             echo "\"Model\" : \"$bus_type\""
             echo "\"BaseModuleType\" : \"$module_type\""
             echo "\"Package\" : \"$package\""
-            echo "\"CapacityMiB\" : \"$capacity\""
+            capacityMB=$(( capacity / 1024 ))
+            echo "\"CapacityMB\" : \"$capacityMB\""
             echo "\"Density\" : \"$density\""
             echo "\"IO Width\" : \"$io_width\""
             echo "\"Bus Width\" : \"$busWidth\""
@@ -583,24 +576,24 @@ do
             printf "\"\n"
             echo "\"PMIC Vendor ID\" : \"PMIC1:$pmic1Mfg1,$pmic1Mfg2,$pmic1Type PMIC2:$pmic2Mfg1,$pmic2Mfg2,$pmic2Type PMIC3:$pmic3Mfg1,$pmic3Mfg2,$pmic3Type\""
             # Save dimm_info
-            echo "\"Model\" : \"$bus_type\""               >> $dimm_info2
-            echo "\"BaseModuleType\" : \"$module_type\""   >> $dimm_info2
-            echo "\"Package\" : \"$package\""              >> $dimm_info2
-            echo "\"CapacityMiB\" : \"$capacity\""         >> $dimm_info2
-            echo "\"Density\" : \"$density\""              >> $dimm_info2
-            echo "\"IO Width\" : \"$io_width\""            >> $dimm_info2
-            echo "\"Bus Width\" : \"$busWidth\""           >> $dimm_info2
-            echo "\"RankCount\" : \"$num_ranks\""          >> $dimm_info2
-            echo "\"OperatingSpeedMhz\" : \"$speed\""      >> $dimm_info2
-            echo "\"Manufacturer\" : \"$vendor1\""         >> $dimm_info2
-            printf "\"PartNumber\" : \"%s\" \n" $spdPN     >> $dimm_info2
-            printf "\"SerialNumber\" : \"%s\" \n" $spdSN   >> $dimm_info2
-            echo -n "\"Date\" : \"WW "                     >> $dimm_info2
-            echo -e "$dc1" | awk '{printf "%2x",$1}'       >> $dimm_info2
-            echo -n " Year 20"                             >> $dimm_info2
-            echo -e "$dc0" | awk '{printf "%2x",$1}'       >> $dimm_info2
-            printf "\"\n"                                  >> $dimm_info2
-            echo "\"PMIC Vendor ID\" : \"PMIC1:$pmic1Mfg1,$pmic1Mfg2,$pmic1Type PMIC2:$pmic2Mfg1,$pmic2Mfg2,$pmic2Type PMIC3:$pmic3Mfg1,$pmic3Mfg2,$pmic3Type\"" >> $dimm_info2
+            echo "\"Model\" : \"$bus_type\""               >> $dimm_info
+            echo "\"BaseModuleType\" : \"$module_type\""   >> $dimm_info
+            echo "\"Package\" : \"$package\""              >> $dimm_info
+            echo "\"CapacityMB\" : \"$capacityMB \""       >> $dimm_info
+            echo "\"Density\" : \"$density\""              >> $dimm_info
+            echo "\"IO Width\" : \"$io_width\""            >> $dimm_info
+            echo "\"Bus Width\" : \"$busWidth\""           >> $dimm_info
+            echo "\"RankCount\" : \"$num_ranks\""          >> $dimm_info
+            echo "\"OperatingSpeedMhz\" : \"$speed\""      >> $dimm_info
+            echo "\"Manufacturer\" : \"$vendor1\""         >> $dimm_info
+            printf "\"PartNumber\" : \"%s\" \n" $spdPN     >> $dimm_info
+            printf "\"SerialNumber\" : \"%s\" \n" $spdSN   >> $dimm_info
+            echo -n "\"Date\" : \"WW "                     >> $dimm_info
+            echo -e "$dc1" | awk '{printf "%2x",$1}'       >> $dimm_info
+            echo -n " Year 20"                             >> $dimm_info
+            echo -e "$dc0" | awk '{printf "%2x",$1}'       >> $dimm_info
+            printf "\"\n"                                  >> $dimm_info
+            echo "\"PMIC Vendor ID\" : \"PMIC1:$pmic1Mfg1,$pmic1Mfg2,$pmic1Type PMIC2:$pmic2Mfg1,$pmic2Mfg2,$pmic2Type PMIC3:$pmic3Mfg1,$pmic3Mfg2,$pmic3Type\"" >> $dimm_info
 
         done # END of dimm loop
 
@@ -610,8 +603,3 @@ do
     done # END of i3c_bus_per_sock loop
     (( sock_id += 1 ))
 done # END of num_sock loop
-if [[ $pwr_on -ne 0 ]]; then
-    busctl set-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis RequestedPowerTransition s  "xyz.openbmc_project.State.Chassis.Transition.On"
-    echo "Power On the system"
-    exit
-fi
