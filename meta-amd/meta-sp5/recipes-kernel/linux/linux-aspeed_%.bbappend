@@ -96,4 +96,5 @@ SRC_URI += "file://sp5.cfg \
             file://0096-ARM-dts-aspeed-Add-DIMM-devices-for-CH2-in-Ruby.patch \
             file://0097-linux-aspeed-Sensor-threshold-tuned-as-per-provided.patch \
             file://0098-Linux-aspeed-Fix-for-PVDD11_S3_P1-VR-Titanite-sensor.patch \
+            file://0099-linux-aspeed-Add-sys_inlet-temp-sensor-with-Titanite-dts.patch \
             "
