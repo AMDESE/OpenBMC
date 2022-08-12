@@ -2,7 +2,7 @@ FILESEXTRAPATHS_prepend_sh5 := "${THISDIR}/${PN}:"
 EXTRA_OECONF_append_sh5 = " --enable-negative-errno-on-fail"
 
 SRC_URI += "file://0001-Add-power-on-monitor-mechanism.patch \
-	   "
+           "
 # Onyx specific sensors
 CHIPS_ONYX = " \
         bus@1e7a0000/i3c4@6000/sbtsi@4c,22400000001 \
@@ -28,93 +28,55 @@ CHIPS_ONYX = " \
         bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/vdd18dualvrm@17 \
         "
 
-# Quartz specific sensors
-CHIPS_QUARTZ = " \
-        bus@1e7a0000/i3c4@6000/sbtsi@4c,22400000001 \
-        bus@1e7a0000/i3c5@7000/sbtsi@48,22400000001 \
-        bus@1e7a0000/i3c4@6000/sbrmi@3c,22400000002 \
-        bus@1e7a0000/i3c5@7000/sbrmi@38,22400000002 \
-        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@0/emc2305@4d \
-        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@1/emc2305@4d \
-        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@2/emc2305@4d \
-        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@3/emc2305@4d \
-        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@4/emc2305@4d \
-        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@48 \
-        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@49 \
-        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4a \
-        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4b \
-        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4c \
-        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4d \
-        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4e \
-        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4f \
-        bus@1e78a000/i2c-bus@300/i2cswitch@70/i2c@0/p0_vdd_core0_run@60 \
-        bus@1e78a000/i2c-bus@300/i2cswitch@70/i2c@0/p0_vdd_core1_run@61 \
-        bus@1e78a000/i2c-bus@300/i2cswitch@70/i2c@0/p0_vdd_vddio_run@62 \
-        bus@1e78a000/i2c-bus@300/i2cswitch@70/i2c@0/p0_vdd_11_sus@63 \
-        bus@1e78a000/i2c-bus@300/i2cswitch@70/i2c@0/p0_vdd_18_dual@64 \
-        bus@1e78a000/i2c-bus@300/i2cswitch@70/i2c@0/p0_vdd_33_dual@65 \
-        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@0/p1_vdd_core0_run@60 \
-        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@0/p1_vdd_core1_run@61 \
-        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@0/p1_vdd_vddio_run@62 \
-        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@0/p1_vdd_11_sus@63 \
-        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@0/p1_vdd_18_dual@64 \
-        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@0/p1_vdd_33_dual@65 \
+# SH5D807 specific sensors
+CHIPS_SH5D807 = " \
+        bus@1e78a000/i2c-bus@100/vdd33run@13 \
+        bus@1e78a000/i2c-bus@100/vdd33dual@14 \
+        bus@1e78a000/i2c-bus@100/vdd5dual@15 \
+        bus@1e78a000/i2c-bus@200/i2cswitch@70/i2c@0/vdd_io_e32@30 \
+        bus@1e78a000/i2c-bus@200/i2cswitch@70/i2c@0/vdd_33_s5@36 \
+        bus@1e78a000/i2c-bus@200/i2cswitch@70/i2c@0/vddcr_socio_a@3c \
+        bus@1e78a000/i2c-bus@200/i2cswitch@70/i2c@0/vddcr_socio_c@41 \
+        bus@1e78a000/i2c-bus@200/i2cswitch@70/i2c@0/vddio_hbm_b@44 \
+        bus@1e78a000/i2c-bus@200/i2cswitch@70/i2c@1/vdd_18@33 \
+        bus@1e78a000/i2c-bus@200/i2cswitch@70/i2c@1/vdd_18_s5@39 \
+        bus@1e78a000/i2c-bus@200/i2cswitch@70/i2c@1/vddio_hbm_d@47 \
+        bus@1e78a000/i2c-bus@200/i2cswitch@70/i2c@1/vdd_075_usr@4a \
+        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@0/emc2305@4d \
+        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@1/emc2305@4d \
+        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@2/emc2305@4d \
+        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@5/lm75a@48 \
+        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@5/lm75a@49 \
+        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@5/lm75a@4a \
+        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@5/lm75a@4b \
+        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@5/lm75a@4c \
+        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@5/lm75a@4d \
+        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@5/lm75a@4e \
+        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@5/lm75a@4f \
+        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@7/tmp468@48 \
         "
 
-# Ruby specific sensors
-CHIPS_RUBY = " \
-        bus@1e7a0000/i3c4@6000/sbtsi@4c,22400000001 \
-        bus@1e7a0000/i3c4@6000/sbrmi@3c,22400000002 \
-        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@0/emc2305@4d \
-        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@48 \
-        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@49 \
-        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4a \
-        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4b \
-        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4c \
-        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4d \
-        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4e \
-        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4f \
-        bus@1e78a000/i2c-bus@300/i2cswitch@70/i2c@0/vddcr_core0_soc@61 \
-        bus@1e78a000/i2c-bus@300/i2cswitch@70/i2c@0/vddcr_core1_11@62 \
-        bus@1e78a000/i2c-bus@300/i2cswitch@70/i2c@0/vddcr_vddio_33@63 \
-        "
+# Sidley specific sensors
+#CHIPS_SIDLEY = "         "
 
-# Titanite specific sensors
-CHIPS_TITANITE = " \
-        bus@1e7a0000/i3c4@6000/sbtsi@4c,22400000001 \
-        bus@1e7a0000/i3c5@7000/sbtsi@48,22400000001 \
-        bus@1e7a0000/i3c4@6000/sbrmi@3c,22400000002 \
-        bus@1e7a0000/i3c5@7000/sbrmi@38,22400000002 \
-        bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@0/i2cswitch@77/i2c@0/amd_cpld@28 \
-        bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@0/i2cswitch@77/i2c@3/lm75a@4b \
-        bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@1/lm75a@48 \
-        bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@1/lm75a@49 \
-        bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@1/lm75a@4a \
-        bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@1/lm75a@4b \
-        bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@1/lm75a@4c \
-        bus@1e78a000/i2c-bus@300/pvdd11_s3_p0@63 \
-        bus@1e78a000/i2c-bus@300/pvddcr_soc_p0@61 \
-        bus@1e78a000/i2c-bus@300/pvddio_p0@62 \
-        bus@1e78a000/i2c-bus@380/pvdd11_s3_p1@74 \
-        bus@1e78a000/i2c-bus@380/pvddcr_soc_p1@72 \
-        bus@1e78a000/i2c-bus@380/pvddio_p1@75 \
-        "
+# Parrypeak specific sensors
+#CHIPS_PARRYPEAK = "         "
+
 ITEMSFMT = "ahb/apb/{0}.conf"
 ITEMS_ONYX = "${@compose_list(d, 'ITEMSFMT', 'CHIPS_ONYX')}"
 ITEMS_ONYX += "iio-hwmon-adc121c.conf"
-ITEMS_QUARTZ = "${@compose_list(d, 'ITEMSFMT', 'CHIPS_QUARTZ')}"
-ITEMS_QUARTZ += "iio-hwmon-adc121c.conf"
-ITEMS_RUBY = "${@compose_list(d, 'ITEMSFMT', 'CHIPS_RUBY')}"
-ITEMS_RUBY += "iio-hwmon-adc121c.conf"
-ITEMS_TITANITE = "${@compose_list(d, 'ITEMSFMT', 'CHIPS_TITANITE')}"
-ITEMS_TITANITE += "iio-hwmon-adc121c.conf"
+ITEMS_SH5D807 = "${@compose_list(d, 'ITEMSFMT', 'CHIPS_SH5D807')}"
+ITEMS_SH5D807 += "iio-hwmon-adc121c.conf"
+#ITEMS_SIDLEY = "${@compose_list(d, 'ITEMSFMT', 'CHIPS_SIDLEY')}"
+#ITEMS_SIDLEY += "iio-hwmon-adc121c.conf"
+#ITEMS_PARRYPEAK = "${@compose_list(d, 'ITEMSFMT', 'CHIPS_PARRYPEAK')}"
+#ITEMS_PARRYPEAK += "iio-hwmon-adc121c.conf"
 
 ENVS_ONYX = "obmc/hwmon_onyx/{0}"
-SYSTEMD_ENVIRONMENT_FILE_${PN}_append_sp5 += " ${@compose_list(d, 'ENVS_ONYX', 'ITEMS_ONYX')}"
-ENVS_QUARTZ = "obmc/hwmon_quartz/{0}"
-SYSTEMD_ENVIRONMENT_FILE_${PN}_append_sp5 += " ${@compose_list(d, 'ENVS_QUARTZ', 'ITEMS_QUARTZ')}"
-ENVS_RUBY = "obmc/hwmon_ruby/{0}"
-SYSTEMD_ENVIRONMENT_FILE_${PN}_append_sp5 += " ${@compose_list(d, 'ENVS_RUBY', 'ITEMS_RUBY')}"
-ENVS_TITANITE = "obmc/hwmon_titanite/{0}"
-SYSTEMD_ENVIRONMENT_FILE_${PN}_append_sp5 += " ${@compose_list(d, 'ENVS_TITANITE', 'ITEMS_TITANITE')}"
-
+SYSTEMD_ENVIRONMENT_FILE_${PN}_append_sh5 += " ${@compose_list(d, 'ENVS_ONYX', 'ITEMS_ONYX')}"
+ENVS_SH5D807 = "obmc/hwmon_sh5d807/{0}"
+SYSTEMD_ENVIRONMENT_FILE_${PN}_append_sh5 += " ${@compose_list(d, 'ENVS_SH5D807', 'ITEMS_SH5D807')}"
+#ENVS_SIDLEY = "obmc/hwmon_sidley/{0}"
+#SYSTEMD_ENVIRONMENT_FILE_${PN}_append_sh5 += " ${@compose_list(d, 'ENVS_SIDLEY', 'ITEMS_SIDLEY')}"
+#ENVS_PARRYPEAK = "obmc/hwmon_parrypeak/{0}"
+#SYSTEMD_ENVIRONMENT_FILE_${PN}_append_sh5 += " ${@compose_list(d, 'ENVS_PARRYPEAK', 'ITEMS_PARRYPEAK')}"
