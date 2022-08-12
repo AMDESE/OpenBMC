@@ -92,6 +92,7 @@ CHIPS_TITANITE = " \
         bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@1/lm75a@4a \
         bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@1/lm75a@4b \
         bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@1/lm75a@4c \
+        bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@6/lm75a@4a \
         bus@1e78a000/i2c-bus@300/pvdd11_s3_p0@63 \
         bus@1e78a000/i2c-bus@300/pvddcr_soc_p0@61 \
         bus@1e78a000/i2c-bus@300/pvddio_p0@62 \
