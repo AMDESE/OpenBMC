@@ -12,19 +12,18 @@ sync_associations_path() {
        "3D"|"40"|"41"|"42"|"52")  # Onyx board_ids
             ln -s  /usr/share/phosphor-inventory-manager/onyx-associations.json /usr/share/phosphor-inventory-manager/associations.json
        ;;
-       "3E"|"43"|"44"|"45"|"51")  # Quartz board_ids
-            ln -s  /usr/share/phosphor-inventory-manager/quartz-associations.json /usr/share/phosphor-inventory-manager/associations.json
+       "5F")  # Sidley board_ids
+        ln -s  /usr/share/phosphor-inventory-manager/sidley-associations.json /usr/share/phosphor-inventory-manager/associations.json
        ;;
-       "46"|"47"|"48")  # Ruby board_ids
-            ln -s  /usr/share/phosphor-inventory-manager/ruby-associations.json /usr/share/phosphor-inventory-manager/associations.json
+       "60")  # Pary Peak board_ids
+        ln -s  /usr/share/phosphor-inventory-manager/parrypeak-associations.json /usr/share/phosphor-inventory-manager/associations.json
        ;;
-       "49"|"4A"|"4B"|"4C"|"4D"|"4E"|"4F")  # Titanite board_ids
-            ln -s  /usr/share/phosphor-inventory-manager/titanite-associations.json /usr/share/phosphor-inventory-manager/associations.json
+       "5C"|"5D"|"5E"|"6C"|"6D")  # SH5 board_ids
+        ln -s  /usr/share/phosphor-inventory-manager/sh5d807-associations.json /usr/share/phosphor-inventory-manager/associations.json
        ;;
-       *)  # Default set to Quartz board
-            ln -s  /usr/share/phosphor-inventory-manager/quartz-associations.json /usr/share/phosphor-inventory-manager/associations.json
+       *)  # Default set to Onyx board
+        ln -s  /usr/share/phosphor-inventory-manager/sh5d807-associations.json /usr/share/phosphor-inventory-manager/associations.json
     esac
-
 }
 
 # Set soft link for /etc/default/obmc/hwmon based on the platfrom

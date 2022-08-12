@@ -1,0 +1,36 @@
+[
+    {
+        "path": "system/chassis/motherboard",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "inventory",
+                    "fType": "sensors"
+                },
+                "paths":
+                [
+
+                ]
+            }
+        ]
+    },
+    {
+        "path": "system/chassis",
+        "endpoints":
+        [
+            {
+                "types":
+                {
+                    "rType": "chassis",
+                    "fType": "all_sensors"
+                },
+                "paths":
+                [
+
+                ]
+            }
+        ]
+    }
+]
