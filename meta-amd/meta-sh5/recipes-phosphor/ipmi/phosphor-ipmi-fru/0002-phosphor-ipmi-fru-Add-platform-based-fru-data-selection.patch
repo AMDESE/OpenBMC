@@ -1,0 +1,231 @@
+From 6e704a3c64e05ddc504887b183d9467634115be3 Mon Sep 17 00:00:00 2001
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Wed, 17 Aug 2022 14:17:17 -0500
+Subject: [PATCH 1/1] phosphor-ipmi-fru: Add platform based fru data selection
+ logic
+
+Platform based FRU data selection logic added
+
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ Makefile.am      | 23 ++++++++++----
+ configure.ac     | 20 ++++++++----
+ frup.hpp         |  3 ++
+ types.hpp        |  3 ++
+ writefrudata.cpp | 83 ++++++++++++++++++++++++++++++++++++++++++++++--
+ 5 files changed, 117 insertions(+), 15 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 2288a3b..97c6c76 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,4 +1,7 @@
+-BUILT_SOURCES=fru-gen.cpp extra-properties-gen.cpp
++BUILT_SOURCES= onyx-fru-gen.cpp \
++	onyx-extra-properties-gen.cpp \
++	sh5d807-fru-gen.cpp \
++	sh5d807-extra-properties-gen.cpp
+ AM_DEFAULT_SOURCE_EXT = .cpp
+
+ CLEANFILES=$(BUILT_SOURCES)
+@@ -16,10 +19,12 @@ phosphor_read_eeprom_LDADD = libwritefrudata.la
+
+ lib_LTLIBRARIES = libwritefrudata.la
+ libwritefrudata_la_SOURCES = frup.cpp \
+-	fru-gen.cpp \
++	onyx-fru-gen.cpp \
++	sh5d807-fru-gen.cpp \
+ 	fru_area.cpp \
+ 	writefrudata.cpp \
+-	extra-properties-gen.cpp
++	onyx-extra-properties-gen.cpp \
++	sh5d807-extra-properties-gen.cpp
+ libwritefrudata_la_LDFLAGS = $(SYSTEMD_LIBS) \
+ 	$(libmapper_LIBS) \
+ 	$(SDBUSPLUS_LIBS) \
+@@ -41,7 +46,11 @@ libstrgfnhandler_la_LIBADD = libwritefrudata.la
+ libstrgfnhandler_la_CXXFLAGS = $(PHOSPHOR_LOGGING_CFLAGS) \
+ 	$(LIBIPMID_CFLAGS)
+
+-fru-gen.cpp:
+-	$(AM_V_GEN)@FRUGEN@ -o $(top_builddir) generate-cpp
+-extra-properties-gen.cpp:
+-	$(AM_V_GEN)@PROPGEN@
++onyx-fru-gen.cpp:
++	$(AM_V_GEN)@ONYX_FRUGEN@ -o $(top_builddir) -p onyx generate-cpp
++onyx-extra-properties-gen.cpp:
++	$(AM_V_GEN)@ONYX_PROPGEN@ -p onyx
++sh5d807-fru-gen.cpp:
++	$(AM_V_GEN)@SH5D807_FRUGEN@ -o $(top_builddir) -p sh5d807 generate-cpp
++sh5d807-extra-properties-gen.cpp:
++	$(AM_V_GEN)@SH5D807_PROPGEN@ -p sh5d807
+diff --git a/configure.ac b/configure.ac
+index 47c31bb..e34ab55 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -64,12 +64,20 @@ AS_IF([test "x$enable_oe_sdk" == "xyes"],
+     AC_SUBST([OESDK_TESTCASE_FLAGS], [$testcase_flags])
+ )
+
+-AS_IF([test "x$YAML_GEN" == "x"], [YAML_GEN="example.yaml"])
+-FRUGEN="$PYTHON $srcdir/scripts/fru_gen.py -i $YAML_GEN"
+-AC_SUBST(FRUGEN)
+-AS_IF([test "x$PROP_YAML" == "x"], [PROP_YAML="extra-properties-example.yaml"])
+-PROPGEN="$PYTHON $srcdir/scripts/extra-properties.py -e $PROP_YAML"
+-AC_SUBST(PROPGEN)
++AS_IF([test "x$ONYX_YAML_GEN" == "x"], [ONYX_YAML_GEN="example.yaml"])
++ONYX_FRUGEN="$PYTHON $srcdir/scripts/fru_gen.py -i $ONYX_YAML_GEN"
++AC_SUBST(ONYX_FRUGEN)
++AS_IF([test "x$ONYX_PROP_YAML" == "x"], [ONYX_PROP_YAML="extra-properties-example.yaml"])
++ONYX_PROPGEN="$PYTHON $srcdir/scripts/extra-properties.py -e $ONYX_PROP_YAML"
++AC_SUBST(ONYX_PROPGEN)
++
++AS_IF([test "x$SH5D807_YAML_GEN" == "x"], [SH5D807_YAML_GEN="example.yaml"])
++SH5D807_FRUGEN="$PYTHON $srcdir/scripts/fru_gen.py -i $SH5D807_YAML_GEN"
++AC_SUBST(SH5D807_FRUGEN)
++AS_IF([test "x$SH5D807_PROP_YAML" == "x"], [SH5D807_PROP_YAML="extra-properties-example.yaml"])
++SH5D807_PROPGEN="$PYTHON $srcdir/scripts/extra-properties.py -e $SH5D807_PROP_YAML"
++AC_SUBST(SH5D807_PROPGEN)
++
+
+ # Create configured output
+ AC_CONFIG_FILES([Makefile])
+diff --git a/frup.hpp b/frup.hpp
+index 6afd621..ac0876d 100644
+--- a/frup.hpp
++++ b/frup.hpp
+@@ -112,4 +112,7 @@ int parse_fru(const void* msgbuf, sd_bus_message* vpdtbl);
+ int parse_fru_area(const uint8_t area, const void* msgbuf, const size_t len,
+                    IPMIFruInfo& info);
+
++extern FruMap frus;
++extern const FruMap onyx_frus;
++extern const FruMap sh5d807_frus;
+ #endif
+diff --git a/types.hpp b/types.hpp
+index 46abfe0..8255b3b 100644
+--- a/types.hpp
++++ b/types.hpp
+@@ -33,5 +33,8 @@ using InterfaceMap = std::map<Interface, PropertyMap>;
+ using Object = sdbusplus::message::object_path;
+ using ObjectMap = std::map<Object, InterfaceMap>;
+
++extern std::map<Path, InterfaceMap> extras;
++extern const std::map<Path, InterfaceMap> onyx_extras;
++extern const std::map<Path, InterfaceMap> sh5d807_extras;
+ } // namespace vpd
+ } // namespace ipmi
+diff --git a/writefrudata.cpp b/writefrudata.cpp
+index eca66d6..99ac65f 100644
+--- a/writefrudata.cpp
++++ b/writefrudata.cpp
+@@ -20,11 +20,26 @@
+ #include <sstream>
+ #include <vector>
+
++// Platform Type
++constexpr auto ONYX_SLT     = 61;   //0x3D
++constexpr auto ONYX_1       = 64;   //0x40
++constexpr auto ONYX_2       = 65;   //0x41
++constexpr auto ONYX_3       = 66;   //0x42
++constexpr auto ONYX_FR4     = 82;   //0x52
++constexpr auto SH5D807_1    = 92;   //0x5C
++constexpr auto SH5D807_2    = 93;   //0x5D
++constexpr auto SH5D807_3    = 94;   //0x5E
++constexpr auto SH5D807_4    = 108;   //0x6C
++constexpr auto SH5D807_5    = 109;   //0x6D
++
++#define COMMAND_BOARD_ID    ("/sbin/fw_printenv -n board_id")
++#define COMMAND_LEN         3
++
+ using namespace ipmi::vpd;
+ using namespace phosphor::logging;
+
+-extern const FruMap frus;
+-extern const std::map<Path, InterfaceMap> extras;
++FruMap frus;
++std::map<Path, InterfaceMap> ipmi::vpd::extras;
+
+ using FruAreaVector = std::vector<std::unique_ptr<IPMIFruArea>>;
+
+@@ -158,6 +173,49 @@ auto getService(sdbusplus::bus::bus& bus, const std::string& intf,
+
+     return mapperResponse.begin()->first;
+ }
++std::string getPlatformID()
++{
++    FILE *pf;
++    char data[COMMAND_LEN] = {0};
++    std::stringstream ss;
++    unsigned int board_id = 0;
++
++    // Setup pipe for reading and execute to get u-boot environment
++    // variable board_id.
++    pf = popen(COMMAND_BOARD_ID,"r");
++
++    if(pf > 0)
++    {   // no error
++        if (fgets(data, COMMAND_LEN , pf) != NULL)
++        {
++            ss << std::hex << (std::string)data;
++            ss >> board_id;
++        }
++        pclose(pf);
++        if ( board_id > 0 || board_id < 0xFF )
++        {
++            switch (board_id)
++            {
++                case ONYX_SLT:
++                case ONYX_1 ... ONYX_3:
++                case ONYX_FR4:
++                    return "onyx";
++                case SH5D807_1 ... SH5D807_3:
++                case SH5D807_4 ... SH5D807_5:
++                    return "sh5807";
++                default:
++                    return "sh5d807";
++            }//switch
++        }
++    }
++    else
++    {
++        log<level::DEBUG>("Unable to determine platform",
++                          entry("Defaulting to 2P"));
++    }
++
++    return "sh5d807";
++}
+
+ /**
+  * Takes FRU data, invokes Parser for each FRU record area and updates
+@@ -174,6 +232,27 @@ int updateInventory(FruAreaVector& areaVector, sdbusplus::bus::bus& bus)
+     uint8_t fruid = 0;
+     IPMIFruInfo fruData;
+
++    // Load platform data structure
++    std::string platform = getPlatformID();
++    if (platform.compare("onyx") == 0)
++    {
++        log<level::INFO>("Loading Onyx configuration");
++        frus = onyx_frus;
++        extras = onyx_extras;
++    }
++    else if (platform.compare("sh5d807") == 0)
++    {
++        log<level::INFO>("Loading Sh5d807 configuration");
++        frus = sh5d807_frus;
++        extras = sh5d807_extras;
++    }
++    else
++    {
++        log<level::ERR>("Unknown platform?!",
++                          entry("Registration failed"));
++    }
++
++
+     // For each FRU area, extract the needed data , get it parsed and update
+     // the Inventory.
+     for (const auto& fruArea : areaVector)
+--
+2.17.1
+
