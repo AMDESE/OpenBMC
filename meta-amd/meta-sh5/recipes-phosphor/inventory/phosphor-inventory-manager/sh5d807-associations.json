@@ -95,7 +95,7 @@
                     "/xyz/openbmc_project/sensors/current/VDD_SOCIO_C_IOUT1",
                     "/xyz/openbmc_project/sensors/current/VDD_SOCIO_C_IOUT2",
                     "/xyz/openbmc_project/sensors/power/VDD_SOCIO_C_PIN1",
-                    "/xyz/openbmc_project/sensors/power/VDD_SOCIO_C_POUT1"
+                    "/xyz/openbmc_project/sensors/power/VDD_SOCIO_C_POUT1",
                     "/xyz/openbmc_project/sensors/power/VDD_SOCIO_C_POUT2",
                     "/xyz/openbmc_project/sensors/temperature/VDD_SOCIO_C_TEMP1",
                     "/xyz/openbmc_project/sensors/temperature/VDD_SOCIO_C_TEMP2",
@@ -157,7 +157,7 @@
                     "/xyz/openbmc_project/sensors/voltage/VDD_075_USR_VOUT1",
                     "/xyz/openbmc_project/sensors/voltage/VDD_075_USR_VOUT2",
                     "/xyz/openbmc_project/sensors/current/VDD_075_USR_IIN1",
-                    "/xyz/openbmc_project/sensors/current/VDD_075_USR_IOUT1"
+                    "/xyz/openbmc_project/sensors/current/VDD_075_USR_IOUT1",
                     "/xyz/openbmc_project/sensors/current/VDD_075_USR_IOUT2",
                     "/xyz/openbmc_project/sensors/power/VDD_075_USR_PIN1",
                     "/xyz/openbmc_project/sensors/power/VDD_075_USR_POUT1",

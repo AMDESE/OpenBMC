@@ -21,7 +21,7 @@ sync_associations_path() {
        "5C"|"5D"|"5E"|"6C"|"6D")  # SH5 board_ids
         ln -s  /usr/share/phosphor-inventory-manager/sh5d807-associations.json /usr/share/phosphor-inventory-manager/associations.json
        ;;
-       *)  # Default set to Onyx board
+       *)  # Default set to sh5d807 board
         ln -s  /usr/share/phosphor-inventory-manager/sh5d807-associations.json /usr/share/phosphor-inventory-manager/associations.json
     esac
 }
