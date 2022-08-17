@@ -25,12 +25,19 @@ do_install() {
   cp --preserve=mode,timestamps -R ${S}/Source/Linux/bmc/yaapd ${D}${bindir}/
   install -d ${D}/${systemd_unitdir}/system
   install -m 0644 ${S}/yaapd.service ${D}/${systemd_unitdir}/system
-  install -d ${D}${sysconfdir}/${BPN}/1P
-  install -d ${D}${sysconfdir}/${BPN}/2P
-  install -m 0644 ${S}/Data/1P/* ${D}${sysconfdir}/${BPN}/1P/
-  install -m 0644 ${S}/Data/2P/* ${D}${sysconfdir}/${BPN}/2P/
+  install -d ${D}${sysconfdir}/${BPN}/SP5/1P
+  install -d ${D}${sysconfdir}/${BPN}/SP5/2P
+  install -d ${D}${sysconfdir}/${BPN}/SH5/1P
+  install -d ${D}${sysconfdir}/${BPN}/SH5/2P
+  install -d ${D}${sysconfdir}/${BPN}/SP6/1P
+  install -d ${D}${sysconfdir}/${BPN}/SP6/2P
+  install -m 0644 ${S}/Data/SP5/1P/* ${D}${sysconfdir}/${BPN}/SP5/1P/
+  install -m 0644 ${S}/Data/SP5/2P/* ${D}${sysconfdir}/${BPN}/SP5/2P/
+  install -m 0644 ${S}/Data/SH5/1P/* ${D}${sysconfdir}/${BPN}/SH5/1P/
+  install -m 0644 ${S}/Data/SH5/2P/* ${D}${sysconfdir}/${BPN}/SH5/2P/
+  install -m 0644 ${S}/Data/SP6/1P/* ${D}${sysconfdir}/${BPN}/SP6/1P/
+  install -m 0644 ${S}/Data/SP6/2P/* ${D}${sysconfdir}/${BPN}/SP6/2P/
 }
-
 
 inherit systemd
 SYSTEMD_SERVICE_${PN} += "yaapd.service \
