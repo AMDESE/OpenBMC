@@ -1,0 +1,340 @@
+From f02d5e445155e4752a58a302ffbd250e8ae32f83 Mon Sep 17 00:00:00 2001
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Wed, 17 Aug 2022 13:04:16 -0500
+Subject: [PATCH 1/1] phosphor-ipmi-host : Modify platformization changes for
+ sh5 platforms
+
+phosphor-ipmi-host code modified to support platform based sensor,
+invenotry and fru data selection
+
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ Makefile.am        | 30 +++++++++++-----
+ configure.ac       | 43 ++++++++++++++--------
+ fruread.hpp        |  4 +++
+ read_fru_data.cpp  |  1 -
+ selutility.cpp     |  1 -
+ selutility.hpp     |  4 +++
+ sensorhandler.cpp  | 10 +-----
+ sensorhandler.hpp  | 11 ++++++
+ storagehandler.cpp | 90 ++++++++++++++++++++++++++++++++++++++++++++--
+ 9 files changed, 158 insertions(+), 36 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index fbeb379..deaba38 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -29,9 +29,12 @@ ipmid_SOURCES = \
+ 	host-cmd-manager.cpp
+
+ libipmi20_BUILT_LIST = \
+-	sensor-gen.cpp \
+-	inventory-sensor-gen.cpp \
+-	fru-read-gen.cpp
++	onyx-sensor-gen.cpp \
++	onyx-inventory-sensor-gen.cpp \
++	onyx-fru-read-gen.cpp \
++	sh5d807-sensor-gen.cpp \
++	sh5d807-inventory-sensor-gen.cpp \
++	sh5d807-fru-read-gen.cpp
+
+ BUILT_SOURCES = \
+ 	$(IPMI_WHITELIST_SOURCE) \
+@@ -75,14 +78,23 @@ ipmid_LDFLAGS = \
+ ipmiwhitelist.cpp: ${srcdir}/generate_whitelist.sh $(WHITELIST_CONF)
+ 	$(SHELL) $^ > $@
+
+-sensor-gen.cpp: scripts/writesensor.mako.cpp scripts/sensor_gen.py @SENSOR_YAML_GEN@
+-	$(AM_V_GEN)@SENSORGEN@ -o $(top_builddir) generate-cpp
++onyx-sensor-gen.cpp: scripts/writesensor.mako.cpp scripts/sensor_gen.py @ONYX_SENSOR_YAML_GEN@
++	$(AM_V_GEN)@ONYX_SENSORGEN@ -o $(top_builddir) -p onyx generate-cpp
+
+-inventory-sensor-gen.cpp: scripts/inventorysensor.mako.cpp scripts/inventory-sensor.py @INVSENSOR_YAML_GEN@
+-	$(AM_V_GEN)@INVSENSORGEN@ -o $(top_builddir) generate-cpp
++onyx-inventory-sensor-gen.cpp: scripts/inventorysensor.mako.cpp scripts/inventory-sensor.py @ONYX_INVSENSOR_YAML_GEN@
++	$(AM_V_GEN)@ONYX_INVSENSORGEN@ -o $(top_builddir) -p onyx generate-cpp
+
+-fru-read-gen.cpp: scripts/readfru.mako.cpp scripts/fru_gen.py @FRU_YAML_GEN@
+-	$(AM_V_GEN)@FRUGEN@ -o $(top_builddir) generate-cpp
++onyx-fru-read-gen.cpp: scripts/readfru.mako.cpp scripts/fru_gen.py @ONYX_FRU_YAML_GEN@
++	$(AM_V_GEN)@ONYX_FRUGEN@ -o $(top_builddir) -p onyx generate-cpp
++
++sh5d807-sensor-gen.cpp: scripts/writesensor.mako.cpp scripts/sensor_gen.py @SH5D807_SENSOR_YAML_GEN@
++	$(AM_V_GEN)@SH5D807_SENSORGEN@ -o $(top_builddir) -p sh5d807 generate-cpp
++
++sh5d807-inventory-sensor-gen.cpp: scripts/inventorysensor.mako.cpp scripts/inventory-sensor.py @SH5D807_INVSENSOR_YAML_GEN@
++	$(AM_V_GEN)@SH5D807_INVSENSORGEN@ -o $(top_builddir) -p sh5d807 generate-cpp
++
++sh5d807-fru-read-gen.cpp: scripts/readfru.mako.cpp scripts/fru_gen.py @SH5D807_FRU_YAML_GEN@
++	$(AM_V_GEN)@SH5D807_FRUGEN@ -o $(top_builddir) -p sh5d807 generate-cpp
+
+ providers_LTLIBRARIES += libipmi20.la
+ if FEATURE_TRANSPORT_OEM
+diff --git a/configure.ac b/configure.ac
+index dcf5e79..f204a10 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -125,20 +125,35 @@ if test -z "$WHITELIST_CONF"; then
+         WHITELIST_CONF=${srcdir}/host-ipmid-whitelist.conf
+ fi
+
+-AS_IF([test "x$SENSOR_YAML_GEN" == "x"], [SENSOR_YAML_GEN="$srcdir/scripts/sensor-example.yaml"])
+-SENSORGEN="$PYTHON ${srcdir}/scripts/sensor_gen.py -i $SENSOR_YAML_GEN"
+-AC_SUBST(SENSOR_YAML_GEN)
+-AC_SUBST(SENSORGEN)
+-
+-AS_IF([test "x$INVSENSOR_YAML_GEN" == "x"], [INVSENSOR_YAML_GEN="$srcdir/scripts/inventory-sensor-example.yaml"])
+-INVSENSORGEN="$PYTHON ${srcdir}/scripts/inventory-sensor.py -i $INVSENSOR_YAML_GEN"
+-AC_SUBST(INVSENSOR_YAML_GEN)
+-AC_SUBST(INVSENSORGEN)
+-
+-AS_IF([test "x$FRU_YAML_GEN" == "x"], [FRU_YAML_GEN="$srcdir/scripts/fru-read-example.yaml"])
+-FRUGEN="$PYTHON $srcdir/scripts/fru_gen.py -i $FRU_YAML_GEN"
+-AC_SUBST(FRU_YAML_GEN)
+-AC_SUBST(FRUGEN)
++AS_IF([test "x$ONYX_SENSOR_YAML_GEN" == "x"], [ONYX_SENSOR_YAML_GEN="$srcdir/scripts/sensor-example.yaml"])
++ONYX_SENSORGEN="$PYTHON ${srcdir}/scripts/sensor_gen.py -i $ONYX_SENSOR_YAML_GEN"
++AC_SUBST(ONYX_SENSOR_YAML_GEN)
++AC_SUBST(ONYX_SENSORGEN)
++
++AS_IF([test "x$ONYX_INVSENSOR_YAML_GEN" == "x"], [ONYX_INVSENSOR_YAML_GEN="$srcdir/scripts/inventory-sensor-example.yaml"])
++ONYX_INVSENSORGEN="$PYTHON ${srcdir}/scripts/inventory-sensor.py -i $ONYX_INVSENSOR_YAML_GEN"
++AC_SUBST(ONYX_INVSENSOR_YAML_GEN)
++AC_SUBST(ONYX_INVSENSORGEN)
++
++AS_IF([test "x$ONYX_FRU_YAML_GEN" == "x"], [ONYX_FRU_YAML_GEN="$srcdir/scripts/fru-read-example.yaml"])
++ONYX_FRUGEN="$PYTHON $srcdir/scripts/fru_gen.py -i $ONYX_FRU_YAML_GEN"
++AC_SUBST(ONYX_FRU_YAML_GEN)
++AC_SUBST(ONYX_FRUGEN)
++
++AS_IF([test "x$SH5D807_SENSOR_YAML_GEN" == "x"], [SH5D807_SENSOR_YAML_GEN="$srcdir/scripts/sensor-example.yaml"])
++SH5D807_SENSORGEN="$PYTHON ${srcdir}/scripts/sensor_gen.py -i $SH5D807_SENSOR_YAML_GEN"
++AC_SUBST(SH5D807_SENSOR_YAML_GEN)
++AC_SUBST(SH5D807_SENSORGEN)
++
++AS_IF([test "x$SH5D807_INVSENSOR_YAML_GEN" == "x"], [SH5D807_INVSENSOR_YAML_GEN="$srcdir/scripts/inventory-sensor-example.yaml"])
++SH5D807_INVSENSORGEN="$PYTHON ${srcdir}/scripts/inventory-sensor.py -i $SH5D807_INVSENSOR_YAML_GEN"
++AC_SUBST(SH5D807_INVSENSOR_YAML_GEN)
++AC_SUBST(SH5D807_INVSENSORGEN)
++
++AS_IF([test "x$SH5D807_FRU_YAML_GEN" == "x"], [SH5D807_FRU_YAML_GEN="$srcdir/scripts/fru-read-example.yaml"])
++SH5D807_FRUGEN="$PYTHON $srcdir/scripts/fru_gen.py -i $SH5D807_FRU_YAML_GEN"
++AC_SUBST(SH5D807_FRU_YAML_GEN)
++AC_SUBST(SH5D807_FRUGEN)
+
+ AS_IF([test "x$ENTITY_YAML_GEN" == "x"], [ENTITY_YAML_GEN="$srcdir/scripts/entity-example.yaml"])
+ ENTITYGEN="$PYTHON $srcdir/scripts/entity_gen.py -i $ENTITY_YAML_GEN"
+diff --git a/fruread.hpp b/fruread.hpp
+index a2fb650..0546b37 100644
+--- a/fruread.hpp
++++ b/fruread.hpp
+@@ -34,3 +34,7 @@ using FruInstanceVec = std::vector<FruInstance>;
+
+ using FruId = uint32_t;
+ using FruMap = std::map<FruId, FruInstanceVec>;
++
++extern FruMap frus;
++extern const FruMap onyx_frus;
++extern const FruMap sh5d807_frus;
+diff --git a/read_fru_data.cpp b/read_fru_data.cpp
+index 740a140..eace885 100644
+--- a/read_fru_data.cpp
++++ b/read_fru_data.cpp
+@@ -11,7 +11,6 @@
+ #include <sdbusplus/message/types.hpp>
+ #include <xyz/openbmc_project/Common/error.hpp>
+
+-extern const FruMap frus;
+ namespace ipmi
+ {
+ namespace fru
+diff --git a/selutility.cpp b/selutility.cpp
+index 11b2fb9..da38608 100644
+--- a/selutility.cpp
++++ b/selutility.cpp
+@@ -12,7 +12,6 @@
+ #include <vector>
+ #include <xyz/openbmc_project/Common/error.hpp>
+
+-extern const ipmi::sensor::InvObjectIDMap invSensors;
+ using namespace phosphor::logging;
+ using InternalFailure =
+     sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure;
+diff --git a/selutility.hpp b/selutility.hpp
+index 06fc453..76a3797 100644
+--- a/selutility.hpp
++++ b/selutility.hpp
+@@ -5,6 +5,10 @@
+ #include <ipmid/types.hpp>
+ #include <sdbusplus/server.hpp>
+
++extern ipmi::sensor::InvObjectIDMap invSensors;
++extern const ipmi::sensor::InvObjectIDMap onyx_invSensors;
++extern const ipmi::sensor::InvObjectIDMap sh5d807_invSensors;
++
+ namespace ipmi
+ {
+
+diff --git a/sensorhandler.cpp b/sensorhandler.cpp
+index 6b29c21..f051617 100644
+--- a/sensorhandler.cpp
++++ b/sensorhandler.cpp
+@@ -28,15 +28,7 @@ static constexpr uint8_t BMCSlaveAddress = 0x20;
+ extern int updateSensorRecordFromSSRAESC(const void*);
+ extern sd_bus* bus;
+
+-namespace ipmi
+-{
+-namespace sensor
+-{
+-extern const IdInfoMap sensors;
+-} // namespace sensor
+-} // namespace ipmi
+-
+-extern const FruMap frus;
++extern FruMap frus;
+
+ using namespace phosphor::logging;
+ using InternalFailure =
+diff --git a/sensorhandler.hpp b/sensorhandler.hpp
+index cf9bda0..ab91c8e 100644
+--- a/sensorhandler.hpp
++++ b/sensorhandler.hpp
+@@ -727,3 +727,14 @@ inline void enableScanning(ipmi::sensor::GetSensorResponse* resp)
+ } // namespace sensor
+
+ } // namespace ipmi
++
++
++
++namespace ipmi {
++namespace sensor {
++
++extern IdInfoMap sensors;
++extern const IdInfoMap onyx_sensors;
++extern const IdInfoMap sh5d807_sensors;
++}
++}
+diff --git a/storagehandler.cpp b/storagehandler.cpp
+index 3f09940..356a879 100644
+--- a/storagehandler.cpp
++++ b/storagehandler.cpp
+@@ -24,6 +24,23 @@
+ #include <variant>
+ #include <xyz/openbmc_project/Common/error.hpp>
+
++// Platform Type
++constexpr auto ONYX_SLT     = 61;   //0x3D
++constexpr auto ONYX_1       = 64;   //0x40
++constexpr auto ONYX_2       = 65;   //0x41
++constexpr auto ONYX_3       = 66;   //0x42
++constexpr auto ONYX_FR4     = 82;   //0x52
++constexpr auto SH5D807_1    = 92;   //0x5C
++constexpr auto SH5D807_2    = 93;   //0x5D
++constexpr auto SH5D807_3    = 94;   //0x5E
++constexpr auto SH5D807_4    = 108;   //0x6C
++constexpr auto SH5D807_5    = 109;   //0x6D
++
++
++
++#define COMMAND_BOARD_ID    ("/sbin/fw_printenv -n board_id")
++#define COMMAND_LEN         3
++
+ void register_netfn_storage_functions() __attribute__((constructor));
+
+ unsigned int g_sel_time = 0xFFFFFFFF;
+@@ -31,11 +48,13 @@ namespace ipmi
+ {
+ namespace sensor
+ {
+-extern const IdInfoMap sensors;
++IdInfoMap sensors;
+ } // namespace sensor
+ } // namespace ipmi
+
+-extern const FruMap frus;
++FruMap frus;
++ipmi::sensor::InvObjectIDMap invSensors;
++
+ constexpr uint8_t eventDataSize = 3;
+ namespace
+ {
+@@ -750,8 +769,75 @@ ipmi::RspType<uint8_t,  // SDR version
+                                  operationSupport);
+ }
+
++std::string getPlatformID()
++{
++    FILE *pf;
++    char data[COMMAND_LEN] = {0};
++    std::stringstream ss;
++    unsigned int board_id = 0;
++
++    // Setup pipe for reading and execute to get u-boot environment
++    // variable board_id.
++    pf = popen(COMMAND_BOARD_ID,"r");
++
++    if(pf > 0)
++    {   // no error
++        if (fgets(data, COMMAND_LEN , pf) != NULL)
++        {
++            ss << std::hex << (std::string)data;
++            ss >> board_id;
++        }
++        pclose(pf);
++        if ( board_id > 0 || board_id < 0xFF )
++        {
++            switch (board_id)
++            {
++                case ONYX_SLT:
++                case ONYX_1 ... ONYX_3:
++                case ONYX_FR4:
++                    return "onyx";
++                case SH5D807_1 ... SH5D807_3:
++                case SH5D807_4 ... SH5D807_5:
++                    return "sh5807";
++                default:
++                    return "sh5d807";
++            }//switch
++        }
++    }
++    else
++    {
++        log<level::DEBUG>("Unable to determine platform",
++                          entry("Defaulting to 2P"));
++    }
++
++    return "sh5807";
++}
++
+ void register_netfn_storage_functions()
+ {
++    // Load the right device symbols based on platform
++
++    std::string platform = getPlatformID();
++    if (platform.compare("onyx") == 0)
++    {
++        log<level::INFO>("Loading Onyx configuration");
++        frus = onyx_frus;
++        invSensors = onyx_invSensors;
++        ipmi::sensor::sensors = ipmi::sensor::onyx_sensors;
++    }
++    else if (platform.compare("sh5807") == 0)
++    {
++        log<level::INFO>("Loading Sh5d807 configuration");
++        frus = sh5d807_frus;
++        invSensors = sh5d807_invSensors;
++        ipmi::sensor::sensors = ipmi::sensor::sh5d807_sensors;
++    }
++    else
++    {
++        log<level::ERR>("Unknown platform?!",
++                          entry("Registration failed"));
++    }
++
+     // <Get SEL Info>
+     ipmi::registerHandler(ipmi::prioOpenBmcBase, ipmi::netFnStorage,
+                           ipmi::storage::cmdGetSelInfo, ipmi::Privilege::User,
+--
+2.17.1
+
