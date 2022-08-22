@@ -99,4 +99,5 @@ SRC_URI += "file://sh5.cfg \
             file://0101-linux-aspeed-Add-Initial-device-tree-for-sh5d807-platform.patch \
             file://0102-linux-aspeed-Add-Initail-device-tree-for-Sidley-platform.patch \
             file://0103-linux-aspeed-Add-Initial-device-tree-for-Parry-Peak-platform.patch \
+            file://0104-linux-aspeed-Modify-sh5d807-devicetree-for-missing-devices.patch \
             "
