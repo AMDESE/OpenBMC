@@ -8,15 +8,15 @@ Base device tree addition for Sidley platform
 
 Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
 ---
- arch/arm/boot/dts/aspeed-bmc-amd-sidely.dts | 196 ++++++++++++++++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-sidley.dts | 196 ++++++++++++++++++++
  1 file changed, 196 insertions(+)
- create mode 100644 arch/arm/boot/dts/aspeed-bmc-amd-sidely.dts
+ create mode 100644 arch/arm/boot/dts/aspeed-bmc-amd-sidley.dts
 
-diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-sidely.dts b/arch/arm/boot/dts/aspeed-bmc-amd-sidely.dts
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-sidley.dts b/arch/arm/boot/dts/aspeed-bmc-amd-sidley.dts
 new file mode 100644
 index 000000000000..8ed5d3b080cd
 --- /dev/null
-+++ b/arch/arm/boot/dts/aspeed-bmc-amd-sidely.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-sidley.dts
 @@ -0,0 +1,196 @@
 +// SPDX-License-Identifier: GPL-2.0
 +// Copyright (c) 2022 AMD Inc.
@@ -29,7 +29,7 @@ index 000000000000..8ed5d3b080cd
 +
 +/ {
 +	model = "AMD SIDLEY BMC";
-+	compatible = "amd,sidely ", "aspeed,ast2600";
++	compatible = "amd,sidley ", "aspeed,ast2600";
 +
 +	aliases {
 +		serial4 = &uart5;
