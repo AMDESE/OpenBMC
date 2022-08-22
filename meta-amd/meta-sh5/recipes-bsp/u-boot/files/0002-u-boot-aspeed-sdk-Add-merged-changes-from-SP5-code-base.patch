@@ -149,7 +149,7 @@ index 3c8667f93d..dc4e3d9858 100644
 +					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-onyx.dtb");
 +					break;
 +				case SH5_SIDLEY:
-+					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-sidely.dtb");
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-sidley.dtb");
 +					break;
 +				case SH5_PARRY_PEAK:
 +					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-parrypeak.dtb");
