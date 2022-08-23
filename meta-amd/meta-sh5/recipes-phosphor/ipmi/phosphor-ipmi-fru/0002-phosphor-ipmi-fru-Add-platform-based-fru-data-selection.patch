@@ -181,7 +181,7 @@ index eca66d6..99ac65f 100644
 +                    return "onyx";
 +                case SH5D807_1 ... SH5D807_3:
 +                case SH5D807_4 ... SH5D807_5:
-+                    return "sh5807";
++                    return "sh5d807";
 +                default:
 +                    return "sh5d807";
 +            }//switch

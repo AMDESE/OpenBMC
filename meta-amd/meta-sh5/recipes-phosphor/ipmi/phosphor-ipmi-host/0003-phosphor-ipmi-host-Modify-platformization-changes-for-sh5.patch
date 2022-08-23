@@ -292,7 +292,7 @@ index 3f09940..356a879 100644
 +                    return "onyx";
 +                case SH5D807_1 ... SH5D807_3:
 +                case SH5D807_4 ... SH5D807_5:
-+                    return "sh5807";
++                    return "sh5d807";
 +                default:
 +                    return "sh5d807";
 +            }//switch
@@ -304,7 +304,7 @@ index 3f09940..356a879 100644
 +                          entry("Defaulting to 2P"));
 +    }
 +
-+    return "sh5807";
++    return "sh5d807";
 +}
 +
  void register_netfn_storage_functions()
@@ -319,7 +319,7 @@ index 3f09940..356a879 100644
 +        invSensors = onyx_invSensors;
 +        ipmi::sensor::sensors = ipmi::sensor::onyx_sensors;
 +    }
-+    else if (platform.compare("sh5807") == 0)
++    else if (platform.compare("sh5d807") == 0)
 +    {
 +        log<level::INFO>("Loading Sh5d807 configuration");
 +        frus = sh5d807_frus;
