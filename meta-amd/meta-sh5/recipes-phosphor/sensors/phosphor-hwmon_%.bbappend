@@ -42,18 +42,19 @@ CHIPS_SH5D807 = " \
         bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@1/vdd_18_s5@39 \
         bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@1/vddio_hbm_d@47 \
         bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@1/vdd_075_usr@4a \
-        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@0/emc2305@4d \
-        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@1/emc2305@4d \
-        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@2/emc2305@4d \
-        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@5/lm75a@48 \
-        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@5/lm75a@49 \
-        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@5/lm75a@4a \
-        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@5/lm75a@4b \
-        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@5/lm75a@4c \
-        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@5/lm75a@4d \
-        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@5/lm75a@4e \
-        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@5/lm75a@4f \
-        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@7/tmp468@48 \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@0/emc2305@4d \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@1/emc2305@4d \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@2/emc2305@4d \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@48 \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@49 \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4a \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4b \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4c \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4d \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4e \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4f \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@7/tmp468@48 \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@7/tmp468@49 \
         "
 
 # Sidley specific sensors
