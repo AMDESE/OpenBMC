@@ -32,6 +32,11 @@ titanite_vr_update()
     BUSNUM=$1
     MODELNUM=$2
 
+    DEVICE_NAME=`find /sys/bus/i2c/drivers/isl68137/ -name $BUS-00$ADDR -exec basename {} \;`
+    echo "DEVICE_NAME = $DEVICE_NAME"
+    echo $DEVICE_NAME > /sys/bus/i2c/drivers/isl68137/unbind
+    echo "isl68137 driver is unbinded for VR update to continue"
+
     /usr/bin/vr-update $BUSNUM $ADDR $HEX_FILE $MODELNUM -b $BOARD
     if [ "$?" -ne "0" ] ; then
         echo "VR upgrade has failed\n"
@@ -39,6 +44,9 @@ titanite_vr_update()
     else
         echo "VR upgrade has succeeded! Please AC cycle for the changes to take effect.\n"
     fi
+    echo $DEVICE_NAME > /sys/bus/i2c/drivers/isl68137/bind
+    echo "isl68137 driver is binded back after VR update"
+
     return "$retval"
 }
 

@@ -4,6 +4,7 @@
 #define RENESAS_VR            ("Renesas")
 #define GEN2                  ("GEN2")
 #define GEN3                  ("GEN3")
+#define PATCH                 ("patch")
 
 #define STATUS_BIT_0          (0)
 #define STATUS_BIT_1          (1)
@@ -19,6 +20,7 @@
 #define DEVICE_REVISON        (0x2000003)
 #define MAX_RETRY             (10)
 #define SLEEP                 (2500)
+#define SLEEP_1               (1)
 #define RAA229613             ("RAA229613")
 #define RAA229625             ("RAA229625")
 #define RAA229620             ("RAA229620")
@@ -29,12 +31,24 @@
 #define SUCCESS               0
 #define FAILURE              -1
 #define MAXIMUM_SIZE         255
+#define SIZE_32              (32)
+#define SIZE_8               (8)
+#define CANDIDATE_FW         (0x02000002)
 
+#define FW_WRITE             0xE6
 #define DMA_WRITE            0xC7
 #define DMA_READ             0xC5
 
+#define CMD_CODE_C6          (0xC6)
+#define CMD_CODE_E6          (0xE6)
+#define CMD_CODE_C7          (0xC7)
+#define COMMIT_DATA          (0x000f)
+
 #define DISABLE_PACKET       0x00A2
 #define FINISH_CAPTURE       0x0002
+#define DEVICE_FW_VERSION    0x0030
+#define HALT_FW              0x0002
+#define POLL_REG             0x004E
 #define FINISH_CMD_CODE      0xE7
 
 #define DEV_ID_CMD           0xAD
@@ -53,11 +67,16 @@
 #define GEN2_CRC_ADDR        0x003F
 #define GEN3_CRC_ADDR        0x0094
 
+#define COMPLETE_BIT         (0x10)
+#define PASS_BIT             (0x80)
+#define FAIL_BIT             (0x40)
+
 #define INDEX_0              (0)
 #define INDEX_1              (1)
 #define INDEX_2              (2)
 #define INDEX_3              (3)
 #define INDEX_4              (4)
+#define INDEX_5              (5)
 
 struct vr_update_context {
     int i2c_bus;
