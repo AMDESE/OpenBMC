@@ -1,0 +1,85 @@
+From 44cd5cd926274ec827a189e46ccdd61f4ea9a068 Mon Sep 17 00:00:00 2001
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Wed, 31 Aug 2022 16:43:01 -0500
+Subject: [PATCH 1/2] linux-aspeed: Modify sh5d807 dts for VR configuration
+
+VR configuraion changed for MP2862/61 driver
+
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-sh5d807.dts | 30 ++++++++++----------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-sh5d807.dts b/arch/arm/boot/dts/aspeed-bmc-amd-sh5d807.dts
+index f5c25cae3b6d..adaf1b99bb60 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-sh5d807.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-sh5d807.dts
+@@ -213,27 +213,27 @@
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+
+-			vdd_io_e32@30 {
+-				compatible = "infineon,xdpe12284";
+-				reg = <0x30>;
++			vdd_io_e32@3f {
++				compatible = "mps,MP2862";
++				reg = <0x3f>;
+ 			};
+
+ 			vdd_33_s5@36 {
+-				compatible = "infineon,xdpe12284";
++				compatible = "mps,MP2862";
+ 				reg = <0x36>;
+ 			};
+
+-			vddcr_socio_a@3C {
+-				compatible = "infineon,xdpe12284";
+-				reg = <0x3C>;
++			vddcr_socio_a@3c {
++				compatible = "mps,MP2862";
++				reg = <0x3c>;
+ 			};
+ 			vddcr_socio_c@41 {
+-				compatible = "infineon,xdpe12284";
++				compatible = "mps,MP2862";
+ 				reg = <0x41>;
+ 			};
+
+ 			vddio_04_hbm_b@44 {
+-				compatible = "infineon,xdpe12284";
++				compatible = "mps,MP2862";
+ 				reg = <0x44>;
+ 			};
+ 		};
+@@ -244,22 +244,22 @@
+ 			#size-cells = <0>;
+
+ 			vdd_18@33 {
+-				compatible = "infineon,xdpe12284";
++				compatible = "mps,MP2862";
+ 				reg = <0x33>;
+ 			};
+
+ 			vdd_18_s5@39 {
+-				compatible = "infineon,xdpe12284";
++				compatible = "mps,MP2862";
+ 				reg = <0x39>;
+ 			};
+
+ 			vddio_04_hbm_d@47 {
+-				compatible = "infineon,xdpe12284";
++				compatible = "mps,MP2862";
+ 				reg = <0x47>;
+ 			};
+-			vdd_075_usr@4A {
+-				compatible = "infineon,xdpe12284";
+-				reg = <0x4A>;
++			vdd_075_usr@4a {
++				compatible = "mps,MP2862";
++				reg = <0x4a>;
+ 			};
+ 		};
+ 	};
+--
+2.17.1
+
