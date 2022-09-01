@@ -30,9 +30,9 @@ CHIPS_ONYX = " \
 
 # SH5D807 specific sensors
 CHIPS_SH5D807 = " \
-        bus@1e78a000/i2c-bus@100/vdd33run@13 \
-        bus@1e78a000/i2c-bus@100/vdd33dual@14 \
-        bus@1e78a000/i2c-bus@100/vdd5dual@15 \
+        bus@1e78a000/i2c-bus@280/vdd_33_run@13 \
+        bus@1e78a000/i2c-bus@280/vdd_33_dual@14 \
+        bus@1e78a000/i2c-bus@280/vdd_5_dual@15 \
         bus@1e78a000/i2c-bus@200/i2cswitch@70/i2c@0/vdd_io_e32@30 \
         bus@1e78a000/i2c-bus@200/i2cswitch@70/i2c@0/vdd_33_s5@36 \
         bus@1e78a000/i2c-bus@200/i2cswitch@70/i2c@0/vddcr_socio_a@3c \
