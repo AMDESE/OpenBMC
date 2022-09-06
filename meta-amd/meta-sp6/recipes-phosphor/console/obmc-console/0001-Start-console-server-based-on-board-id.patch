@@ -1,0 +1,22 @@
+From 9e295c596608d3b76be026bf6b6fbb8b14ef31d1 Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Tue, 6 Sep 2022 01:26:52 -0500
+Subject: [PATCH] Start console server based on board id
+
+---
+ conf/obmc-console@.service.in | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/conf/obmc-console@.service.in b/conf/obmc-console@.service.in
+index c6cd1b4..f939676 100644
+--- a/conf/obmc-console@.service.in
++++ b/conf/obmc-console@.service.in
+@@ -4,6 +4,8 @@ ConditionPathExists=/etc/obmc-console/server.%i.conf
+
+ [Service]
+ # Instance ID is the VUART basename
++ExecStartPre=/bin/sh -c 'if [[ $(/sbin/fw_printenv -n board_id) == "63" ]] ; then touch /tmp/ttyVUART0 ; else touch /tmp/ttyS0; fi'
++ExecStartPre=/bin/sh -c 'ls /tmp/%i > /dev/null 2>&1'
+ ExecStart=/usr/sbin/obmc-console-server --config /etc/obmc-console/server.%i.conf %i
+ SyslogIdentifier=%i-console-server
+ Restart=always
