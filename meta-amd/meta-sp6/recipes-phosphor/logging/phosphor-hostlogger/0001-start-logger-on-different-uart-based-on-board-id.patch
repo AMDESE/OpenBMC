@@ -1,0 +1,23 @@
+From 3d541a306a40568a2769d78267a32eaebcc9b68f Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Tue, 6 Sep 2022 03:53:33 -0500
+Subject: [PATCH] start logger on different uart based on board id
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+---
+ hostlogger@.service | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/hostlogger@.service b/hostlogger@.service
+index 73ebd00..1c531cd 100644
+--- a/hostlogger@.service
++++ b/hostlogger@.service
+@@ -4,6 +4,8 @@ BindsTo=obmc-console@%i.service
+ After=obmc-console@%i.service
+
+ [Service]
++ExecStartPre=/bin/sh -c 'if [[ $(/sbin/fw_printenv -n board_id) == "63" ]] ; then touch /tmp/ttyVUART0 ; else touch /tmp/ttyS0; fi'
++ExecStartPre=/bin/sh -c 'ls /tmp/%i > /dev/null 2>&1'
+ ExecStart=/usr/bin/env hostlogger
+ EnvironmentFile=/etc/hostlogger/%i.conf
+ Restart=always
