@@ -3,7 +3,7 @@ DESCRIPTION = "Yet Another AMD Protocol for Jtag communication with main Process
 
 LICENSE = "CLOSED"
 
-SRC_URI  = "git://git@github.com/AMDESE/YAAP.git;branch=sp5;protocol=ssh"
+SRC_URI  = "git://git@github.com/AMDESE/YAAP.git;branch=integ;protocol=ssh"
 
 SRCREV = "${AUTOREV}"
 
