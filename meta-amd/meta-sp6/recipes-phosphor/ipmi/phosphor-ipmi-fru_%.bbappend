@@ -3,10 +3,8 @@ inherit obmc-phosphor-systemd
 DEPENDS_append_sp6 = " sp6-yaml-config"
 
 EXTRA_OECONF_sp6 = " \
-    SHALE96_YAML_GEN=${STAGING_DIR_HOST}${datadir}/sp6-yaml-config/shale96-ipmi-fru-read.yaml \
-    SHALE96_PROP_YAML=${STAGING_DIR_HOST}${datadir}/sp6-yaml-config/shale96-ipmi-extra-properties.yaml \
-    SHALE64_YAML_GEN=${STAGING_DIR_HOST}${datadir}/sp6-yaml-config/shale64-ipmi-fru-read.yaml \
-    SHALE64_PROP_YAML=${STAGING_DIR_HOST}${datadir}/sp6-yaml-config/shale64-ipmi-extra-properties.yaml \
+    SHALE_YAML_GEN=${STAGING_DIR_HOST}${datadir}/sp6-yaml-config/shale-ipmi-fru-read.yaml \
+    SHALE_PROP_YAML=${STAGING_DIR_HOST}${datadir}/sp6-yaml-config/shale-ipmi-extra-properties.yaml \
     CINNABAR_YAML_GEN=${STAGING_DIR_HOST}${datadir}/sp6-yaml-config/cinnabar-ipmi-fru-read.yaml \
     CINNABAR_PROP_YAML=${STAGING_DIR_HOST}${datadir}/sp6-yaml-config/cinnabar-ipmi-extra-properties.yaml \
     SUNSTONE_YAML_GEN=${STAGING_DIR_HOST}${datadir}/sp6-yaml-config/sunstone-ipmi-fru-read.yaml \
@@ -36,5 +34,8 @@ SYSTEMD_LINK_${PN}_append_sp6 := "${@compose_list(d, 'FMT', 'EEPROMS_ESCAPED')}"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
-SRC_URI += "file://0001-python-template-changes-for-sp6.patch file://0002-platformization-changes-for-sp6-fru.patch"
+SRC_URI += "file://0001-python-template-changes-for-sp6.patch \
+            file://0002-platformization-changes-for-sp6-fru.patch \
+            file://0003-Merge-shale64-and-shale96-platforms.patch \
+            "
 

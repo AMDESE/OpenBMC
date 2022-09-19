@@ -1,0 +1,229 @@
+From b9be7ebde48b9b6fba6f7849eb375dd765f987e4 Mon Sep 17 00:00:00 2001
+From: Abinaya <abinaya.dhandapani@amd.com>
+Date: Fri, 12 Aug 2022 09:41:20 -0500
+Subject: [PATCH] Merge shale64 and shale96 platforms
+
+---
+ Makefile.am        | 30 +++++++++---------------------
+ configure.ac       | 43 ++++++++++++++-----------------------------
+ fruread.hpp        |  3 +--
+ selutility.hpp     |  3 +--
+ sensorhandler.hpp  |  3 +--
+ storagehandler.cpp | 31 +++++++++++--------------------
+ 6 files changed, 37 insertions(+), 76 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index fb9904d..c062e35 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -29,12 +29,9 @@ ipmid_SOURCES = \
+ 	host-cmd-manager.cpp
+
+ libipmi20_BUILT_LIST = \
+-	shale64-sensor-gen.cpp \
+-	shale64-inventory-sensor-gen.cpp \
+-	shale64-fru-read-gen.cpp \
+-	shale96-sensor-gen.cpp \
+-	shale96-inventory-sensor-gen.cpp \
+-	shale96-fru-read-gen.cpp \
++	shale-sensor-gen.cpp \
++	shale-inventory-sensor-gen.cpp \
++	shale-fru-read-gen.cpp \
+ 	sunstone-sensor-gen.cpp \
+ 	sunstone-inventory-sensor-gen.cpp \
+ 	sunstone-fru-read-gen.cpp \
+@@ -84,23 +81,14 @@ ipmid_LDFLAGS = \
+ ipmiwhitelist.cpp: ${srcdir}/generate_whitelist.sh $(WHITELIST_CONF)
+ 	$(SHELL) $^ > $@
+
+-shale96-sensor-gen.cpp: scripts/writesensor.mako.cpp scripts/sensor_gen.py @SHALE96_SENSOR_YAML_GEN@
+-	$(AM_V_GEN)@SHALE96_SENSORGEN@ -o $(top_builddir) -p shale96 generate-cpp
++shale-sensor-gen.cpp: scripts/writesensor.mako.cpp scripts/sensor_gen.py @SHALE_SENSOR_YAML_GEN@
++	$(AM_V_GEN)@SHALE_SENSORGEN@ -o $(top_builddir) -p shale generate-cpp
+
+-shale96-inventory-sensor-gen.cpp: scripts/inventorysensor.mako.cpp scripts/inventory-sensor.py @SHALE96_INVSENSOR_YAML_GEN@
+-	$(AM_V_GEN)@SHALE96_INVSENSORGEN@ -o $(top_builddir) -p shale96 generate-cpp
++shale-inventory-sensor-gen.cpp: scripts/inventorysensor.mako.cpp scripts/inventory-sensor.py @SHALE_INVSENSOR_YAML_GEN@
++	$(AM_V_GEN)@SHALE_INVSENSORGEN@ -o $(top_builddir) -p shale generate-cpp
+
+-shale96-fru-read-gen.cpp: scripts/readfru.mako.cpp scripts/fru_gen.py @SHALE96_FRU_YAML_GEN@
+-	$(AM_V_GEN)@SHALE96_FRUGEN@ -o $(top_builddir) -p shale96 generate-cpp
+-
+-shale64-sensor-gen.cpp: scripts/writesensor.mako.cpp scripts/sensor_gen.py @SHALE64_SENSOR_YAML_GEN@
+-	$(AM_V_GEN)@SHALE64_SENSORGEN@ -o $(top_builddir) -p shale64 generate-cpp
+-
+-shale64-inventory-sensor-gen.cpp: scripts/inventorysensor.mako.cpp scripts/inventory-sensor.py @SHALE64_INVSENSOR_YAML_GEN@
+-	$(AM_V_GEN)@SHALE64_INVSENSORGEN@ -o $(top_builddir) -p shale64 generate-cpp
+-
+-shale64-fru-read-gen.cpp: scripts/readfru.mako.cpp scripts/fru_gen.py @SHALE64_FRU_YAML_GEN@
+-	$(AM_V_GEN)@SHALE64_FRUGEN@ -o $(top_builddir) -p shale64 generate-cpp
++shale-fru-read-gen.cpp: scripts/readfru.mako.cpp scripts/fru_gen.py @SHALE_FRU_YAML_GEN@
++	$(AM_V_GEN)@SHALE_FRUGEN@ -o $(top_builddir) -p shale generate-cpp
+
+ cinnabar-sensor-gen.cpp: scripts/writesensor.mako.cpp scripts/sensor_gen.py @CINNABAR_SENSOR_YAML_GEN@
+ 	$(AM_V_GEN)@CINNABAR_SENSORGEN@ -o $(top_builddir) -p cinnabar generate-cpp
+diff --git a/configure.ac b/configure.ac
+index 84bcede..f24d37f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -125,35 +125,20 @@ if test -z "$WHITELIST_CONF"; then
+         WHITELIST_CONF=${srcdir}/host-ipmid-whitelist.conf
+ fi
+
+-AS_IF([test "x$SHALE96_SENSOR_YAML_GEN" == "x"], [SHALE96_SENSOR_YAML_GEN="$srcdir/scripts/sensor-example.yaml"])
+-SHALE96_SENSORGEN="$PYTHON ${srcdir}/scripts/sensor_gen.py -i $SHALE96_SENSOR_YAML_GEN"
+-AC_SUBST(SHALE96_SENSOR_YAML_GEN)
+-AC_SUBST(SHALE96_SENSORGEN)
+-
+-AS_IF([test "x$SHALE96_INVSENSOR_YAML_GEN" == "x"], [SHALE96_INVSENSOR_YAML_GEN="$srcdir/scripts/inventory-sensor-example.yaml"])
+-SHALE96_INVSENSORGEN="$PYTHON ${srcdir}/scripts/inventory-sensor.py -i $SHALE96_INVSENSOR_YAML_GEN"
+-AC_SUBST(SHALE96_INVSENSOR_YAML_GEN)
+-AC_SUBST(SHALE96_INVSENSORGEN)
+-
+-AS_IF([test "x$SHALE96_FRU_YAML_GEN" == "x"], [SHALE96_FRU_YAML_GEN="$srcdir/scripts/fru-read-example.yaml"])
+-SHALE96_FRUGEN="$PYTHON $srcdir/scripts/fru_gen.py -i $SHALE96_FRU_YAML_GEN"
+-AC_SUBST(SHALE96_FRU_YAML_GEN)
+-AC_SUBST(SHALE96_FRUGEN)
+-
+-AS_IF([test "x$SHALE64_SENSOR_YAML_GEN" == "x"], [SHALE64_SENSOR_YAML_GEN="$srcdir/scripts/sensor-example.yaml"])
+-SHALE64_SENSORGEN="$PYTHON ${srcdir}/scripts/sensor_gen.py -i $SHALE64_SENSOR_YAML_GEN"
+-AC_SUBST(SHALE64_SENSOR_YAML_GEN)
+-AC_SUBST(SHALE64_SENSORGEN)
+-
+-AS_IF([test "x$SHALE64_INVSENSOR_YAML_GEN" == "x"], [SHALE64_INVSENSOR_YAML_GEN="$srcdir/scripts/inventory-sensor-example.yaml"])
+-SHALE64_INVSENSORGEN="$PYTHON ${srcdir}/scripts/inventory-sensor.py -i $SHALE64_INVSENSOR_YAML_GEN"
+-AC_SUBST(SHALE64_INVSENSOR_YAML_GEN)
+-AC_SUBST(SHALE64_INVSENSORGEN)
+-
+-AS_IF([test "x$SHALE64_FRU_YAML_GEN" == "x"], [SHALE64_FRU_YAML_GEN="$srcdir/scripts/fru-read-example.yaml"])
+-SHALE64_FRUGEN="$PYTHON $srcdir/scripts/fru_gen.py -i $SHALE64_FRU_YAML_GEN"
+-AC_SUBST(SHALE64_FRU_YAML_GEN)
+-AC_SUBST(SHALE64_FRUGEN)
++AS_IF([test "x$SHALE_SENSOR_YAML_GEN" == "x"], [SHALE_SENSOR_YAML_GEN="$srcdir/scripts/sensor-example.yaml"])
++SHALE_SENSORGEN="$PYTHON ${srcdir}/scripts/sensor_gen.py -i $SHALE_SENSOR_YAML_GEN"
++AC_SUBST(SHALE_SENSOR_YAML_GEN)
++AC_SUBST(SHALE_SENSORGEN)
++
++AS_IF([test "x$SHALE_INVSENSOR_YAML_GEN" == "x"], [SHALE_INVSENSOR_YAML_GEN="$srcdir/scripts/inventory-sensor-example.yaml"])
++SHALE_INVSENSORGEN="$PYTHON ${srcdir}/scripts/inventory-sensor.py -i $SHALE_INVSENSOR_YAML_GEN"
++AC_SUBST(SHALE_INVSENSOR_YAML_GEN)
++AC_SUBST(SHALE_INVSENSORGEN)
++
++AS_IF([test "x$SHALE_FRU_YAML_GEN" == "x"], [SHALE_FRU_YAML_GEN="$srcdir/scripts/fru-read-example.yaml"])
++SHALE_FRUGEN="$PYTHON $srcdir/scripts/fru_gen.py -i $SHALE_FRU_YAML_GEN"
++AC_SUBST(SHALE_FRU_YAML_GEN)
++AC_SUBST(SHALE_FRUGEN)
+
+ AS_IF([test "x$CINNABAR_SENSOR_YAML_GEN" == "x"], [CINNABAR_SENSOR_YAML_GEN="$srcdir/scripts/sensor-example.yaml"])
+ CINNABAR_SENSORGEN="$PYTHON ${srcdir}/scripts/sensor_gen.py -i $CINNABAR_SENSOR_YAML_GEN"
+diff --git a/fruread.hpp b/fruread.hpp
+index ec22925..263aa91 100644
+--- a/fruread.hpp
++++ b/fruread.hpp
+@@ -36,7 +36,6 @@ using FruId = uint32_t;
+ using FruMap = std::map<FruId, FruInstanceVec>;
+
+ extern FruMap frus;
+-extern const FruMap shale64_frus;
++extern const FruMap shale_frus;
+ extern const FruMap sunstone_frus;
+-extern const FruMap shale96_frus;
+ extern const FruMap cinnabar_frus;
+diff --git a/selutility.hpp b/selutility.hpp
+index a532023..0f48fb0 100644
+--- a/selutility.hpp
++++ b/selutility.hpp
+@@ -6,9 +6,8 @@
+ #include <sdbusplus/server.hpp>
+
+ extern ipmi::sensor::InvObjectIDMap invSensors;
+-extern const ipmi::sensor::InvObjectIDMap shale64_invSensors;
+ extern const ipmi::sensor::InvObjectIDMap sunstone_invSensors;
+-extern const ipmi::sensor::InvObjectIDMap shale96_invSensors;
++extern const ipmi::sensor::InvObjectIDMap shale_invSensors;
+ extern const ipmi::sensor::InvObjectIDMap cinnabar_invSensors;
+
+ namespace ipmi
+diff --git a/sensorhandler.hpp b/sensorhandler.hpp
+index b861cfb..5b79716 100644
+--- a/sensorhandler.hpp
++++ b/sensorhandler.hpp
+@@ -734,9 +734,8 @@ namespace ipmi {
+ namespace sensor {
+
+ extern IdInfoMap sensors;
+-extern const IdInfoMap shale64_sensors;
++extern const IdInfoMap shale_sensors;
+ extern const IdInfoMap sunstone_sensors;
+-extern const IdInfoMap shale96_sensors;
+ extern const IdInfoMap cinnabar_sensors;
+ }
+ }
+diff --git a/storagehandler.cpp b/storagehandler.cpp
+index 613f29d..2c61e10 100644
+--- a/storagehandler.cpp
++++ b/storagehandler.cpp
+@@ -25,16 +25,16 @@
+ #include <xyz/openbmc_project/Common/error.hpp>
+
+ // Platform Type
+-constexpr auto SHALE_64        =0x59;
++constexpr auto SHALE_1         =0x59;
+ constexpr auto SUNSTONE_DAP    =0x61;
+ constexpr auto SHALE_SLT       =0x62;
+ constexpr auto CINNABAR        =0x63;
+ constexpr auto SUNSTONE        =0x64;
+ constexpr auto SHALE           =0x65;
+-constexpr auto SHALE64_1     = 67;   //0x43
+-constexpr auto SHALE64_2     = 68;   //0x44
+-constexpr auto SHALE64_3     = 69;   //0x45
+-constexpr auto SHALE64_FR4   = 81;   //0x51
++constexpr auto SHALE_2     = 67;   //0x43
++constexpr auto SHALE_3     = 68;   //0x44
++constexpr auto SHALE_4     = 69;   //0x45
++constexpr auto SHALE_FR4   = 81;   //0x51
+ constexpr auto CINNABAR_1       = 70;   //0x46
+ constexpr auto CINNABAR_2       = 71;   //0x47
+ constexpr auto CINNABAR_3       = 72;   //0x48
+@@ -802,15 +802,13 @@ std::string getPlatformID()
+                 case SHALE_SLT:
+                 case SHALE:
+
+-                    return "shale96";
++                    return "shale";
+                 case CINNABAR:
+                     return "cinnabar";
+                 case SUNSTONE:
+                 case SUNSTONE_DAP:
+
+                     return "sunstone";
+-                case SHALE_64:
+-                    return "shale64";
+                 default:
+                     return "sunstone";
+             }//switch
+@@ -830,19 +828,12 @@ void register_netfn_storage_functions()
+     // Load the right device symbols based on platform
+
+     std::string platform = getPlatformID();
+-    if (platform.compare("shale64") == 0)
++    if (platform.compare("shale") == 0)
+     {
+-        log<level::INFO>("Loading Shale64 configuration");
+-        frus = shale64_frus;
+-        invSensors = shale64_invSensors;
+-        ipmi::sensor::sensors = ipmi::sensor::shale64_sensors;
+-    }
+-    else if (platform.compare("shale96") == 0)
+-    {
+-        log<level::INFO>("Loading Shale96 configuration");
+-        frus = shale96_frus;
+-        invSensors = shale96_invSensors;
+-        ipmi::sensor::sensors = ipmi::sensor::shale96_sensors;
++        log<level::INFO>("Loading Shale configuration");
++        frus = shale_frus;
++        invSensors = shale_invSensors;
++        ipmi::sensor::sensors = ipmi::sensor::shale_sensors;
+     }
+     else if (platform.compare("cinnabar") == 0)
+     {

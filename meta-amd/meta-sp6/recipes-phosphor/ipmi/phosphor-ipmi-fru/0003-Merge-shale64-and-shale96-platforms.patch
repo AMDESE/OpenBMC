@@ -1,0 +1,186 @@
+From 30dc9665f3efe7dc37fd5e580a2ad09564bc7b64 Mon Sep 17 00:00:00 2001
+From: Abinaya <abinaya.dhandapani@amd.com>
+Date: Fri, 12 Aug 2022 09:31:58 -0500
+Subject: [PATCH] Merge shale64 and shale96 platforms
+
+---
+ Makefile.am      | 24 ++++++++----------------
+ configure.ac     | 19 ++++++-------------
+ frup.hpp         |  3 +--
+ types.hpp        |  3 +--
+ writefrudata.cpp | 28 ++++++++++------------------
+ 5 files changed, 26 insertions(+), 51 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 8755c04..c5532e4 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,7 +1,5 @@
+-BUILT_SOURCES= shale96-fru-gen.cpp \
+-	shale96-extra-properties-gen.cpp \
+-	shale64-fru-gen.cpp \
+-	shale64-extra-properties-gen.cpp \
++BUILT_SOURCES= shale-fru-gen.cpp \
++	shale-extra-properties-gen.cpp \
+ 	cinnabar-fru-gen.cpp \
+ 	cinnabar-extra-properties-gen.cpp \
+ 	sunstone-fru-gen.cpp \
+@@ -24,14 +22,12 @@ phosphor_read_eeprom_LDADD = libwritefrudata.la
+
+ lib_LTLIBRARIES = libwritefrudata.la
+ libwritefrudata_la_SOURCES = frup.cpp \
+-	shale96-fru-gen.cpp \
+-	shale64-fru-gen.cpp \
++	shale-fru-gen.cpp \
+ 	cinnabar-fru-gen.cpp \
+ 	sunstone-fru-gen.cpp \
+ 	fru_area.cpp \
+ 	writefrudata.cpp \
+-	shale96-extra-properties-gen.cpp \
+-	shale64-extra-properties-gen.cpp \
++	shale-extra-properties-gen.cpp \
+ 	cinnabar-extra-properties-gen.cpp \
+ 	sunstone-extra-properties-gen.cpp
+ libwritefrudata_la_LDFLAGS = $(SYSTEMD_LIBS) \
+@@ -55,14 +51,10 @@ libstrgfnhandler_la_LIBADD = libwritefrudata.la
+ libstrgfnhandler_la_CXXFLAGS = $(PHOSPHOR_LOGGING_CFLAGS) \
+ 	$(LIBIPMID_CFLAGS)
+
+-shale96-fru-gen.cpp:
+-	$(AM_V_GEN)@SHALE96_FRUGEN@ -o $(top_builddir) -p shale96 generate-cpp
+-shale96-extra-properties-gen.cpp:
+-	$(AM_V_GEN)@SHALE96_PROPGEN@ -p shale96
+-shale64-fru-gen.cpp:
+-	$(AM_V_GEN)@SHALE64_FRUGEN@ -o $(top_builddir) -p shale64 generate-cpp
+-shale64-extra-properties-gen.cpp:
+-	$(AM_V_GEN)@SHALE64_PROPGEN@ -p shale64
++shale-fru-gen.cpp:
++	$(AM_V_GEN)@SHALE_FRUGEN@ -o $(top_builddir) -p shale generate-cpp
++shale-extra-properties-gen.cpp:
++	$(AM_V_GEN)@SHALE_PROPGEN@ -p shale
+ cinnabar-fru-gen.cpp:
+ 	$(AM_V_GEN)@CINNABAR_FRUGEN@ -o $(top_builddir) -p cinnabar generate-cpp
+ cinnabar-extra-properties-gen.cpp:
+diff --git a/configure.ac b/configure.ac
+index eddc0da..44ec396 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -64,19 +64,12 @@ AS_IF([test "x$enable_oe_sdk" == "xyes"],
+     AC_SUBST([OESDK_TESTCASE_FLAGS], [$testcase_flags])
+ )
+
+-AS_IF([test "x$SHALE96_YAML_GEN" == "x"], [SHALE96_YAML_GEN="example.yaml"])
+-SHALE96_FRUGEN="$PYTHON $srcdir/scripts/fru_gen.py -i $SHALE96_YAML_GEN"
+-AC_SUBST(SHALE96_FRUGEN)
+-AS_IF([test "x$SHALE96_PROP_YAML" == "x"], [SHALE96_PROP_YAML="extra-properties-example.yaml"])
+-SHALE96_PROPGEN="$PYTHON $srcdir/scripts/extra-properties.py -e $SHALE96_PROP_YAML"
+-AC_SUBST(SHALE96_PROPGEN)
+-
+-AS_IF([test "x$SHALE64_YAML_GEN" == "x"], [SHALE64_YAML_GEN="example.yaml"])
+-SHALE64_FRUGEN="$PYTHON $srcdir/scripts/fru_gen.py -i $SHALE64_YAML_GEN"
+-AC_SUBST(SHALE64_FRUGEN)
+-AS_IF([test "x$SHALE64_PROP_YAML" == "x"], [SHALE64_PROP_YAML="extra-properties-example.yaml"])
+-SHALE64_PROPGEN="$PYTHON $srcdir/scripts/extra-properties.py -e $SHALE64_PROP_YAML"
+-AC_SUBST(SHALE64_PROPGEN)
++AS_IF([test "x$SHALE_YAML_GEN" == "x"], [SHALE_YAML_GEN="example.yaml"])
++SHALE_FRUGEN="$PYTHON $srcdir/scripts/fru_gen.py -i $SHALE_YAML_GEN"
++AC_SUBST(SHALE_FRUGEN)
++AS_IF([test "x$SHALE_PROP_YAML" == "x"], [SHALE_PROP_YAML="extra-properties-example.yaml"])
++SHALE_PROPGEN="$PYTHON $srcdir/scripts/extra-properties.py -e $SHALE_PROP_YAML"
++AC_SUBST(SHALE_PROPGEN)
+
+ AS_IF([test "x$CINNABAR_YAML_GEN" == "x"], [CINNABAR_YAML_GEN="example.yaml"])
+ CINNABAR_FRUGEN="$PYTHON $srcdir/scripts/fru_gen.py -i $CINNABAR_YAML_GEN"
+diff --git a/frup.hpp b/frup.hpp
+index 4e872c6..7d6a5d4 100644
+--- a/frup.hpp
++++ b/frup.hpp
+@@ -113,8 +113,7 @@ int parse_fru_area(const uint8_t area, const void* msgbuf, const size_t len,
+                    IPMIFruInfo& info);
+
+ extern FruMap frus;
+-extern const FruMap shale96_frus;
+-extern const FruMap shale64_frus;
++extern const FruMap shale_frus;
+ extern const FruMap cinnabar_frus;
+ extern const FruMap sunstone_frus;
+ #endif
+diff --git a/types.hpp b/types.hpp
+index a1d1167..8e0db6f 100644
+--- a/types.hpp
++++ b/types.hpp
+@@ -34,8 +34,7 @@ using Object = sdbusplus::message::object_path;
+ using ObjectMap = std::map<Object, InterfaceMap>;
+
+ extern std::map<Path, InterfaceMap> extras;
+-extern const std::map<Path, InterfaceMap> shale96_extras;
+-extern const std::map<Path, InterfaceMap> shale64_extras;
++extern const std::map<Path, InterfaceMap> shale_extras;
+ extern const std::map<Path, InterfaceMap> cinnabar_extras;
+ extern const std::map<Path, InterfaceMap> sunstone_extras;
+ } // namespace vpd
+diff --git a/writefrudata.cpp b/writefrudata.cpp
+index eed48df..367fbd1 100644
+--- a/writefrudata.cpp
++++ b/writefrudata.cpp
+@@ -21,16 +21,16 @@
+ #include <vector>
+
+ // Platform Type
+-constexpr auto SHALE_64        =0x59;
++constexpr auto SHALE_1         =0x59;
+ constexpr auto SUNSTONE_DAP    =0x61;
+ constexpr auto SHALE_SLT       =0x62;
+ constexpr auto CINNABAR        =0x63;
+ constexpr auto SUNSTONE        =0x64;
+ constexpr auto SHALE           =0x65;
+-constexpr auto SHALE64_1     = 67;   //0x43
+-constexpr auto SHALE64_2     = 68;   //0x44
+-constexpr auto SHALE64_3     = 69;   //0x45
+-constexpr auto SHALE64_FR4   = 81;   //0x51
++constexpr auto SHALE_2     = 67;   //0x43
++constexpr auto SHALE_3     = 68;   //0x44
++constexpr auto SHALE_4     = 69;   //0x45
++constexpr auto SHALE_FR4   = 81;   //0x51
+ constexpr auto CINNABAR_1       = 70;   //0x46
+ constexpr auto CINNABAR_2       = 71;   //0x47
+ constexpr auto CINNABAR_3       = 72;   //0x48
+@@ -208,15 +208,13 @@ std::string getPlatformID()
+                 case SHALE:
+                 case SHALE_SLT:
+
+-                    return "shale96";
++                    return "shale";
+                 case CINNABAR:
+                     return "cinnabar";
+                 case SUNSTONE:
+                 case SUNSTONE_DAP:
+
+                     return "sunstone";
+-                case SHALE_64:
+-                    return "shale64";
+                 default:
+                     return "sunstone";
+             }//switch
+@@ -248,17 +246,11 @@ int updateInventory(FruAreaVector& areaVector, sdbusplus::bus::bus& bus)
+
+     // Load platform data structure
+     std::string platform = getPlatformID();
+-    if (platform.compare("shale64") == 0)
++    if (platform.compare("shale") == 0)
+     {
+-        log<level::INFO>("Loading Shale64 configuration");
+-        frus = shale64_frus;
+-        extras = shale64_extras;
+-    }
+-    else if (platform.compare("shale96") == 0)
+-    {
+-        log<level::INFO>("Loading Shale96 configuration");
+-        frus = shale96_frus;
+-        extras = shale96_extras;
++        log<level::INFO>("Loading Shale configuration");
++        frus = shale_frus;
++        extras = shale_extras;
+     }
+     else if (platform.compare("cinnabar") == 0)
+     {

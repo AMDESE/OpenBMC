@@ -217,13 +217,13 @@ index eca66d6..1ab63e5 100644
 +            {
 +                case SHALE:
 +                case SHALE_SLT:
-+               
++
 +                    return "shale96";
 +                case CINNABAR:
 +                    return "cinnabar";
 +                case SUNSTONE:
 +                case SUNSTONE_DAP:
-+                
++
 +                    return "sunstone";
 +                case SHALE_64:
 +                    return "shale64";
