@@ -20,11 +20,8 @@ case $boardID in
    "63")  # Cinnabar board_ids
         ln -s /usr/share/swampd/cinnabar-stepwise-config.json /usr/share/swampd/config.json
    ;;
-   "59")  # Shale64 board_ids
-        ln -s /usr/share/swampd/shale64-stepwise-config.json /usr/share/swampd/config.json
-   ;;
-   "62"|"65")  # Shale96 board_ids
-        ln -s /usr/share/swampd/shale96-stepwise-config.json /usr/share/swampd/config.json
+   "59"|"62"|"65")  # Shale board_ids
+        ln -s /usr/share/swampd/shale-stepwise-config.json /usr/share/swampd/config.json
    ;;
    *)  # Default set to Sunstone board, as it have most fans connected
         ln -s /usr/share/swampd/sunstone-stepwise-config.json /usr/share/swampd/config.json
