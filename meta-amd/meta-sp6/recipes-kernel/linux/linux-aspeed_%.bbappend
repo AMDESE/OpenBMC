@@ -101,4 +101,5 @@ SRC_URI += "file://sp6.cfg \
             file://0101-ARM-dts-aspeed-Add-Shale-Device-tree.patch \
             file://0102-ARM-dts-aspeed-Add-Shale64-Device-tree.patch \
             file://0103-ARM-dts-Aspeed-remove-ununsed-i3c-buses-from-SP6.patch \
+            file://0104-ARM-dts-aspeed-Add-Shale-device-tree.patch \
             "
