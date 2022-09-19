@@ -15,11 +15,8 @@ sync_hwmon_path() {
        "63")  # Cinnabar board_ids
                 ln -s  /etc/default/obmc/hwmon_cinnabar/ /etc/default/obmc/hwmon
            ;;
-       "59")  # Shale64 board_ids
-                ln -s  /etc/default/obmc/hwmon_shale64/ /etc/default/obmc/hwmon
-           ;;
-       "62"|"65")  # Shale96 board_ids
-                ln -s  /etc/default/obmc/hwmon_shale96/ /etc/default/obmc/hwmon
+       "59"|"62"|"65")  # Shale board_ids
+                ln -s  /etc/default/obmc/hwmon_shale/ /etc/default/obmc/hwmon
            ;;
            *)  # Default set to Sunstone board
                 ln -s  /etc/default/obmc/hwmon_sunstone/ /etc/default/obmc/hwmon
