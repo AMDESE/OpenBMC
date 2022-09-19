@@ -6,14 +6,10 @@ LIC_FILES_CHKSUM = "file://${COREBASE}/meta/files/common-licenses/Apache-2.0;md5
 inherit allarch
 
 SRC_URI = " \
-    file://shale64-ipmi-sensors.yaml \
-    file://shale64-ipmi-fru.yaml \
-    file://shale64-ipmi-fru-properties.yaml \
-    file://shale64-ipmi-inventory-sensors.yaml \
-    file://shale96-ipmi-sensors.yaml \
-    file://shale96-ipmi-fru.yaml \
-    file://shale96-ipmi-fru-properties.yaml \
-    file://shale96-ipmi-inventory-sensors.yaml \
+    file://shale-ipmi-sensors.yaml \
+    file://shale-ipmi-fru.yaml \
+    file://shale-ipmi-fru-properties.yaml \
+    file://shale-ipmi-inventory-sensors.yaml \
     file://cinnabar-ipmi-sensors.yaml \
     file://cinnabar-ipmi-fru.yaml \
     file://cinnabar-ipmi-fru-properties.yaml \
@@ -27,24 +23,15 @@ SRC_URI = " \
 S = "${WORKDIR}"
 
 do_install() {
-    cat shale96-ipmi-fru.yaml > fru-read.yaml
-    install -m 0644 -D shale96-ipmi-fru-properties.yaml \
-        ${D}${datadir}/${BPN}/shale96-ipmi-extra-properties.yaml
+    cat shale-ipmi-fru.yaml > fru-read.yaml
+    install -m 0644 -D shale-ipmi-fru-properties.yaml \
+        ${D}${datadir}/${BPN}/shale-ipmi-extra-properties.yaml
     install -m 0644 -D fru-read.yaml \
-        ${D}${datadir}/${BPN}/shale96-ipmi-fru-read.yaml
-    install -m 0644 -D shale96-ipmi-sensors.yaml \
-        ${D}${datadir}/${BPN}/shale96-ipmi-sensors.yaml
-    install -m 0644 -D shale96-ipmi-inventory-sensors.yaml \
-        ${D}${datadir}/${BPN}/shale96-ipmi-inventory-sensors.yaml
-    cat shale64-ipmi-fru.yaml > fru-read.yaml
-    install -m 0644 -D shale64-ipmi-fru-properties.yaml \
-        ${D}${datadir}/${BPN}/shale64-ipmi-extra-properties.yaml
-    install -m 0644 -D fru-read.yaml \
-        ${D}${datadir}/${BPN}/shale64-ipmi-fru-read.yaml
-    install -m 0644 -D shale64-ipmi-sensors.yaml \
-        ${D}${datadir}/${BPN}/shale64-ipmi-sensors.yaml
-    install -m 0644 -D shale64-ipmi-inventory-sensors.yaml \
-        ${D}${datadir}/${BPN}/shale64-ipmi-inventory-sensors.yaml
+        ${D}${datadir}/${BPN}/shale-ipmi-fru-read.yaml
+    install -m 0644 -D shale-ipmi-sensors.yaml \
+        ${D}${datadir}/${BPN}/shale-ipmi-sensors.yaml
+    install -m 0644 -D shale-ipmi-inventory-sensors.yaml \
+        ${D}${datadir}/${BPN}/shale-ipmi-inventory-sensors.yaml
     cat cinnabar-ipmi-fru.yaml > fru-read.yaml
     install -m 0644 -D cinnabar-ipmi-fru-properties.yaml \
         ${D}${datadir}/${BPN}/cinnabar-ipmi-extra-properties.yaml
@@ -67,14 +54,10 @@ do_install() {
 }
 
 FILES_${PN}-dev = " \
-    ${datadir}/${BPN}/shale96-ipmi-sensors.yaml \
-    ${datadir}/${BPN}/shale96-ipmi-extra-properties.yaml \
-    ${datadir}/${BPN}/shale96-ipmi-fru-read.yaml \
-    ${datadir}/${BPN}/shale96-ipmi-inventory-sensors.yaml \
-    ${datadir}/${BPN}/shale64-ipmi-sensors.yaml \
-    ${datadir}/${BPN}/shale64-ipmi-extra-properties.yaml \
-    ${datadir}/${BPN}/shale64-ipmi-fru-read.yaml \
-    ${datadir}/${BPN}/shale64-ipmi-inventory-sensors.yaml \
+    ${datadir}/${BPN}/shale-ipmi-sensors.yaml \
+    ${datadir}/${BPN}/shale-ipmi-extra-properties.yaml \
+    ${datadir}/${BPN}/shale-ipmi-fru-read.yaml \
+    ${datadir}/${BPN}/shale-ipmi-inventory-sensors.yaml \
     ${datadir}/${BPN}/cinnabar-ipmi-sensors.yaml \
     ${datadir}/${BPN}/cinnabar-ipmi-extra-properties.yaml \
     ${datadir}/${BPN}/cinnabar-ipmi-fru-read.yaml \
