@@ -18,5 +18,6 @@ SRC_URI += "file://0001-Add-Initial-u-boot-configuration.patch \
             file://0015-u-boot-aspeed-sdk-Add-systemd.hostname-as-kernel-par.patch \
             file://0016-u-boot-add-support-to-report-BMC-Boot-Cause.patch \
             file://0017-u-boot-aspeed-sdk-Add-Sp6-platforms-to-uboot.patch \
+            file://0018-u-boot-aspeed-sdk-Add-dtb-selection-for-Shale.patch \
             file://sp6-u-boot.cfg \
             "
