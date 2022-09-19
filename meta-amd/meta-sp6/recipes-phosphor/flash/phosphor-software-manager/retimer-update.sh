@@ -22,13 +22,9 @@ case $boardID in
         echo "Retimer update not supported for Cinnabar"
         mux=70
    ;;
-   "59")  # Shale64 board_ids
+   "59"|"62"|"65")  # Shale board_ids
         echo "Retimer update not supported for Shale64"
         mux=70
-   ;;
-   "62"|"65")  # Shale96 board_ids
-        echo "Shale96 Platform Rev $revID"
-        mux=71
    ;;
    *)  # Default
         echo "Unknown Platform. Aborting"
