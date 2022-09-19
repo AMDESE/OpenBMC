@@ -15,11 +15,8 @@ sync_associations_path() {
        "63")  # Cinnabar board_ids
             ln -s  /usr/share/phosphor-inventory-manager/cinnabar-associations.json /usr/share/phosphor-inventory-manager/associations.json
        ;;
-       "59")  # Shale64 board_ids
-            ln -s  /usr/share/phosphor-inventory-manager/shale64-associations.json /usr/share/phosphor-inventory-manager/associations.json
-       ;;
-       "62"|"65")  # Shale96 board_ids
-            ln -s  /usr/share/phosphor-inventory-manager/shale96-associations.json /usr/share/phosphor-inventory-manager/associations.json
+       "59"|"62"|"65")  # Shale board_ids
+            ln -s  /usr/share/phosphor-inventory-manager/shale-associations.json /usr/share/phosphor-inventory-manager/associations.json
        ;;
        *)  # Default set to Sunstone board
             ln -s  /usr/share/phosphor-inventory-manager/sunstone-associations.json /usr/share/phosphor-inventory-manager/associations.json
