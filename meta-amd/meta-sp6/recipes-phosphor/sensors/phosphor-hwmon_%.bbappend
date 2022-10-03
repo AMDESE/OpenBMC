@@ -1,5 +1,5 @@
 FILESEXTRAPATHS_prepend_sp6 := "${THISDIR}/${PN}:"
-EXTRA_OECONF_append_sp6 = " --enable-negative-errno-on-fail"
+EXTRA_OEMESON_append_sp6 = " -Dupdate-functional-on-fail=true -Dnegative-errno-on-fail=false"
 
 SRC_URI += "file://0001-Add-power-on-monitor-mechanism.patch \
 	   "
