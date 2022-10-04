@@ -1,6 +1,7 @@
 [Unit]
 Description=Get DIMM info for Redfish in S5 at boot time
-After=xyz.openbmc_project.Inventory.Manager.service
+Wants=mapper-wait@-xyz-openbmc_project-inventory.service
+After=mapper-wait@-xyz-openbmc_project-inventory.service
 
 [Service]
 Type=oneshot
