@@ -48,24 +48,29 @@ fi
 
 # If no board_id then set num of cpu to 2 socket
 case "$board_id" in
-    "3d" | "3D" | "40" | "41" | "42" | "52")
-        echo " Onyx 1 CPU"
-        echo " Onyx 1 CPU" >> $dimm_info
+    "68")
+        echo " Galena 1 CPU"
+        echo " Galena 1 CPU" >> $dimm_info
         num_of_cpu=1
         ;;
-    "46" | "47" | "48")
-        echo " Ruby 1 CPU"
-        echo " Ruby 1 CPU" >> $dimm_info
+    "69")
+        echo " Recluse 1 CPU"
+        echo " Recluse 1 CPU" >> $dimm_info
+        num_of_cpu=1
+        ;;
+    "6A" | "6a")
+        echo " Purico 1 CPU"
+        echo " Purico 1 CPU" >> $dimm_info
         num_of_cpu=2
         ;;
-    "3e" | "3E" | "43" | "44" | "45" | "51")
-        echo " Quartz 2 CPU"
-        echo " Quartz 2 CPU" >> $dimm_info
+    "66")
+        echo " Chalupa 2 CPU"
+        echo " Chalupa 2 CPU" >> $dimm_info
         num_of_cpu=2
         ;;
-    "49" | "4A" | "4a" | "4B" | "4b" | "4C" |"4c" | "4D" | "4d" | "4E" | "4e")
-        echo " Titanite 2 CPU "
-        echo " Titanite 2 CPU " >> $dimm_info
+    "67")
+        echo " Huambo 2 CPU "
+        echo " Huambo 2 CPU " >> $dimm_info
         num_of_cpu=2
         ;;
     *)

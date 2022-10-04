@@ -8,23 +8,34 @@ num_of_cpu=1
 
 # If no board_id then set num of cpu to 2 socket
 case "$board_id" in
-    "3d" | "3D" | "40" | "41" | "42" | "52")
-        echo " Onyx 1 CPU"
+    "68")
+        echo " Galena 1 CPU"
+        echo " Galena 1 CPU" >> $dimm_info
         num_of_cpu=1
         ;;
-    "46" | "47" | "48")
-        echo " Ruby 1 CPU"
+    "69")
+        echo " Recluse 1 CPU"
+        echo " Recluse 1 CPU" >> $dimm_info
         num_of_cpu=1
         ;;
-    "3e" | "3E" | "43" | "44" | "45" | "51")
-        echo " Quartz 2 CPU"
+    "6A" | "6a")
+        echo " Purico 1 CPU"
+        echo " Purico 1 CPU" >> $dimm_info
         num_of_cpu=2
         ;;
-    "49" | "4A" | "4a" | "4B" | "4b" | "4C" |"4c" | "4D" | "4d" | "4E" | "4e")
-        echo " Titanite 2 CPU "
+    "66")
+        echo " Chalupa 2 CPU"
+        echo " Chalupa 2 CPU" >> $dimm_info
+        num_of_cpu=2
+        ;;
+    "67")
+        echo " Huambo 2 CPU "
+        echo " Huambo 2 CPU " >> $dimm_info
         num_of_cpu=2
         ;;
     *)
+        echo " Unknown 2 CPU "
+        echo " Unknown 2 CPU " >> $dimm_info
         num_of_cpu=2
         ;;
 esac
@@ -75,10 +86,10 @@ do
             id=$(( channel + dimm ))
             reg="${LOG_DIR}/P${sock_id}_dimm${id}_pmic_temp"
 
-	    # Read PMIC Register 0x3B (Rev)
+            # Read PMIC Register 0x3B (Rev)
             temp1="$($I3C_TOOL -d ${pmic_name} -w 0x3b -r 1 | grep 0x)"
-	    printf 'R35 (Rev) = %s \n' ${temp1}
-	    printf 'R35 (Rev) = %s \n' ${temp1} >> $pmic_info
+            printf 'R35 (Rev) = %s \n' ${temp1}
+            printf 'R35 (Rev) = %s \n' ${temp1} >> $pmic_info
 
             # Read PMIC Register 0x04
             temp1="$($I3C_TOOL -d ${pmic_name} -w 0x04 -r 1 | grep 0x)"
