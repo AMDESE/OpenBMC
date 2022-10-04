@@ -7,6 +7,7 @@ SRC_URI_append += " file://shale-stepwise-config.json \
                     file://sunstone-stepwise-config.json \
                     file://set-platform-json-config.sh \
                     file://phosphor-pid-control.service \
+                    file://phosphor-pid-control.path \
                     file://0001-phosphor-pid-control-Add-CPU-Temp-simulation-code.patch \
                     file://0002-phosphor-pid-control-Modify-Sensor-based-Temp-simulation.patch \
                   "
@@ -19,7 +20,7 @@ FILES_${PN}_append = " ${datadir}/swampd/shale-stepwise-config.json \
 
 RDEPENDS_${PN} += "bash"
 
-SYSTEMD_SERVICE_${PN}_append = " phosphor-pid-control.service"
+SYSTEMD_SERVICE_${PN}_append = " phosphor-pid-control.service phosphor-pid-control.path"
 
 do_install_append() {
     install -d ${D}/${bindir}
@@ -35,6 +36,8 @@ do_install_append() {
 
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${WORKDIR}/phosphor-pid-control.service \
+        ${D}${systemd_system_unitdir}
+    install -m 0644 ${WORKDIR}/phosphor-pid-control.path \
         ${D}${systemd_system_unitdir}
     mkdir -p thermal.d ${D}/etc/thermal.d
     touch ${D}/etc/thermal.d/tuning

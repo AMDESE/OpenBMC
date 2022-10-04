@@ -1,6 +1,6 @@
 [Unit]
 Description=Swampd Margin-based Fan Control Daemon
-After=xyz.openbmc_project.FanSensor.service
+ConditionPathExists=/tmp/apml_init_complete
 
 [Service]
 Type=simple
