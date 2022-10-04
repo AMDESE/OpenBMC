@@ -1,0 +1,32 @@
+From 109b241b26d4a26ac5831714d1cb530592ea83dc Mon Sep 17 00:00:00 2001
+From: Mohsen Dolaty <mohsen.dolaty@amd.com>
+Date: Thu, 2 Dec 2021 10:27:35 -0600
+Subject: [PATCH 1/1] recipes-kernel/linux: change i2c-1 freq to 50KHz
+
+recipes-kernel/linux: change i2c-1 freq to 50 KHz
+
+Change i2c-1 freq to 50 KHz (from 100 KHz) for LCD
+
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
+---
+ drivers/i2c/busses/i2c-aspeed.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/i2c/busses/i2c-aspeed.c b/drivers/i2c/busses/i2c-aspeed.c
+index 724bf30600d6..dd54b3271841 100644
+--- a/drivers/i2c/busses/i2c-aspeed.c
++++ b/drivers/i2c/busses/i2c-aspeed.c
+@@ -1004,6 +1004,10 @@ static int aspeed_i2c_probe_bus(struct platform_device *pdev)
+ 			"Could not read bus-frequency property\n");
+ 		bus->bus_frequency = I2C_MAX_STANDARD_MODE_FREQ;
+ 	}
++	if (strcmp(pdev->dev.of_node->full_name, "i2c-bus@100") == 0) {
++		bus->bus_frequency = I2C_MAX_STANDARD_MODE_FREQ/2;
++		dev_info(&pdev->dev, "Setting %s (i2c-1) Freq to (%d) HZ\n", pdev->dev.of_node->full_name, I2C_MAX_STANDARD_MODE_FREQ/2);
++	}
+
+ 	match = of_match_node(aspeed_i2c_bus_of_table, pdev->dev.of_node);
+ 	if (!match)
+--
+2.25.1
+

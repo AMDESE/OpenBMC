@@ -1,0 +1,353 @@
+From e594986050cf8c7c062c5cba0d816d392bd0d7eb Mon Sep 17 00:00:00 2001
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Fri, 29 Oct 2021 11:37:17 -0500
+Subject: [PATCH 1/1] ARM:dts:aspeed: Add Onyx and Quartz dts fan nodes
+
+Fan controller nodes added as per below
+  - Onyx   : 4 emc2305 controller and 18 fans
+  - Quartz : 5 emc2305 controller and 25 fans
+
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts   | 124 ++++++++++++++-
+ arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts | 168 +++++++++++++++++++-
+ 2 files changed, 285 insertions(+), 7 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+index cc68bd5af4f8..64d1779614e8 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+@@ -292,18 +292,136 @@
+ 		//  port 0 to 3 connected to 4 fan controllers which controls 5 fans each
+ 		i2c@0 {
+ 			reg = <0>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			emc2305@4d {
++				compatible = "smsc,emc2305";
++				reg = <0x4d>;
++				#cooling-cells = <0x02>;
++
++				fan@0 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++				fan@1 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@2 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@3 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@4 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++			};
+ 		};
+
+ 		i2c@1 {
+-			reg = <0>;
++			reg = <1>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			emc2305@4d {
++				compatible = "smsc,emc2305";
++				reg = <0x4d>;
++				#cooling-cells = <0x02>;
++
++				fan@0 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++				fan@1 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@2 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@3 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@4 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++			};
+ 		};
+
+ 		i2c@2 {
+-			reg = <0>;
++			reg = <2>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			emc2305@4d {
++				compatible = "smsc,emc2305";
++				reg = <0x4d>;
++				#cooling-cells = <0x02>;
++
++				fan@0 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++				fan@1 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@2 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@3 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@4 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++			};
+ 		};
+
+ 		i2c@3 {
+-			reg = <0>;
++			reg = <3>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			emc2305@4d {
++				compatible = "smsc,emc2305";
++				reg = <0x4d>;
++				#cooling-cells = <0x02>;
++
++				fan@0 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++				fan@1 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@3 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++			};
+ 		};
+
+ 		i2c@5 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+index c7844c665e8c..403baf16a961 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+@@ -209,22 +209,182 @@
+ 		//  port 0 to 4 connected to 5 fan controllers which controls 5 fans each
+ 		i2c@0 {
+ 			reg = <0>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			emc2305@4d {
++				compatible = "smsc,emc2305";
++				reg = <0x4d>;
++				#cooling-cells = <0x02>;
++
++				fan@0 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++				fan@1 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@2 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@3 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@4 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++			};
+ 		};
+
+ 		i2c@1 {
+-			reg = <0>;
++			reg = <1>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			emc2305@4d {
++				compatible = "smsc,emc2305";
++				reg = <0x4d>;
++				#cooling-cells = <0x02>;
++
++				fan@0 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++				fan@1 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@2 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@3 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@4 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++			};
+ 		};
+
+ 		i2c@2 {
+-			reg = <0>;
++			reg = <2>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			emc2305@4d {
++				compatible = "smsc,emc2305";
++				reg = <0x4d>;
++				#cooling-cells = <0x02>;
++
++				fan@0 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++				fan@1 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@2 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@3 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@4 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++			};
+ 		};
+
+ 		i2c@3 {
+-			reg = <0>;
++			reg = <3>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			emc2305@4d {
++				compatible = "smsc,emc2305";
++				reg = <0x4d>;
++				#cooling-cells = <0x02>;
++
++				fan@0 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++				fan@1 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@2 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@3 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@4 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++			};
+ 		};
+
+ 		i2c@4 {
+-			reg = <0>;
++			reg = <4>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			emc2305@4d {
++				compatible = "smsc,emc2305";
++				reg = <0x4d>;
++				#cooling-cells = <0x02>;
++
++				fan@0 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++				fan@1 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@2 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@3 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@4 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++			};
+ 		};
+
+ 		i2c@5 {
+--
+2.17.1
+

@@ -1,0 +1,21 @@
+From 6fb79d00c7a49abd2418cc06143957902df75601 Mon Sep 17 00:00:00 2001
+From: Siddharth Jere <Siddharth.Jere@amd.com>
+Date: Thu, 30 Sep 2021 05:41:53 -0500
+Subject: [PATCH] recipe/phosphor-dbus-interfaces: Adding VR Support
+
+Signed-off-by: Siddharth Jere <Siddharth.Jere@amd.com>
+---
+ xyz/openbmc_project/Software/Version.interface.yaml | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/xyz/openbmc_project/Software/Version.interface.yaml b/xyz/openbmc_project/Software/Version.interface.yaml
+index 2d9089f..0f9b10d 100644
+--- a/xyz/openbmc_project/Software/Version.interface.yaml
++++ b/xyz/openbmc_project/Software/Version.interface.yaml
+@@ -44,3 +44,6 @@ enumerations:
+         - name: HPM_FPGA
+           description: >
+             The version is a version for a HPM FPGA.
++        - name: VR
++          description: >
++            The version is a version for a VR.

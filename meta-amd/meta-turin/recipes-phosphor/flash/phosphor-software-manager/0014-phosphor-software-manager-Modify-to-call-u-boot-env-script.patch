@@ -1,0 +1,37 @@
+From a0a9c8b12c91c852b67f8bdc08b5990602828c64 Mon Sep 17 00:00:00 2001
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Fri, 22 Jul 2022 12:13:10 -0500
+Subject: [PATCH 1/1] phosphor-software-manager: Modify to call u-boot env
+ reset script
+
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ static/item_updater_helper.cpp | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/static/item_updater_helper.cpp b/static/item_updater_helper.cpp
+index 1ea4cf1..5b607c5 100644
+--- a/static/item_updater_helper.cpp
++++ b/static/item_updater_helper.cpp
+@@ -2,6 +2,7 @@
+
+ #include "utils.hpp"
+
++
+ namespace phosphor
+ {
+ namespace software
+@@ -29,6 +30,10 @@ void Helper::factoryReset()
+     // Redfish Managers.ResetAll is expected to handle reset
+     // of both Host and BMC settings
+     utils::execute("/usr/sbin/amd-clear-cmos.sh","Y");
++
++    // Cleare the ethaddr, board_id and modify bootarg u-boot envs
++    utils::execute("/usr/sbin/amd-reset-u-boot-env.sh","Y");
++
+     // Set openbmconce=factory-reset env in U-Boot.
+     // The init will cleanup rwfs during boot.
+     utils::execute("/sbin/fw_setenv", "openbmconce", "factory-reset");
+--
+2.17.1
+

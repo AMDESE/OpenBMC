@@ -1,0 +1,344 @@
+From d5ab12e4e1aa9cae45595539b00fa043b19ec89e Mon Sep 17 00:00:00 2001
+From: Sreedhar Govardhana <srgovard@amd.com>
+Date: Thu, 29 Jul 2021 18:58:06 -0500
+Subject: [PATCH] ARM:dts:aspeed: Add I3C controllers to dtsi files and set the
+ clocks
+
+This patch adds I3C controller informations to the dtsi files.
+Clock driver changes to add i3c clock.
+
+Signed-off-by: Sreedhar Govardhana <srgovard@amd.com>
+---
+ arch/arm/boot/dts/aspeed-g6-pinctrl.dtsi  |  14 ++-
+ arch/arm/boot/dts/aspeed-g6.dtsi          | 129 ++++++++++++++++++++++
+ drivers/clk/clk-ast2600.c                 |  32 ++++--
+ include/dt-bindings/clock/ast2600-clock.h |  58 ++++++----
+ 4 files changed, 203 insertions(+), 30 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-g6-pinctrl.dtsi b/arch/arm/boot/dts/aspeed-g6-pinctrl.dtsi
+index b0bc0d607928..588b79262625 100644
+--- a/arch/arm/boot/dts/aspeed-g6-pinctrl.dtsi
++++ b/arch/arm/boot/dts/aspeed-g6-pinctrl.dtsi
+@@ -208,12 +208,12 @@ pinctrl_gpiu7_default: gpiu7_default {
+ 	};
+
+ 	pinctrl_hvi3c3_default: hvi3c3_default {
+-		function = "HVI3C3";
++		function = "I3C3";
+ 		groups = "HVI3C3";
+ 	};
+
+ 	pinctrl_hvi3c4_default: hvi3c4_default {
+-		function = "HVI3C4";
++		function = "I3C4";
+ 		groups = "HVI3C4";
+ 	};
+
+@@ -297,6 +297,16 @@ pinctrl_i2c9_default: i2c9_default {
+ 		groups = "I2C9";
+ 	};
+
++	pinctrl_i3c1_default: i3c1_default {
++		function = "I3C1";
++		groups = "I3C1";
++	};
++
++	pinctrl_i3c2_default: i3c2_default {
++		function = "I3C2";
++		groups = "I3C2";
++	};
++
+ 	pinctrl_i3c3_default: i3c3_default {
+ 		function = "I3C3";
+ 		groups = "I3C3";
+diff --git a/arch/arm/boot/dts/aspeed-g6.dtsi b/arch/arm/boot/dts/aspeed-g6.dtsi
+index cac234073530..05a9740a6eac 100644
+--- a/arch/arm/boot/dts/aspeed-g6.dtsi
++++ b/arch/arm/boot/dts/aspeed-g6.dtsi
+@@ -13,6 +13,12 @@ / {
+ 	interrupt-parent = <&gic>;
+
+ 	aliases {
++		i3c0 = &i3c0;
++		i3c1 = &i3c1;
++		i3c2 = &i3c2;
++		i3c3 = &i3c3;
++		i3c4 = &i3c4;
++		i3c5 = &i3c5;
+ 		i2c0 = &i2c0;
+ 		i2c1 = &i2c1;
+ 		i2c2 = &i2c2;
+@@ -700,6 +706,14 @@ fsim1: fsi@1e79b100 {
+ 				clocks = <&syscon ASPEED_CLK_GATE_FSICLK>;
+ 				status = "disabled";
+ 			};
++
++			i3c: bus@1e7a0000 {
++				compatible = "simple-bus";
++				#address-cells = <1>;
++				#size-cells = <1>;
++				ranges = <0 0x1e7a0000 0x8000>;
++			};
++
+ 		};
+ 	};
+ };
+@@ -947,3 +961,118 @@ i2c15: i2c-bus@800 {
+ 		status = "disabled";
+ 	};
+ };
++
++&i3c{
++	i3cglobal: i3cg@00 {
++		reg = <0x0 0x1000>;
++		compatible = "aspeed,ast2600-i3c-global";
++		resets = <&syscon ASPEED_RESET_I3C>;
++		ni3cs = <6>;
++	};
++
++	i3c0: i3c0@2000 {
++		#address-cells = <1>;
++		#size-cells = <0>;
++		#interrupt-cells = <1>;
++
++		reg = <0x2000 0x1000>;
++		compatible = "snps,dw-i3c-master-1.00a";
++		clocks = <&syscon ASPEED_CLK_GATE_I3C0CLK>;
++		resets = <&syscon ASPEED_RESET_I3C0>;
++		i2c-scl-hz = <400000>;
++		i3c-scl-hz = <12500000>;
++		interrupts = <GIC_SPI 102 IRQ_TYPE_LEVEL_HIGH>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&pinctrl_i3c1_default>;
++
++		status = "disabled";
++	};
++
++	i3c1: i3c1@3000 {
++		#address-cells = <1>;
++		#size-cells = <0>;
++		#interrupt-cells = <1>;
++
++		reg = <0x3000 0x1000>;
++		compatible = "snps,dw-i3c-master-1.00a";
++		clocks = <&syscon ASPEED_CLK_GATE_I3C1CLK>;
++		resets = <&syscon ASPEED_RESET_I3C1>;
++		i2c-scl-hz = <400000>;
++		i3c-scl-hz = <12500000>;
++		interrupts = <GIC_SPI 103 IRQ_TYPE_LEVEL_HIGH>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&pinctrl_i3c2_default>;
++
++		status = "disabled";
++	};
++
++	i3c2: i3c2@4000 {
++		#address-cells = <1>;
++		#size-cells = <0>;
++		#interrupt-cells = <1>;
++
++		reg = <0x4000 0x1000>;
++		compatible = "snps,dw-i3c-master-1.00a";
++		clocks = <&syscon ASPEED_CLK_GATE_I3C2CLK>;
++		resets = <&syscon ASPEED_RESET_I3C2>;
++		i2c-scl-hz = <400000>;
++		i3c-scl-hz = <12500000>;
++		interrupts = <GIC_SPI 104 IRQ_TYPE_LEVEL_HIGH>;
++
++		status = "disabled";
++	};
++
++	i3c3: i3c3@5000 {
++		#address-cells = <1>;
++		#size-cells = <0>;
++		#interrupt-cells = <1>;
++
++		reg = <0x5000 0x1000>;
++		compatible = "snps,dw-i3c-master-1.00a";
++		clocks = <&syscon ASPEED_CLK_GATE_I3C3CLK>;
++		resets = <&syscon ASPEED_RESET_I3C3>;
++		i2c-scl-hz = <400000>;
++		i3c-scl-hz = <12500000>;
++		interrupts = <GIC_SPI 105 IRQ_TYPE_LEVEL_HIGH>;
++
++		status = "disabled";
++	};
++
++	i3c4: i3c4@6000 {
++		#address-cells = <1>;
++		#size-cells = <0>;
++		#interrupt-cells = <1>;
++
++		reg = <0x6000 0x1000>;
++		compatible = "snps,dw-i3c-master-1.00a";
++		clocks = <&syscon ASPEED_CLK_GATE_I3C4CLK>;
++		resets = <&syscon ASPEED_RESET_I3C4>;
++		i2c-scl-hz = <400000>;
++		i3c-scl-hz = <12500000>;
++		interrupts = <GIC_SPI 106 IRQ_TYPE_LEVEL_HIGH>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&pinctrl_i3c5_default>;
++
++		status = "disabled";
++	};
++
++	i3c5: i3c5@7000 {
++		#address-cells = <1>;
++		#size-cells = <0>;
++		#interrupt-cells = <1>;
++
++		reg = <0x7000 0x1000>;
++		compatible = "snps,dw-i3c-master-1.00a";
++		clocks = <&syscon ASPEED_CLK_GATE_I3C5CLK>;
++		resets = <&syscon ASPEED_RESET_I3C5>;
++		i2c-scl-hz = <400000>;
++		i3c-scl-hz = <12500000>;
++		interrupts = <GIC_SPI 107 IRQ_TYPE_LEVEL_HIGH>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&pinctrl_i3c6_default>;
++
++		status = "disabled";
++	};
++
++};
++
+diff --git a/drivers/clk/clk-ast2600.c b/drivers/clk/clk-ast2600.c
+index 085d0a18b2b6..68ad48ff0c92 100644
+--- a/drivers/clk/clk-ast2600.c
++++ b/drivers/clk/clk-ast2600.c
+@@ -32,6 +32,7 @@
+ #define ASPEED_G6_CLK_SELECTION1	0x300
+ #define ASPEED_G6_CLK_SELECTION2	0x304
+ #define ASPEED_G6_CLK_SELECTION4	0x310
++#define ASPEED_G6_CLK_SELECTION5	0x314
+
+ #define ASPEED_HPLL_PARAM		0x200
+ #define ASPEED_APLL_PARAM		0x210
+@@ -95,14 +96,14 @@ static const struct aspeed_gate_data aspeed_g6_gates[] = {
+ 	[ASPEED_CLK_GATE_LHCCLK]	= { 37, -1, "lhclk-gate",	"lhclk", 0 },	/* LPC master/LPC+ */
+ 	/* Reserved 38 RSA: no longer used */
+ 	/* Reserved 39 */
+-	[ASPEED_CLK_GATE_I3C0CLK]	= { 40,  40, "i3c0clk-gate",	NULL,	 0 },	/* I3C0 */
+-	[ASPEED_CLK_GATE_I3C1CLK]	= { 41,  41, "i3c1clk-gate",	NULL,	 0 },	/* I3C1 */
+-	[ASPEED_CLK_GATE_I3C2CLK]	= { 42,  42, "i3c2clk-gate",	NULL,	 0 },	/* I3C2 */
+-	[ASPEED_CLK_GATE_I3C3CLK]	= { 43,  43, "i3c3clk-gate",	NULL,	 0 },	/* I3C3 */
+-	[ASPEED_CLK_GATE_I3C4CLK]	= { 44,  44, "i3c4clk-gate",	NULL,	 0 },	/* I3C4 */
+-	[ASPEED_CLK_GATE_I3C5CLK]	= { 45,  45, "i3c5clk-gate",	NULL,	 0 },	/* I3C5 */
+-	[ASPEED_CLK_GATE_I3C6CLK]	= { 46,  46, "i3c6clk-gate",	NULL,	 0 },	/* I3C6 */
+-	[ASPEED_CLK_GATE_I3C7CLK]	= { 47,  47, "i3c7clk-gate",	NULL,	 0 },	/* I3C7 */
++	[ASPEED_CLK_GATE_I3CDMACLK] 	= { 39,  ASPEED_RESET_I3C,		"i3cclk-gate",	NULL,	0 }, 			/* I3C_DMA */
++	[ASPEED_CLK_GATE_I3C0CLK] 		= { 40,  ASPEED_RESET_I3C0, 	"i3c0clk-gate",	"i3cclk",	0 }, 		/* I3C0 */
++	[ASPEED_CLK_GATE_I3C1CLK] 		= { 41,  ASPEED_RESET_I3C1, 	"i3c1clk-gate",	"i3cclk",	0 }, 		/* I3C1 */
++	[ASPEED_CLK_GATE_I3C2CLK] 		= { 42,  ASPEED_RESET_I3C2, 	"i3c2clk-gate",	"i3cclk",	0 }, 				/* I3C2 */
++	[ASPEED_CLK_GATE_I3C3CLK] 		= { 43,  ASPEED_RESET_I3C3, 	"i3c3clk-gate",	"i3cclk",	0 }, 				/* I3C3 */
++	[ASPEED_CLK_GATE_I3C4CLK] 		= { 44,  ASPEED_RESET_I3C4, 	"i3c4clk-gate",	"i3cclk",	0 }, 				/* I3C4 */
++	[ASPEED_CLK_GATE_I3C5CLK] 		= { 45,  ASPEED_RESET_I3C5, 	"i3c5clk-gate",	"i3cclk",	0 }, 				/* I3C5 */
++	[ASPEED_CLK_GATE_I3C6CLK] 		= { 46,  ASPEED_RESET_I3C6, 	"i3c6clk-gate",	"i3cclk",	0 }, 				/* I3C6 */
+ 	[ASPEED_CLK_GATE_UART1CLK]	= { 48,  -1, "uart1clk-gate",	"uart",	 0 },	/* UART1 */
+ 	[ASPEED_CLK_GATE_UART2CLK]	= { 49,  -1, "uart2clk-gate",	"uart",	 0 },	/* UART2 */
+ 	[ASPEED_CLK_GATE_UART3CLK]	= { 50,  -1, "uart3clk-gate",	"uart",  0 },	/* UART3 */
+@@ -772,6 +773,21 @@ static void __init aspeed_g6_cc(struct regmap *map)
+ 	/* USB 2.0 port1 phy 40MHz clock */
+ 	hw = clk_hw_register_fixed_rate(NULL, "usb-phy-40m", NULL, 0, 40000000);
+ 	aspeed_g6_clk_data->hws[ASPEED_CLK_USBPHY_40M] = hw;
++
++	//* i3c clock */
++	regmap_read(map, ASPEED_G6_CLK_SELECTION5, &val);
++	if(val & BIT(31)) {
++		val = (val >> 28) & 0x7;
++		if(val)
++			div = val + 1;
++		else
++			div = val + 2;
++		hw = clk_hw_register_fixed_factor(NULL, "i3cclk", "apll", 0, 1, div);
++	} else {
++		hw = clk_hw_register_fixed_factor(NULL, "i3cclk", "ahb", 0, 1, 1);
++	}
++	aspeed_g6_clk_data->hws[ASPEED_CLK_I3C] = hw;
++
+ };
+
+ static void __init aspeed_g6_cc_init(struct device_node *np)
+diff --git a/include/dt-bindings/clock/ast2600-clock.h b/include/dt-bindings/clock/ast2600-clock.h
+index 62b9520a00fd..91fcc1482061 100644
+--- a/include/dt-bindings/clock/ast2600-clock.h
++++ b/include/dt-bindings/clock/ast2600-clock.h
+@@ -51,14 +51,14 @@
+ #define ASPEED_CLK_GATE_SDCLK		35
+ #define ASPEED_CLK_GATE_EMMCCLK		36
+
+-#define ASPEED_CLK_GATE_I3C0CLK		37
+-#define ASPEED_CLK_GATE_I3C1CLK		38
+-#define ASPEED_CLK_GATE_I3C2CLK		39
+-#define ASPEED_CLK_GATE_I3C3CLK		40
+-#define ASPEED_CLK_GATE_I3C4CLK		41
+-#define ASPEED_CLK_GATE_I3C5CLK		42
+-#define ASPEED_CLK_GATE_I3C6CLK		43
+-#define ASPEED_CLK_GATE_I3C7CLK		44
++#define ASPEED_CLK_GATE_I3CDMACLK	37
++#define ASPEED_CLK_GATE_I3C0CLK		38
++#define ASPEED_CLK_GATE_I3C1CLK		39
++#define ASPEED_CLK_GATE_I3C2CLK		40
++#define ASPEED_CLK_GATE_I3C3CLK		41
++#define ASPEED_CLK_GATE_I3C4CLK		42
++#define ASPEED_CLK_GATE_I3C5CLK		43
++#define ASPEED_CLK_GATE_I3C6CLK		44
+
+ #define ASPEED_CLK_GATE_FSICLK		45
+
+@@ -76,22 +76,40 @@
+ #define ASPEED_CLK_LHCLK		57
+ #define ASPEED_CLK_UART			58
+ #define ASPEED_CLK_UARTX		59
+-#define ASPEED_CLK_SDIO			60
+-#define ASPEED_CLK_EMMC			61
+-#define ASPEED_CLK_ECLK			62
+-#define ASPEED_CLK_ECLK_MUX		63
+-#define ASPEED_CLK_MAC12		64
+-#define ASPEED_CLK_MAC34		65
+-#define ASPEED_CLK_USBPHY_40M		66
+-#define ASPEED_CLK_MAC1RCLK		67
+-#define ASPEED_CLK_MAC2RCLK		68
+-#define ASPEED_CLK_MAC3RCLK		69
+-#define ASPEED_CLK_MAC4RCLK		70
++
++/*
++ * Aspeed added HUARTX, UXCLK, HUXCLK and I3C clocks here and
++ * shifted the rest. Since we are only interested in I3C, the other
++ * newly added clocks are commented out for now
++ * #define ASPEED_CLK_HUARTX		60
++ * #define ASPEED_CLK_UXCLK		61
++ * #define ASPEED_CLK_HUXCLK		62
++ */
++
++#define ASPEED_CLK_I3C			63
++#define ASPEED_CLK_SDIO			64
++#define ASPEED_CLK_EMMC			65
++#define ASPEED_CLK_ECLK			66
++#define ASPEED_CLK_ECLK_MUX		67
++#define ASPEED_CLK_MAC12		68
++#define ASPEED_CLK_MAC34		69
++#define ASPEED_CLK_USBPHY_40M		70
++#define ASPEED_CLK_MAC1RCLK		71
++#define ASPEED_CLK_MAC2RCLK		72
++#define ASPEED_CLK_MAC3RCLK		73
++#define ASPEED_CLK_MAC4RCLK		74
+
+ /* Only list resets here that are not part of a gate */
+ #define ASPEED_RESET_ADC		55
+ #define ASPEED_RESET_JTAG_MASTER2	54
+-#define ASPEED_RESET_I3C_DMA		39
++#define ASPEED_RESET_I3C6		46
++#define ASPEED_RESET_I3C5		45
++#define ASPEED_RESET_I3C4		44
++#define ASPEED_RESET_I3C3		43
++#define ASPEED_RESET_I3C2		42
++#define ASPEED_RESET_I3C1		41
++#define ASPEED_RESET_I3C0		40
++#define ASPEED_RESET_I3C		39
+ #define ASPEED_RESET_PWM		37
+ #define ASPEED_RESET_PECI		36
+ #define ASPEED_RESET_MII		35
+--
+2.25.1
+

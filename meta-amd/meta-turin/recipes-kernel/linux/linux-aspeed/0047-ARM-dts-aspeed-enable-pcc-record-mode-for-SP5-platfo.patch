@@ -1,0 +1,144 @@
+From 33d8fd06cc3bb52cbdd5d37258196a7a1b01c432 Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Wed, 20 Oct 2021 02:53:01 -0500
+Subject: [PATCH] ARM dts aspeed enable pcc record mode for SP5 platfom
+
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts     | 11 +++++------
+ arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts   | 10 ++++------
+ arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts     | 10 ++++------
+ arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts | 10 ++++------
+ 4 files changed, 17 insertions(+), 24 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+index 9bcfa6907322..cc68bd5af4f8 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+@@ -52,7 +52,7 @@
+
+ 		pcc_memory: pccbuffer {
+ 			no-map;
+-			reg = <0xE0000000 0x00000010>; /* 16 Bytes */
++			reg = <0xE0000000 0x00001000>; /* 4K */
+ 		};
+ 	};
+ };
+@@ -535,15 +535,14 @@
+ 	status = "okay";
+ };
+
+-&lpc_snoop {
+-	status = "okay";
+-	snoop-ports = <0x80>;
+-};
+-
+ &lpc_pcc {
+ 	port-addr = <0x80>;
+ 	dma-mode;
+ 	memory-region = <&pcc_memory>;
++	rec-mode = <0x1>;
++	port-addr-hbits-select = <0x1>;
++	port-addr-xbits = <0x3>;
++
+ 	status = "okay";
+ };
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+index 3dc1539a9b45..c7844c665e8c 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+@@ -51,7 +51,7 @@
+
+ 		pcc_memory: pccbuffer {
+ 			no-map;
+-			reg = <0xE0000000 0x00000010>; /* 16 Bytes */
++			reg = <0xE0000000 0x00001000>; /* 4K */
+ 		};
+ 	};
+
+@@ -599,15 +599,13 @@
+ 	status = "okay";
+ };
+
+-&lpc_snoop {
+-	status = "okay";
+-	snoop-ports = <0x80>;
+-};
+-
+ &lpc_pcc {
+ 	port-addr = <0x80>;
+ 	dma-mode;
+ 	memory-region = <&pcc_memory>;
++	rec-mode = <0x1>;
++	port-addr-hbits-select = <0x1>;
++	port-addr-xbits = <0x3>;
+ 	status = "okay";
+ };
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+index 9cf6699e5d1a..d203d684f94e 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+@@ -51,7 +51,7 @@
+
+ 		pcc_memory: pccbuffer {
+ 			no-map;
+-			reg = <0xE0000000 0x00000010>; /* 16 Bytes */
++			reg = <0xE0000000 0x00001000>; /* 4K */
+ 		};
+ 	};
+
+@@ -432,15 +432,13 @@
+ 	status = "okay";
+ };
+
+-&lpc_snoop {
+-	status = "okay";
+-	snoop-ports = <0x80>;
+-};
+-
+ &lpc_pcc {
+ 	port-addr = <0x80>;
+ 	dma-mode;
+ 	memory-region = <&pcc_memory>;
++	rec-mode = <0x1>;
++	port-addr-hbits-select = <0x1>;
++	port-addr-xbits = <0x3>;
+ 	status = "okay";
+ };
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts b/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
+index 791bf4d57b0a..c8283b31f912 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
+@@ -39,7 +39,7 @@
+
+ 		pcc_memory: pccbuffer {
+ 			no-map;
+-			reg = <0xE0000000 0x00000010>; /* 16 Bytes */
++			reg = <0xE0000000 0x00001000>; /* 4K */
+ 		};
+ 	};
+
+@@ -406,15 +406,13 @@
+ 	status = "okay";
+ };
+
+-&lpc_snoop {
+-	status = "okay";
+-	snoop-ports = <0x80>;
+-};
+-
+ &lpc_pcc {
+ 	port-addr = <0x80>;
+ 	dma-mode;
+ 	memory-region = <&pcc_memory>;
++	rec-mode = <0x1>;
++	port-addr-hbits-select = <0x1>;
++	port-addr-xbits = <0x3>;
+ 	status = "okay";
+ };
+
+--
+2.17.1
+

@@ -1,0 +1,39 @@
+From a218ca40ea173e0ff12da8bb8c97f3d93ba3e4d6 Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Fri, 5 Nov 2021 03:13:25 -0500
+Subject: [PATCH] fix to return four byte post code
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+---
+ main.cpp | 15 ++-------------
+ 1 file changed, 2 insertions(+), 13 deletions(-)
+
+diff --git a/main.cpp b/main.cpp
+index cc9a545..1af643f 100644
+--- a/main.cpp
++++ b/main.cpp
+@@ -127,22 +127,11 @@ void PostCodeEventHandler(sdeventplus::source::IO& s, int postFd, uint32_t,
+                 {
+                     return;
+                 }
+-
+-                /* Read failure. */
+-                if (readb == 0)
+-                {
+-                    fprintf(stderr, "Unexpected EOF reading postcode\n");
+-                }
+-                else
+-                {
+-                    fprintf(stderr, "Failed to read postcode: %s\n", strerror(errno));
+-                }
+-                s.get_event().exit(1);
+             }
+         }
+         // extract 0xppqqrrss from 0x43pp42qq41rr40ss pattern
+-        trunc_code = (GET_BYTE_7(code) | GET_BYTE_5(code) |
+-                      GET_BYTE_3(code) | GET_BYTE_1(code));
++        trunc_code = ((GET_BYTE_7(code) << 24) | (GET_BYTE_5(code) << 16) |
++                      (GET_BYTE_3(code) << 8) | GET_BYTE_1(code));
+
+         code = trunc_code;
+

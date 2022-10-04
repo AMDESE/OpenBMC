@@ -1,0 +1,13 @@
+[Unit]
+Description=Get DIMM info for Redfish in S5 at boot time
+Wants=mapper-wait@-xyz-openbmc_project-inventory.service
+After=mapper-wait@-xyz-openbmc_project-inventory.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/usr/sbin/dimm-info.sh
+
+[Install]
+WantedBy=multi-user.target
+

@@ -1,0 +1,79 @@
+From 942ef51647aea05f9d984e2ac4b03c661d814f27 Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Tue, 4 Jan 2022 06:18:33 -0600
+Subject: [PATCH] enable uart dma drivers for host console
+
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts     | 5 +++++
+ arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts   | 5 +++++
+ arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts     | 5 +++++
+ arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts | 5 +++++
+ 4 files changed, 20 insertions(+)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+index 66910840f3a1..1704139036b9 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+@@ -122,6 +122,11 @@
+
+ &uart1 {
+ 	//Host console
++	compatible = "aspeed,ast2600-uart";
++	/delete-property/ reg-shift;
++	/delete-property/ reg-io-width;
++	dma-mode;
++	dma-channel = <0>;
+ 	status = "okay";
+ };
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+index e59a16e22c92..773e998cbdb0 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+@@ -122,6 +122,11 @@
+
+ &uart1 {
+ 	//Host console
++	compatible = "aspeed,ast2600-uart";
++	/delete-property/ reg-shift;
++	/delete-property/ reg-io-width;
++	dma-mode;
++	dma-channel = <0>;
+ 	status = "okay";
+ };
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+index 9699147cf67c..c54a835dc3a3 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+@@ -120,6 +120,11 @@
+
+ // Host Serial console
+ &uart1 {
++	compatible = "aspeed,ast2600-uart";
++	/delete-property/ reg-shift;
++	/delete-property/ reg-io-width;
++	dma-mode;
++	dma-channel = <0>;
+ 	status = "okay";
+ };
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts b/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
+index e9af777e4b5e..81e8742418d8 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
+@@ -108,6 +108,11 @@
+
+ // Host Serial console
+ &uart1 {
++	compatible = "aspeed,ast2600-uart";
++	/delete-property/ reg-shift;
++	/delete-property/ reg-io-width;
++	dma-mode;
++	dma-channel = <0>;
+ 	status = "okay";
+ };
+
+--
+2.17.1
+

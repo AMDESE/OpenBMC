@@ -1,0 +1,63 @@
+From 9ba5c93b34f8d14ad8b2c586f6f703fbf7958481 Mon Sep 17 00:00:00 2001
+From: Ashok Kumar <ashok2.kumar@amd.com>
+Date: Tue, 24 May 2022 07:01:31 -0500
+Subject: [PATCH] added cpuInfo in Redfish API
+
+Added support read DBus property CPUID1 and CPUID2 in Redfish API
+recipes-phosphor/interfaces/bmcweb/redfish-core/lib/power.hpp
+
+Signed-off-by: Ashok Kumar <ashok2.kumar@amd.com>
+---
+ redfish-core/lib/power.hpp | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
+
+diff --git a/redfish-core/lib/power.hpp b/redfish-core/lib/power.hpp
+index 4173ce8..6eea69a 100644
+--- a/redfish-core/lib/power.hpp
++++ b/redfish-core/lib/power.hpp
+@@ -227,6 +227,7 @@ class Power : public Node
+                         return;
+                     }
+
++                    //power Control
+                     nlohmann::json& tempArray = sensorAsyncResp->asyncResp->res
+                                                     .jsonValue["PowerControl"];
+
+@@ -246,6 +247,8 @@ class Power : public Node
+                     }
+
+                     nlohmann::json& sensorJson = tempArray.back();
++                    nlohmann::json& cpuJson = tempArray.back();
++
+                     bool enabled = false;
+                     double powerCap = 0.0;
+                     int64_t scale = 0;
+@@ -253,6 +256,28 @@ class Power : public Node
+                     for (const std::pair<std::string, SensorVariant>& property :
+                          properties)
+                     {
++                        if (!property.first.compare("CPUID1")){
++                            const std::string* cp = std::get_if<std::string>(&property.second);
++                            if (cp != nullptr) {
++                                 cpuJson["CpuIDs"]["CPU1"] = *cp;
++                             }
++                             else{
++                                 cpuJson["CpuIDs"]["CPU1"] = "UnKnown";
++                             }
++                          }
++
++                         if (!property.first.compare("CPUID2")){
++                            const std::string* cp = std::get_if<std::string>(&property.second);
++
++                            if (cp != nullptr) {
++                                 cpuJson["CpuIDs"]["CPU2"] = *cp;
++                            }
++                            else
++                            {
++                                 cpuJson["CpuIDs"]["CPU2"] = "UnKnown";
++                            }
++                        }
++
+                         if (!property.first.compare("Scale"))
+                         {
+                             const int64_t* i =

@@ -1,0 +1,43 @@
+#!/bin/bash
+
+function usage() {
+        echo -e "\nUsage: $0 <all-pcie | sata-nvme>"
+        echo -e "   all-pcie  - for all NVMe configuration"
+        echo -e "   sata-nvme - for SATA + NVMe configuration\n"
+        echo -e "Please inspect the hardware and update FRU"
+        echo -e "(update log will be stored at /tmp/Results.log)\n"
+        exit
+}
+if [ "$1" != "all-pcie" ] && [ "$1" != "sata-nvme" ] ; then
+        echo "Invalid option : $1"
+        usage
+fi
+power_status() {
+        st=$(busctl get-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis CurrentPowerState | cut -d"." -f6)
+        if [ "$st" == "On\"" ]; then
+                echo "on"
+        else
+                echo "off"
+        fi
+}
+status=$(power_status)
+if [ "$status" == "off" ] ; then
+        echo "Host is powered off, please power-on and try again."
+        exit
+fi
+br=`i2cget -f -y 10 0x75`
+i2cset -f -y 10 0x75 0x08
+passed=0
+echo "Updating main code..."
+passed=`/usr/bin/mg9100test_RL20220323_1709 10 -i -fw002| grep -c "PASS"`
+echo "$passed devices updated"
+echo "Updating software strap and custom UBM FRU"
+> /tmp/Result.log
+if [ "$1" == "sata-nvme" ] ; then
+    /usr/bin/AMI_MG9100_001_Update_CFRU_S16_23_SATA.sh
+fi
+if [ "$1" == "all-pcie" ] ; then
+    /usr/bin/AMI_MG9100_001_ALL_PCIE.sh
+fi
+cat /tmp/Result.log
+i2cset -f -y 10 0x75 $br
