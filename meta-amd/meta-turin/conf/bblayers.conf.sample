@@ -14,7 +14,7 @@ BBLAYERS ?= " \
   ##OEROOT##/meta-phosphor \
   ##OEROOT##/meta-aspeed \
   ##OEROOT##/meta-amd \
-  ##OEROOT##/meta-amd/meta-sp5 \
+  ##OEROOT##/meta-amd/meta-turin \
   "
 BBLAYERS_NON_REMOVABLE ?= " \
   ##OEROOT##/meta \
@@ -25,5 +25,5 @@ BBLAYERS_NON_REMOVABLE ?= " \
   ##OEROOT##/meta-phosphor \
   ##OEROOT##/meta-aspeed \
   ##OEROOT##/meta-amd \
-  ##OEROOT##/meta-amd/meta-sp5 \
+  ##OEROOT##/meta-amd/meta-turin \
   "
