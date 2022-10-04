@@ -1,0 +1,126 @@
+From d3077a92722a0a9fa623ae74929dd3f6e8e5dfd2 Mon Sep 17 00:00:00 2001
+From: Mohsen Dolaty <mohsen.dolaty@amd.com>
+Date: Thu, 29 Sep 2022 11:01:53 -0500
+Subject: [PATCH 1/1] u-boot:Turin initial configuration
+
+This is Turin initial configuration
+Add 5 new platforms for Turin to u-boot
+Delete SP5 platforms
+
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
+---
+ common/image-fit.c | 24 ++++++++++------------
+ common/main.c      | 50 +++++++++++++++++-----------------------------
+ 2 files changed, 29 insertions(+), 45 deletions(-)
+
+diff --git a/common/image-fit.c b/common/image-fit.c
+index 3bdcc86130..4c9ab8426c 100644
+--- a/common/image-fit.c
++++ b/common/image-fit.c
+@@ -1866,20 +1866,18 @@ int fit_image_load(bootm_headers_t *images, ulong addr,
+ 			board_id = str2hex(platform_id);
+ 			// select the  device tree configuration based on board_id
+ 			switch (board_id) {
+-				case 0x3D:
+-				case 0x40 ... 0x42:
+-				case 0x52:
+-					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-onyx.dtb"); break;
+-				case 0x3E:
+-				case 0x43 ... 0x45:
+-				case 0x51:
+-					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-quartz.dtb"); break;
+-				case 0x46 ... 0x48:
+-					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-ruby.dtb"); break;
+-				case 0x49 ... 0x4E:
+-					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-titanite.dtb"); break;
++				case 0x66:
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-chalupa.dtb"); break;
++				case 0x67:
++                                        sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-huambo.dtb"); break;
++				case 0x68:
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-galena.dtb"); break;
++				case 0x69:
++                                        sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-recluse.dtb"); break;
++				case 0x6A:
++                                        sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-purico.dtb"); break;
+ 				default :
+-					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-quartz.dtb"); break;
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-galena.dtb"); break;
+ 			} // switch
+
+ 			cfg_noffset = fit_conf_get_node(fit,
+diff --git a/common/main.c b/common/main.c
+index f3b8ee65d8..742f1b5fd7 100644
+--- a/common/main.c
++++ b/common/main.c
+@@ -26,25 +26,12 @@
+ /* Sys Scratch reg that holds sys_rst info */
+ #define ASPEED_SYS_SCRATCH_1FC 0x1e6e21fc
+
+-#define ONYX_SLT        61  //0x3D
+-#define ONYX_1          64  //0x40
+-#define ONYX_2          65  //0x41
+-#define ONYX_3          66  //0x42
+-#define ONYX_FR4        82  //0x52
+-#define QUARTZ_DAP      62  //0x3E
+-#define QUARTZ_1        67  //0x43
+-#define QUARTZ_2        68  //0x44
+-#define QUARTZ_3        69  //0x45
+-#define QUARTZ_FR4      81  //0x51
+-#define RUBY_1          70  //0x46
+-#define RUBY_2          71  //0x47
+-#define RUBY_3          72  //0x48
+-#define TITANITE_1      73  //0x49
+-#define TITANITE_2      74  //0x4A
+-#define TITANITE_3      75  //0x4B
+-#define TITANITE_4      76  //0x4C
+-#define TITANITE_5      77  //0x4D
+-#define TITANITE_6      78  //0x4E
++/* turin Platform IDs */
++#define CHALUPA       102 // 0x66
++#define HUAMBO        103 // 0x67
++#define GALENA        104 // 0x68
++#define RECLUSE       105 // 0x69
++#define PURICO        106 // 0x6A
+
+ #define HOSTNAME_BUFF_LEN       32
+ #define CMD_BOOT_ARGS_BUFF_LEN  512
+@@ -89,24 +76,23 @@ void set_hostname()
+
+             switch ((int)simple_strtol(board_id, NULL, HEX_BASE))
+             {
+-                case ONYX_SLT:
+-                case ONYX_FR4:
+-                case ONYX_1 ... ONYX_3:
+-                    sprintf(hostname, "onyx-%02x%02x", octate_5, octate_6);
++                case CHALUPA:
++                    sprintf(hostname, "chalupa-%02x%02x", octate_5, octate_6);
+                     break;
+-                case QUARTZ_DAP:
+-                case QUARTZ_FR4:
+-                case QUARTZ_1 ... QUARTZ_3:
+-                    sprintf(hostname, "quartz-%02x%02x", octate_5, octate_6);
++		case HUAMBO:
++                    sprintf(hostname, "huambo-%02x%02x", octate_5, octate_6);
+                     break;
+-                case RUBY_1 ... RUBY_3:
+-                    sprintf(hostname, "ruby-%02x%02x", octate_5, octate_6);
++                case GALENA:
++                    sprintf(hostname, "galena-%02x%02x", octate_5, octate_6);
+                     break;
+-                case TITANITE_1 ... TITANITE_6:
+-                    sprintf(hostname, "titanite-%02x%02x", octate_5, octate_6);
++                case RECLUSE:
++                    sprintf(hostname, "recluse-%02x%02x", octate_5, octate_6);
++                    break;
++		case PURICO:
++                    sprintf(hostname, "purico-%02x%02x", octate_5, octate_6);
+                     break;
+                 default:
+-                    sprintf(hostname, "sp5-%02x%02x", octate_5, octate_6);
++                    sprintf(hostname, "turin-%02x%02x", octate_5, octate_6);
+                     break;
+             }
+             /* Append bootargs with hostname */
+--
+2.25.1
