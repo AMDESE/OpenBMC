@@ -17,6 +17,11 @@
 #define BYTE_COUNT_4          (4)
 #define BYTE_COUNT_5          (5)
 
+#define MASK_BYTE_2           (0xFF00)
+#define MASK_BYTE_3           (0xFF0000)
+#define MASK_BYTE_4           (0xFF000000)
+#define MASK_TWO_BYTES        (0xFFFF)
+
 #define SHIFT_24              (24)
 #define SHIFT_16              (16)
 #define SHIFT_8               (8)

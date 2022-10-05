@@ -1,3 +1,6 @@
+#include <iostream>
+#include <fstream>
+#include <string>
 #include "common.h"
 
 extern "C"
@@ -13,6 +16,14 @@ extern "C"
 #include <fcntl.h>
 #include "renesas-vr-update.h"
 }
+
+struct PMBusPayload
+{
+   char flag;
+   u_int8_t command;
+   u_int32_t data;
+};
+
 
 static int fd = FAILURE;
 static FILE *fp = NULL;
@@ -425,10 +436,10 @@ int gen2_poll_programmer_status_register(void)
     u_int8_t rdata[MAXIMUM_SIZE] = { 0 };
     int length, timeout = 0, ret = 0, status = 0;
 
+    sleep(SLEEP_2);
     //Poll PROGRAMMER_STATUS Register
     while (timeout < MAX_RETRY) {
         timeout++;
-        usleep(SLEEP_1000);
 
         if (i2c_smbus_write_word_data(fd,DMA_WRITE, GEN2_PRGM_STATUS) != SUCCESS) {
             printf("%s:Write to DMA Address Register failed\n", __func__);
@@ -444,7 +455,7 @@ int gen2_poll_programmer_status_register(void)
             status = SUCCESS;
             break;
         } else {
-            status = SUCCESS;
+            status = FAILURE;
         }
     }
 
@@ -474,10 +485,10 @@ int gen3_poll_programmer_status_register(void)
     u_int8_t rdata[MAXIMUM_SIZE] = { 0 };
     int length, timeout = 0, ret = 0, status = 0;
 
+    sleep(SLEEP_2);
     //Poll PROGRAMMER_STATUS Register
     while (timeout < 10) {
         timeout++;
-        usleep(SLEEP_2500);
 
         if (i2c_smbus_write_word_data(fd,DMA_WRITE, GEN3_PRGM_STATUS) != SUCCESS) {
             printf("%s:Write to DMA Address Register failed\n", __func__);
@@ -493,7 +504,7 @@ int gen3_poll_programmer_status_register(void)
             status = SUCCESS;
             break;
         } else {
-            status = SUCCESS;
+            status = FAILURE;
         }
     }
 
@@ -615,7 +626,7 @@ int crc_check_verification(int argc, char* argv[],int crc_value)
     if ((strncmp(argv[ARGV_7], RAA229613, strlen(RAA229613)) == SUCCESS)
         || (strncmp(argv[ARGV_7], RAA229625, strlen(RAA229625)) == SUCCESS)
         || ((strncmp(argv[ARGV_7], RAA229620, strlen(RAA229620))) == SUCCESS)
-        || ((strncmp(argv[ARGV_7], RAA229621, strlen(RAA229620))) == SUCCESS))
+        || ((strncmp(argv[ARGV_7], RAA229621, strlen(RAA229621))) == SUCCESS))
     {
         strncpy(vr_context.gen, GEN3, strlen(GEN3));
     }
@@ -845,6 +856,240 @@ clean_vr_update:
     return ret;
 }
 
+int check_device_fw_version()
+{
+
+    u_int8_t rdata[MAXIMUM_SIZE] = { 0 };
+    int length;
+    int ret = 0;
+    u_int32_t device_id = 0;
+
+    //write to DMA Address Register to read device fw version
+    ret = i2c_smbus_write_word_data(fd, DMA_WRITE, DEVICE_FW_VERSION);
+    if (ret < SUCCESS) {
+        printf("%s:write to DMA Address Register failed \n", __func__);
+    return FAILURE;
+    }
+
+    //read from DMA Address Register
+    ret = i2c_smbus_read_i2c_block_data(fd, DMA_READ, BYTE_COUNT_4, rdata);
+    if (ret < SUCCESS) {
+        printf("%s:Read to DMA Address Register failed with ret value %d\n",__func__,ret);
+        return FAILURE;
+    }
+
+    device_id = (rdata[INDEX_3] << SHIFT_24) |
+                (rdata[INDEX_2] << SHIFT_16) |
+                (rdata[INDEX_1] << SHIFT_8) | rdata[INDEX_0];
+
+    printf("Device id from the device = %x\n",device_id);
+
+    /* Check to make sure the firmware is the correct version;
+       if not, upgrade isn't possible */
+    if(device_id == CANDIDATE_FW)
+    {
+        printf("Patch update is allowed for this device. Updating the patch\n");
+        ret = SUCCESS;
+    } else {
+        printf("Patch update is not allowed for this device. Aborting the update\n");
+        ret = FAILURE;
+    }
+    return ret;
+
+}
+
+int halt_device_fw()
+{
+    int ret = 0;
+
+    printf("Sleeping firmware\n");
+
+    ret = i2c_smbus_write_word_data(fd, FW_WRITE, HALT_FW);
+    if (ret < SUCCESS) {
+        printf("%s:write to DMA Address Register failed \n", __func__);
+    return FAILURE;
+    }
+
+    usleep(SLEEP_1000);
+
+    return ret;
+}
+
+int write_patch_data_to_device() {
+
+    int ret = 0;
+    std::string command;
+    std::fstream newfile;
+
+    newfile.open(vr_context.update_file_path,std::ios::in);
+
+    if (newfile.is_open())
+    {
+        std::string hexfile_data;
+        //Read hex file line by line
+        while(getline(newfile, hexfile_data))
+        {
+            struct PMBusPayload pmbus_payload;
+            std::string data;
+            int len = hexfile_data.size();
+            pmbus_payload.flag = hexfile_data[INDEX_0];
+
+            /* "w" in the hex file indicates that
+            the line should be written to the hw*/
+            if(pmbus_payload.flag != 'w')
+                continue;
+
+            /*Extract command code */
+            command = hexfile_data.substr(INDEX_2,INDEX_2);
+            pmbus_payload.command = std::stoul(command, nullptr, BASE_16);
+
+            /*Extract pmbus data*/
+            data = hexfile_data.substr(INDEX_5,len - INDEX_5);
+            pmbus_payload.data = std::stoul(data, nullptr, BASE_16);
+
+
+            if(pmbus_payload.command == CMD_CODE_C6)
+            {
+                u_int8_t write_pmbus_data[INDEX_4] = {0};
+                write_pmbus_data[INDEX_3] = ((pmbus_payload.data & MASK_BYTE_4) >> SHIFT_24);
+                write_pmbus_data[INDEX_2] = ((pmbus_payload.data & MASK_BYTE_3) >> SHIFT_16);
+                write_pmbus_data[INDEX_1] = ((pmbus_payload.data & MASK_BYTE_2) >> SHIFT_8);
+                write_pmbus_data[INDEX_0] = (pmbus_payload.data & INT_255);
+
+                //Writing 4 bytes to the device
+                ret = i2c_smbus_write_i2c_block_data(fd, pmbus_payload.command, BYTE_COUNT_4, write_pmbus_data);
+                if (ret < SUCCESS) {
+                    printf("Writing block data to the device failed \n");
+                    return FAILURE;
+                }
+            }
+            else
+            {
+                u_int16_t write_pmbus_data;
+
+                if(pmbus_payload.command == CMD_CODE_C7)
+                {
+                    write_pmbus_data = pmbus_payload.data & MASK_TWO_BYTES;
+                }
+                else if(pmbus_payload.command == CMD_CODE_E6)
+                {
+                   write_pmbus_data = (u_int16_t)pmbus_payload.data;
+                }
+
+                //Writing 2 byte to the device
+                ret = i2c_smbus_write_word_data(fd, pmbus_payload.command , write_pmbus_data);
+                if (ret < SUCCESS) {
+                    printf("%s:write to DMA Address Register failed \n", __func__);
+                    return FAILURE;
+                }
+            }
+        }
+        newfile.close();
+    }
+
+    return ret;
+}
+
+
+int commit_patch_to_nvm()
+{
+    int ret = 0;
+
+    if (i2c_smbus_write_word_data(fd,CMD_CODE_E6, COMMIT_DATA) != SUCCESS) {
+        printf("%s:Write to DMA Address Register failed\n", __func__);
+        return FAILURE;
+    } else {
+       printf("Patch committed to NVM\n");
+    }
+
+    return ret;
+}
+
+int poll_register_for_complete_bit()
+{
+    u_int8_t rdata[MAXIMUM_SIZE] = { 0 };
+    int length, timeout = 0, ret = 0, status = 0;
+
+    sleep(SLEEP_1);
+    //Poll PROGRAMMER_STATUS Register
+    while (timeout < MAX_RETRY) {
+        timeout++;
+        usleep(SLEEP_1000);
+
+        if (i2c_smbus_write_word_data(fd,DMA_WRITE, POLL_REG) != SUCCESS) {
+            printf("%s:Write to DMA Address Register failed\n", __func__);
+            return FAILURE;
+        }
+
+        ret = i2c_smbus_read_i2c_block_data(fd,DMA_READ, BYTE_COUNT_4, rdata);
+        if (ret < SUCCESS) {
+            printf("%s:Read from DMA Address Register failed\n", __func__);
+            return FAILURE;
+        }
+
+        if ((rdata[INDEX_3] & COMPLETE_BIT))
+        {
+            if((rdata[INDEX_3] & PASS_BIT))
+            {
+                status = SUCCESS;
+                printf("Patch update Succeeded. Please do AC cycle\n");
+                break;
+            } else if((rdata[INDEX_3] & FAIL_BIT))
+            {
+                status = FAILURE;
+                break;
+            }
+        } else {
+            status = FAILURE;
+        }
+    }
+
+    if(status  == FAILURE)
+        printf("Patch update failed\n");
+
+    return status;
+}
+
+int vr_patch_update()
+{
+    int ret = 0;
+
+    if (vr_update_open_dev() != SUCCESS) {
+        ret = FAILURE;
+        goto clean_vr_update;
+    }
+
+    if(check_device_fw_version() != SUCCESS) {
+        ret = FAILURE;
+        goto clean_vr_update;
+    }
+
+    if(halt_device_fw() != SUCCESS) {
+        ret = FAILURE;
+        goto clean_vr_update;
+    }
+
+    if(write_patch_data_to_device() != SUCCESS) {
+        ret = FAILURE;
+        goto clean_vr_update;
+    }
+
+    if(commit_patch_to_nvm() != SUCCESS) {
+        ret = FAILURE;
+        goto clean_vr_update;
+    }
+
+    if(poll_register_for_complete_bit() != SUCCESS) {
+        ret = FAILURE;
+        goto clean_vr_update;
+    }
+
+clean_vr_update:
+
+    vr_update_header_file_close();
+    return ret;
+}
+
 int renesas_vr_update(int argc, char* argv[])
 {
     char *update_file;
@@ -863,37 +1108,31 @@ int renesas_vr_update(int argc, char* argv[])
 
     vr_context.crc = 0;
     if(argv[ARGV_7] != NULL)
-        vr_context.crc = strtoul(argv[ARGV_7], NULL, 16);
+        vr_context.crc = strtoul(argv[ARGV_7], NULL, BASE_16);
 
-    if ((strncmp(argv[ARGV_6], RAA229613, strlen(RAA229613)) == SUCCESS) ||
-        (strncmp(argv[ARGV_6], RAA229625, strlen(RAA229625)) == SUCCESS)
-        || ((strncmp(argv[ARGV_6], RAA229620, strlen(RAA229620)) == SUCCESS)))
+    if(strstr(vr_context.update_file_path,PATCH) != NULL)
     {
-        strncpy(vr_context.gen, GEN3, strlen(GEN3));
-    }
-    else if (strncmp(argv[ARGV_6], ISL68220, strlen(ISL68220)) == SUCCESS)
-    {
-        strncpy(vr_context.gen, GEN2, strlen(GEN2));
+        /*Patch update for Renesas loadline issue*/
+        ret = vr_patch_update();
     }
     else {
-        printf("Invalid model number\n");
-        return FAILURE;
-    }
-
-    if ((strncmp(vr_context.gen, GEN2, strlen(GEN2))) == SUCCESS)
-    {
-        printf("Initiating VR update for Gen2\n");
-        ret = gen2_programming();
-
-    } else if ((strncmp(vr_context.gen, GEN3, strlen(GEN3))) == SUCCESS)
-    {
-        printf("Initiating VR update for Gen3\n");
-        ret = gen3_programming();
-
-    } else {
-        printf("Invalid generation option \n");
-        ret = FAILURE;
+        if ((strncmp(argv[ARGV_6], RAA229613, strlen(RAA229613)) == SUCCESS)
+           || (strncmp(argv[ARGV_6], RAA229625, strlen(RAA229625)) == SUCCESS)
+           || (strncmp(argv[ARGV_6], RAA229620, strlen(RAA229620)) == SUCCESS)
+           || ((strncmp(argv[ARGV_6], RAA229621, strlen(RAA229621))) == SUCCESS))
+        {
+            strncpy(vr_context.gen, GEN3, strlen(GEN3));
+            ret = gen3_programming();
+        }
+        else if (strncmp(argv[ARGV_6], ISL68220, strlen(ISL68220)) == SUCCESS)
+        {
+            strncpy(vr_context.gen, GEN2, strlen(GEN2));
+            ret = gen2_programming();
+        }
+        else {
+            printf("Invalid model number\n");
+            return FAILURE;
+        }
     }
     return ret;
-
 }
