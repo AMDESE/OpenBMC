@@ -10,20 +10,23 @@ sync_hwmon_path() {
     boardID=`fw_printenv board_id | sed -n "s/^board_id=//p"`
 
     case $boardID in
-           "3D"|"40"|"41"|"42"|"52")  # Onyx board_ids
-                ln -s  /etc/default/obmc/hwmon_onyx/ /etc/default/obmc/hwmon
+           "68")  # galena board_ids
+                ln -s  /etc/default/obmc/hwmon_galena/ /etc/default/obmc/hwmon
            ;;
-           "3E"|"43"|"44"|"45"|"51")  # Quartz board_ids
-                ln -s  /etc/default/obmc/hwmon_quartz/ /etc/default/obmc/hwmon
+           "69")  # recluse board_ids
+                ln -s  /etc/default/obmc/hwmon_recluse/ /etc/default/obmc/hwmon
            ;;
-           "46"|"47"|"48")  # Ruby board_ids
-                ln -s  /etc/default/obmc/hwmon_ruby/ /etc/default/obmc/hwmon
+           "6A")  # purico board_ids
+                ln -s  /etc/default/obmc/hwmon_purico/ /etc/default/obmc/hwmon
            ;;
-           "49"|"4A"|"4B"|"4C"|"4D"|"4E")  # Titanite board_ids
-                ln -s  /etc/default/obmc/hwmon_titanite/ /etc/default/obmc/hwmon
+           "66")  # chalupa board_ids
+                ln -s  /etc/default/obmc/hwmon_chalupa/ /etc/default/obmc/hwmon
            ;;
-           *)  # Default set to Onyx board
-                ln -s  /etc/default/obmc/hwmon_onyx/ /etc/default/obmc/hwmon
+           "67")  # huambo board_ids
+                ln -s  /etc/default/obmc/hwmon_huambo/ /etc/default/obmc/hwmon
+           ;;
+           *)  # Default set to galena board
+                ln -s  /etc/default/obmc/hwmon_galena/ /etc/default/obmc/hwmon
     esac
 
 }

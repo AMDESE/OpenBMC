@@ -1,10 +1,10 @@
-FILESEXTRAPATHS_prepend_sp5 := "${THISDIR}/${PN}:"
-EXTRA_OEMESON_append_sp5 = " -Dupdate-functional-on-fail=true -Dnegative-errno-on-fail=false"
+FILESEXTRAPATHS_prepend_turin := "${THISDIR}/${PN}:"
+EXTRA_OEMESON_append_turin = " -Dupdate-functional-on-fail=true -Dnegative-errno-on-fail=false"
 
 SRC_URI += "file://0001-Add-power-on-monitor-mechanism.patch \
 	   "
-# Onyx specific sensors
-CHIPS_ONYX = " \
+# Galena specific sensors
+CHIPS_GALENA = " \
         bus@1e7a0000/i3c4@6000/sbtsi@4c,22400000001 \
         bus@1e7a0000/i3c4@6000/sbrmi@3c,22400000002 \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@0/emc2305@4d \
@@ -28,8 +28,33 @@ CHIPS_ONYX = " \
         bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/vdd18dualvrm@17 \
         "
 
-# Quartz specific sensors
-CHIPS_QUARTZ = " \
+# Recluse specific sensors
+CHIPS_RECLUSE = " \
+        bus@1e7a0000/i3c4@6000/sbtsi@4c,22400000001 \
+        bus@1e7a0000/i3c4@6000/sbrmi@3c,22400000002 \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@0/emc2305@4d \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@1/emc2305@4d \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@2/emc2305@4d \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@3/emc2305@4d \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@48 \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@49 \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4a \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4b \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4c \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4d \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4e \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4f \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@7/tmp468@48 \
+        bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/core0socvrm@40 \
+        bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/iovrm@41 \
+        bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/core1vrm@42 \
+        bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/vdd11susvrm@70 \
+        bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/vdd33dualvrm@16 \
+        bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/vdd18dualvrm@17 \
+        "
+
+# Chalupa specific sensors
+CHIPS_CHALUPA = " \
         bus@1e7a0000/i3c4@6000/sbtsi@4c,22400000001 \
         bus@1e7a0000/i3c5@7000/sbtsi@48,22400000001 \
         bus@1e7a0000/i3c4@6000/sbrmi@3c,22400000002 \
@@ -61,8 +86,8 @@ CHIPS_QUARTZ = " \
         bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@0/p1_vdd_33_dual@65 \
         "
 
-# Ruby specific sensors
-CHIPS_RUBY = " \
+# Purico specific sensors
+CHIPS_PURICO = " \
         bus@1e7a0000/i3c4@6000/sbtsi@4c,22400000001 \
         bus@1e7a0000/i3c4@6000/sbrmi@3c,22400000002 \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@0/emc2305@4d \
@@ -79,8 +104,8 @@ CHIPS_RUBY = " \
         bus@1e78a000/i2c-bus@300/i2cswitch@70/i2c@0/vddcr_vddio_33@63 \
         "
 
-# Titanite specific sensors
-CHIPS_TITANITE = " \
+# Huambo specific sensors
+CHIPS_HUAMBO = " \
         bus@1e7a0000/i3c4@6000/sbtsi@4c,22400000001 \
         bus@1e7a0000/i3c5@7000/sbtsi@48,22400000001 \
         bus@1e7a0000/i3c4@6000/sbrmi@3c,22400000002 \
@@ -101,21 +126,25 @@ CHIPS_TITANITE = " \
         bus@1e78a000/i2c-bus@380/pvddio_p1@75 \
         "
 ITEMSFMT = "ahb/apb/{0}.conf"
-ITEMS_ONYX = "${@compose_list(d, 'ITEMSFMT', 'CHIPS_ONYX')}"
-ITEMS_ONYX += "iio-hwmon-adc121c.conf"
-ITEMS_QUARTZ = "${@compose_list(d, 'ITEMSFMT', 'CHIPS_QUARTZ')}"
-ITEMS_QUARTZ += "iio-hwmon-adc121c.conf"
-ITEMS_RUBY = "${@compose_list(d, 'ITEMSFMT', 'CHIPS_RUBY')}"
-ITEMS_RUBY += "iio-hwmon-adc121c.conf"
-ITEMS_TITANITE = "${@compose_list(d, 'ITEMSFMT', 'CHIPS_TITANITE')}"
-ITEMS_TITANITE += "iio-hwmon-adc121c.conf"
+ITEMS_GALENA = "${@compose_list(d, 'ITEMSFMT', 'CHIPS_GALENA')}"
+ITEMS_GALENA += "iio-hwmon-adc121c.conf"
+ITEMS_RECLUSE = "${@compose_list(d, 'ITEMSFMT', 'CHIPS_RECLUSE')}"
+ITEMS_RECLUSE += "iio-hwmon-adc121c.conf"
+ITEMS_CHALUPA = "${@compose_list(d, 'ITEMSFMT', 'CHIPS_CHALUPA')}"
+ITEMS_CHALUPA += "iio-hwmon-adc121c.conf"
+ITEMS_PURICO = "${@compose_list(d, 'ITEMSFMT', 'CHIPS_PURICO')}"
+ITEMS_PURICO += "iio-hwmon-adc121c.conf"
+ITEMS_HUAMBO = "${@compose_list(d, 'ITEMSFMT', 'CHIPS_HUAMBO')}"
+ITEMS_HUAMBO += "iio-hwmon-adc121c.conf"
 
-ENVS_ONYX = "obmc/hwmon_onyx/{0}"
-SYSTEMD_ENVIRONMENT_FILE_${PN}_append_sp5 += " ${@compose_list(d, 'ENVS_ONYX', 'ITEMS_ONYX')}"
-ENVS_QUARTZ = "obmc/hwmon_quartz/{0}"
-SYSTEMD_ENVIRONMENT_FILE_${PN}_append_sp5 += " ${@compose_list(d, 'ENVS_QUARTZ', 'ITEMS_QUARTZ')}"
-ENVS_RUBY = "obmc/hwmon_ruby/{0}"
-SYSTEMD_ENVIRONMENT_FILE_${PN}_append_sp5 += " ${@compose_list(d, 'ENVS_RUBY', 'ITEMS_RUBY')}"
-ENVS_TITANITE = "obmc/hwmon_titanite/{0}"
-SYSTEMD_ENVIRONMENT_FILE_${PN}_append_sp5 += " ${@compose_list(d, 'ENVS_TITANITE', 'ITEMS_TITANITE')}"
+ENVS_GALENA = "obmc/hwmon_galena/{0}"
+SYSTEMD_ENVIRONMENT_FILE_${PN}_append_sp5 += " ${@compose_list(d, 'ENVS_GALENA', 'ITEMS_GALENA')}"
+ENVS_RECLUSE = "obmc/hwmon_recluse/{0}"
+SYSTEMD_ENVIRONMENT_FILE_${PN}_append_sp5 += " ${@compose_list(d, 'ENVS_RECLUSE', 'ITEMS_RECLUSE')}"
+ENVS_CHALUPA = "obmc/hwmon_chalupa/{0}"
+SYSTEMD_ENVIRONMENT_FILE_${PN}_append_sp5 += " ${@compose_list(d, 'ENVS_CHALUPA', 'ITEMS_CHALUPA')}"
+ENVS_PURICO = "obmc/hwmon_purico/{0}"
+SYSTEMD_ENVIRONMENT_FILE_${PN}_append_sp5 += " ${@compose_list(d, 'ENVS_PURICO', 'ITEMS_PURICO')}"
+ENVS_HUAMBO = "obmc/hwmon_huambo/{0}"
+SYSTEMD_ENVIRONMENT_FILE_${PN}_append_sp5 += " ${@compose_list(d, 'ENVS_HUAMBO', 'ITEMS_HUAMBO')}"
 
