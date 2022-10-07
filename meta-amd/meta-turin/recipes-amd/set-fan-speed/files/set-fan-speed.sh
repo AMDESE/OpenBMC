@@ -48,17 +48,17 @@ set_emc2305_pump_fan_speed()
 {
    speed_val=0xFF
    if [[ $curr_emc2305_ctrl -eq 4 ]]; then
-        # Set Onyx pump fan speed
+        # Set Turin-1P pump fan speed
         # Pump fan is on emc2305 controller# 3, fan#4
-        echo "Setting Onyx Pump Fans at full speed...."
+        echo "Setting Turin-1P Pump Fans at full speed.... " $speed_val
         i2cset -f -y ${i2c_bus_array[2]} $EMC2305_DEV ${FAN_SET_REG[3]} $speed_val
         if [ $? -ne 0 ]; then
             echo "Error: Setting Pump fan speed failed.."
         fi
    elif [[ $curr_emc2305_ctrl -eq 5 ]]; then
-        # Set Quartz pump fan speed
+        # Set Turin-2P pump fan speed
         # Pump fan is on emc2305 controller# 5, fan# 4 & 5
-        echo "Setting Quartz Pump Fans at full speed...."
+        echo "Setting Turin-2P Pump Fans at full speed.... " $speed_val
         for (( j=3; j < 5; j++ ));
         do
             i2cset -f -y ${i2c_bus_array[4]} $EMC2305_DEV ${FAN_SET_REG[j]} $speed_val
@@ -77,12 +77,12 @@ set_cpld_fan_speed()
     echo " Num of pwms = ${cpld_num_of_pwms}"
     # Get the CPLD i2c bus number
     cpld_i2c_bus_num=`find /sys/bus/i2c/drivers | grep cpld| grep 0028 | cut -d"/" -f 7 | cut -d"-" -f 1`
-    echo "clpd i2c bust num = ${cpld_i2c_bus_num}"
+    echo "cpld i2c bus num = ${cpld_i2c_bus_num}"
 
     # Write speed value to CPLD controller Regs.
     # Set speed to 30% pwm, (CPLD range 0 to 100 %)
     pwm_val=30
-    echo "Setting all Fan speeds to $pwm_val pwm"
+    echo "Setting all Huambo Fan speeds to $pwm_val pwm"
     for ((i=0; i<${cpld_num_of_pwms}; i++));
     do
         i2cset -f -y ${cpld_i2c_bus_num} $CPLD_DEV ${CPLD_FAN_SET_REG[i]} $pwm_val || retval=$?
@@ -101,7 +101,7 @@ set_cpld_fan_speed()
 board_id=`fw_printenv board_id | sed -n "s/^board_id=//p"`
 echo "board_id = ${board_id}"
 
-if [[ $board_id == "4A" || $board_id == "4B" || $board_id == "4C" || $board_id == "4D" || $board_id == "4E" || $board_id == "4F" ]]; then
+if [[ $board_id == "67" ]]; then
     set_cpld_fan_speed
 else
     # Verify that input speed is not below Limit value.

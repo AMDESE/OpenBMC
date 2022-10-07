@@ -1,5 +1,5 @@
 SUMMARY = "AMD Fan speed setting service"
-DESCRIPTION = "Script for setting Onyx Fan speeds at boot time"
+DESCRIPTION = "Script for setting Turin Fan speeds at boot time"
 
 
 LICENSE = "CLOSED"
