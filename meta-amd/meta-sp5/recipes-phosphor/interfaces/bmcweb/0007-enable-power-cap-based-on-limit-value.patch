@@ -1,0 +1,109 @@
+From 53654f4ac6e1e0ba79104a5c03b78761cbff91e4 Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Wed, 12 Oct 2022 05:45:07 -0500
+Subject: [PATCH] enable power cap based on limit value
+
+enable power cap feature if user supplies non-zero value
+if user sends zero as power limit, disable power cap feature
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+---
+ redfish-core/lib/power.hpp | 70 +++++++++++++++++++++++++-------------
+ 1 file changed, 46 insertions(+), 24 deletions(-)
+
+diff --git a/redfish-core/lib/power.hpp b/redfish-core/lib/power.hpp
+index 6eea69a..0ee5d09 100644
+--- a/redfish-core/lib/power.hpp
++++ b/redfish-core/lib/power.hpp
+@@ -81,13 +81,8 @@ class Power : public Node
+             {
+                 return;
+             }
+-            if (!value)
+-            {
+-                return;
+-            }
+             auto valueHandler = [value, sensorsAsyncResp](
+-                                    const boost::system::error_code ec,
+-                                    const SensorVariant& powerCapEnable) {
++                                    const boost::system::error_code ec) {
+                 if (ec)
+                 {
+                     messages::internalError(sensorsAsyncResp->asyncResp->res);
+@@ -95,24 +90,50 @@ class Power : public Node
+                         << "powerCapEnable Get handler: Dbus error " << ec;
+                     return;
+                 }
+-                // Check PowerCapEnable
+-                const bool* b = std::get_if<bool>(&powerCapEnable);
+-                if (b == nullptr)
+-                {
+-                    messages::internalError(sensorsAsyncResp->asyncResp->res);
+-                    BMCWEB_LOG_ERROR << "Fail to get PowerCapEnable status ";
+-                    return;
+-                }
+-                if (!(*b))
+-                {
+-                    messages::actionNotSupported(
+-                        sensorsAsyncResp->asyncResp->res,
+-                        "Setting LimitInWatts when PowerLimit "
+-                        "feature is disabled");
+-                    BMCWEB_LOG_ERROR << "PowerLimit feature is disabled ";
+-                    return;
+-                }
+-
++                /* d-bus exposes two properties, PowerCapEnable and PowerCap.
++                   But redfish(UI) uses only one PowerCap value.
++                   So, update feature enable/disable flag based on PowerCapValue
++                   if PowerCapValue is 0, disable power-cap feature
++                   if non-zero, enable power-cap and set PowerCapValue.
++                */
++                if (value == 0) {
++                crow::connections::systemBus->async_method_call(
++                    [sensorsAsyncResp](const boost::system::error_code ec2) {
++                        if (ec2)
++                        {
++                            BMCWEB_LOG_DEBUG << "Power Cap Enable Set: Dbus error: "
++                                             << ec2;
++                            messages::internalError(
++                                sensorsAsyncResp->asyncResp->res);
++                            return;
++                        }
++                        sensorsAsyncResp->asyncResp->res.result(
++                            boost::beast::http::status::no_content);
++                    },
++                    "xyz.openbmc_project.Settings",
++                    "/xyz/openbmc_project/control/host0/power_cap",
++                    "org.freedesktop.DBus.Properties", "Set",
++                    "xyz.openbmc_project.Control.Power.Cap", "PowerCapEnable",
++                    std::variant<bool>(false));
++                } else {
++                crow::connections::systemBus->async_method_call(
++                    [sensorsAsyncResp](const boost::system::error_code ec2) {
++                        if (ec2)
++                        {
++                            BMCWEB_LOG_DEBUG << "Power Cap Enable Set: Dbus error: "
++                                             << ec2;
++                            messages::internalError(
++                                sensorsAsyncResp->asyncResp->res);
++                            return;
++                        }
++                        sensorsAsyncResp->asyncResp->res.result(
++                            boost::beast::http::status::no_content);
++                    },
++                    "xyz.openbmc_project.Settings",
++                    "/xyz/openbmc_project/control/host0/power_cap",
++                    "org.freedesktop.DBus.Properties", "Set",
++                    "xyz.openbmc_project.Control.Power.Cap", "PowerCapEnable",
++                    std::variant<bool>(true));
+                 crow::connections::systemBus->async_method_call(
+                     [sensorsAsyncResp](const boost::system::error_code ec2) {
+                         if (ec2)
+@@ -131,6 +152,7 @@ class Power : public Node
+                     "org.freedesktop.DBus.Properties", "Set",
+                     "xyz.openbmc_project.Control.Power.Cap", "PowerCap",
+                     std::variant<uint32_t>(*value));
++                }
+             };
+             crow::connections::systemBus->async_method_call(
+                 std::move(valueHandler), "xyz.openbmc_project.Settings",
