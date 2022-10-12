@@ -1,0 +1,28 @@
+From 3396a2b8b722366c223d4ce40e4b87a8ea884df1 Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Wed, 12 Oct 2022 05:52:04 -0500
+Subject: [PATCH] allow zero as power limit value
+
+zero value will be used to enable/disable PowerCapEnable d-bus property
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+---
+ src/store/modules/ResourceManagement/PowerControlStore.js | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/store/modules/ResourceManagement/PowerControlStore.js b/src/store/modules/ResourceManagement/PowerControlStore.js
+index ff71239..b061bfe 100644
+--- a/src/store/modules/ResourceManagement/PowerControlStore.js
++++ b/src/store/modules/ResourceManagement/PowerControlStore.js
+@@ -86,7 +86,7 @@ const PowerControlStore = {
+     },
+     async setPowerControl(_, powerCapValue) {
+       const data = {
+-        PowerControl: [{ PowerLimit: { LimitInWatts: powerCapValue } }],
++        PowerControl: [{ PowerLimit: { LimitInWatts: Number(powerCapValue) } }],
+       };
+
+       return await api
+--
+2.17.1
+

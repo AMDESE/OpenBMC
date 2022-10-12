@@ -14,4 +14,5 @@ SRC_URI += "file://0001-webvue-ui-Support-HPM-and-SCM-FPGA-firmware-updates.patc
             file://0010-show-recent-200-post-codes.patch \
             file://0011-webUI-changes-to-display-CPU-information.patch \
             file://0012-increase-firmware-update-max-timeout.patch \
+            file://0013-allow-zero-as-power-limit-value.patch \
             "
