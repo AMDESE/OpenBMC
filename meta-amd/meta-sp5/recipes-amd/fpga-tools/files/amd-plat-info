@@ -44,7 +44,7 @@ function get_hpm_fpga_ver()
 {
     local plat
     plat=$(get_board_info name)
-    if [ "$plat" == "onyx" ]; then
+    if [ "$plat" == "onyx" ] || [ "$plat" == "ruby" ]; then
         MAJOR=$(read_reg 0 0x50 3)
         MINOR=$(read_reg 0 0x50 4)
         REV=$(printf "\x$(printf %x $(read_reg 0 0x50 5))")
@@ -59,7 +59,12 @@ function get_hpm_fpga_ver()
         MINOR=$(read_reg 0 0x20 1)
         echo -ne $MAJOR.$MINOR
     fi
-    if [ "$plat" == "ruby" ] || [ "$plat" == "quartz" ] || [ "$plat" == "sp5" ]; then
+    if [ "$plat" == "quartz" ]; then
+        MAJOR=$(read_reg 0)
+        MINOR=$(read_reg 1)
+        echo $MAJOR.$MINOR
+    fi
+    if [ "$plat" == "sp5" ]; then
         echo -ne Unknown
     fi
 }

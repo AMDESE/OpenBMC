@@ -6,6 +6,9 @@ LICENSE = "CLOSED"
 SRC_URI += " \
            file://onyx-fpga-dump.sh \
            file://titanite-fpga-dump.sh \
+           file://ruby-fpga-dump.sh \
+           file://quartz-fpga-dump.sh \
+           file://hpm-fpga-dump.sh \
            file://amd-plat-info \
            "
 

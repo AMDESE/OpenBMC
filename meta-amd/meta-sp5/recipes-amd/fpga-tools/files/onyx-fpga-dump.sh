@@ -111,7 +111,7 @@ echo -e "    PSU Signal              Default\tCurrent"
 echo -e "    ----------              -------\t-------"
 signal_status PSU_PWROK_BUF_1        $data 0x80 7 0
 signal_status PSU_VIN_GOOD_BUF_1     $data 0x40 6 1
-signal_status PSU_PRSNT_BUF_L_1      $data 0x20 6 1
+signal_status PSU_PRSNT_BUF_L_1      $data 0x20 5 1
 signal_status PSU_CONN_PRSNT_L_1     $data 0x10 4 0
 signal_status PSU_PWROK_BUF_0        $data 0x08 3 1
 signal_status PSU_VIN_GOOD_BUF_0     $data 0x04 2 1
@@ -125,7 +125,7 @@ echo -e "    VR En Signal            Default\tCurrent"
 echo -e "    ------------            -------\t-------"
 signal_status PSU_PSON_L_1           $data 0x80 7 0
 signal_status PSU_PSON_L_0           $data 0x40 6 0
-signal_status VDD_12_RUN_DUAL_EN     $data 0x20 6 0
+signal_status VDD_12_RUN_DUAL_EN     $data 0x20 5 0
 signal_status VDD_12_ALW_DUAL_EN     $data 0x10 4 0
 signal_status RSVD                   $data 0x08 3 0
 signal_status VDD_33_RUN_EN          $data 0x04 2 1
@@ -139,7 +139,7 @@ echo -e "    VR PWR_GD Signal        Default\tCurrent"
 echo -e "    ----------------        -------\t-------"
 signal_status RSVD                   $data 0x80 7 0
 signal_status RSVD                   $data 0x40 6 0
-signal_status RSVD                   $data 0x20 6 0
+signal_status RSVD                   $data 0x20 5 0
 signal_status SCM_VDD_12_ALW_PG      $data 0x10 4 1
 signal_status LOM_VDD_33_ALW_PG_BUF  $data 0x08 3 1
 signal_status VDD_33_RUN_PG          $data 0x04 2 0
@@ -154,7 +154,7 @@ echo -e "        P0 Signal           Default\tCurrent"
 echo -e "    ----------------        -------\t-------"
 signal_status RSVD                   $data 0x80 7 0
 signal_status RSVD                   $data 0x40 6 0
-signal_status RSVD                   $data 0x20 6 0
+signal_status RSVD                   $data 0x20 5 0
 signal_status P0_PWROK               $data 0x10 4 U
 signal_status P0_SLP_S5_L            $data 0x08 3 U
 signal_status P0_SLP_S3_L            $data 0x04 2 U
@@ -168,7 +168,7 @@ echo -e "        P1 Signal           Default\tCurrent"
 echo -e "    ----------------        -------\t-------"
 signal_status RSVD                   $data 0x80 7 0
 signal_status RSVD                   $data 0x40 6 0
-signal_status RSVD                   $data 0x20 6 0
+signal_status RSVD                   $data 0x20 5 0
 signal_status P0_PWROK               $data 0x10 4 0
 signal_status P0_SLP_S5_L            $data 0x08 3 0
 signal_status P0_SLP_S3_L            $data 0x04 2 0
@@ -182,7 +182,7 @@ echo -e "     P0 ID Signal           Default\tCurrent"
 echo -e "    ----------------        -------\t-------"
 signal_status P0_SP5R_4              $data 0x80 7 U
 signal_status P0_SP5R_3              $data 0x40 6 U
-signal_status P0_SP5R_2              $data 0x20 6 U
+signal_status P0_SP5R_2              $data 0x20 5 U
 signal_status P0_SP5R_1              $data 0x10 4 U
 signal_status RSVD                   $data 0x08 3 0
 signal_status P0_CORETYPE_2          $data 0x04 2 U
@@ -196,7 +196,7 @@ echo -e "     P1 ID Signal           Default\tCurrent"
 echo -e "    ----------------        -------\t-------"
 signal_status P1_SP5R_4              $data 0x80 7 U
 signal_status P1_SP5R_3              $data 0x40 6 U
-signal_status P1_SP5R_2              $data 0x20 6 U
+signal_status P1_SP5R_2              $data 0x20 5 U
 signal_status P1_SP5R_1              $data 0x10 4 U
 signal_status RSVD                   $data 0x08 3 0
 signal_status P1_CORETYPE_2          $data 0x04 2 U
@@ -210,7 +210,7 @@ echo -e "    P0 PWR_EN Signal        Default\tCurrent"
 echo -e "    ----------------        -------\t-------"
 signal_status RSVD                   $data 0x80 7 U
 signal_status P0_VDD_CORE_1_RUN_EN   $data 0x40 6 U
-signal_status P0_VDD_CORE_0_RUN_EN   $data 0x20 6 U
+signal_status P0_VDD_CORE_0_RUN_EN   $data 0x20 5 U
 signal_status P0_VDD_SOC_0_RUN_EN    $data 0x10 4 U
 signal_status P0_VDD_VDDIO_RUN_EN    $data 0x08 3 U
 signal_status P0_VDD_11_SUS_EN       $data 0x04 2 U
@@ -224,7 +224,7 @@ echo -e "    P0 PWR_GD Signal        Default\tCurrent"
 echo -e "    ----------------        -------\t-------"
 signal_status P0_PWR_GOOD            $data 0x80 7 U
 signal_status P0_VDD_CORE_1_RUN_PG   $data 0x40 6 U
-signal_status P0_VDD_CORE_0_RUN_PG   $data 0x20 6 U
+signal_status P0_VDD_CORE_0_RUN_PG   $data 0x20 5 U
 signal_status P0_VDD_SOC_0_RUN_PG    $data 0x10 4 U
 signal_status P0_VDD_VDDIO_RUN_PG    $data 0x08 3 U
 signal_status P0_VDD_11_SUS_PG       $data 0x04 2 U
@@ -238,7 +238,7 @@ echo -e "    P1 PWR_EN Signal        Default\tCurrent"
 echo -e "    ----------------        -------\t-------"
 signal_status RSVD                   $data 0x80 7 U
 signal_status P1_VDD_CORE_1_RUN_EN   $data 0x40 6 U
-signal_status P1_VDD_CORE_0_RUN_EN   $data 0x20 6 U
+signal_status P1_VDD_CORE_0_RUN_EN   $data 0x20 5 U
 signal_status P1_VDD_SOC_0_RUN_EN    $data 0x10 4 U
 signal_status P1_VDD_VDDIO_RUN_EN    $data 0x08 3 U
 signal_status P1_VDD_11_SUS_EN       $data 0x04 2 U
@@ -252,7 +252,7 @@ echo -e "    P1 PWR_GD Signal        Default\tCurrent"
 echo -e "    ----------------        -------\t-------"
 signal_status P1_PWR_GOOD            $data 0x80 7 U
 signal_status P1_VDD_CORE_1_RUN_PG   $data 0x40 6 U
-signal_status P1_VDD_CORE_0_RUN_PG   $data 0x20 6 U
+signal_status P1_VDD_CORE_0_RUN_PG   $data 0x20 5 U
 signal_status P1_VDD_SOC_0_RUN_PG    $data 0x10 4 U
 signal_status P1_VDD_VDDIO_RUN_PG    $data 0x08 3 U
 signal_status P1_VDD_11_SUS_PG       $data 0x04 2 U
@@ -266,7 +266,7 @@ echo -e "    P0 Error Signal         Default\tCurrent"
 echo -e "    ----------------        -------\t-------"
 signal_status RSVD                   $data 0x80 7 U
 signal_status P0_SMERR_L             $data 0x40 6 U
-signal_status P0_PROCHOT_L           $data 0x20 6 U
+signal_status P0_PROCHOT_L           $data 0x20 5 U
 signal_status P0_THERMTRIP_L         $data 0x10 4 U
 signal_status RSVD                   $data 0x08 3 U
 signal_status RSVD                   $data 0x04 2 U
@@ -280,7 +280,7 @@ echo -e "    P1 Error Signal         Default\tCurrent"
 echo -e "    ----------------        -------\t-------"
 signal_status RSVD                   $data 0x80 7 U
 signal_status P1_SMERR_L             $data 0x40 6 U
-signal_status P1_PROCHOT_L           $data 0x20 6 U
+signal_status P1_PROCHOT_L           $data 0x20 5 U
 signal_status P1_THERMTRIP_L         $data 0x10 4 U
 signal_status RSVD                   $data 0x08 3 U
 signal_status RSVD                   $data 0x04 2 U
@@ -294,7 +294,7 @@ echo -e "    I2C Alert Signal        Default\tCurrent"
 echo -e "    ----------------        -------\t-------"
 signal_status RSVD                   $data 0x80 7 U
 signal_status P0_I3C_APML_ALERT_L    $data 0x40 6 U
-signal_status SCM_I2C_ALERT_L_7      $data 0x20 6 U
+signal_status SCM_I2C_ALERT_L_7      $data 0x20 5 U
 signal_status SCM_I2C_ALERT_L_6      $data 0x10 4 U
 signal_status SCM_I2C_ALERT_L_5      $data 0x08 3 U
 signal_status SCM_I2C_ALERT_L_3      $data 0x04 2 U
