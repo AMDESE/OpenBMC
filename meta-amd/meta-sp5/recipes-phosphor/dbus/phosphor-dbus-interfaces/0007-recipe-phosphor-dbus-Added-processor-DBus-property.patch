@@ -1,0 +1,93 @@
+From 7c5a1fe96ea78421a71b54ed07c42674d00c71d0 Mon Sep 17 00:00:00 2001
+From: Ashok Kumar <ashok2.kumar@amd.com>
+Date: Mon, 17 Oct 2022 03:25:04 -0500
+Subject: [PATCH] xyz_openbmc_project: Added processor DBus property as per
+ latest redfish dmtf specification
+
+BMC to gather all CPU information
+Feature: FWDEV-23894
+
+Signed-off-by: Ashok Kumar <ashok2.kumar@amd.com>
+
+---
+ .../Inventory/Item/Cpu.interface.yaml         | 46 ++++++++++++++++---
+ 1 file changed, 40 insertions(+), 6 deletions(-)
+
+diff --git a/xyz/openbmc_project/Inventory/Item/Cpu.interface.yaml b/xyz/openbmc_project/Inventory/Item/Cpu.interface.yaml
+index 0f40ee9..05d0835 100644
+--- a/xyz/openbmc_project/Inventory/Item/Cpu.interface.yaml
++++ b/xyz/openbmc_project/Inventory/Item/Cpu.interface.yaml
+@@ -5,19 +5,26 @@ properties:
+       type: string
+       description: >
+           Processor Socket designation on MotherBoard.
++      default: ""
+     - name: Family
+       type: string
+       description: >
+-          A free form string indicates processor family type.
+-          For example, values can be "Intel Xeon
+-          processor", "AS400 Family", etc.
++          The processor family.
++      default: ""
++    - name: EffectiveFamily
++      type: string
++      description: >
++          The effective family for this processor.
++    - name: EffectiveModel
++      type: string
++      description: >
++          The effective model for this processor.
+     - name: Id
+       type: uint64
+       description: >
+           This Processor ID field contains processor-specific information
+           that describes the processor's features. Details depend on
+           processor architecture.
+-          For x86 and ARM processors, DMTF DSP0134 Section 7.5.3 is used.
+       default: 0
+     - name: MaxSpeedInMhz
+       type: uint32
+@@ -37,7 +44,24 @@ properties:
+       type: uint16
+       description: >
+           The maximum number of threads the processor can support.
+-
++    - name: Step
++      type: string
++      description: >
++          The step value for this processor
++      default: ""
++    - name: Microcode
++      type: string
++      description: >
++          The microcode information for this processor
++      default: ""
++    - name: VendorId
++      type: string
++      description: >
++          The vendor identification for this processor.
++    - name: Model
++      type: string
++      description: >
++          The product model number of this device.
+ enumerations:
+     - name: Capability
+       description: >
+@@ -61,4 +85,14 @@ enumerations:
+               Support enhanced virtualization.
+         - name: PowerPerformanceControl
+           description: >
+-              Support power/performance control.
+\ No newline at end of file
++              Support power/performance control.
++associations:
++    - name: associated_pcie_slots
++      description: >
++          Objects that implement Cpu can optionally implement the
++          associated_pcie_slots association to provide a link to one or more
++          PCIe slots.
++      reverse_names:
++          - upstream_processor
++      required_endpoint_interfaces:
++          - xyz.openbmc_project.Inventory.Item.PCIeSlot
