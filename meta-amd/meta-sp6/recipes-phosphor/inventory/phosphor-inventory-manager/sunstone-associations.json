@@ -85,7 +85,7 @@
                     "/xyz/openbmc_project/sensors/fan_tach/P0_EH_DIMM_Fan",
                     "/xyz/openbmc_project/sensors/fan_tach/P0_South_VR_Fan1",
                     "/xyz/openbmc_project/sensors/fan_tach/P0_South_VR_Fan2",
-                    "/xyz/openbmc_project/sensors/fan_tach/P1_AD_DIMM_Fan",
+                    "/xyz/openbmc_project/sensors/fan_tach/P0_AD_DIMM_Fan",
 
                     "/xyz/openbmc_project/sensors/current/P0_VDD_11_IIN",
                     "/xyz/openbmc_project/sensors/current/P0_VDD_11_IOUT1",
@@ -203,7 +203,7 @@
                     "/xyz/openbmc_project/sensors/fan_tach/P0_EH_DIMM_Fan",
                     "/xyz/openbmc_project/sensors/fan_tach/P0_South_VR_Fan1",
                     "/xyz/openbmc_project/sensors/fan_tach/P0_South_VR_Fan2",
-                    "/xyz/openbmc_project/sensors/fan_tach/P1_AD_DIMM_Fan",
+                    "/xyz/openbmc_project/sensors/fan_tach/P0_AD_DIMM_Fan",
 
                     "/xyz/openbmc_project/sensors/current/P0_VDD_11_IIN",
                     "/xyz/openbmc_project/sensors/current/P0_VDD_11_IOUT1",

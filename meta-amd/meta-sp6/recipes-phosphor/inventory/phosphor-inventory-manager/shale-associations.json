@@ -97,12 +97,12 @@
                "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan9",
                "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan10",
                "/xyz/openbmc_project/sensors/fan_tach/P0_CPU_Fan",
-               "/xyz/openbmc_project/sensors/fan_tach/South_VR_Fan1",
-               "/xyz/openbmc_project/sensors/fan_tach/South_VR_Fan2",
+               "/xyz/openbmc_project/sensors/fan_tach/P0_South_VR_Fan1",
+               "/xyz/openbmc_project/sensors/fan_tach/P0_South_VR_Fan2",
                "/xyz/openbmc_project/sensors/fan_tach/P0_AD_DIMM_Fan",
                "/xyz/openbmc_project/sensors/fan_tach/P0_EH_DIMM_Fan",
-               "/xyz/openbmc_project/sensors/fan_tach/North_VR_Fan1",
-               "/xyz/openbmc_project/sensors/fan_tach/North_VR_Fan2",
+               "/xyz/openbmc_project/sensors/fan_tach/P0_North_VR_Fan1",
+               "/xyz/openbmc_project/sensors/fan_tach/P0_North_VR_Fan2",
                "/xyz/openbmc_project/sensors/fan_tach/P0_WaterPump_Fan"
             ]
          }
@@ -206,12 +206,12 @@
                "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan9",
                "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan10",
                "/xyz/openbmc_project/sensors/fan_tach/P0_CPU_Fan",
-               "/xyz/openbmc_project/sensors/fan_tach/South_VR_Fan1",
-               "/xyz/openbmc_project/sensors/fan_tach/South_VR_Fan2",
+               "/xyz/openbmc_project/sensors/fan_tach/P0_South_VR_Fan1",
+               "/xyz/openbmc_project/sensors/fan_tach/P0_South_VR_Fan2",
                "/xyz/openbmc_project/sensors/fan_tach/P0_AD_DIMM_Fan",
                "/xyz/openbmc_project/sensors/fan_tach/P0_EH_DIMM_Fan",
-               "/xyz/openbmc_project/sensors/fan_tach/North_VR_Fan1",
-               "/xyz/openbmc_project/sensors/fan_tach/North_VR_Fan2",
+               "/xyz/openbmc_project/sensors/fan_tach/P0_North_VR_Fan1",
+               "/xyz/openbmc_project/sensors/fan_tach/P0_North_VR_Fan2",
                "/xyz/openbmc_project/sensors/fan_tach/P0_WaterPump_Fan"
             ]
          }

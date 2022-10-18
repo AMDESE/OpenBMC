@@ -90,50 +90,50 @@
             "max": 255
         },
         {
-            "name": "North_VR_Fan1",
+            "name": "P0_North_VR_Fan1",
             "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/North_VR_Fan1",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/North_VR_Fan1",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/P0_North_VR_Fan1",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/P0_North_VR_Fan1",
             "min": 0,
             "max": 255
         },
         {
-            "name": "North_VR_Fan2",
+            "name": "P0_North_VR_Fan2",
             "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/North_VR_Fan2",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/North_VR_Fan2",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/P0_North_VR_Fan2",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/P0_North_VR_Fan2",
             "min": 0,
             "max": 255
         },
         {
-            "name": "P0_GL_DIMM_Fan",
+            "name": "P0_EH_DIMM_Fan",
             "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/P0_GL_DIMM_Fan",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/P0_GL_DIMM_Fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/P0_EH_DIMM_Fan",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/P0_EH_DIMM_Fan",
             "min":0,
             "max": 255
         },
         {
-            "name": "South_VR_Fan1",
+            "name": "P0_South_VR_Fan1",
             "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/South_VR_Fan1",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/South_VR_Fan1",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/P0_South_VR_Fan1",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/P0_South_VR_Fan1",
             "min": 0,
             "max": 255
         },
         {
-            "name": "South_VR_Fan2",
+            "name": "P0_South_VR_Fan2",
             "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/South_VR_Fan2",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/South_VR_Fan2",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/P0_South_VR_Fan2",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/P0_South_VR_Fan2",
             "min": 0,
             "max": 255
         },
         {
-            "name": "P0_AF_DIMM_Fan",
+            "name": "P0_AD_DIMM_Fan",
             "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/P0_AF_DIMM_Fan",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/P0_AF_DIMM_Fan",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/P0_AD_DIMM_Fan",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/P0_AD_DIMM_Fan",
             "min": 0,
             "max": 255
         },
@@ -141,27 +141,6 @@
             "name": "CPU0_Temp",
             "type": "temp",
             "readPath": "/xyz/openbmc_project/sensors/temperature/CPU0_Temp",
-            "ignoreDbusMinMax": true,
-            "timeout": 0
-        },
-        {
-            "name": "P0_DIMM_C_Temp",
-            "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_C_Temp",
-            "ignoreDbusMinMax": true,
-            "timeout": 0
-        },
-        {
-            "name": "P0_DIMM_E_Temp",
-            "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_E_Temp",
-            "ignoreDbusMinMax": true,
-            "timeout": 0
-        },
-        {
-            "name": "P0_DIMM_F_Temp",
-            "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_F_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         },
@@ -187,30 +166,16 @@
             "timeout": 0
         },
         {
-            "name": "P0_DIMM_I_Temp",
+            "name": "P0_DIMM_E_Temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_I_Temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_E_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
-            "name": "P0_DIMM_K_Temp",
+            "name": "P0_DIMM_F_Temp",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_K_Temp",
-            "ignoreDbusMinMax": true,
-            "timeout": 0
-        },
-        {
-            "name": "P0_DIMM_L_Temp",
-            "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_L_Temp",
-            "ignoreDbusMinMax": true,
-            "timeout": 0
-        },
-        {
-            "name": "P0_DIMM_G_Temp",
-            "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_G_Temp",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_F_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         },
@@ -218,13 +183,6 @@
             "name": "P0_DIMM_H_Temp",
             "type": "temp",
             "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_H_Temp",
-            "ignoreDbusMinMax": true,
-            "timeout": 0
-        },
-        {
-            "name": "P0_DIMM_J_Temp",
-            "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/P0_DIMM_J_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         }
@@ -250,12 +208,12 @@
                                "Chassis_Fan9",
                                "Chassis_Fan10",
                                "P0_CPU_Fan",
-                               "North_VR_Fan1",
-                               "North_VR_Fan2",
-                               "P0_GL_DIMM_Fan",
-                               "South_VR_Fan1",
-                               "South_VR_Fan2",
-                               "P0_AF_DIMM_Fan"],
+                               "P0_North_VR_Fan1",
+                               "P0_North_VR_Fan2",
+                               "P0_EH_DIMM_Fan",
+                               "P0_South_VR_Fan1",
+                               "P0_South_VR_Fan2",
+                               "P0_AD_DIMM_Fan"],
                     "setpoint": 20.0,
                     "pid": {
                         "samplePeriod": 1.0,
@@ -330,18 +288,14 @@
                 {
                     "name": "DIMM1-12",
                     "type": "stepwise",
-                    "inputs": ["P0_DIMM_C_Temp",
-                               "P0_DIMM_E_Temp",
-                               "P0_DIMM_F_Temp",
-                               "P0_DIMM_A_Temp",
+                    "name": "DIMM1-6",
+                    "type": "stepwise",
+                    "inputs": ["P0_DIMM_A_Temp",
                                "P0_DIMM_B_Temp",
                                "P0_DIMM_D_Temp",
-                               "P0_DIMM_I_Temp",
-                               "P0_DIMM_K_Temp",
-                               "P0_DIMM_L_Temp",
-                               "P0_DIMM_G_Temp",
-                               "P0_DIMM_H_Temp",
-                               "P0_DIMM_J_Temp"
+                               "P0_DIMM_E_Temp",
+                               "P0_DIMM_F_Temp",
+                               "P0_DIMM_H_Temp"
                                ],
                     "setpoint": 20.0,
                     "pid": {
@@ -399,4 +353,3 @@
         }
     ]
 }
-
