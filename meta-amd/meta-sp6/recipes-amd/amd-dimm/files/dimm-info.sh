@@ -2,6 +2,10 @@
 
 # Read board_id from u-boot env
 board_id=`/sbin/fw_printenv -n board_id`
+if [ "$board_id" == "62" ] ; then
+        echo "SLT board, skipping DIMM inventory collection"
+        exit
+fi
 por_rst=`/sbin/fw_printenv -n por_rst`
 I3C_TOOL="/usr/bin/i3ctransfer"
 LOG_DIR="/var/lib/dimm"
