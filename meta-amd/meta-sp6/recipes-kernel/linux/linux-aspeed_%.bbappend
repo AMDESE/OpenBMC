@@ -102,4 +102,5 @@ SRC_URI += "file://sp6.cfg \
             file://0102-ARM-dts-aspeed-Add-Shale64-Device-tree.patch \
             file://0103-ARM-dts-Aspeed-remove-ununsed-i3c-buses-from-SP6.patch \
             file://0104-ARM-dts-aspeed-Add-Shale-device-tree.patch \
+            file://0105-Change-ISL-driver-to-XDPE-driver-for-xdpe-VR-parts.patch \
             "
