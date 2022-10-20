@@ -8,23 +8,20 @@ num_of_cpu=1
 
 # If no board_id then set num of cpu to 2 socket
 case "$board_id" in
-    "3d" | "3D" | "40" | "41" | "42" | "52")
-        echo " Onyx 1 CPU"
+    "65" | "62")
+        echo " Shale 1 CPU"
         num_of_cpu=1
         ;;
-    "46" | "47" | "48")
-        echo " Ruby 1 CPU"
-        num_of_cpu=1
-        ;;
-    "3e" | "3E" | "43" | "44" | "45" | "51")
-        echo " Quartz 2 CPU"
+    "63")
+        echo " Cinnabar 1 CPU"
         num_of_cpu=2
         ;;
-    "49" | "4A" | "4a" | "4B" | "4b" | "4C" |"4c" | "4D" | "4d" | "4E" | "4e")
-        echo " Titanite 2 CPU "
+    "64" | "61")
+        echo " Sunstone 1 CPU"
         num_of_cpu=2
         ;;
     *)
+        echo " Unknown 2 CPU "
         num_of_cpu=2
         ;;
 esac

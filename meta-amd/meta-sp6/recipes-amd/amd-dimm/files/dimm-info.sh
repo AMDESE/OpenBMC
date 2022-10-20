@@ -7,6 +7,8 @@ if [ "$board_id" == "62" ] ; then
         exit
 fi
 por_rst=`/sbin/fw_printenv -n por_rst`
+dpc2="false"
+dimm_per_bus=3
 I3C_TOOL="/usr/bin/i3ctransfer"
 LOG_DIR="/var/lib/dimm"
 dimm_sh="${LOG_DIR}/dimm.sh"
@@ -52,29 +54,27 @@ fi
 
 # If no board_id then set num of cpu to 2 socket
 case "$board_id" in
-    "3d" | "3D" | "40" | "41" | "42" | "52")
-        echo " Onyx 1 CPU"
-        echo " Onyx 1 CPU" >> $dimm_info
+    "65" | "62")
+        echo " Shale 1 CPU"
+        echo " Shale 1 CPU" >> $dimm_info
         num_of_cpu=1
         ;;
-    "46" | "47" | "48")
-        echo " Ruby 1 CPU"
-        echo " Ruby 1 CPU" >> $dimm_info
+    "63")
+        echo " Cinnabar 1 CPU"
+        echo " Cinnabar 1 CPU" >> $dimm_info
+        dpc2="true"
         num_of_cpu=2
         ;;
-    "3e" | "3E" | "43" | "44" | "45" | "51")
-        echo " Quartz 2 CPU"
-        echo " Quartz 2 CPU" >> $dimm_info
-        num_of_cpu=2
-        ;;
-    "49" | "4A" | "4a" | "4B" | "4b" | "4C" |"4c" | "4D" | "4d" | "4E" | "4e")
-        echo " Titanite 2 CPU "
-        echo " Titanite 2 CPU " >> $dimm_info
+    "64" | "61")
+        echo " Sunstone 1 CPU"
+        echo " Sunstone 1 CPU" >> $dimm_info
+        dpc2="true"
         num_of_cpu=2
         ;;
     *)
         echo " Unknown 2 CPU "
         echo " Unknown 2 CPU " >> $dimm_info
+        dpc2="true"
         num_of_cpu=2
         ;;
 esac
@@ -109,13 +109,13 @@ do
             echo "No dimms detected on S"${sock_id} "I3C_Bus"${i3cid} >> $dimm_info
             # No DIMMs on this I3C bus
             (( i3cid += 1))
-            (( channel += 6 ))
+            (( channel += dimm_per_bus ))
             continue
         fi
         # This section reads various SPD bytes and provides dimm info
-        for dimm in {0..5}
+        for dimm in {0..2}
         do
-            (( dimmNum = (i3cid * 6)+(dimm) ))
+            (( dimmNum = (i3cid * dimm_per_bus)+(dimm) ))
             # Driver generated I3C name for this dimm
             pmic_name="/dev/i3c-${i3cid}-2040000000${dimm}"
             spd_name="/dev/i3c-${i3cid}-3c00000000${dimm}"
@@ -128,70 +128,58 @@ do
                 dimmID=P0_DIMM_B
             ;;
             "2")
-                dimmID=P0_DIMM_C
-            ;;
-            "3")
                 dimmID=P0_DIMM_D
             ;;
-            "4")
+            "3")
                 dimmID=P0_DIMM_E
             ;;
-            "5")
+            "4")
                 dimmID=P0_DIMM_F
             ;;
-            "6")
-                dimmID=P0_DIMM_G
-            ;;
-            "7")
+            "5")
                 dimmID=P0_DIMM_H
             ;;
+            "6")
+                if [ "$dpc2" == "true" ]; then
+                    dimmID=P0_DIMM_A1
+                else
+                    dimmID=P1_DIMM_A
+                fi
+            ;;
+            "7")
+                if [ "$dpc2" == "true" ]; then
+                    dimmID=P0_DIMM_B1
+                else
+                    dimmID=P1_DIMM_B
+                fi
+            ;;
             "8")
-                dimmID=P0_DIMM_I
+                if [ "$dpc2" == "true" ]; then
+                    dimmID=P0_DIMM_D1
+                else
+                    dimmID=P1_DIMM_D
+                fi
             ;;
             "9")
-                dimmID=P0_DIMM_J
+                if [ "$dpc2" == "true" ]; then
+                    dimmID=P0_DIMM_E1
+                else
+                    dimmID=P1_DIMM_E
+                fi
             ;;
             "10")
-                dimmID=P0_DIMM_K
+                if [ "$dpc2" == "true" ]; then
+                    dimmID=P0_DIMM_F1
+                else
+                    dimmID=P1_DIMM_F
+                fi
             ;;
             "11")
-                dimmID=P0_DIMM_L
-            ;;
-            "12")
-                dimmID=P1_DIMM_A
-            ;;
-            "13")
-                dimmID=P1_DIMM_B
-            ;;
-            "14")
-                dimmID=P1_DIMM_C
-            ;;
-            "15")
-                dimmID=P1_DIMM_D
-            ;;
-            "16")
-                dimmID=P1_DIMM_E
-            ;;
-            "17")
-                dimmID=P1_DIMM_F
-            ;;
-            "18")
-                dimmID=P1_DIMM_G
-            ;;
-            "19")
-                dimmID=P1_DIMM_H
-            ;;
-            "20")
-                dimmID=P1_DIMM_I
-            ;;
-            "21")
-                dimmID=P1_DIMM_J
-            ;;
-            "22")
-                dimmID=P1_DIMM_K
-            ;;
-            "23")
-                dimmID=P1_DIMM_L
+                if [ "$dpc2" == "true" ]; then
+                    dimmID=P0_DIMM_H1
+                else
+                    dimmID=P1_DIMM_H
+                fi
             ;;
             *)
                 echo "wrong DIMM Number " $dimmNum
