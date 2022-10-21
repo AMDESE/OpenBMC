@@ -1,0 +1,191 @@
+From 8316d5c77c65362cf2d525dc3c9c1f6805375a95 Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Fri, 21 Oct 2022 04:07:45 -0500
+Subject: [PATCH] ARM-dts-aspeed: Add HPM lockout and vuart
+
+added hpm lockout gpio and vuart conditions.
+either vuart or physical uart can be enabled.
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts     | 14 ++++++++------
+ arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts   | 14 ++++++++------
+ arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts     | 14 ++++++++------
+ arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts | 14 ++++++++------
+ 4 files changed, 32 insertions(+), 24 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+index 99ac9b81a88e..eab7435b7919 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+@@ -144,6 +144,12 @@
+
+ };
+
++#ifdef HOST_SERIAL_ESPI_VUART
++// eSPI Virtual UART - 0x3F8
++&vuart1 {
++	status = "okay";
++};
++#else
+ &uart1 {
+ 	//Host console
+ 	compatible = "aspeed,ast2600-uart";
+@@ -153,6 +159,7 @@
+ 	dma-channel = <0>;
+ 	status = "okay";
+ };
++#endif
+
+ //BMC Console
+ &uart5 {
+@@ -807,7 +814,7 @@
+ 	/*M0-M7*/	"","","","","","","","",
+ 	/*N0-N7*/	"","","","","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
+ 	/*O0-O7*/	"","","HDT_SEL","HDT_XTRIG5","HDT_XTRIG6","JTAG_TRST_N","","",
+-	/*P0-P7*/	"MON_RST_BTN_L","ASSERT_RST_BTN_L","MON_PWR_BTN_L","ASSERT_PWR_BTN_L","","ASSERT_NMI_BTN_L","MON_PWR_GOOD","",
++	/*P0-P7*/	"MON_RST_BTN_L","ASSERT_RST_BTN_L","MON_PWR_BTN_L","ASSERT_PWR_BTN_L","HPM_FPGA_LOCKOUT","ASSERT_NMI_BTN_L","MON_PWR_GOOD","",
+ 	/*Q0-Q7*/	"","","HDT_DBREQ_L","","BIOS_SPD_MUX_CTRL_RELEASED_L","","","",
+ 	/*R0-R7*/	"","","","","","","","",
+ 	/*S0-S7*/	"","","","","","","P0_DIMM_AF_ERROR","P0_DIMM_GL_ERROR",
+@@ -852,8 +859,3 @@
+ 	status = "okay";
+ 	aspeed,lpc-io-reg = <0xCA2>;
+ };
+-
+-// eSPI Virtual UART - 0x3F8
+-&vuart1 {
+-	status = "okay";
+-};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+index 4ca85b2b669d..e314da6747c2 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+@@ -143,6 +143,12 @@
+
+ };
+
++#ifdef HOST_SERIAL_ESPI_VUART
++// eSPI Virtual UART - 0x3F8
++&vuart1 {
++	status = "okay";
++};
++#else
+ &uart1 {
+ 	//Host console
+ 	compatible = "aspeed,ast2600-uart";
+@@ -152,6 +158,7 @@
+ 	dma-channel = <0>;
+ 	status = "okay";
+ };
++#endif
+
+ //BMC Console
+ &uart5 {
+@@ -1136,7 +1143,7 @@
+ 	/*M0-M7*/	"","","","","","","","",
+ 	/*N0-N7*/	"","","","","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
+ 	/*O0-O7*/	"","","HDT_SEL","HDT_XTRIG5","HDT_XTRIG6","JTAG_TRST_N","","",
+-	/*P0-P7*/	"MON_RST_BTN_L","ASSERT_RST_BTN_L","MON_PWR_BTN_L","ASSERT_PWR_BTN_L","","ASSERT_NMI_BTN_L","MON_PWR_GOOD","",
++	/*P0-P7*/	"MON_RST_BTN_L","ASSERT_RST_BTN_L","MON_PWR_BTN_L","ASSERT_PWR_BTN_L","HPM_FPGA_LOCKOUT","ASSERT_NMI_BTN_L","MON_PWR_GOOD","",
+ 	/*Q0-Q7*/	"","","HDT_DBREQ_L","","BIOS_SPD_MUX_CTRL_RELEASED_L","","","",
+ 	/*R0-R7*/	"","","","","","","","",
+ 	/*S0-S7*/	"","","","","P1_DIMM_AF_ERROR","P1_DIMM_GL_ERROR","P0_DIMM_AF_ERROR","P0_DIMM_GL_ERROR",
+@@ -1180,8 +1187,3 @@
+ 	status = "okay";
+ 	aspeed,lpc-io-reg = <0xCA2>;
+ };
+-
+-// eSPI Virtual UART - 0x3F8
+-&vuart1 {
+-	status = "okay";
+-};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+index 5e1b0bcb30bb..924b922111e4 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+@@ -143,6 +143,12 @@
+
+ };
+
++#ifdef HOST_SERIAL_ESPI_VUART
++// eSPI Virtual UART - 0x3F8
++&vuart1 {
++	status = "okay";
++};
++#else
+ // Host Serial console
+ &uart1 {
+ 	compatible = "aspeed,ast2600-uart";
+@@ -152,6 +158,7 @@
+ 	dma-channel = <0>;
+ 	status = "okay";
+ };
++#endif
+
+ // BMC Serial Console
+ &uart5 {
+@@ -860,7 +867,7 @@
+ 	/*M0-M7*/	"","","","","","","","",
+ 	/*N0-N7*/	"","","","","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
+ 	/*O0-O7*/	"","","HDT_SEL","HDT_XTRIG5","HDT_XTRIG6","JTAG_TRST_N","","",
+-	/*P0-P7*/	"MON_RST_BTN_L","ASSERT_RST_BTN_L","MON_PWR_BTN_L","ASSERT_PWR_BTN_L","","ASSERT_NMI_BTN_L","MON_PWR_GOOD","",
++	/*P0-P7*/	"MON_RST_BTN_L","ASSERT_RST_BTN_L","MON_PWR_BTN_L","ASSERT_PWR_BTN_L","HPM_FPGA_LOCKOUT","ASSERT_NMI_BTN_L","MON_PWR_GOOD","",
+ 	/*Q0-Q7*/	"","","HDT_DBREQ_L","","BIOS_SPD_MUX_CTRL_RELEASED_L","","","",
+ 	/*R0-R7*/	"","","","","","","","",
+ 	/*S0-S7*/	"","","","","","","P0_DIMM_AF_ERROR","P0_DIMM_GL_ERROR",
+@@ -904,8 +911,3 @@
+ 	status = "okay";
+ 	aspeed,lpc-io-reg = <0xCA2>;
+ };
+-
+-// eSPI Virtual UART - 0x3F8
+-&vuart1 {
+-	status = "okay";
+-};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts b/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
+index 77b3066d7305..aa8b01d9a173 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
+@@ -142,6 +142,12 @@
+
+ };
+
++#ifdef HOST_SERIAL_ESPI_VUART
++// eSPI Virtual UART - 0x3F8
++&vuart1 {
++	status = "okay";
++};
++#else
+ // Host Serial console
+ &uart1 {
+ 	compatible = "aspeed,ast2600-uart";
+@@ -151,6 +157,7 @@
+ 	dma-channel = <0>;
+ 	status = "okay";
+ };
++#endif
+
+ // BMC Serial Console
+ &uart5 {
+@@ -908,7 +915,7 @@
+ 	/*M0-M7*/	"","","","","","","","",
+ 	/*N0-N7*/	"","","","","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
+ 	/*O0-O7*/	"","","HDT_SEL","HDT_XTRIG5","HDT_XTRIG6","JTAG_TRST_N","","",
+-	/*P0-P7*/	"MON_RST_BTN_L","ASSERT_RST_BTN_L","MON_PWR_BTN_L","ASSERT_PWR_BTN_L","","ASSERT_NMI_BTN_L","MON_PWR_GOOD","",
++	/*P0-P7*/	"MON_RST_BTN_L","ASSERT_RST_BTN_L","MON_PWR_BTN_L","ASSERT_PWR_BTN_L","HPM_FPGA_LOCKOUT","ASSERT_NMI_BTN_L","MON_PWR_GOOD","",
+ 	/*Q0-Q7*/	"","","HDT_DBREQ_L","","BIOS_SPD_MUX_CTRL_RELEASED_L","","","",
+ 	/*R0-R7*/	"","","","","","","","",
+ 	/*S0-S7*/	"","","","","P1_DIMM_AF_ERROR","P1_DIMM_GL_ERROR","P0_DIMM_AF_ERROR","P0_DIMM_GL_ERROR",
+@@ -955,8 +962,3 @@
+ 	status = "okay";
+ 	aspeed,lpc-io-reg = <0xCA2>;
+ };
+-
+-// eSPI Virtual UART - 0x3F8
+-&vuart1 {
+-	status = "okay";
+-};
+--
+2.17.1
+
