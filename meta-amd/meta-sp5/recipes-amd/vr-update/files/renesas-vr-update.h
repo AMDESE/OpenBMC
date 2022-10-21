@@ -21,6 +21,7 @@
 #define MAX_RETRY             (10)
 #define SLEEP                 (2500)
 #define SLEEP_1               (1)
+#define SLEEP_2               (2)
 #define RAA229613             ("RAA229613")
 #define RAA229625             ("RAA229625")
 #define RAA229620             ("RAA229620")

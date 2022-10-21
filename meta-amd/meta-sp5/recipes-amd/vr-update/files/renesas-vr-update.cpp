@@ -436,10 +436,10 @@ int gen2_poll_programmer_status_register(void)
     u_int8_t rdata[MAXIMUM_SIZE] = { 0 };
     int length, timeout = 0, ret = 0, status = 0;
 
+    sleep(SLEEP_2);
     //Poll PROGRAMMER_STATUS Register
     while (timeout < MAX_RETRY) {
         timeout++;
-        usleep(SLEEP_1000);
 
         if (i2c_smbus_write_word_data(fd,DMA_WRITE, GEN2_PRGM_STATUS) != SUCCESS) {
             printf("%s:Write to DMA Address Register failed\n", __func__);
@@ -485,10 +485,10 @@ int gen3_poll_programmer_status_register(void)
     u_int8_t rdata[MAXIMUM_SIZE] = { 0 };
     int length, timeout = 0, ret = 0, status = 0;
 
+    sleep(SLEEP_2);
     //Poll PROGRAMMER_STATUS Register
     while (timeout < 10) {
         timeout++;
-        usleep(SLEEP_2500);
 
         if (i2c_smbus_write_word_data(fd,DMA_WRITE, GEN3_PRGM_STATUS) != SUCCESS) {
             printf("%s:Write to DMA Address Register failed\n", __func__);
@@ -504,7 +504,7 @@ int gen3_poll_programmer_status_register(void)
             status = SUCCESS;
             break;
         } else {
-            status = SUCCESS;
+            status = FAILURE;
         }
     }
 
@@ -561,7 +561,7 @@ int read_bank_status_register(u_int16_t bank_status_reg)
     u_int8_t rdata[MAXIMUM_SIZE] = { 0 };
     int length, timeout = 0, ret = 0, status = 0;
     int bank = 0;
-    sleep(2);
+    sleep(SLEEP_2);
     //write to DMA Address Register
     if (i2c_smbus_write_word_data(fd,DMA_WRITE, bank_status_reg) != SUCCESS) {
         printf("%s: Write to DMA Address Register failed\n", __func__);
@@ -626,7 +626,7 @@ int crc_check_verification(int argc, char* argv[],int crc_value)
     if ((strncmp(argv[ARGV_7], RAA229613, strlen(RAA229613)) == SUCCESS)
         || (strncmp(argv[ARGV_7], RAA229625, strlen(RAA229625)) == SUCCESS)
         || ((strncmp(argv[ARGV_7], RAA229620, strlen(RAA229620))) == SUCCESS)
-        || ((strncmp(argv[ARGV_7], RAA229621, strlen(RAA229620))) == SUCCESS))
+        || ((strncmp(argv[ARGV_7], RAA229621, strlen(RAA229621))) == SUCCESS))
     {
         strncpy(vr_context.gen, GEN3, strlen(GEN3));
     }
@@ -1116,16 +1116,19 @@ int renesas_vr_update(int argc, char* argv[])
         ret = vr_patch_update();
     }
     else {
-        if ((strncmp(argv[ARGV_6], RAA229613, strlen(RAA229613)) == SUCCESS) ||
-            (strncmp(argv[ARGV_6], RAA229625, strlen(RAA229625)) == SUCCESS)
-            || ((strncmp(argv[ARGV_6], RAA229620, strlen(RAA229620)) == SUCCESS)))
+        if ((strncmp(argv[ARGV_6], RAA229613, strlen(RAA229613)) == SUCCESS)
+           || (strncmp(argv[ARGV_6], RAA229625, strlen(RAA229625)) == SUCCESS)
+           || (strncmp(argv[ARGV_6], RAA229620, strlen(RAA229620)) == SUCCESS)
+           || ((strncmp(argv[ARGV_6], RAA229621, strlen(RAA229621))) == SUCCESS))
         {
             strncpy(vr_context.gen, GEN3, strlen(GEN3));
+            printf("GEN3 programming initiated\n");
             ret = gen3_programming();
         }
         else if (strncmp(argv[ARGV_6], ISL68220, strlen(ISL68220)) == SUCCESS)
         {
             strncpy(vr_context.gen, GEN2, strlen(GEN2));
+            printf("GEN2 programming initiated\n");
             ret = gen2_programming();
         }
         else {

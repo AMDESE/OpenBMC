@@ -28,7 +28,7 @@ else
     exit -1
 fi
 
-CRC=$(sed '7!d' $MANIFEST_FILE | awk -F= '{print $NF}')
+CRC=$(sed '8!d' $MANIFEST_FILE | awk -F= '{print $NF}')
 
 if [ -e *.hex ] ; then
     IMAGE_FILE=$(find -type f -name '*.hex')
@@ -50,7 +50,8 @@ echo "VR image file is $IMAGE_FILE"
 if [ "$Manufacturer" == "Renesas" ]; then
     SLAVEADDR=$(sed '3!d' $MANIFEST_FILE | awk -F= '{print $NF}')
     PROCESSOR=$(sed '4!d' $MANIFEST_FILE | awk -F= '{print $NF}')
-    /usr/bin/renesas-vr-update.sh $PROCESSOR $SLAVEADDR $IMAGE_FILE $Manufacturer $CRC
+    MODEL=$(sed '7!d' $MANIFEST_FILE | awk -F= '{print $NF}')
+    /usr/bin/renesas-vr-update.sh $PROCESSOR $SLAVEADDR "$IMAGE_FILE" $Manufacturer $MODEL $CRC
     if [ $? -eq 0 ]; then
         echo "Renesas VR update Successful"
     else
@@ -62,9 +63,9 @@ elif [ "$Manufacturer" == "Infineon" ]; then
     XSF_IMAGE_FILE=$(find -type f -name '*.xsf')
 
     if [ -e "$XSF_IMAGE_FILE" ]; then
-        /usr/bin/infineon-vr-update.sh $IMAGE_FILE $Manufacturer $slave_addr $CRC
+        /usr/bin/infineon-vr-update.sh "$IMAGE_FILE" $Manufacturer $slave_addr $CRC
     else
-        /usr/bin/infineon-vr-update.sh $IMAGE_FILE $Manufacturer $CRC
+        /usr/bin/infineon-vr-update.sh "$IMAGE_FILE" $Manufacturer $CRC
     fi
 
     if [ $? -eq 0 ]; then
