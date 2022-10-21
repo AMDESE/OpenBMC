@@ -1,30 +1,30 @@
 0x00:
-  /system/chassis/motherboard/P0_DIMM_A0:
+  /system/chassis/motherboard/P0_DIMM_A:
     entityID: 8
     entityInstance: 1
     interfaces:
         xyz.openbmc_project.Inventory.Item.Dimm:
-  /system/chassis/motherboard/P0_DIMM_B0:
+  /system/chassis/motherboard/P0_DIMM_B:
     entityID: 8
     entityInstance: 2
     interfaces:
         xyz.openbmc_project.Inventory.Item.Dimm:
-  /system/chassis/motherboard/P0_DIMM_D0:
+  /system/chassis/motherboard/P0_DIMM_D:
     entityID: 8
     entityInstance: 3
     interfaces:
         xyz.openbmc_project.Inventory.Item.Dimm:
-  /system/chassis/motherboard/P0_DIMM_E0:
+  /system/chassis/motherboard/P0_DIMM_E:
     entityID: 8
     entityInstance: 4
     interfaces:
         xyz.openbmc_project.Inventory.Item.Dimm:
-  /system/chassis/motherboard/P0_DIMM_F0:
+  /system/chassis/motherboard/P0_DIMM_F:
     entityID: 8
     entityInstance: 5
     interfaces:
         xyz.openbmc_project.Inventory.Item.Dimm:
-  /system/chassis/motherboard/P0_DIMM_H0:
+  /system/chassis/motherboard/P0_DIMM_H:
     entityID: 8
     entityInstance: 6
     interfaces:

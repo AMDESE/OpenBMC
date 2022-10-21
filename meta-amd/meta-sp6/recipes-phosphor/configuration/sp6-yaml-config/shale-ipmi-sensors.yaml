@@ -1269,7 +1269,7 @@
 0x43:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_C_Temp
+  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_D_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -1289,7 +1289,7 @@
 0x44:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_E_Temp
+  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_A_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -1309,7 +1309,7 @@
 0x45:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_F_Temp
+  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_B_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -1329,7 +1329,7 @@
 0x46:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_A_Temp
+  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_H_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -1349,7 +1349,7 @@
 0x47:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_B_Temp
+  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_E_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
@@ -1369,127 +1369,7 @@
 0x48:
   sensorType: 0x01
   entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_D_Temp
-  sensorReadingType: 0x01
-  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
-  offsetB: 0
-  bExp: 0
-  rExp: 0
-  mutability: Mutability::Write | Mutability::Read
-  serviceInterface: org.freedesktop.DBus.Properties
-  readingType: readingData
-  interfaces:
-    xyz.openbmc_project.Sensor.Value:
-      Value:
-        Offsets:
-          0xFF:
-            type: double
-
-0x49:
-  sensorType: 0x01
-  entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_I_Temp
-  sensorReadingType: 0x01
-  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
-  offsetB: 0
-  bExp: 0
-  rExp: 0
-  mutability: Mutability::Write | Mutability::Read
-  serviceInterface: org.freedesktop.DBus.Properties
-  readingType: readingData
-  interfaces:
-    xyz.openbmc_project.Sensor.Value:
-      Value:
-        Offsets:
-          0xFF:
-            type: double
-
-0x4A:
-  sensorType: 0x01
-  entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_K_Temp
-  sensorReadingType: 0x01
-  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
-  offsetB: 0
-  bExp: 0
-  rExp: 0
-  mutability: Mutability::Write | Mutability::Read
-  serviceInterface: org.freedesktop.DBus.Properties
-  readingType: readingData
-  interfaces:
-    xyz.openbmc_project.Sensor.Value:
-      Value:
-        Offsets:
-          0xFF:
-            type: double
-
-0x4B:
-  sensorType: 0x01
-  entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_L_Temp
-  sensorReadingType: 0x01
-  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
-  offsetB: 0
-  bExp: 0
-  rExp: 0
-  mutability: Mutability::Write | Mutability::Read
-  serviceInterface: org.freedesktop.DBus.Properties
-  readingType: readingData
-  interfaces:
-    xyz.openbmc_project.Sensor.Value:
-      Value:
-        Offsets:
-          0xFF:
-            type: double
-
-0x4C:
-  sensorType: 0x01
-  entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_G_Temp
-  sensorReadingType: 0x01
-  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
-  offsetB: 0
-  bExp: 0
-  rExp: 0
-  mutability: Mutability::Write | Mutability::Read
-  serviceInterface: org.freedesktop.DBus.Properties
-  readingType: readingData
-  interfaces:
-    xyz.openbmc_project.Sensor.Value:
-      Value:
-        Offsets:
-          0xFF:
-            type: double
-
-0x4D:
-  sensorType: 0x01
-  entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_H_Temp
-  sensorReadingType: 0x01
-  unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
-  scale: 0
-  offsetB: 0
-  bExp: 0
-  rExp: 0
-  mutability: Mutability::Write | Mutability::Read
-  serviceInterface: org.freedesktop.DBus.Properties
-  readingType: readingData
-  interfaces:
-    xyz.openbmc_project.Sensor.Value:
-      Value:
-        Offsets:
-          0xFF:
-            type: double
-
-0x4E:
-  sensorType: 0x01
-  entityID: 0x20
-  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_J_Temp
+  path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_F_Temp
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.DegreesC
   scale: 0
