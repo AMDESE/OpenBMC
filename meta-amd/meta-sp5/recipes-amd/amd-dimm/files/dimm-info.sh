@@ -3,6 +3,7 @@
 # Read board_id from u-boot env
 board_id=`/sbin/fw_printenv -n board_id`
 por_rst=`/sbin/fw_printenv -n por_rst`
+dpc2="false"
 I3C_TOOL="/usr/bin/i3ctransfer"
 LOG_DIR="/var/lib/dimm"
 dimm_sh="${LOG_DIR}/dimm.sh"
@@ -56,6 +57,7 @@ case "$board_id" in
     "46" | "47" | "48")
         echo " Ruby 1 CPU"
         echo " Ruby 1 CPU" >> $dimm_info
+        dpc2="true"
         num_of_cpu=2
         ;;
     "3e" | "3E" | "43" | "44" | "45" | "51")
@@ -154,40 +156,88 @@ do
                 dimmID=P0_DIMM_L
             ;;
             "12")
-                dimmID=P1_DIMM_A
+                if [ "$dpc2" == "true" ]; then
+                    dimmID=P0_DIMM_A1
+                else
+                    dimmID=P1_DIMM_A
+                fi
             ;;
             "13")
-                dimmID=P1_DIMM_B
+                if [ "$dpc2" == "true" ]; then
+                    dimmID=P0_DIMM_B1
+                else
+                    dimmID=P1_DIMM_B
+                fi
             ;;
             "14")
-                dimmID=P1_DIMM_C
+                if [ "$dpc2" == "true" ]; then
+                    dimmID=P0_DIMM_C1
+                else
+                    dimmID=P1_DIMM_C
+                fi
             ;;
             "15")
-                dimmID=P1_DIMM_D
+                if [ "$dpc2" == "true" ]; then
+                    dimmID=P0_DIMM_D1
+                else
+                    dimmID=P1_DIMM_D
+                fi
             ;;
             "16")
-                dimmID=P1_DIMM_E
+                if [ "$dpc2" == "true" ]; then
+                    dimmID=P0_DIMM_E1
+                else
+                    dimmID=P1_DIMM_E
+                fi
             ;;
             "17")
-                dimmID=P1_DIMM_F
+                if [ "$dpc2" == "true" ]; then
+                    dimmID=P0_DIMM_F1
+                else
+                    dimmID=P1_DIMM_F
+                fi
             ;;
             "18")
-                dimmID=P1_DIMM_G
+                if [ "$dpc2" == "true" ]; then
+                    dimmID=P0_DIMM_G1
+                else
+                    dimmID=P1_DIMM_G
+                fi
             ;;
             "19")
-                dimmID=P1_DIMM_H
+                if [ "$dpc2" == "true" ]; then
+                    dimmID=P0_DIMM_H1
+                else
+                    dimmID=P1_DIMM_H
+                fi
             ;;
             "20")
-                dimmID=P1_DIMM_I
+                if [ "$dpc2" == "true" ]; then
+                    dimmID=P0_DIMM_I1
+                else
+                    dimmID=P1_DIMM_I
+                fi
             ;;
             "21")
-                dimmID=P1_DIMM_J
+                if [ "$dpc2" == "true" ]; then
+                    dimmID=P0_DIMM_J1
+                else
+                    dimmID=P1_DIMM_J
+                fi
             ;;
             "22")
-                dimmID=P1_DIMM_K
+                if [ "$dpc2" == "true" ]; then
+                    dimmID=P0_DIMM_K1
+                else
+                    dimmID=P1_DIMM_K
+                fi
             ;;
             "23")
-                dimmID=P1_DIMM_L
+                if [ "$dpc2" == "true" ]; then
+                    dimmID=P0_DIMM_L1
+                else
+                    dimmID=P1_DIMM_L
+                fi
             ;;
             *)
                 echo "wrong DIMM Number " $dimmNum
