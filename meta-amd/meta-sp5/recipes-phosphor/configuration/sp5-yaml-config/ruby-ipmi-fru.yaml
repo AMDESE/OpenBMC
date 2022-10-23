@@ -59,62 +59,62 @@
     entityInstance: 12
     interfaces:
         xyz.openbmc_project.Inventory.Item.Dimm:
-  /system/chassis/motherboard/P1_DIMM_A:
+  /system/chassis/motherboard/P0_DIMM_A1:
     entityID: 8
     entityInstance: 13
     interfaces:
         xyz.openbmc_project.Inventory.Item.Dimm:
-  /system/chassis/motherboard/P1_DIMM_B:
+  /system/chassis/motherboard/P0_DIMM_B1:
     entityID: 8
     entityInstance: 14
     interfaces:
         xyz.openbmc_project.Inventory.Item.Dimm:
-  /system/chassis/motherboard/P1_DIMM_C:
+  /system/chassis/motherboard/P0_DIMM_C1:
     entityID: 8
     entityInstance: 15
     interfaces:
         xyz.openbmc_project.Inventory.Item.Dimm:
-  /system/chassis/motherboard/P1_DIMM_D:
+  /system/chassis/motherboard/P0_DIMM_D1:
     entityID: 8
     entityInstance: 16
     interfaces:
         xyz.openbmc_project.Inventory.Item.Dimm:
-  /system/chassis/motherboard/P1_DIMM_E:
+  /system/chassis/motherboard/P0_DIMM_E1:
     entityID: 8
     entityInstance: 17
     interfaces:
         xyz.openbmc_project.Inventory.Item.Dimm:
-  /system/chassis/motherboard/P1_DIMM_F:
+  /system/chassis/motherboard/P0_DIMM_F1:
     entityID: 8
     entityInstance: 18
     interfaces:
         xyz.openbmc_project.Inventory.Item.Dimm:
-  /system/chassis/motherboard/P1_DIMM_G:
+  /system/chassis/motherboard/P0_DIMM_G1:
     entityID: 8
     entityInstance: 19
     interfaces:
         xyz.openbmc_project.Inventory.Item.Dimm:
-  /system/chassis/motherboard/P1_DIMM_H:
+  /system/chassis/motherboard/P0_DIMM_H1:
     entityID: 8
     entityInstance: 20
     interfaces:
         xyz.openbmc_project.Inventory.Item.Dimm:
-  /system/chassis/motherboard/P1_DIMM_I:
+  /system/chassis/motherboard/P0_DIMM_I1:
     entityID: 8
     entityInstance: 21
     interfaces:
         xyz.openbmc_project.Inventory.Item.Dimm:
-  /system/chassis/motherboard/P1_DIMM_J:
+  /system/chassis/motherboard/P0_DIMM_J1:
     entityID: 8
     entityInstance: 22
     interfaces:
         xyz.openbmc_project.Inventory.Item.Dimm:
-  /system/chassis/motherboard/P1_DIMM_K:
+  /system/chassis/motherboard/P0_DIMM_K1:
     entityID: 8
     entityInstance: 23
     interfaces:
         xyz.openbmc_project.Inventory.Item.Dimm:
-  /system/chassis/motherboard/P1_DIMM_L:
+  /system/chassis/motherboard/P0_DIMM_L1:
     entityID: 8
     entityInstance: 24
     interfaces:
