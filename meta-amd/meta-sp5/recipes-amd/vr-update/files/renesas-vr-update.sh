@@ -64,6 +64,12 @@ if [ "$PLAT" == "quartz" ] ; then
     P1=${BUS:0:2}
     P0=${BUS:2:4}
 
+    if [ $P0 -gt $P1 ] ; then
+        tmp=$P0
+        P0=$P1
+        P1=$tmp
+    fi
+
     if [ "$PROCESSOR" == "P0" ] ; then
         BUS=$P0
         vr_update $BUS
