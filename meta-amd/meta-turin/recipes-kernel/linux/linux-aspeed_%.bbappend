@@ -99,4 +99,5 @@ SRC_URI += "file://turin.cfg \
             file://0099-linux-aspeed-Add-sys_inlet-temp-sensor-with-Titanite-dts.patch \
             file://0100-linux-aspeed-Enable-APML-Over-I2C.patch \
             file://0101-ARM-dts-aspeed-Turin-initial-DTS.patch \
+            file://0102-ARM-dts-aspeed-Add-Volcano-DTS.patch  \
             "
