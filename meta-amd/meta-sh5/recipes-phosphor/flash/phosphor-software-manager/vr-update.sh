@@ -37,6 +37,7 @@ elif [ -e *.bin ] ; then
 elif [ -e *.txt ] ; then
     IMAGE_FILE=$(find -type f -name '*.txt')
     CRC=$(sed '5!d' $MANIFEST_FILE | awk -F= '{print $NF}')
+	#echo "CRC is $CRC"
 elif [ -e *.xsf ] ; then
     IMAGE_FILE=$(find -type f -name '*.xsf')
     slave_addr=$(sed '3!d' $MANIFEST_FILE | awk -F= '{print $NF}')
@@ -73,6 +74,17 @@ elif [ "$Manufacturer" == "Infineon" ]; then
         echo "Infineon VR update failed"
         exit -1
     fi
+
+elif [	"$Manufacturer" == "MPS" ]; then
+	SLAVEADDR=$(sed '3!d' $MANIFEST_FILE | awk -F= '{print $NF}')
+	PROCESSOR=$(sed '4!d' $MANIFEST_FILE | awk -F= '{print $NF}')
+	/usr/bin/mps-vr-update.sh $PROCESSOR $SLAVEADDR $IMAGE_FILE $Manufacturer
+	if [ $? -eq 0 ]; then
+		echo "MPS VR update successful"
+	else
+		echo "MPS VR update failed"
+	exit -1
+	fi
 
 else
     echo "Not a valid Manufacturer Name. Aborting the update"

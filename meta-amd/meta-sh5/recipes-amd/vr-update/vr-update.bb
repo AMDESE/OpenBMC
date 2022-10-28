@@ -15,6 +15,8 @@ SRC_URI = "file://common.h \
            file://renesas-vr-update.h  \
            file://renesas-vr-update.cpp \
            file://renesas-vr-update.sh \
+	   file://mps-vr-update.sh \
+	   file://mps-vr.sh \
           "
 
 S = "${WORKDIR}"
@@ -31,5 +33,8 @@ do_install() {
         install -m 0755 infineon-vr-update.sh ${D}${bindir}
         install -m 0755 vr-update ${D}${bindir}
         install -m 0755 ${S}/renesas-vr-update.sh ${D}${bindir}
+        install -m 0755 ${S}/mps-vr-update.sh ${D}${bindir}
+	install -m 0755 ${S}/mps-vr.sh ${D}${bindir}
+
 
 }
