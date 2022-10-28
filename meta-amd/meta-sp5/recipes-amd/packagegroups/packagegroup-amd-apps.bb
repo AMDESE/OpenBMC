@@ -46,6 +46,7 @@ RDEPENDS_${PN}-system = " \
         amd-ras \
         amd-yaap \
         bmcweb \
+        cpu-info \
         debug-apps \
         first-boot-set-hwmon-path \
         fpga-tools \
