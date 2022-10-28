@@ -1,0 +1,99 @@
+From afa037ea51fdd0a13f1ea3b6c420ac74671baea4 Mon Sep 17 00:00:00 2001
+From: Ashok Kumar <ashok2.kumar@amd.com>
+Date: Mon, 17 Oct 2022 06:51:54 -0500
+Subject: [PATCH] To display Processors information using redfish API
+
+Signed-off-by: Ashok Kumar <ashok2.kumar@amd.com>
+
+---
+ redfish-core/lib/processor.hpp | 65 ++++++++++++++++++++++++++++++++--
+ 1 file changed, 63 insertions(+), 2 deletions(-)
+
+diff --git a/redfish-core/lib/processor.hpp b/redfish-core/lib/processor.hpp
+index 49e04e29..4bb99c69 100644
+--- a/redfish-core/lib/processor.hpp
++++ b/redfish-core/lib/processor.hpp
+@@ -122,14 +122,24 @@ inline void
+                     aResp->res.jsonValue["TotalThreads"] = *value;
+                 }
+             }
+-            else if (property.first == "Family")
++            else if (property.first == "EffectiveFamily")
+             {
+                 const std::string* value =
+                     std::get_if<std::string>(&property.second);
+                 if (value != nullptr)
+                 {
+                     aResp->res.jsonValue["ProcessorId"]["EffectiveFamily"] =
+-                        *value;
++                        "0x" + *value;
++                }
++            }
++            else if (property.first == "EffectiveModel")
++            {
++                const std::string* value =
++                    std::get_if<std::string>(&property.second);
++                if (value != nullptr)
++                {
++                    aResp->res.jsonValue["ProcessorId"]["EffectiveModel"] =
++                        "0x" + *value;
+                 }
+             }
+             else if (property.first == "Id")
+@@ -142,6 +152,57 @@ inline void
+                         boost::lexical_cast<std::string>(*value);
+                 }
+             }
++            else if (property.first == "Microcode")
++            {
++                const std::string* value =
++                    std::get_if<std::string>(&property.second);
++                if (value != nullptr)
++                {
++                    aResp->res.jsonValue["ProcessorId"]["MicrocodeInfo"] =
++                        *value;
++                }
++            }
++            else if (property.first == "Step")
++            {
++                const std::string* value =
++                    std::get_if<std::string>(&property.second);
++                if (value != nullptr)
++                {
++                    aResp->res.jsonValue["ProcessorId"]["Step"] =
++                       "0x" + *value;
++                }
++            }
++            else if (property.first == "VendorId")
++            {
++                const std::string* value =
++                    std::get_if<std::string>(&property.second);
++                if (value != nullptr)
++                {
++                    aResp->res.jsonValue["VendorId"] =
++                       *value;
++                }
++            }
++            else if (property.first == "Family")
++            {
++                const std::string* value =
++                    std::get_if<std::string>(&property.second);
++                if (value != nullptr)
++                {
++                    aResp->res.jsonValue["ProcessorId"]["Family"] =
++                       "0x" + *value;
++                }
++            }
++            else if (property.first == "Model")
++            {
++                const std::string* value =
++                    std::get_if<std::string>(&property.second);
++                if (value != nullptr)
++                {
++                    aResp->res.jsonValue["ProcessorId"]["Model"] =
++                       "0x" + *value;
++                }
++            }
++
+         }
+     }
