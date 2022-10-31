@@ -1,0 +1,64 @@
+From 33505b349528bfed849c0aa37f0953e8383d79ed Mon Sep 17 00:00:00 2001
+From: mushtaqk07 <Mushtaq.Khan@amd.com>
+Date: Fri, 3 Feb 2023 18:37:39 +0000
+Subject: [PATCH 08/11] enable-lpc-modules
+
+---
+ arch/arm/boot/dts/aspeed-ast2600-lipari.dts | 41 +++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
+
+diff --git a/arch/arm/boot/dts/aspeed-ast2600-lipari.dts b/arch/arm/boot/dts/aspeed-ast2600-lipari.dts
+index accc52160d99..9d7d62aac262 100644
+--- a/arch/arm/boot/dts/aspeed-ast2600-lipari.dts
++++ b/arch/arm/boot/dts/aspeed-ast2600-lipari.dts
+@@ -186,6 +186,47 @@
+ 
+ };
+ 
++&kcs1 {
++    kcs_addr = <0xca0>;
++    status = "okay";
++};
++&kcs2 {
++    kcs_addr = <0xca8>;
++    status = "okay";
++};
++&kcs3 {
++    kcs_addr = <0xca2>;
++    status = "okay";
++};
++&kcs4 {
++    kcs_addr = <0xca4>;
++    status = "okay";
++};
++&lpc_ctrl {
++    status = "okay";
++};
++&lpc_snoop {
++    status = "okay";
++    snoop-ports = <0x80>, <0x81>;
++};
++&lpc_reset {
++    status = "okay";
++};
++&uart_routing {
++    status = "okay";
++};
++&ibt {
++    status = "okay";
++};
++
++&lpc_pcc {
++    rec-mode = <0x1>;
++    port-addr = <0x80>;
++    port-addr-hbits-select = <0x1>;
++    port-addr-xbits = <0x3>;
++    status = "okay";
++};
++	
+ &i2c0 {
+ 	status = "okay";
+ };
+-- 
+2.17.1
+
