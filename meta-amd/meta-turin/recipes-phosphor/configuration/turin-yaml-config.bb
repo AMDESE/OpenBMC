@@ -26,6 +26,10 @@ SRC_URI = " \
     file://huambo-ipmi-fru.yaml  \
     file://huambo-ipmi-fru-properties.yaml  \
     file://huambo-ipmi-inventory-sensors.yaml  \
+    file://volcano-ipmi-sensors.yaml  \
+    file://volcano-ipmi-fru.yaml  \
+    file://volcano-ipmi-fru-properties.yaml  \
+    file://volcano-ipmi-inventory-sensors.yaml  \
     "
 
 S = "${WORKDIR}"
@@ -76,6 +80,15 @@ do_install() {
         ${D}${datadir}/${BPN}/huambo-ipmi-sensors.yaml
     install -m 0644 -D huambo-ipmi-inventory-sensors.yaml \
         ${D}${datadir}/${BPN}/huambo-ipmi-inventory-sensors.yaml
+    cat volcano-ipmi-fru.yaml > fru-read.yaml
+    install -m 0644 -D volcano-ipmi-fru-properties.yaml \
+        ${D}${datadir}/${BPN}/volcano-ipmi-extra-properties.yaml
+    install -m 0644 -D fru-read.yaml \
+        ${D}${datadir}/${BPN}/volcano-ipmi-fru-read.yaml
+    install -m 0644 -D volcano-ipmi-sensors.yaml \
+        ${D}${datadir}/${BPN}/volcano-ipmi-sensors.yaml
+    install -m 0644 -D volcano-ipmi-inventory-sensors.yaml \
+        ${D}${datadir}/${BPN}/volcano-ipmi-inventory-sensors.yaml
 
 }
 
@@ -100,6 +113,10 @@ FILES_${PN}-dev = " \
     ${datadir}/${BPN}/huambo-ipmi-extra-properties.yaml \
     ${datadir}/${BPN}/huambo-ipmi-fru-read.yaml \
     ${datadir}/${BPN}/huambo-ipmi-inventory-sensors.yaml \
+    ${datadir}/${BPN}/volcano-ipmi-sensors.yaml \
+    ${datadir}/${BPN}/volcano-ipmi-extra-properties.yaml \
+    ${datadir}/${BPN}/volcano-ipmi-fru-read.yaml \
+    ${datadir}/${BPN}/volcano-ipmi-inventory-sensors.yaml \
     "
 
 ALLOW_EMPTY_${PN} = "1"
