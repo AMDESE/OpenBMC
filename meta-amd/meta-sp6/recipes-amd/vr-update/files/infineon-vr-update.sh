@@ -20,6 +20,8 @@ then
         CRC=$4
         if ([ "$ADDR" == "13" ] || [ "$ADDR" == "14" ] || [ "$ADDR" == "15" ]); then
             BUS=4
+            DEVICE_NAME=`find /sys/bus/i2c/drivers/xdpe12284/ -name "*$ADDR" -exec basename {} \;`
+            if [ ! -z "$DEVICE_NAME" ] ; then UNBIND_DRIVER=1 ; fi
         else
             UNBIND_DRIVER=1
         fi
