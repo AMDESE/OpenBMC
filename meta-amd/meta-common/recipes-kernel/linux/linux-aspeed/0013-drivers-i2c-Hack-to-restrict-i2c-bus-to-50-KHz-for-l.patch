@@ -1,0 +1,33 @@
+From ef7b75cb47da5a8a330475cc982799083820df33 Mon Sep 17 00:00:00 2001
+From: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
+Date: Wed, 9 Nov 2022 19:44:10 -0600
+Subject: [PATCH 13/19] drivers/i2c: Hack to restrict i2c bus to 50 KHz for
+ legacy LCD device
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+Restricts i2c bus speed to 50 KHz to make legacy LCD device work.
+
+Signed-off-by: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
+---
+ drivers/i2c/busses/i2c-aspeed.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/i2c/busses/i2c-aspeed.c b/drivers/i2c/busses/i2c-aspeed.c
+index 724bf30600d6..dd54b3271841 100644
+--- a/drivers/i2c/busses/i2c-aspeed.c
++++ b/drivers/i2c/busses/i2c-aspeed.c
+@@ -1004,6 +1004,10 @@ static int aspeed_i2c_probe_bus(struct platform_device *pdev)
+ 			"Could not read bus-frequency property\n");
+ 		bus->bus_frequency = I2C_MAX_STANDARD_MODE_FREQ;
+ 	}
++	if (strcmp(pdev->dev.of_node->full_name, "i2c-bus@100") == 0) {
++		bus->bus_frequency = I2C_MAX_STANDARD_MODE_FREQ/2;
++		dev_info(&pdev->dev, "Setting %s (i2c-1) Freq to (%d) HZ\n", pdev->dev.of_node->full_name, I2C_MAX_STANDARD_MODE_FREQ/2);
++	}
+
+ 	match = of_match_node(aspeed_i2c_bus_of_table, pdev->dev.of_node);
+ 	if (!match)
+--
+2.17.1
+

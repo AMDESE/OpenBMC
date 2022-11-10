@@ -1,0 +1,64 @@
+From 5098cefd3618baaab02922791890bf9e5853fa78 Mon Sep 17 00:00:00 2001
+From: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
+Date: Wed, 9 Nov 2022 19:31:47 -0600
+Subject: [PATCH 11/19] drivers/hwmon: Extend support for infineon xdpe19283
+ and tds38725 VRs
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+Extends support for infineon "xdpe1928" and "tds38725" Voltage
+Regulators.
+
+Signed-off-by: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
+---
+ drivers/hwmon/pmbus/xdpe12284.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/drivers/hwmon/pmbus/xdpe12284.c b/drivers/hwmon/pmbus/xdpe12284.c
+index f8bc0f41cd5f..ea5a973661bc 100644
+--- a/drivers/hwmon/pmbus/xdpe12284.c
++++ b/drivers/hwmon/pmbus/xdpe12284.c
+@@ -16,6 +16,8 @@
+ #define XDPE122_PROT_VR12_5_10MV	0x02 /* VR12.5 mode, 10-mV DAC */
+ #define XDPE122_PROT_IMVP9_10MV		0x03 /* IMVP9 mode, 10-mV DAC */
+ #define XDPE122_AMD_625MV		0x10 /* AMD mode 6.25mV */
++#define XDPE19283A_VR			0x18 /* VOUT_MODE val for XDPE192xx */
++#define TDA38725_VR			0x0C /* VOUT_MODE val for TDA38xxx */
+ #define XDPE122_PAGE_NUM		2
+
+ static int xdpe122_read_word_data(struct i2c_client *client, int page,
+@@ -99,6 +101,13 @@ static int xdpe122_identify(struct i2c_client *client,
+ 		case XDPE122_AMD_625MV:
+ 			info->vrm_version[i] = amd625mv;
+ 			break;
++		case XDPE19283A_VR:
++			info->format[PSC_VOLTAGE_OUT] = linear;
++			info->vrm_version[i] = amd625mv;
++			break;
++		case TDA38725_VR:
++			info->vrm_version[i] = amd625mv;
++			break;
+ 		default:
+ 			return -EINVAL;
+ 		}
+@@ -142,6 +151,8 @@ static int xdpe122_probe(struct i2c_client *client)
+ static const struct i2c_device_id xdpe122_id[] = {
+ 	{"xdpe12254", 0},
+ 	{"xdpe12284", 0},
++	{"xdpe19283", 0},
++	{"tds38725", 0},
+ 	{}
+ };
+
+@@ -150,6 +161,8 @@ MODULE_DEVICE_TABLE(i2c, xdpe122_id);
+ static const struct of_device_id __maybe_unused xdpe122_of_match[] = {
+ 	{.compatible = "infineon,xdpe12254"},
+ 	{.compatible = "infineon,xdpe12284"},
++	{.compatible = "infineon,xdpe19283"},
++	{.compatible = "infineon,tds38725"},
+ 	{}
+ };
+ MODULE_DEVICE_TABLE(of, xdpe122_of_match);
+--
+2.17.1
+

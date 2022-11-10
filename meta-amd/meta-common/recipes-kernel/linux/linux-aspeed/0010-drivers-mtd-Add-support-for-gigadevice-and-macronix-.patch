@@ -1,0 +1,70 @@
+From 56475fc1ab76956af8bcf73d3f8137adb1c9ad49 Mon Sep 17 00:00:00 2001
+From: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
+Date: Wed, 9 Nov 2022 19:27:55 -0600
+Subject: [PATCH 10/19] drivers/mtd: Add support for gigadevice and macronix
+ flash chips
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+Adds support for gigadevice and macronix flash  Gigadevice "gd25b512"
+and macronix "mx25u25645g" chips.
+
+Signed-off-by: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
+---
+ drivers/mtd/spi-nor/gigadevice.c           | 2 ++
+ drivers/mtd/spi-nor/macronix.c             | 3 +++
+ drivers/pinctrl/aspeed/pinctrl-aspeed-g6.c | 4 ++--
+ 3 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/mtd/spi-nor/gigadevice.c b/drivers/mtd/spi-nor/gigadevice.c
+index 447d84bb2128..1650131fd79a 100644
+--- a/drivers/mtd/spi-nor/gigadevice.c
++++ b/drivers/mtd/spi-nor/gigadevice.c
+@@ -50,6 +50,8 @@ static const struct flash_info gigadevice_parts[] = {
+ 			   SPI_NOR_4B_OPCODES | SPI_NOR_HAS_LOCK |
+ 			   SPI_NOR_HAS_TB | SPI_NOR_TB_SR_BIT6)
+ 		.fixups = &gd25q256_fixups },
++	{ "gd25b512", INFO(0xc8471a, 0, 64 * 1024, 512,
++			   SECT_4K | SPI_NOR_QUAD_READ) },
+ };
+
+ const struct spi_nor_manufacturer spi_nor_gigadevice = {
+diff --git a/drivers/mtd/spi-nor/macronix.c b/drivers/mtd/spi-nor/macronix.c
+index 325ef998e192..d1f3c49870bc 100644
+--- a/drivers/mtd/spi-nor/macronix.c
++++ b/drivers/mtd/spi-nor/macronix.c
+@@ -89,6 +89,9 @@ static const struct flash_info macronix_parts[] = {
+ 	{ "mx66u2g45g",	 INFO(0xc2253c, 0, 64 * 1024, 4096,
+ 			      SECT_4K | SPI_NOR_DUAL_READ |
+ 			      SPI_NOR_QUAD_READ | SPI_NOR_4B_OPCODES) },
++	{ "mx25u25645g", INFO(0xc00018, 0, 64 * 1024, 512,
++			      SECT_4K | SPI_NOR_DUAL_READ |
++			      SPI_NOR_QUAD_READ | SPI_NOR_4B_OPCODES) },
+ };
+
+ static void macronix_default_init(struct spi_nor *nor)
+diff --git a/drivers/pinctrl/aspeed/pinctrl-aspeed-g6.c b/drivers/pinctrl/aspeed/pinctrl-aspeed-g6.c
+index 5c1a109842a7..6077e3be2375 100644
+--- a/drivers/pinctrl/aspeed/pinctrl-aspeed-g6.c
++++ b/drivers/pinctrl/aspeed/pinctrl-aspeed-g6.c
+@@ -1189,7 +1189,7 @@ SIG_EXPR_LIST_DECL_SEMG(AB10, RXD12, UART12G1, UART12,
+ 			SIG_DESC_SET(SCU4D4, 31));
+ PIN_DECL_2(AB10, GPIOX7, SPI2DQ3, RXD12);
+
+-GROUP_DECL(QSPI2, AE8, AF8, AB9, AD9, AF9, AB10);
++GROUP_DECL(QSPI2, AF9, AB10);
+ FUNC_DECL_2(SPI2, SPI2, QSPI2);
+
+ GROUP_DECL(UART12G1, AF9, AB10);
+@@ -1278,7 +1278,7 @@ SIG_EXPR_LIST_DECL_SEMG(AF10, RXD13, UART13G1, UART13,
+ 			SIG_DESC_CLEAR(SCU4B8, 3), SIG_DESC_SET(SCU4D8, 15));
+ PIN_DECL_2(AF10, GPIOZ7, SPI1DQ3, RXD13);
+
+-GROUP_DECL(QSPI1, AB11, AC11, AA11, AD11, AF10);
++GROUP_DECL(QSPI1, AD11, AF10);
+ FUNC_DECL_2(SPI1, SPI1, QSPI1);
+
+ GROUP_DECL(UART13G1, AD11, AF10);
+--
+2.17.1
+

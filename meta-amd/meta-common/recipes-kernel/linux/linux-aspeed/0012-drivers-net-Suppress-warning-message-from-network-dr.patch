@@ -1,0 +1,52 @@
+From 6dca02c1b7812b1db0f6f9fcdbe7041e36fbb184 Mon Sep 17 00:00:00 2001
+From: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
+Date: Wed, 9 Nov 2022 19:34:47 -0600
+Subject: [PATCH 12/19] drivers/net: Suppress warning message from network
+ driver
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+Suppresses warning message "transmit queue  timed out" for eth1
+interface.
+
+Signed-off-by: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
+---
+ drivers/net/ethernet/faraday/ftgmac100.c | 4 ++++
+ net/sched/sch_generic.c                  | 2 ++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
+index 1c7912a94e36..c260a51aaa68 100644
+--- a/drivers/net/ethernet/faraday/ftgmac100.c
++++ b/drivers/net/ethernet/faraday/ftgmac100.c
+@@ -1795,6 +1795,10 @@ static int ftgmac100_probe(struct platform_device *pdev)
+ 	priv->dev = &pdev->dev;
+ 	INIT_WORK(&priv->reset_task, ftgmac100_reset_task);
+
++	pdev->id = of_alias_get_id(pdev->dev.of_node, "ethernet");
++	if (pdev->id < 0)
++		pdev->id = 0;
++	sprintf(netdev->name, "eth%d", pdev->id);
+ 	/* map io memory */
+ 	priv->res = request_mem_region(res->start, resource_size(res),
+ 				       dev_name(&pdev->dev));
+diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
+index 49eae93d1489..342fbcad02f6 100644
+--- a/net/sched/sch_generic.c
++++ b/net/sched/sch_generic.c
+@@ -438,10 +438,12 @@ static void dev_watchdog(struct timer_list *t)
+ 			}
+
+ 			if (some_queue_timedout) {
++				if (strcmp(dev->name, "eth1")!=0) {
+ 				trace_net_dev_xmit_timeout(dev, i);
+ 				WARN_ONCE(1, KERN_INFO "NETDEV WATCHDOG: %s (%s): transmit queue %u timed out\n",
+ 				       dev->name, netdev_drivername(dev), i);
+ 				dev->netdev_ops->ndo_tx_timeout(dev, i);
++				}
+ 			}
+ 			if (!mod_timer(&dev->watchdog_timer,
+ 				       round_jiffies(jiffies +
+--
+2.17.1
+
