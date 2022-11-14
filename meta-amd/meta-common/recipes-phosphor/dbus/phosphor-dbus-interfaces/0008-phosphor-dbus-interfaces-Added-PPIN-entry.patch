@@ -1,0 +1,28 @@
+From ff424b0671cfbf83659eeccfa99ab8ddb623981b Mon Sep 17 00:00:00 2001
+From: Ashok Kumar <ashok2.kumar@amd.com>
+Date: Mon, 14 Nov 2022 12:16:08 -0600
+Subject: [PATCH] phosphor-dbus-interfaces: Added PPIN entry
+
+Added PPIN entry for RAS internal changes
+Fixes: Added PPIN entry
+
+Signed-off-by: Ashok Kumar <ashok2.kumar@amd.com>
+---
+ xyz/openbmc_project/Inventory/Item/Cpu.interface.yaml | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/xyz/openbmc_project/Inventory/Item/Cpu.interface.yaml b/xyz/openbmc_project/Inventory/Item/Cpu.interface.yaml
+index 05d0835..d7a66e6 100644
+--- a/xyz/openbmc_project/Inventory/Item/Cpu.interface.yaml
++++ b/xyz/openbmc_project/Inventory/Item/Cpu.interface.yaml
+@@ -62,6 +62,10 @@ properties:
+       type: string
+       description: >
+           The product model number of this device.
++    - name: PPIN
++      type: string
++      description: >
++          The PPIN information for this processor.
+ enumerations:
+     - name: Capability
+       description: >
