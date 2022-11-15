@@ -1,0 +1,310 @@
+From 2d13246242b94e1145229885151dcad8c9c5a8dc Mon Sep 17 00:00:00 2001
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Thu, 17 Nov 2022 10:50:35 -0600
+Subject: [PATCH 2/2] u-boot-aspeed-sdk: add platform based board_id and
+ hostname settings
+
+1. amd-platforms.h header file added for amd platforms related info
+2. Set the platform based board_id u-boot env
+3. Set platform based hostname pass to bootargs.
+
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ common/main.c           | 162 +++++++++++++++++++++++++++++++++++++++-
+ include/amd-platforms.h |  98 ++++++++++++++++++++++++
+ 2 files changed, 257 insertions(+), 3 deletions(-)
+ create mode 100644 include/amd-platforms.h
+
+diff --git a/common/main.c b/common/main.c
+index 1cc049b9b6..99ad609834 100644
+--- a/common/main.c
++++ b/common/main.c
+@@ -13,15 +13,167 @@
+ #include <cli.h>
+ #include <console.h>
+ #include <version.h>
+-
+-/* Sys Scratch reg that holds sys_rst info */
+-#define ASPEED_SYS_SCRATCH_1FC 0x1e6e21fc
++#include <i2c.h>
++#include <linux/ctype.h>
++#include <string.h>
++#include <amd-platforms.h>
+
+ /*
+  * Board-specific Platform code can reimplement show_boot_progress () if needed
+  */
+ __weak void show_boot_progress(int val) {}
+
++/*
++ * Read board_id env, Read ethaddr env
++ * set the hostname as Kernel cmd args
++ */
++void set_hostname()
++{
++	char *board_id;
++	char *ethaddr;
++	char hostname[HOSTNAME_BUFF_LEN];
++	char *cur_bootargs;
++	char new_bootargs[CMD_BOOT_ARGS_BUFF_LEN];
++	int octate_5, octate_6;
++
++	/*  Read Kernel cmd line args */
++	cur_bootargs =  env_get("bootargs");
++
++	/*  Check whether 'bootargs' alrady contains hostname parameter */
++	if  ( !(strstr(cur_bootargs, "systemd.hostname")) )
++	{
++		/* Read the board_id from   env */
++		board_id = env_get("board_id");
++		/* Read the eth0 MAC address from env */
++		ethaddr = env_get("ethaddr");
++
++		if ( board_id != NULL && ethaddr != NULL && strlen(ethaddr) >= MAC_ADDR_ARRAY_SIZE)
++		{
++			octate_5 = (int)simple_strtol(&ethaddr[OCTATE_5_OFFSET], NULL, HEX_BASE);
++			octate_6 = (int)simple_strtol(&ethaddr[OCTATE_6_OFFSET], NULL, HEX_BASE);
++
++			switch ((int)simple_strtol(board_id, NULL, HEX_BASE))
++			{
++				// SP5 Platforms
++				case ONYX_SLT:
++				case ONYX_FR4:
++				case ONYX_1 ... ONYX_3:
++					sprintf(hostname, "onyx-%02x%02x", octate_5, octate_6);
++					break;
++				case QUARTZ_DAP:
++				case QUARTZ_FR4:
++				case QUARTZ_1 ... QUARTZ_3:
++					sprintf(hostname, "quartz-%02x%02x", octate_5, octate_6);
++					break;
++				case RUBY_1 ... RUBY_3:
++					sprintf(hostname, "ruby-%02x%02x", octate_5, octate_6);
++					break;
++				case TITANITE_1 ... TITANITE_6:
++					sprintf(hostname, "titanite-%02x%02x", octate_5, octate_6);
++					break;
++
++				// SH5 Platforms
++				case SH5_SIDLEY:
++					sprintf(hostname, "sidley-%02x%02x", octate_5, octate_6);
++					break;
++				case SH5_PARRY_PEAK:
++					sprintf(hostname, "parrypeak-%02x%02x", octate_5, octate_6);
++					break;
++				case SH5_1P_PWR ... SH5_1P_SLT:
++				case SH5_1P_OEM_P:
++				case SH5_2P_CABLED:
++					sprintf(hostname, "sh5d807-%02x%02x", octate_5, octate_6);
++					break;
++
++				// SP6 Platforms
++				case SUNSTONE:
++				case SUNSTONE_DAP:
++					sprintf(hostname, "sunstone-%02x%02x", octate_5, octate_6);
++					break;
++				case SHALE:
++				case SHALE_SLT:
++					sprintf(hostname, "shale-%02x%02x", octate_5, octate_6);
++					break;
++				case SHALE_64:
++					sprintf(hostname, "shale-%02x%02x", octate_5, octate_6);
++					break;
++				case CINNABAR:
++					sprintf(hostname, "cinnabar-%02x%02x", octate_5, octate_6);
++					break;
++
++				// Turin Platforms
++				case CHALUPA:
++					sprintf(hostname, "chalupa-%02x%02x", octate_5, octate_6);
++					break;
++				case HUAMBO:
++					sprintf(hostname, "huambo-%02x%02x", octate_5, octate_6);
++					break;
++				case GALENA:
++					sprintf(hostname, "galena-%02x%02x", octate_5, octate_6);
++					break;
++				case RECLUSE:
++					sprintf(hostname, "recluse-%02x%02x", octate_5, octate_6);
++					break;
++				case PURICO:
++					sprintf(hostname, "purico-%02x%02x", octate_5, octate_6);
++					break;
++
++				default:
++					sprintf(hostname, "hawaii-%02x%02x", octate_5, octate_6);
++					break;
++			}
++			/* Append bootargs with hostname */
++			sprintf(new_bootargs, "%s systemd.hostname=%s", cur_bootargs, hostname);
++			env_set("bootargs", new_bootargs);
++			env_save();
++			printf("Hostname set to '%s'\n", hostname);
++		}
++		else
++			printf("Failed setting hostname, board_id or ethaddr is not set\n");
++	}
++	else
++		printf("Hostname is already set with bootargs\n");
++
++	return;
++}
++
++/*
++ * Read board ID from mother board eeprom and set as an env
++ */
++void set_board_id()
++{
++	char *s;
++	unsigned char board_id [BOARD_ID_LEN];
++	int ret, i=0;
++	char brdid[BOARD_ID_BUFF_LEN];
++
++	/* Check if the board_id env is set */
++	s = env_get("board_id");
++
++	/* Read board_id from eeprom */
++	i2c_set_bus_num(EEPROM_I2C_BUS);
++	ret = i2c_read(EEPROM_DEV_ADDR, EEPROM_BOARD_ID_OFFSET, EEPROM_ADDR_LEN, board_id, BOARD_ID_LEN);
++	if (ret < 0) {
++		printf("Error : Retrieving board_id from EEPROM Failed\n");
++	}
++	else {
++		sprintf(brdid, "%x", board_id[0]);
++		/* Convert char to upper case */
++		for ( i=0; i < BOARD_ID_BUFF_LEN; i++) {
++			brdid[i]= toupper(brdid[i]);
++		}
++
++		/* if the env is not set OR env id  and eeprom id are different, then set from eeprom id */
++		if ( (s == NULL) || (strcmp(s, brdid) !=0 ) ) {
++			env_set("board_id", brdid);
++			env_save();
++		}
++	}
++
++	printf("Board_id : %s\n", env_get("board_id"));
++	return;
++}
++
+ static void run_preboot_environment_command(void)
+ {
+ #ifdef CONFIG_PREBOOT
+@@ -67,6 +219,10 @@ void main_loop(void)
+ 	else
+ 		env_set("por_rst", "false");
+ 	env_save();
++
++	/* Read board id from eerpom and set env */
++	set_board_id();
++	set_hostname();
+ 	s = bootdelay_process();
+ 	if (cli_process_fdt(&s))
+ 		cli_secure_boot_cmd(s);
+diff --git a/include/amd-platforms.h b/include/amd-platforms.h
+new file mode 100644
+index 0000000000..935ef18ab7
+--- /dev/null
++++ b/include/amd-platforms.h
+@@ -0,0 +1,98 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/*
++ * (C) Copyright 2022
++ * Advanced Micro Device, vinu.vaghasia@amd.com
++ */
++
++#ifndef _AMD_PLATFOMS_H_
++#define _AMD_PLATFOMS_H
++
++#define EEPROM_I2C_BUS          7
++#define EEPROM_DEV_ADDR         0X50
++#define EEPROM_BOARD_ID_OFFSET  0X10
++#define EEPROM_ADDR_LEN         2
++#define BOARD_ID_LEN            1
++#define BOARD_ID_BUFF_LEN       2
++
++#define HOSTNAME_BUFF_LEN       32
++#define CMD_BOOT_ARGS_BUFF_LEN  512
++#define HEX_BASE                16
++#define OCTATE_5_OFFSET         12
++#define OCTATE_6_OFFSET         15
++#define MAC_ADDR_ARRAY_SIZE     17
++
++#define HEX_BASE                16
++#define DECIMAL_BASE            10
++
++/* SP5 Platform IDs */
++#define ONYX_SLT        61  //0x3D
++#define ONYX_1          64  //0x40
++#define ONYX_2          65  //0x41
++#define ONYX_3          66  //0x42
++#define ONYX_FR4        82  //0x52
++#define QUARTZ_DAP      62  //0x3E
++#define QUARTZ_1        67  //0x43
++#define QUARTZ_2        68  //0x44
++#define QUARTZ_3        69  //0x45
++#define QUARTZ_FR4      81  //0x51
++#define RUBY_1          70  //0x46
++#define RUBY_2          71  //0x47
++#define RUBY_3          72  //0x48
++#define TITANITE_1      73  //0x49
++#define TITANITE_2      74  //0x4A
++#define TITANITE_3      75  //0x4B
++#define TITANITE_4      76  //0x4C
++#define TITANITE_5      77  //0x4D
++#define TITANITE_6      78  //0x4E
++
++/* SH5 Platform IDs */
++#define SH5_1P_PWR      92  //0x5C
++#define SH5_1P_OEM      93  //0x5D
++#define SH5_1P_SLT      94  //0x5E
++#define SH5_2P_CABLED   108 //0x6C
++#define SH5_1P_OEM_P    109 //0x6D
++#define SH5_SIDLEY      95  //0x5F
++#define SH5_PARRY_PEAK  96  //0x60
++
++/* SP6 Platform IDs */
++#define SHALE_64        89  //0x59
++#define SHALE_SLT       98  //0x62
++#define SHALE           101 //0x65
++#define SUNSTONE_DAP    97  //0x61
++#define CINNABAR        99  //0x63
++#define SUNSTONE        100 //0x64
++
++/* Turin Platform IDs */
++#define CHALUPA         102 // 0x66
++#define CHALUPA_1       110 // 0x6E
++#define CHALUPA_2       111 // 0x6F
++#define HUAMBO          103 // 0x67
++#define GALENA          104 // 0x68
++#define GALENA_1        112 // 0x70
++#define GALENA_2        113 // 0x71
++#define RECLUSE         105 // 0x69
++#define PURICO          106 // 0x6A
++#define PURICO_1        114 // 0x72
++#define PURICO_2        115 // 0x73
++#define VOLCANO         107 // 0x6B
++#define VOLCANO_1       116 // 0x74
++#define VOLCANO_2       117 // 0x75
++
++// EEPROM info
++#define EEPROM_I2C_BUS          7
++#define EEPROM_DEV_ADDR         0X50
++#define EEPROM_BOARD_ID_OFFSET  0X10
++#define EEPROM_ADDR_LEN         2
++#define BOARD_ID_LEN            1
++#define BOARD_ID_BUFF_LEN       2
++#define HOSTNAME_BUFF_LEN       32
++#define CMD_BOOT_ARGS_BUFF_LEN  512
++#define HEX_BASE                16
++#define OCTATE_5_OFFSET         12
++#define OCTATE_6_OFFSET         15
++#define MAC_ADDR_ARRAY_SIZE     17
++
++// Sys Scratch reg that holds sys_rst info
++#define ASPEED_SYS_SCRATCH_1FC 0x1e6e21fc
++
++#endif /* _AMD_PLATFOMS_H */
+--
+2.17.1
+

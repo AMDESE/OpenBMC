@@ -1,0 +1,221 @@
+From 3cdbf72ea7b224d24342ba16d738f6580511c112 Mon Sep 17 00:00:00 2001
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Tue, 15 Nov 2022 12:09:06 -0600
+Subject: [PATCH 2/2] u-boot-aspeed-sdk: modify Platform based device tree
+ selection
+
+Code modified to select the platform based device tree and pass on the
+Linux kernel
+
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ common/image-fit.c | 105 +++++++++++++++++++++++++++++++++++++++++++--
+ tools/Makefile     |   5 +++
+ 2 files changed, 106 insertions(+), 4 deletions(-)
+
+diff --git a/common/image-fit.c b/common/image-fit.c
+index 3c8667f93d..5ef75a8f1a 100644
+--- a/common/image-fit.c
++++ b/common/image-fit.c
+@@ -11,10 +11,13 @@
+ #ifdef USE_HOSTCC
+ #include "mkimage.h"
+ #include <time.h>
++#include "env/fw_env.h"
++#define env_get fw_getenv
+ #else
+ #include <linux/compiler.h>
+ #include <linux/kconfig.h>
+ #include <common.h>
++#include <u-boot/crc.h>
+ #include <errno.h>
+ #include <mapmem.h>
+ #include <asm/io.h>
+@@ -24,11 +27,12 @@ DECLARE_GLOBAL_DATA_PTR;
+
+ #include <image.h>
+ #include <bootstage.h>
+-#include <u-boot/crc.h>
+ #include <u-boot/md5.h>
+ #include <u-boot/sha1.h>
+ #include <u-boot/sha256.h>
+ #include <u-boot/sha512.h>
++#include <linux/ctype.h>
++#include <amd-platforms.h>
+
+ /*****************************************************************************/
+ /* New uImage format routines */
+@@ -1784,6 +1788,21 @@ static const char *fit_get_image_type_property(int type)
+ 	return "unknown";
+ }
+
++uint32_t str2hex(const char *str)
++{
++	uint32_t val = 0;
++	char *str1 = strdup(str);
++	for (int i = 0; i < strlen(str1); i++) {
++		if (isxdigit(str1[i])) {
++			if (isdigit(str1[i])) str1[i] = str1[i] - '0';
++			else str1[i] = toupper(str1[i]) - 'A'+ DECIMAL_BASE;
++		}
++		val = (val * HEX_BASE) | (str1[i] & 0xF);
++	}
++	free(str1);
++	return val;
++}
++
+ int fit_image_load(bootm_headers_t *images, ulong addr,
+ 		   const char **fit_unamep, const char **fit_uname_configp,
+ 		   int arch, int image_type, int bootstage_id,
+@@ -1795,6 +1814,11 @@ int fit_image_load(bootm_headers_t *images, ulong addr,
+ 	const char *fit_base_uname_config;
+ 	const void *fit;
+ 	const void *buf;
++	const int conf_name_size = 64;
++	char *conf_name;
++	char *platform_id;
++	int board_id;
++
+ 	size_t size;
+ 	int type_ok, os_ok;
+ 	ulong load, data, len;
+@@ -1811,7 +1835,6 @@ int fit_image_load(bootm_headers_t *images, ulong addr,
+ 	fit_base_uname_config = NULL;
+ 	prop_name = fit_get_image_type_property(image_type);
+ 	printf("## Loading %s from FIT Image at %08lx ...\n", prop_name, addr);
+-
+ 	bootstage_mark(bootstage_id + BOOTSTAGE_SUB_FORMAT);
+ 	if (!fit_check_format(fit)) {
+ 		printf("Bad FIT %s image format!\n", prop_name);
+@@ -1833,6 +1856,82 @@ int fit_image_load(bootm_headers_t *images, ulong addr,
+ 		if (IMAGE_ENABLE_BEST_MATCH && !fit_uname_config) {
+ 			cfg_noffset = fit_conf_find_compat(fit, gd_fdt_blob());
+ 		} else {
++			fit_uname_config = (char *) malloc(conf_name_size);
++
++			// Reading board_id from ENV
++			platform_id = env_get("board_id");
++			// Convert bd_id string to integer
++			board_id = str2hex(platform_id);
++			// select the  device tree configuration based on board_id
++			switch (board_id)
++			{
++				/* SP5 Platforms  dts selection */
++				case ONYX_SLT:
++				case ONYX_1 ... ONYX_3:
++				case ONYX_FR4:
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-onyx.dtb");
++					break;
++				case QUARTZ_DAP:
++				case QUARTZ_1 ... QUARTZ_3:
++				case QUARTZ_FR4:
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-quartz.dtb");
++					break;
++				case RUBY_1 ... RUBY_3:
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-ruby.dtb");
++					break;
++				case TITANITE_1 ... TITANITE_6:
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-titanite.dtb");
++					break;
++
++				/* SH5 Platforms  dts selection */
++				case SH5_SIDLEY:
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-sidley.dtb");
++					break;
++				case SH5_PARRY_PEAK:
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-parrypeak.dtb");
++					break;
++				case SH5_1P_PWR ... SH5_1P_SLT:
++				case SH5_1P_OEM_P:
++				case SH5_2P_CABLED:
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-sh5d807.dtb");
++					break;
++
++				/* SP6 Platforms  dts selection */
++				case SUNSTONE:
++				case SUNSTONE_DAP:
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-sunstone.dtb");
++					break;
++				case SHALE_SLT:
++				case SHALE:
++				case SHALE_64:
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-shale.dtb");
++					break;
++				case CINNABAR:
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-cinnabar.dtb");
++					break;
++
++				/* Turin Platforms dts selection */
++				case CHALUPA:
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-chalupa.dtb");
++					break;
++				case HUAMBO:
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-huambo.dtb");
++					break;
++				case GALENA:
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-galena.dtb");
++					break;
++				case RECLUSE:
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-recluse.dtb");
++					break;
++				case PURICO:
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-purico.dtb");
++					break;
++
++				default :
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-quartz.dtb");
++					break;
++			} // switch
++
+ 			cfg_noffset = fit_conf_get_node(fit,
+ 							fit_uname_config);
+ 		}
+@@ -1842,7 +1941,6 @@ int fit_image_load(bootm_headers_t *images, ulong addr,
+ 					BOOTSTAGE_SUB_NO_UNIT_NAME);
+ 			return -ENOENT;
+ 		}
+-
+ 		fit_base_uname_config = fdt_get_name(fit, cfg_noffset, NULL);
+ 		printf("   Using '%s' configuration\n", fit_base_uname_config);
+ 		/* Remember this config */
+@@ -2064,7 +2162,6 @@ int boot_get_fdt_fit(bootm_headers_t *images, ulong addr,
+ 		if (next_config - 1 > fit_uname_config_copy)
+ 			fit_uname_config = fit_uname_config_copy;
+ 	}
+-
+ 	fdt_noffset = fit_image_load(images,
+ 		addr, &fit_uname, &fit_uname_config,
+ 		arch, IH_TYPE_FLATDT,
+diff --git a/tools/Makefile b/tools/Makefile
+index 81aa374a32..64e5c6230f 100644
+--- a/tools/Makefile
++++ b/tools/Makefile
+@@ -77,6 +77,9 @@ RSA_OBJS-$(CONFIG_FIT_SIGNATURE) := $(addprefix lib/rsa/, \
+
+ ROCKCHIP_OBS = lib/rc4.o rkcommon.o rkimage.o rksd.o rkspi.o
+
++ENV_OBJS = $(addprefix env/, fw_env.o ctype.o linux_string.o \
++				env_attr.o env_flags.o )
++
+ # common objs for dumpimage and mkimage
+ dumpimage-mkimage-objs := aisimage.o \
+ 			atmelimage.o \
+@@ -88,6 +91,7 @@ dumpimage-mkimage-objs := aisimage.o \
+ 			lib/fdtdec.o \
+ 			fit_common.o \
+ 			fit_image.o \
++			$(ENV_OBJS) \
+ 			common/image-fit.o \
+ 			image-host.o \
+ 			common/image.o \
+@@ -254,6 +258,7 @@ HOST_EXTRACFLAGS += -include $(srctree)/include/compiler.h \
+ 		$(patsubst -I%,-idirafter%, $(filter -I%, $(UBOOTINCLUDE))) \
+ 		-I$(srctree)/scripts/dtc/libfdt \
+ 		-I$(srctree)/tools \
++		-I$(srctree)/tools/env \
+ 		-DUSE_HOSTCC \
+ 		-D__KERNEL_STRICT_NAMES \
+ 		-D_GNU_SOURCE \
+--
+2.17.1
+

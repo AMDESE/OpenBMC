@@ -1,0 +1,280 @@
+From 6f3d394a5ad50619a376dc4ddf94c6be14c7b3a6 Mon Sep 17 00:00:00 2001
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Thu, 17 Nov 2022 10:43:08 -0600
+Subject: [PATCH 1/2] u-boot-sdk: add spi-nor MT25Q01G, set MAC addr, BMC Root
+ cause
+
+1. Due to bad raising timing, hold/reset pin feature should be disabled
+if quad mode is enabled. Otherwise, flash will be hold when command is
+send to flash.
+2. Added code to read the MAC address from the EEPROM and set the Net
+interfaces
+3. Ads support to read syscontrol reset status register to check if BMC
+booting after AC power on. Exports the boolean value in u-boot env var,
+so that dimm-info.service can Read DIMM SPD.
+
+Signed-off-by: Chin-Ting Kuo <chin-ting_kuo@aspeedtech.com>
+Signed-off-by: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ arch/arm/mach-aspeed/ast2600/scu_info.c |  6 ++
+ common/main.c                           | 13 +++++
+ drivers/mtd/spi/spi-nor-core.c          | 76 +++++++++++++++++++++++++
+ include/linux/mtd/spi-nor.h             |  3 +
+ net/eth-uclass.c                        | 33 ++++++++++-
+ 5 files changed, 130 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/mach-aspeed/ast2600/scu_info.c b/arch/arm/mach-aspeed/ast2600/scu_info.c
+index fe26f743c0..838b2b9588 100644
+--- a/arch/arm/mach-aspeed/ast2600/scu_info.c
++++ b/arch/arm/mach-aspeed/ast2600/scu_info.c
+@@ -12,6 +12,9 @@
+ /* SoC mapping Table */
+ #define SOC_ID(str, rev) { .name = str, .rev_id = rev, }
+
++/* Sys Scratch reg SCU1FC */
++#define ASPEED_SYS_SCRATCH_1FC 0x1e6e21fc
++
+ struct soc_id {
+ 	const char *name;
+ 	u64 rev_id;
+@@ -217,6 +220,9 @@ void aspeed_print_sysrst_info(void)
+ 	u32 rest = readl(ASPEED_SYS_RESET_CTRL);
+ 	u32 rest3 = readl(ASPEED_SYS_RESET_CTRL3);
+
++	/* Save ASPEED_SYS_RESET_CTRL value in scratch reg */
++	writel(rest, ASPEED_SYS_SCRATCH_1FC);
++
+ 	if (rest & SYS_PWR_RESET_FLAG) {
+ 		printf("RST: Power On \n");
+ 		writel(rest, ASPEED_SYS_RESET_CTRL);
+diff --git a/common/main.c b/common/main.c
+index 07b34bf2b0..1cc049b9b6 100644
+--- a/common/main.c
++++ b/common/main.c
+@@ -7,11 +7,16 @@
+ /* #define	DEBUG	*/
+
+ #include <common.h>
++#include <errno.h>
++#include <asm/io.h>
+ #include <autoboot.h>
+ #include <cli.h>
+ #include <console.h>
+ #include <version.h>
+
++/* Sys Scratch reg that holds sys_rst info */
++#define ASPEED_SYS_SCRATCH_1FC 0x1e6e21fc
++
+ /*
+  * Board-specific Platform code can reimplement show_boot_progress () if needed
+  */
+@@ -41,6 +46,7 @@ static void run_preboot_environment_command(void)
+ void main_loop(void)
+ {
+ 	const char *s;
++	u32 por_rst = readl(ASPEED_SYS_SCRATCH_1FC);
+
+ 	bootstage_mark_name(BOOTSTAGE_ID_MAIN_LOOP, "main_loop");
+
+@@ -54,6 +60,13 @@ void main_loop(void)
+ 	if (IS_ENABLED(CONFIG_UPDATE_TFTP))
+ 		update_tftp(0UL, NULL, NULL);
+
++	/* set reset reason env */
++	printf("Scratch register value: 0x%08x\n", por_rst);
++	if (por_rst & (u32)0x1)
++		env_set("por_rst", "true");
++	else
++		env_set("por_rst", "false");
++	env_save();
+ 	s = bootdelay_process();
+ 	if (cli_process_fdt(&s))
+ 		cli_secure_boot_cmd(s);
+diff --git a/drivers/mtd/spi/spi-nor-core.c b/drivers/mtd/spi/spi-nor-core.c
+index a8f5b61582..e1fe91712e 100644
+--- a/drivers/mtd/spi/spi-nor-core.c
++++ b/drivers/mtd/spi/spi-nor-core.c
+@@ -595,6 +595,78 @@ erase_err:
+ 	return ret;
+ }
+
++static int micron_read_nvcr(struct spi_nor *nor)
++{
++	int ret;
++	int val;
++
++	ret = nor->read_reg(nor, SPINOR_OP_MICRON_RDNVCR, (u8 *)&val, 2);
++	if (ret < 0) {
++		dev_err(nor->dev, "[Micron] error %d reading NVCR\n", ret);
++		return ret;
++	}
++
++	return val;
++}
++
++static int micron_write_nvcr(struct spi_nor *nor, int val)
++{
++	int ret;
++
++	write_enable(nor);
++
++	nor->cmd_buf[0] = val & 0xff;
++	nor->cmd_buf[1] = (val >> 8) & 0xff;
++
++	ret = nor->write_reg(nor, SPINOR_OP_MICRON_WRNVCR, nor->cmd_buf, 2);
++	if (ret < 0) {
++		dev_err(nor->dev,
++			"[Micron] error while writing configuration register\n");
++		return -EINVAL;
++	}
++
++	ret = spi_nor_wait_till_ready(nor);
++	if (ret) {
++		dev_err(nor->dev,
++			"[Micron] timeout while writing configuration register\n");
++		return ret;
++	}
++
++	return 0;
++}
++
++static int micron_read_cr_quad_enable(struct spi_nor *nor)
++{
++	int ret;
++
++	/* Check current Quad Enable bit value. */
++	ret = micron_read_nvcr(nor);
++	if (ret < 0) {
++		dev_err(dev, "[Micron] error while reading nonvolatile configuration register\n");
++		return -EINVAL;
++	}
++
++	if ((ret & MICRON_RST_HOLD_CTRL) == 0)
++		return 0;
++
++	ret &= ~MICRON_RST_HOLD_CTRL;
++
++	/* Keep the current value of the Status Register. */
++	ret = micron_write_nvcr(nor, ret);
++	if (ret < 0) {
++		dev_err(dev, "[Micron] error while writing nonvolatile configuration register\n");
++		return -EINVAL;
++	}
++
++	ret = micron_read_nvcr(nor);
++	if (ret > 0 && (ret & MICRON_RST_HOLD_CTRL)) {
++		dev_err(nor->dev, "[Micron] Quad bit not set\n");
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
+ #ifdef CONFIG_SPI_FLASH_SPANSION
+ /*
+  * Erase for Spansion/Cypress Flash devices that has overlaid 4KB sectors at
+@@ -2165,6 +2237,10 @@ static int spi_nor_init_params(struct spi_nor *nor,
+ 			}
+ #endif
+ 		}
++
++		/* need to disable hold/reset pin feature */
++		if (JEDEC_MFR(info) == SNOR_MFR_ST)
++			params->quad_enable = micron_read_cr_quad_enable;
+ 	}
+
+ 	return 0;
+diff --git a/include/linux/mtd/spi-nor.h b/include/linux/mtd/spi-nor.h
+index 8abaac65b0..0aab424ad6 100644
+--- a/include/linux/mtd/spi-nor.h
++++ b/include/linux/mtd/spi-nor.h
+@@ -115,6 +115,8 @@
+ /* Used for Micron flashes only. */
+ #define SPINOR_OP_RD_EVCR      0x65    /* Read EVCR register */
+ #define SPINOR_OP_WD_EVCR      0x61    /* Write EVCR register */
++#define SPINOR_OP_MICRON_RDNVCR 0xB5   /* Read nonvolatile configuration register */
++#define SPINOR_OP_MICRON_WRNVCR 0xB1   /* Write nonvolatile configuration register */
+
+ /* Status Register bits. */
+ #define SR_WIP			BIT(0)	/* Write in progress */
+@@ -133,6 +135,7 @@
+
+ /* Enhanced Volatile Configuration Register bits */
+ #define EVCR_QUAD_EN_MICRON	BIT(7)	/* Micron Quad I/O */
++#define MICRON_RST_HOLD_CTRL BIT(4)
+
+ /* Flag Status Register bits */
+ #define FSR_READY		BIT(7)	/* Device status, 0 = Busy, 1 = Ready */
+diff --git a/net/eth-uclass.c b/net/eth-uclass.c
+index a7f8792710..aa629b93c9 100644
+--- a/net/eth-uclass.c
++++ b/net/eth-uclass.c
+@@ -12,9 +12,14 @@
+ #include <dm/device-internal.h>
+ #include <dm/uclass-internal.h>
+ #include "eth_internal.h"
++#include <i2c.h>
+
+ DECLARE_GLOBAL_DATA_PTR;
+
++#define I2C_MAC_OFFSET1 0x8
++#define I2C_MAC_OFFSET2 0x10
++
++
+ /**
+  * struct eth_device_priv - private structure for each Ethernet device
+  *
+@@ -465,6 +470,7 @@ static int eth_post_probe(struct udevice *dev)
+ 	struct eth_device_priv *priv = dev->uclass_priv;
+ 	struct eth_pdata *pdata = dev->platdata;
+ 	unsigned char env_enetaddr[ARP_HLEN];
++	int ret;
+
+ #if defined(CONFIG_NEEDS_MANUAL_RELOC)
+ 	struct eth_ops *ops = eth_get_ops(dev);
+@@ -498,7 +504,31 @@ static int eth_post_probe(struct udevice *dev)
+ 	if (eth_get_ops(dev)->read_rom_hwaddr)
+ 		eth_get_ops(dev)->read_rom_hwaddr(dev);
+
+-	eth_env_get_enetaddr_by_index("eth", dev->seq, env_enetaddr);
++	if (!eth_env_get_enetaddr_by_index("eth", dev->seq, env_enetaddr)) {
++		i2c_set_bus_num(CONFIG_SYS_I2C_EEPROM_BUS);
++
++		if (dev->seq == 0) {
++			ret = i2c_read(CONFIG_SYS_I2C_EEPROM_ADDR, I2C_MAC_OFFSET1, CONFIG_SYS_I2C_EEPROM_ADDR_LEN, env_enetaddr, ARP_HLEN);
++		}
++		else if (dev->seq == 1) {
++			ret = i2c_read(CONFIG_SYS_I2C_EEPROM_ADDR, I2C_MAC_OFFSET2, CONFIG_SYS_I2C_EEPROM_ADDR_LEN, env_enetaddr, ARP_HLEN);
++		}
++		else {
++			printf("Warning: No MAC address on EEPROM for this interface\n");
++		}
++
++		if (ret < 0) {
++			printf("Error : Retrieving MAC from EEPROM Failed\n");
++		}
++		else {
++			if (is_valid_ethaddr(env_enetaddr)) {
++				eth_env_set_enetaddr_by_index("eth", dev->seq, env_enetaddr);
++				/* Once we have board ID env save working, we might not need to save here */
++				env_save();
++			}
++		}
++	}
++
+ 	if (!is_zero_ethaddr(env_enetaddr)) {
+ 		if (!is_zero_ethaddr(pdata->enetaddr) &&
+ 		    memcmp(pdata->enetaddr, env_enetaddr, ARP_HLEN)) {
+@@ -512,6 +542,7 @@ static int eth_post_probe(struct udevice *dev)
+
+ 		/* Override the ROM MAC address */
+ 		memcpy(pdata->enetaddr, env_enetaddr, ARP_HLEN);
++		printf("Using ENV MAC address: %pM\n", env_enetaddr);
+ 	} else if (is_valid_ethaddr(pdata->enetaddr)) {
+ 		eth_env_set_enetaddr_by_index("eth", dev->seq, pdata->enetaddr);
+ 		printf("\nWarning: %s using MAC address from ROM\n",
+--
+2.17.1
+
