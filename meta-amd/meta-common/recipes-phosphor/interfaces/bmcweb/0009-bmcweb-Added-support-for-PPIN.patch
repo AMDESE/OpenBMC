@@ -1,0 +1,35 @@
+From e1eeade3c982fdff7ec234d862dfbad8a897ff02 Mon Sep 17 00:00:00 2001
+From: Ashok Kumar <ashok2.kumar@amd.com>
+Date: Wed, 16 Nov 2022 09:38:30 -0600
+Subject: [PATCH] bmcweb: Added support for PPIN
+
+Added support for PPIN
+Fixes: Added support for PPIN
+
+Signed-off-by: Ashok Kumar <ashok2.kumar@amd.com>
+---
+ redfish-core/lib/processor.hpp | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/redfish-core/lib/processor.hpp b/redfish-core/lib/processor.hpp
+index 4bb99c69..00a5ceb9 100644
+--- a/redfish-core/lib/processor.hpp
++++ b/redfish-core/lib/processor.hpp
+@@ -202,7 +202,16 @@ inline void
+                        "0x" + *value;
+                 }
+             }
+-
++            else if (property.first == "PPIN")
++            {
++                const std::string* value =
++                    std::get_if<std::string>(&property.second);
++                if (value != nullptr)
++                {
++                    aResp->res.jsonValue["ProcessorId"]["ProtectedIdentificationNumber"] =
++                       *value;
++                }
++            }
+         }
+     }
+
