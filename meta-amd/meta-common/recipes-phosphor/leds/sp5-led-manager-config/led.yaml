@@ -1,0 +1,12 @@
+enclosure_fault:
+    fault:
+        Action: 'On'
+        DutyOn: 50
+        Period: 0
+        Priority: 'Blink'
+
+enclosure_identify:
+    identify:
+        Action: 'Blink'
+        DutyOn: 50
+        Period: 1000
