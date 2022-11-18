@@ -1,21 +1,26 @@
-From 1b8a5fe6c81530fa97cd69eecfcec14236c46a01 Mon Sep 17 00:00:00 2001
+From 5d032455b5eef5293d67fa7013d8518baa0cf1b3 Mon Sep 17 00:00:00 2001
 From: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
 Date: Tue, 10 May 2022 12:25:40 -0500
 Subject: [PATCH 1/1] amd-apml: Enable apml library with i3c
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
 
 Enables apml oob library with i3c.
 Copy of UAPI header file is copied to esmi_oob include folder to resolve
 compilation issues.
 Further set-apml.sh script is included as part of the scripts directory.
 
+Remove all platform dependent code from set-apml.sh
+Add new parameter to either bind or unbind drivers
+handle both I2C and I3C cases
+Add new I3C Mux set for Reg 0x0E for Titanite
+Require num_of_cpu from u-boot env
+
 Signed-off-by: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
 ---
- include/esmi_oob/amd-apml.h |  74 ++++++++++++++
+ include/esmi_oob/amd-apml.h |  74 +++++++++++++
  include/esmi_oob/apml.h     |   2 +-
- scripts/set-apml.sh         | 194 ++++++++++++++++++++++++++++++++++++
- 3 files changed, 269 insertions(+), 1 deletion(-)
+ scripts/set-apml.sh         | 212 ++++++++++++++++++++++++++++++++++++
+ 3 files changed, 287 insertions(+), 1 deletion(-)
  create mode 100644 include/esmi_oob/amd-apml.h
  create mode 100644 scripts/set-apml.sh
 
@@ -100,7 +105,7 @@ index 0000000..cb8f6b2
 +
 +#endif /*_AMD_APML_H_*/
 diff --git a/include/esmi_oob/apml.h b/include/esmi_oob/apml.h
-index 9f93eac..1ab0d2a 100644
+index c9154d7..f3f1a0c 100644
 --- a/include/esmi_oob/apml.h
 +++ b/include/esmi_oob/apml.h
 @@ -44,7 +44,7 @@
@@ -114,21 +119,27 @@ index 9f93eac..1ab0d2a 100644
  /** \file apml.h
 diff --git a/scripts/set-apml.sh b/scripts/set-apml.sh
 new file mode 100644
-index 0000000..e6a65cd
+index 0000000..5c9d7d9
 --- /dev/null
 +++ b/scripts/set-apml.sh
-@@ -0,0 +1,194 @@
+@@ -0,0 +1,212 @@
 +#!/bin/bash
 +
-+# Read board_id from u-boot env
-+board_id=`/sbin/fw_printenv -n board_id`
-+num_of_cpu=1
++num_of_cpu=`/sbin/fw_printenv -n num_of_cpu`
 +
 +# i2c BUS
 +DEV_I2C_2="/dev/i2c-2"
 +DEV_I2C_3="/dev/i2c-3"
 +I2C_BUS=2
 +I2C_MUX=0x70
++
++DEV_I2C_SBTSI_PATH="/sys/bus/i2c/drivers/sbtsi"
++DEV_I2C_SBTSI_2="4-22400000001"
++DEV_I2C_SBTSI_2="5-22400000001"
++
++DEV_I2C_SBRMI_PATH="/sys/bus/i2c/drivers/sbrmi"
++DEV_I2C_SBRMI_3="4-22400000002"
++DEV_I2C_SBRMI_3="5-22400000002"
 +
 +# i3c bus
 +I3C_TOOL="/usr/bin/i3ctransfer"
@@ -147,32 +158,6 @@ index 0000000..e6a65cd
 +DEV_I3C_SBRMI_4="4-22400000002"
 +DEV_I3C_SBRMI_5="5-22400000002"
 +
-+# check num of cpu
-+check_num_of_cpu()
-+{
-+    # If no board_id then set num of cpu to 2 socket
-+    case "$board_id" in
-+        "40" | "41" | "42")
-+            echo " Onyx 1 CPU"
-+            num_of_cpu=1
-+            ;;
-+        "46" | "47" | "48")
-+            echo " Ruby 1 CPU"
-+            num_of_cpu=1
-+            ;;
-+        "43" | "44" | "45")
-+            echo " Quartz 2 CPU"
-+            num_of_cpu=2
-+            ;;
-+        "49" | "4A" |"4a" | "4B" | "4b")
-+            echo " Titanite 2 CPU "
-+            num_of_cpu=2
-+            ;;
-+        *)
-+            num_of_cpu=2
-+            ;;
-+    esac
-+}
 +# Set i2c APML
 +set_i2c_apml()
 +{
@@ -240,6 +225,7 @@ index 0000000..e6a65cd
 +        sleep 1
 +    fi
 +    $I3C_TOOL -d $I3C_MUX_0 -w 0x46,0x00,0x01
++    $I3C_TOOL -d $I3C_MUX_0 -w 0x0E,0x00,0x24
 +    $I3C_TOOL -d $I3C_MUX_0 -w 0x40,0x00,0x40
 +    $I3C_TOOL -d $I3C_MUX_0 -w 0x41,0x00,0x40
 +
@@ -284,6 +270,7 @@ index 0000000..e6a65cd
 +            sleep 1
 +        fi
 +        $I3C_TOOL -d $I3C_MUX_1 -w 0x46,0x00,0x01
++        $I3C_TOOL -d $I3C_MUX_1 -w 0x0E,0x00,0x24
 +        $I3C_TOOL -d $I3C_MUX_1 -w 0x40,0x00,0x40
 +        $I3C_TOOL -d $I3C_MUX_1 -w 0x41,0x00,0x40
 +        # Unbind sbtsi driver
@@ -298,20 +285,56 @@ index 0000000..e6a65cd
 +    fi
 +}
 +
++# unbind i2c drivers
++unbind_i2c_drivers()
++{
++    # Unbind sbtsi and sbrmi drivers
++    echo  $DEV_I2C_SBTSI_2 > $DEV_I2C_SBTSI_PATH/unbind
++    echo  $DEV_I2C_SBRMI_2 > $DEV_I2C_SBRMI_PATH/unbind
++    if [[ $num_of_cpu == 2 ]]
++    then
++        echo  $DEV_I2C_SBTSI_3 > $DEV_I2C_SBTSI_PATH/unbind
++        echo  $DEV_I2C_SBRMI_3 > $DEV_I2C_SBRMI_PATH/unbind
++    fi
++}
++
++# unbind i3c drivers
++unbind_i3c_drivers()
++{
++    # Unbind sbtsi and sbrmi drivers
++    echo  $DEV_I3C_SBTSI_4 > $DEV_I3C_SBTSI_PATH/unbind
++    echo  $DEV_I3C_SBRMI_4 > $DEV_I3C_SBRMI_PATH/unbind
++    if [[ $num_of_cpu == 2 ]]
++    then
++        echo  $DEV_I3C_SBTSI_5 > $DEV_I3C_SBTSI_PATH/unbind
++        echo  $DEV_I3C_SBRMI_5 > $DEV_I3C_SBRMI_PATH/unbind
++    fi
++}
 +
 +# Main()
 +#---------
 +
 +# check num of cpu
-+check_num_of_cpu
++echo "Num of CPU " $num_of_cpu
 +
-+# check for i2c vs i3c
-+if [ -a "$DEV_I2C_2" ]
++if [ $1 == "bind" ]
 +then
-+    set_i2c_apml
++    echo "Bind Drivers"
++    if [ -a "$DEV_I2C_2" ]
++    then
++        set_i2c_apml
++    else
++        set_i3c_apml
++    fi
 +else
-+    set_i3c_apml
++    echo "Unbind Drivers"
++    if [ -a "$DEV_I2C_2" ]
++    then
++        unbind_i2c_drivers
++    else
++        unbind_i3c_drivers
++    fi
 +fi
 --
-2.17.1
+2.25.1
 
