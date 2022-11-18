@@ -1,7 +1,0 @@
-[Unit]
-Description=Flash HPM FPGA image %I to HPM FPGA SPI flash
-
-[Service]
-Type=oneshot
-RemainAfterExit=no
-ExecStart=/usr/sbin/hpm-fpga-update.sh /tmp/images/%i

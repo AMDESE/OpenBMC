@@ -1,7 +1,0 @@
-[Unit]
-Description=Flash VR image %I to VR
-
-[Service]
-Type=oneshot
-RemainAfterExit=no
-ExecStart=/usr/sbin/vr-update.sh /tmp/images/%i

@@ -1,7 +1,0 @@
-[Unit]
-Description=Flash %I Retimer firmware 
-
-[Service]
-Type=oneshot
-RemainAfterExit=no
-ExecStart=/usr/sbin/retimer-update.sh /tmp/images/%i
