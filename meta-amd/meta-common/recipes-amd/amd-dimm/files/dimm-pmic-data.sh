@@ -1,33 +1,10 @@
 #!/bin/bash
 
-# Read board_id from u-boot env
-board_id=`/sbin/fw_printenv -n board_id`
+# Read number of CPU from u-boot env
+num_of_cpu=`/sbin/fw_printenv -n num_of_cpu`
+dimm_per_bus=`/sbin/fw_printenv -n dimm_per_bus`
 I3C_TOOL="/usr/bin/i3ctransfer"
-LOG_DIR="/home/root"
-num_of_cpu=1
-
-# If no board_id then set num of cpu to 2 socket
-case "$board_id" in
-    "3d" | "3D" | "40" | "41" | "42" | "52")
-        echo " Onyx 1 CPU"
-        num_of_cpu=1
-        ;;
-    "46" | "47" | "48")
-        echo " Ruby 1 CPU"
-        num_of_cpu=1
-        ;;
-    "3e" | "3E" | "43" | "44" | "45" | "51")
-        echo " Quartz 2 CPU"
-        num_of_cpu=2
-        ;;
-    "49" | "4A" | "4a" | "4B" | "4b" | "4C" |"4c" | "4D" | "4d" | "4E" | "4e")
-        echo " Titanite 2 CPU "
-        num_of_cpu=2
-        ;;
-    *)
-        num_of_cpu=2
-        ;;
-esac
+LOG_DIR="/var/lib/dimm"
 
 # assume BMC has access to I3C
 i3cid=0
@@ -35,8 +12,8 @@ sock_id=0
 channel=0
 
 #move DIMM pmic info files from prev read
-mv ${LOG_DIR}/pmic_info ${LOG_DIR}/pmic_info.sav
-pmic_info="${LOG_DIR}/pmic_info"
+mv ${LOG_DIR}/pmic_info.txt ${LOG_DIR}/pmic_info.sav
+pmic_info="${LOG_DIR}/pmic_info.txt"
 
 # read and process DIMM PMIC Regs
 while [[ $sock_id < $num_of_cpu ]]
@@ -49,11 +26,11 @@ do
         then
             # No DIMMs on this I3C bus
             (( i3cid += 1))
-            (( channel += 6 ))
+            (( channel += dimm_per_bus ))
             continue
         fi
 
-        for dimm in {0..5}
+        for (( dimm=0; dimm<dimm_per_bus; dimm++ ))
         do
             # Driver generated I3C name for this dimm
             pmic_name="/dev/i3c-${i3cid}-2040000000${dimm}"
@@ -75,10 +52,10 @@ do
             id=$(( channel + dimm ))
             reg="${LOG_DIR}/P${sock_id}_dimm${id}_pmic_temp"
 
-	    # Read PMIC Register 0x3B (Rev)
+            # Read PMIC Register 0x3B (Rev)
             temp1="$($I3C_TOOL -d ${pmic_name} -w 0x3b -r 1 | grep 0x)"
-	    printf 'R35 (Rev) = %s \n' ${temp1}
-	    printf 'R35 (Rev) = %s \n' ${temp1} >> $pmic_info
+            printf 'R35 (Rev) = %s \n' ${temp1}
+            printf 'R35 (Rev) = %s \n' ${temp1} >> $pmic_info
 
             # Read PMIC Register 0x04
             temp1="$($I3C_TOOL -d ${pmic_name} -w 0x04 -r 1 | grep 0x)"

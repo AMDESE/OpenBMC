@@ -1,47 +1,10 @@
 #!/bin/bash
 
-# Read board_id from u-boot env
-board_id=`/sbin/fw_printenv -n board_id`
+# Read num of cpu from u-boot env
+num_of_cpu=`/sbin/fw_printenv -n num_of_cpu`
+dimm_per_bus=`/sbin/fw_printenv -n dimm_per_bus`
 I3C_TOOL="/usr/bin/i3ctransfer"
-LOG_DIR="/home/root/DIMM_SPD"
-num_of_cpu=1
-
-# If no board_id then set num of cpu to 2 socket
-case "$board_id" in
-    "68")
-        echo " Galena 1 CPU"
-        num_of_cpu=1
-        ;;
-    "69")
-        echo " Recluse 1 CPU"
-        num_of_cpu=1
-        ;;
-    "6A" | "6a")
-        echo " Purico 1 CPU"
-        num_of_cpu=2
-        ;;
-    "66")
-        echo " Chalupa 2 CPU"
-        num_of_cpu=2
-        ;;
-    "67")
-        echo " Huambo 2 CPU "
-        num_of_cpu=2
-        ;;
-    *)
-        echo " Unknown 2 CPU "
-        num_of_cpu=2
-        ;;
-esac
-
-# <TBD>
-# Set BMC GPIO for I3C access
-# Currently Hawaii doesn't have any GPIOs defined for this
-# and Onyx has P0_SPD_HOST_CTRL GPIO which tells whether
-# platform fw is has the bus or not.
-# Ideally default behavior should be: whenever host power is
-# off, BMC should have I3C access without setting any GPIOs.
-# <TBD>
+LOG_DIR="/var/lib/dimm/DIMM_SPD"
 
 # BMC has access to I3C - Read DIMM SPDs
 i3cid=0
@@ -68,11 +31,11 @@ do
         then
             # No DIMMs on this I3C bus
             (( i3cid += 1))
-            (( channel += 6 ))
+            (( channel += dimm_per_bus ))
             continue
         fi
 
-        for dimm in {0..5}
+        for (( dimm=0; dimm<dimm_per_bus; dimm++ ))
         do
             # Driver generated I3C name for this dimm
             dev_name="/dev/i3c-${i3cid}-3c00000000${dimm}"
@@ -112,8 +75,3 @@ do
     (( sock_id += 1 ))
 
 done # END of num_of_cpu loop
-
-# <TBD>
-# If BMC set any GPIO for I3C access then
-# release it here
-# <TBD>
