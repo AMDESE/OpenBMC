@@ -1,9 +1,0 @@
-[Match]
-Name=eth0
-[Network]
-DHCP=true
-LinkLocalAddressing=yes
-IPv6AcceptRA=true
-[DHCP]
-ClientIdentifier=mac
-CriticalConnection=true
