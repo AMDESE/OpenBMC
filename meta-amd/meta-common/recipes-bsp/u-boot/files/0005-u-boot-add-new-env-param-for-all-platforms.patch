@@ -1,0 +1,178 @@
+From 015633da38c8f7e11d0561016178f4f658968152 Mon Sep 17 00:00:00 2001
+From: Mohsen Dolaty <mohsen.dolaty@amd.com>
+Date: Tue, 29 Nov 2022 13:06:56 -0600
+Subject: [PATCH 1/1] u-boot: add new env param for all platforms
+
+Add num_of_cpu (1 or 2)
+Add dimm_per_ch (1 or 2)
+Add dimm_per_bus (3 or 6)
+Add new Turin platforms
+
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
+---
+ common/image-fit.c | 12 ++++++++++-
+ common/main.c      | 50 +++++++++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 58 insertions(+), 4 deletions(-)
+
+diff --git a/common/image-fit.c b/common/image-fit.c
+index 5ef75a8f1a..f4208da863 100644
+--- a/common/image-fit.c
++++ b/common/image-fit.c
+@@ -1912,21 +1912,31 @@ int fit_image_load(bootm_headers_t *images, ulong addr,
+
+ 				/* Turin Platforms dts selection */
+ 				case CHALUPA:
++				case CHALUPA_1:
++				case CHALUPA_2:
+ 					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-chalupa.dtb");
+ 					break;
+ 				case HUAMBO:
+ 					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-huambo.dtb");
+ 					break;
+ 				case GALENA:
++				case GALENA_1:
++				case GALENA_2:
+ 					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-galena.dtb");
+ 					break;
+ 				case RECLUSE:
+ 					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-recluse.dtb");
+ 					break;
+ 				case PURICO:
++				case PURICO_1:
++				case PURICO_2:
+ 					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-purico.dtb");
+ 					break;
+-
++				case VOLCANO:
++				case VOLCANO_1:
++				case VOLCANO_2:
++					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-volcano.dtb");
++					break;
+ 				default :
+ 					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-quartz.dtb");
+ 					break;
+diff --git a/common/main.c b/common/main.c
+index 99ad609834..665083e8b3 100644
+--- a/common/main.c
++++ b/common/main.c
+@@ -18,6 +18,14 @@
+ #include <string.h>
+ #include <amd-platforms.h>
+
++#define ONE_SOCKET_CONFIG  1
++#define TWO_SOCKET_CONFIG  2
++#define ONE_DIMM_PER_CH    1
++#define TWO_DIMM_PER_CH    2
++#define THREE_DIMM_PER_BUS 3
++#define SIX_DIMM_PER_BUS   6
++#define TMP_BUF_LEN        8
++
+ /*
+  * Board-specific Platform code can reimplement show_boot_progress () if needed
+  */
+@@ -34,7 +42,11 @@ void set_hostname()
+ 	char hostname[HOSTNAME_BUFF_LEN];
+ 	char *cur_bootargs;
+ 	char new_bootargs[CMD_BOOT_ARGS_BUFF_LEN];
++	char tmp[TMP_BUF_LEN];
+ 	int octate_5, octate_6;
++	int num_of_cpu   = ONE_SOCKET_CONFIG;
++	int dimm_per_ch  = ONE_DIMM_PER_CH;
++	int dimm_per_bus = SIX_DIMM_PER_BUS;
+
+ 	/*  Read Kernel cmd line args */
+ 	cur_bootargs =  env_get("bootargs");
+@@ -64,12 +76,15 @@ void set_hostname()
+ 				case QUARTZ_FR4:
+ 				case QUARTZ_1 ... QUARTZ_3:
+ 					sprintf(hostname, "quartz-%02x%02x", octate_5, octate_6);
++					num_of_cpu = TWO_SOCKET_CONFIG;
+ 					break;
+ 				case RUBY_1 ... RUBY_3:
+ 					sprintf(hostname, "ruby-%02x%02x", octate_5, octate_6);
++					dimm_per_ch = TWO_DIMM_PER_CH;
+ 					break;
+ 				case TITANITE_1 ... TITANITE_6:
+ 					sprintf(hostname, "titanite-%02x%02x", octate_5, octate_6);
++					num_of_cpu = TWO_SOCKET_CONFIG;
+ 					break;
+
+ 				// SH5 Platforms
+@@ -89,43 +104,72 @@ void set_hostname()
+ 				case SUNSTONE:
+ 				case SUNSTONE_DAP:
+ 					sprintf(hostname, "sunstone-%02x%02x", octate_5, octate_6);
++					dimm_per_bus = THREE_DIMM_PER_BUS;
++					dimm_per_ch  = TWO_DIMM_PER_CH;
+ 					break;
+ 				case SHALE:
+ 				case SHALE_SLT:
+-					sprintf(hostname, "shale-%02x%02x", octate_5, octate_6);
+-					break;
+ 				case SHALE_64:
+ 					sprintf(hostname, "shale-%02x%02x", octate_5, octate_6);
++					dimm_per_bus = THREE_DIMM_PER_BUS;
+ 					break;
+ 				case CINNABAR:
+ 					sprintf(hostname, "cinnabar-%02x%02x", octate_5, octate_6);
++					dimm_per_bus = THREE_DIMM_PER_BUS;
++					dimm_per_ch  = TWO_DIMM_PER_CH;
+ 					break;
+-
+ 				// Turin Platforms
+ 				case CHALUPA:
++				case CHALUPA_1:
++				case CHALUPA_2:
+ 					sprintf(hostname, "chalupa-%02x%02x", octate_5, octate_6);
++					num_of_cpu = TWO_SOCKET_CONFIG;
+ 					break;
+ 				case HUAMBO:
+ 					sprintf(hostname, "huambo-%02x%02x", octate_5, octate_6);
++					num_of_cpu = TWO_SOCKET_CONFIG;
+ 					break;
+ 				case GALENA:
++				case GALENA_1:
++				case GALENA_2:
+ 					sprintf(hostname, "galena-%02x%02x", octate_5, octate_6);
+ 					break;
+ 				case RECLUSE:
+ 					sprintf(hostname, "recluse-%02x%02x", octate_5, octate_6);
+ 					break;
+ 				case PURICO:
++				case PURICO_1:
++				case PURICO_2:
+ 					sprintf(hostname, "purico-%02x%02x", octate_5, octate_6);
++					dimm_per_ch = TWO_DIMM_PER_CH;
++					break;
++				case VOLCANO:
++				case VOLCANO_1:
++				case VOLCANO_2:
++					sprintf(hostname, "volcano-%02x%02x", octate_5, octate_6);
++					num_of_cpu = TWO_SOCKET_CONFIG;
+ 					break;
+
+ 				default:
+ 					sprintf(hostname, "hawaii-%02x%02x", octate_5, octate_6);
+ 					break;
+ 			}
++
+ 			/* Append bootargs with hostname */
+ 			sprintf(new_bootargs, "%s systemd.hostname=%s", cur_bootargs, hostname);
+ 			env_set("bootargs", new_bootargs);
++
++			sprintf(tmp, "%d",num_of_cpu);
++			env_set("num_of_cpu", tmp);
++
++			sprintf(tmp, "%d",dimm_per_ch);
++			env_set("dimm_per_ch", tmp);
++
++			sprintf(tmp, "%d",dimm_per_bus);
++			env_set("dimm_per_bus", tmp);
++
+ 			env_save();
++
+ 			printf("Hostname set to '%s'\n", hostname);
+ 		}
+ 		else
+--
+2.25.1
