@@ -1,5 +1,5 @@
 {
-    "version" : "AMD-Onyx-Stepwise-v01",
+    "version" : "AMD-Purico-Stepwise-v01",
     "sensors" : [
         {
             "name": "Chassis_Fan1",
@@ -30,110 +30,6 @@
             "type": "fan",
             "readPath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan4",
             "writePath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan4",
-            "min": 0,
-            "max": 255
-        },
-        {
-            "name": "Chassis_Fan5",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan5",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan5",
-            "min": 0,
-            "max": 255
-        },
-        {
-            "name": "Chassis_Fan6",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan6",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan6",
-            "min": 0,
-            "max": 255
-        },
-        {
-            "name": "Chassis_Fan7",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan7",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan7",
-            "min": 0,
-            "max": 255
-        },
-        {
-            "name": "Chassis_Fan8",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan8",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan8",
-            "min": 0,
-            "max": 255
-        },
-        {
-            "name": "Chassis_Fan9",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan9",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan9",
-            "min": 0,
-            "max": 255
-        },
-        {
-            "name": "Chassis_Fan10",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan10",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan10",
-            "min": 0,
-            "max": 255
-        },
-        {
-            "name": "P0_CPU_Fan",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/P0_CPU_Fan",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/P0_CPU_Fan",
-            "min": 0,
-            "max": 255
-        },
-        {
-            "name": "North_VR_Fan1",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/North_VR_Fan1",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/North_VR_Fan1",
-            "min": 0,
-            "max": 255
-        },
-        {
-            "name": "North_VR_Fan2",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/North_VR_Fan2",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/North_VR_Fan2",
-            "min": 0,
-            "max": 255
-        },
-        {
-            "name": "P0_GL_DIMM_Fan",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/P0_GL_DIMM_Fan",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/P0_GL_DIMM_Fan",
-            "min":0,
-            "max": 255
-        },
-        {
-            "name": "South_VR_Fan1",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/South_VR_Fan1",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/South_VR_Fan1",
-            "min": 0,
-            "max": 255
-        },
-        {
-            "name": "South_VR_Fan2",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/South_VR_Fan2",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/South_VR_Fan2",
-            "min": 0,
-            "max": 255
-        },
-        {
-            "name": "P0_AF_DIMM_Fan",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/P0_AF_DIMM_Fan",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/P0_AF_DIMM_Fan",
             "min": 0,
             "max": 255
         },
@@ -237,25 +133,12 @@
             "failsafePercent": 30.0,
             "pids": [
                 {
-                    "name": "Chassis_Fan1-17",
+                    "name": "Chassis_Fan1-4",
                     "type": "fan",
                     "inputs": ["Chassis_Fan1",
                                "Chassis_Fan2",
                                "Chassis_Fan3",
-                               "Chassis_Fan4",
-                               "Chassis_Fan5",
-                               "Chassis_Fan6",
-                               "Chassis_Fan7",
-                               "Chassis_Fan8",
-                               "Chassis_Fan9",
-                               "Chassis_Fan10",
-                               "P0_CPU_Fan",
-                               "North_VR_Fan1",
-                               "North_VR_Fan2",
-                               "P0_GL_DIMM_Fan",
-                               "South_VR_Fan1",
-                               "South_VR_Fan2",
-                               "P0_AF_DIMM_Fan"],
+                               "Chassis_Fan4"],
                     "setpoint": 20.0,
                     "pid": {
                         "samplePeriod": 1.0,

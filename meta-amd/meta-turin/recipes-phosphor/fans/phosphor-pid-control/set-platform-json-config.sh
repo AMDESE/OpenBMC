@@ -13,19 +13,25 @@ boardID=`fw_printenv board_id | sed -n "s/^board_id=//p"`
 
 # Set soflink for platform dependent config.json file
 case $boardID in
-   "3D"|"40"|"41"|"42"|"52")  # Onyx board_ids
-        ln -s /usr/share/swampd/onyx-stepwise-config.json /usr/share/swampd/config.json
+   "68"|"70"|"71")  # Galena board_ids
+        ln -s /usr/share/swampd/galena-stepwise-config.json /usr/share/swampd/config.json
    ;;
-   "3E"|"43"|"44"|"45"|"51")  # Quartz board_ids
-        ln -s /usr/share/swampd/quartz-stepwise-config.json /usr/share/swampd/config.json
+   "69")  # Recluse board_ids
+        ln -s /usr/share/swampd/recluse-stepwise-config.json /usr/share/swampd/config.json
    ;;
-   "46"|"47"|"48")  # Ruby board_ids
-        ln -s /usr/share/swampd/ruby-stepwise-config.json /usr/share/swampd/config.json
+   "66"|"6E"|"6F")  # Chalupa board_ids
+        ln -s /usr/share/swampd/chalupa-stepwise-config.json /usr/share/swampd/config.json
    ;;
-   "49"|"4A"|"4B"|"4C"|"4D"|"4E"|"4F")  # Titanite board_ids
-        ln -s /usr/share/swampd/titanite-stepwise-config.json /usr/share/swampd/config.json
+   "6A"|"72"|"73")  # Purico board_ids
+        ln -s /usr/share/swampd/purico-stepwise-config.json /usr/share/swampd/config.json
    ;;
-   *)  # Default set to Quartz board, as it have most fans connected
-        ln -s /usr/share/swampd/quartz-stepwise-config.json /usr/share/swampd/config.json
+   "6B"|"74"|"75")  # Volcano board_ids
+        ln -s /usr/share/swampd/volcano-stepwise-config.json /usr/share/swampd/config.json
+   ;;
+   "67")  # Huambo board_ids
+        ln -s /usr/share/swampd/huambo-stepwise-config.json /usr/share/swampd/config.json
+   ;;
+   *)  # Default set to Chalupa board, as it have most fans connected
+        ln -s /usr/share/swampd/chalupa-stepwise-config.json /usr/share/swampd/config.json
 esac
 

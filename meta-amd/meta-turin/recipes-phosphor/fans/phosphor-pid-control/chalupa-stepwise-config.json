@@ -1,5 +1,5 @@
 {
-    "version" : "AMD-Quartz-Stepwise-v01",
+    "version" : "AMD-Chalupa-Stepwise-v01",
     "sensors" : [
         {
             "name": "Chassis_Fan1",
