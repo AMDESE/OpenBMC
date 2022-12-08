@@ -1,0 +1,28 @@
+From c35fe2f8e03dd1b0a86352dbbd4c28c9c53e54ee Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Thu, 8 Dec 2022 00:46:41 -0600
+Subject: [PATCH] Route io1 to uart1
+
+io1 is routed to uart10 on some platforms during
+power-on. overriding power-on defaults
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+---
+ conf/obmc-console@.service.in | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/conf/obmc-console@.service.in b/conf/obmc-console@.service.in
+index c6cd1b4..6a9d6d9 100644
+--- a/conf/obmc-console@.service.in
++++ b/conf/obmc-console@.service.in
+@@ -3,6 +3,10 @@ Description=%i Console Server
+ ConditionPathExists=/etc/obmc-console/server.%i.conf
+
+ [Service]
++ExecStartPre=/bin/sh -c 'echo -n uart10 > /sys/bus/platform/drivers/aspeed-uart-routing/1e789098.uart_routing/io3'
++ExecStartPre=/bin/sh -c 'echo -n io3 > /sys/bus/platform/drivers/aspeed-uart-routing/1e789098.uart_routing/uart10'
++ExecStartPre=/bin/sh -c 'echo -n uart1 > /sys/bus/platform/drivers/aspeed-uart-routing/1e789098.uart_routing/io1'
++ExecStartPre=/bin/sh -c 'echo -n io1 > /sys/bus/platform/drivers/aspeed-uart-routing/1e789098.uart_routing/uart1'
+ # Instance ID is the VUART basename
+ ExecStart=/usr/sbin/obmc-console-server --config /etc/obmc-console/server.%i.conf %i
+ SyslogIdentifier=%i-console-server
