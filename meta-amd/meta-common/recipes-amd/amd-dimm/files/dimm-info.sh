@@ -6,6 +6,7 @@ num_of_cpu=`/sbin/fw_printenv -n num_of_cpu`
 dimm_per_ch=`/sbin/fw_printenv -n dimm_per_ch`
 dimm_per_bus=`/sbin/fw_printenv -n dimm_per_bus`
 por_rst=`/sbin/fw_printenv -n por_rst`
+max_loop_cnt=1
 I3C_TOOL="/usr/bin/i3ctransfer"
 LOG_DIR="/var/lib/dimm"
 dimm_sh="${LOG_DIR}/dimm.sh"
@@ -21,8 +22,13 @@ power_status() {
         fi
 }
 
+if [ $num_of_cpu == 2 ];then
+    max_loop_cnt=2
+fi
+
 if [ $dimm_per_ch == 2 ];then
     dpc2="true"
+    max_loop_cnt=2
 else
     dpc2="false"
 fi
@@ -74,7 +80,7 @@ rm $dimm_info
 echo "#!/bin/bash" >> $dimm_sh
 chmod 777 $dimm_sh
 
-while [[ $sock_id < $num_of_cpu ]]
+while [[ $sock_id < $max_loop_cnt ]]
 do
     for i3c_bus_per_soc in 1 2
     do
