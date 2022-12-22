@@ -30,18 +30,15 @@ CHIPS_ONYX = " \
 
 # SH5D807 specific sensors
 CHIPS_SH5D807 = " \
-        bus@1e78a000/i2c-bus@280/vdd_33_run@13 \
-        bus@1e78a000/i2c-bus@280/vdd_33_dual@14 \
-        bus@1e78a000/i2c-bus@280/vdd_5_dual@15 \
-        bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/vdd_io_e32@3f \
-        bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/vdd_33_s5@36 \
-        bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/vddcr_socio_a@3c \
-        bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/vddcr_socio_c@41 \
-        bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/vddio_hbm_b@44 \
-        bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@1/vdd_18@33 \
-        bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@1/vdd_18_s5@39 \
-        bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@1/vddio_hbm_d@47 \
-        bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@1/vdd_075_usr@4a \
+        bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/vddcr_soc@36 \
+        bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/vddcr_vdd0@3f \
+        bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/vddcr_vdd3@3c \
+        bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/vddcr_11_hbm_b@41 \
+        bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/vdd_075_hbm_b@44 \
+        bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@1/vddcr_vdd1@33 \
+        bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@1/vddcr_vdd2@39 \
+        bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@1/vddcr_11_hbm_d@47 \
+        bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@1/vdd_075_hbm_d@4a \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@0/emc2305@4d \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@1/emc2305@4d \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@2/emc2305@4d \
