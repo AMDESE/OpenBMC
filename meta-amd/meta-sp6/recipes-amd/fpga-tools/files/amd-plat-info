@@ -13,20 +13,17 @@ function get_board_info ()
     # Read Board ID from u-boot env
     boardID=`fw_printenv board_id | sed -n "s/^board_id=//p"`
     case $boardID in
-       "3D"|"40"|"41"|"42"|"52")  # Onyx board_ids
-            name="onyx"
+       "61"|"64")  # Sunstone board_ids
+            name="sunstone"
        ;;
-       "3E"|"43"|"44"|"45"|"51")  # Quartz board_ids
-            name="quartz"
+       "63")  # Cinnabar board_ids
+            name="cinnabar"
        ;;
-       "46"|"47"|"48")  # Ruby board_ids
-            name="ruby"
-       ;;
-       "49"|"4A"|"4B"|"4C"|"4D"|"4E"|"4F")  # Titanite board_ids
-            name="titanite"
+       "59"|"62"|"65")  # Shale board_ids
+            name="shale"
        ;;
        *)  # Default
-            name="sp5"
+            name="sp6"
     esac
     if [ "$1" == "name" ]; then
         echo -ne $name
@@ -44,7 +41,7 @@ function get_hpm_fpga_ver()
 {
     local plat
     plat=$(get_board_info name)
-    if [ "$plat" == "onyx" ]; then
+    if [ "$plat" == "cinnabar" ] || [ "$plat" == "sunstone" ] || [ "$plat" == "shale" ]; then
         MAJOR=$(read_reg 0 0x50 3)
         MINOR=$(read_reg 0 0x50 4)
         REV=$(printf "\x$(printf %x $(read_reg 0 0x50 5))")
@@ -54,12 +51,7 @@ function get_hpm_fpga_ver()
             echo -ne $MAJOR.$MINOR.$REV
         fi
     fi
-    if [ "$plat" == "titanite" ]; then
-        MAJOR=$(printf "%X" $(read_reg 0 0x20 0))
-        MINOR=$(read_reg 0 0x20 1)
-        echo -ne $MAJOR.$MINOR
-    fi
-    if [ "$plat" == "ruby" ] || [ "$plat" == "quartz" ] || [ "$plat" == "sp5" ]; then
+    if [ "$plat" == "sp6" ]; then
         echo -ne Unknown
     fi
 }

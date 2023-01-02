@@ -1,0 +1,49 @@
+#!/bin/sh
+I2CBUS=0
+FPGAADDR=0x50
+
+function read_reg()
+{
+        local FPGA_REG=$1
+        local DATA=$(i2cget -y $I2CBUS $FPGAADDR $(printf "0x%x" $FPGA_REG))
+        echo -ne $((DATA))
+}
+
+if [ $# -eq 1 ] ; then
+case $1 in
+  LOM)
+        i2cset -y $I2CBUS $FPGAADDR 0x20 0x00
+        ;;
+  OCP)
+        i2cset -y $I2CBUS $FPGAADDR 0x20 0x01
+        echo OCP 3.0
+        ;;
+  NIC)
+        i2cset -y $I2CBUS $FPGAADDR 0x20 0x02
+        ;;
+  *)
+        echo "Invalid Mode"
+        echo "(Available options: LOM | OCP | NIC)"
+        ;;
+esac
+
+fi
+
+data=$(read_reg 0x20)
+echo -ne "Current NIC mode: "
+case $data in
+  0)
+        echo LOM
+        ;;
+  1)
+        echo OCP 3.0
+        ;;
+  2)
+        echo NIC
+        ;;
+  *)
+        echo Invalid Mode
+        ;;
+esac
+
+exit 0

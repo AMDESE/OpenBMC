@@ -43,8 +43,8 @@ printf "Magic Byte: $(printf %x $(read_reg 0))\n"
 # Board ID
 echo "Board ID: $(read_reg 1)"
 
-if [ $(read_reg 1) -ne 1 ] ; then
-        echo "FPGA Board ID is not Onyx"
+if [ $(read_reg 1) -ne 99 ] ; then  # hex ID 0x63
+        echo "FPGA Board ID is not Cinnabar"
         exit 1
 fi
 
@@ -302,4 +302,23 @@ signal_status SCM_I2C_ALERT_L_2      $data 0x02 1 U
 signal_status SCM_I2C_ALERT_L_1      $data 0x01 0 U
 printf "\n"
 
+# GPIO Bus 0
+data=$(read_reg 0x20)
+echo -e "     GPIO Bus 0             Default\tCurrent"
+echo -e "    ----------------        -------\t-------"
+echo -ne "NIC Mode                    LOM   \t"
+case $data in
+  0)
+	echo LOM
+	;;
+  1)
+	echo OCP 3.0
+	;;
+  2)
+	echo Smart NIC
+	;;
+  *)
+	echo Invalid Mode
+	;;
+esac
 exit 0
