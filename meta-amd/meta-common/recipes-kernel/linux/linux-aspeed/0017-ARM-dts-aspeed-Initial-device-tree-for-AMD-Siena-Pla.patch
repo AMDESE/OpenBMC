@@ -46,7 +46,7 @@ new file mode 100644
 index 000000000000..bce94407c975
 --- /dev/null
 +++ b/arch/arm/boot/dts/aspeed-bmc-amd-cinnabar.dts
-@@ -0,0 +1,827 @@
+@@ -0,0 +1,831 @@
 +// SPDX-License-Identifier: GPL-2.0
 +// Copyright (c) 2022 AMD Inc.
 +// Author: Ashok Kumar <ashok2.kumar@amd.com>
@@ -872,6 +872,10 @@ index 000000000000..bce94407c975
 +
 +// eSPI Virtual UART - 0x3F8
 +&vuart1 {
++	status = "okay";
++};
++
++&chassis {
 +	status = "okay";
 +};
 diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-shale.dts b/arch/arm/boot/dts/aspeed-bmc-amd-shale.dts
