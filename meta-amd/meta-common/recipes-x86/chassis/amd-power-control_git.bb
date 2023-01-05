@@ -18,6 +18,7 @@ SYSTEMD_SERVICE_${PN} += "xyz.openbmc_project.Chassis.Control.Power.service \
                          chassis-system-reset.service \
                          chassis-system-reset.target"
 
+TARGET_LDFLAGS = " -lpthread"
 DEPENDS += " \
     boost \
     libgpiod \
