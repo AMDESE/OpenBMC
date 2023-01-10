@@ -46,7 +46,7 @@ new file mode 100644
 index 000000000000..bce94407c975
 --- /dev/null
 +++ b/arch/arm/boot/dts/aspeed-bmc-amd-cinnabar.dts
-@@ -0,0 +1,831 @@
+@@ -0,0 +1,835 @@
 +// SPDX-License-Identifier: GPL-2.0
 +// Copyright (c) 2022 AMD Inc.
 +// Author: Ashok Kumar <ashok2.kumar@amd.com>
@@ -878,12 +878,16 @@ index 000000000000..bce94407c975
 +&chassis {
 +	status = "okay";
 +};
++
++&uart_routing {
++	status = "okay";
++};
 diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-shale.dts b/arch/arm/boot/dts/aspeed-bmc-amd-shale.dts
 new file mode 100644
 index 000000000000..8eff60190b9e
 --- /dev/null
 +++ b/arch/arm/boot/dts/aspeed-bmc-amd-shale.dts
-@@ -0,0 +1,814 @@
+@@ -0,0 +1,818 @@
 +// SPDX-License-Identifier: GPL-2.0
 +// Copyright (c) 2022 AMD Inc.
 +// Author: Abinaya Dhandapani (abinaya.dhandapani@amd.com)
@@ -1698,12 +1702,16 @@ index 000000000000..8eff60190b9e
 +&vuart1 {
 +	status = "okay";
 +};
++
++&uart_routing {
++	status = "okay";
++};
 diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-sunstone.dts b/arch/arm/boot/dts/aspeed-bmc-amd-sunstone.dts
 new file mode 100644
 index 000000000000..6791e4bf4012
 --- /dev/null
 +++ b/arch/arm/boot/dts/aspeed-bmc-amd-sunstone.dts
-@@ -0,0 +1,923 @@
+@@ -0,0 +1,927 @@
 +// SPDX-License-Identifier: GPL-2.0
 +// Copyright (c) 2022 AMD Inc.
 +// Author: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
@@ -2625,6 +2633,10 @@ index 000000000000..6791e4bf4012
 +
 +// eSPI Virtual UART - 0x3F8
 +&vuart1 {
++	status = "okay";
++};
++
++&uart_routing {
 +	status = "okay";
 +};
 --
