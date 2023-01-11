@@ -20,6 +20,6 @@ index 4a3252a..1801c68 100644
 -static constexpr uint8_t setParmBootFlagsValidPermanent = 0xC0;
 +static constexpr uint8_t setParmBootFlagsValidOneTime = 0xA0;
 +static constexpr uint8_t setParmBootFlagsValidPermanent = 0xE0;
- 
+
  constexpr size_t sizeVersion = 2;
  constexpr size_t DEFAULT_IDENTIFY_TIME_OUT = 15;

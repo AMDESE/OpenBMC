@@ -1,25 +1,20 @@
-DEPENDS_append_sp5 = " sp5-yaml-config"
+DEPENDS_append_turin = " turin-yaml-config"
 
-EXTRA_OECONF_sp5 = " \
-    ONYX_SENSOR_YAML_GEN=${STAGING_DIR_HOST}${datadir}/sp5-yaml-config/onyx-ipmi-sensors.yaml \
-    ONYX_FRU_YAML_GEN=${STAGING_DIR_HOST}${datadir}/sp5-yaml-config/onyx-ipmi-fru-read.yaml \
-    ONYX_INVSENSOR_YAML_GEN=${STAGING_DIR_HOST}${datadir}/sp5-yaml-config/onyx-ipmi-inventory-sensors.yaml \
-    QUARTZ_SENSOR_YAML_GEN=${STAGING_DIR_HOST}${datadir}/sp5-yaml-config/quartz-ipmi-sensors.yaml \
-    QUARTZ_FRU_YAML_GEN=${STAGING_DIR_HOST}${datadir}/sp5-yaml-config/quartz-ipmi-fru-read.yaml \
-    QUARTZ_INVSENSOR_YAML_GEN=${STAGING_DIR_HOST}${datadir}/sp5-yaml-config/quartz-ipmi-inventory-sensors.yaml \
-    RUBY_SENSOR_YAML_GEN=${STAGING_DIR_HOST}${datadir}/sp5-yaml-config/ruby-ipmi-sensors.yaml \
-    RUBY_FRU_YAML_GEN=${STAGING_DIR_HOST}${datadir}/sp5-yaml-config/ruby-ipmi-fru-read.yaml \
-    RUBY_INVSENSOR_YAML_GEN=${STAGING_DIR_HOST}${datadir}/sp5-yaml-config/ruby-ipmi-inventory-sensors.yaml \
-    TITANITE_SENSOR_YAML_GEN=${STAGING_DIR_HOST}${datadir}/sp5-yaml-config/titanite-ipmi-sensors.yaml \
-    TITANITE_FRU_YAML_GEN=${STAGING_DIR_HOST}${datadir}/sp5-yaml-config/titanite-ipmi-fru-read.yaml \
-    TITANITE_INVSENSOR_YAML_GEN=${STAGING_DIR_HOST}${datadir}/sp5-yaml-config/titanite-ipmi-inventory-sensors.yaml \
+EXTRA_OECONF_turin = " \
+    GALENA_SENSOR_YAML_GEN=${STAGING_DIR_HOST}${datadir}/turin-yaml-config/galena-ipmi-sensors.yaml \
+    GALENA_FRU_YAML_GEN=${STAGING_DIR_HOST}${datadir}/turin-yaml-config/galena-ipmi-fru-read.yaml \
+    GALENA_INVSENSOR_YAML_GEN=${STAGING_DIR_HOST}${datadir}/turin-yaml-config/galena-ipmi-inventory-sensors.yaml \
+    CHALUPA_SENSOR_YAML_GEN=${STAGING_DIR_HOST}${datadir}/turin-yaml-config/chalupa-ipmi-sensors.yaml \
+    CHALUPA_FRU_YAML_GEN=${STAGING_DIR_HOST}${datadir}/turin-yaml-config/chalupa-ipmi-fru-read.yaml \
+    CHALUPA_INVSENSOR_YAML_GEN=${STAGING_DIR_HOST}${datadir}/turin-yaml-config/chalupa-ipmi-inventory-sensors.yaml \
+    PURICO_SENSOR_YAML_GEN=${STAGING_DIR_HOST}${datadir}/turin-yaml-config/purico-ipmi-sensors.yaml \
+    PURICO_FRU_YAML_GEN=${STAGING_DIR_HOST}${datadir}/turin-yaml-config/purico-ipmi-fru-read.yaml \
+    PURICO_INVSENSOR_YAML_GEN=${STAGING_DIR_HOST}${datadir}/turin-yaml-config/purico-ipmi-inventory-sensors.yaml \
+    VOLCANO_SENSOR_YAML_GEN=${STAGING_DIR_HOST}${datadir}/turin-yaml-config/volcano-ipmi-sensors.yaml \
+    VOLCANO_FRU_YAML_GEN=${STAGING_DIR_HOST}${datadir}/turin-yaml-config/volcano-ipmi-fru-read.yaml \
+    VOLCANO_INVSENSOR_YAML_GEN=${STAGING_DIR_HOST}${datadir}/turin-yaml-config/volcano-ipmi-inventory-sensors.yaml \
     enable_i2c_whitelist_check=no \
     "
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
-SRC_URI += "file://0001-set-BIOS-boot-type-to-EFI.patch \
-            file://0002-script-changes-for-mako-templates-and-platforms.patch \
-            file://0003-platformization-changes-for-sp5-platforms.patch \
-            file://0004-Add-Set-Sensor-threshold-IPMI-command.patch \
-            "
-
+SRC_URI += "file://0001-turin-host-platform-changes.patch"

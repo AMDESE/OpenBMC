@@ -1,0 +1,672 @@
+From 3fa8f076e399c25b48ba4168925856774c59eedc Mon Sep 17 00:00:00 2001
+From: Alisha Kulkarni <ALISHA.KULKARNI@amd.com>
+Date: Wed, 11 Jan 2023 13:34:48 -0600
+Subject: [PATCH 1/1] turin-host-platform-changes
+
+Signed-off-by: Alisha Kulkarni <ALISHA.KULKARNI@amd.com>
+---
+ Makefile.am                      |  78 +++++++++++++++---
+ configure.ac                     | 103 ++++++++++++++++++++----
+ fruread.hpp                      |   7 ++
+ scripts/fru_gen.py               |  13 ++-
+ scripts/inventory-sensor.py      |  13 ++-
+ scripts/inventorysensor.mako.cpp |   5 +-
+ scripts/readfru.mako.cpp         |   2 +-
+ scripts/sensor_gen.py            |  13 ++-
+ scripts/writesensor.mako.cpp     |   2 +-
+ selutility.cpp                   |   2 +-
+ selutility.hpp                   |   8 ++
+ sensorhandler.cpp                |  10 +--
+ sensorhandler.hpp                |  13 +++
+ storagehandler.cpp               | 134 ++++++++++++++++++++++++++++++-
+ 14 files changed, 352 insertions(+), 51 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index fbeb379..e95df1a 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -29,9 +29,24 @@ ipmid_SOURCES = \
+ 	host-cmd-manager.cpp
+
+ libipmi20_BUILT_LIST = \
+-	sensor-gen.cpp \
+-	inventory-sensor-gen.cpp \
+-	fru-read-gen.cpp
++	galena-sensor-gen.cpp \
++	galena-inventory-sensor-gen.cpp \
++	galena-fru-read-gen.cpp \
++	recluse-sensor-gen.cpp \
++	recluse-inventory-sensor-gen.cpp \
++	recluse-fru-read-gen.cpp \
++	chalupa-sensor-gen.cpp \
++	chalupa-inventory-sensor-gen.cpp \
++	chalupa-fru-read-gen.cpp \
++	purico-sensor-gen.cpp \
++	purico-inventory-sensor-gen.cpp \
++	purico-fru-read-gen.cpp \
++	volcano-sensor-gen.cpp \
++	volcano-inventory-sensor-gen.cpp \
++	volcano-fru-read-gen.cpp \
++	huambo-sensor-gen.cpp \
++	huambo-inventory-sensor-gen.cpp \
++	huambo-fru-read-gen.cpp
+
+ BUILT_SOURCES = \
+ 	$(IPMI_WHITELIST_SOURCE) \
+@@ -75,14 +90,59 @@ ipmid_LDFLAGS = \
+ ipmiwhitelist.cpp: ${srcdir}/generate_whitelist.sh $(WHITELIST_CONF)
+ 	$(SHELL) $^ > $@
+
+-sensor-gen.cpp: scripts/writesensor.mako.cpp scripts/sensor_gen.py @SENSOR_YAML_GEN@
+-	$(AM_V_GEN)@SENSORGEN@ -o $(top_builddir) generate-cpp
++galena-sensor-gen.cpp: scripts/writesensor.mako.cpp scripts/sensor_gen.py @GALENA_SENSOR_YAML_GEN@
++	$(AM_V_GEN)@GALENA_SENSORGEN@ -o $(top_builddir) -p  galena generate-cpp
+
+-inventory-sensor-gen.cpp: scripts/inventorysensor.mako.cpp scripts/inventory-sensor.py @INVSENSOR_YAML_GEN@
+-	$(AM_V_GEN)@INVSENSORGEN@ -o $(top_builddir) generate-cpp
++galena-inventory-sensor-gen.cpp: scripts/inventorysensor.mako.cpp scripts/inventory-sensor.py @GALENA_INVSENSOR_YAML_GEN@
++	$(AM_V_GEN)@GALENA_INVSENSORGEN@ -o $(top_builddir) -p  galena generate-cpp
+
+-fru-read-gen.cpp: scripts/readfru.mako.cpp scripts/fru_gen.py @FRU_YAML_GEN@
+-	$(AM_V_GEN)@FRUGEN@ -o $(top_builddir) generate-cpp
++galena-fru-read-gen.cpp: scripts/readfru.mako.cpp scripts/fru_gen.py @GALENA_FRU_YAML_GEN@
++	$(AM_V_GEN)@GALENA_FRUGEN@ -o $(top_builddir) -p  galena generate-cpp
++
++recluse-sensor-gen.cpp: scripts/writesensor.mako.cpp scripts/sensor_gen.py @RECLUSE_SENSOR_YAML_GEN@
++	$(AM_V_GEN)@RECLUSE_SENSORGEN@ -o $(top_builddir) -p  recluse generate-cpp
++
++recluse-inventory-sensor-gen.cpp: scripts/inventorysensor.mako.cpp scripts/inventory-sensor.py @RECLUSE_INVSENSOR_YAML_GEN@
++	$(AM_V_GEN)@RECLUSE_INVSENSORGEN@ -o $(top_builddir) -p  recluse generate-cpp
++
++recluse-fru-read-gen.cpp: scripts/readfru.mako.cpp scripts/fru_gen.py @RECLUSE_FRU_YAML_GEN@
++	$(AM_V_GEN)@RECLUSE_FRUGEN@ -o $(top_builddir) -p  recluse generate-cpp
++
++chalupa-sensor-gen.cpp: scripts/writesensor.mako.cpp scripts/sensor_gen.py @CHALUPA_SENSOR_YAML_GEN@
++	$(AM_V_GEN)@CHALUPA_SENSORGEN@ -o $(top_builddir) -p chalupa generate-cpp
++
++chalupa-inventory-sensor-gen.cpp: scripts/inventorysensor.mako.cpp scripts/inventory-sensor.py @CHALUPA_INVSENSOR_YAML_GEN@
++	$(AM_V_GEN)@CHALUPA_INVSENSORGEN@ -o $(top_builddir) -p chalupa generate-cpp
++
++chalupa-fru-read-gen.cpp: scripts/readfru.mako.cpp scripts/fru_gen.py @CHALUPA_FRU_YAML_GEN@
++	$(AM_V_GEN)@CHALUPA_FRUGEN@ -o $(top_builddir) -p chalupa generate-cpp
++
++purico-sensor-gen.cpp: scripts/writesensor.mako.cpp scripts/sensor_gen.py @PURICO_SENSOR_YAML_GEN@
++	$(AM_V_GEN)@PURICO_SENSORGEN@ -o $(top_builddir) -p purico generate-cpp
++
++purico-inventory-sensor-gen.cpp: scripts/inventorysensor.mako.cpp scripts/inventory-sensor.py @PURICO_INVSENSOR_YAML_GEN@
++	$(AM_V_GEN)@PURICO_INVSENSORGEN@ -o $(top_builddir) -p purico generate-cpp
++
++purico-fru-read-gen.cpp: scripts/readfru.mako.cpp scripts/fru_gen.py @PURICO_FRU_YAML_GEN@
++	$(AM_V_GEN)@PURICO_FRUGEN@ -o $(top_builddir) -p purico generate-cpp
++
++volcano-sensor-gen.cpp: scripts/writesensor.mako.cpp scripts/sensor_gen.py @VOLCANO_SENSOR_YAML_GEN@
++	$(AM_V_GEN)@VOLCANO_SENSORGEN@ -o $(top_builddir) -p volcano generate-cpp
++
++volcano-inventory-sensor-gen.cpp: scripts/inventorysensor.mako.cpp scripts/inventory-sensor.py @VOLCANO_INVSENSOR_YAML_GEN@
++	$(AM_V_GEN)@VOLCANO_INVSENSORGEN@ -o $(top_builddir) -p volcano generate-cpp
++
++volcano-fru-read-gen.cpp: scripts/readfru.mako.cpp scripts/fru_gen.py @VOLCANO_FRU_YAML_GEN@
++	$(AM_V_GEN)@VOLCANO_FRUGEN@ -o $(top_builddir) -p volcano generate-cpp
++
++huambo-sensor-gen.cpp: scripts/writesensor.mako.cpp scripts/sensor_gen.py @HUAMBO_SENSOR_YAML_GEN@
++	$(AM_V_GEN)@HUAMBO_SENSORGEN@ -o $(top_builddir) -p huambo generate-cpp
++
++huambo-inventory-sensor-gen.cpp: scripts/inventorysensor.mako.cpp scripts/inventory-sensor.py @HUAMBO_INVSENSOR_YAML_GEN@
++	$(AM_V_GEN)@HUAMBO_INVSENSORGEN@ -o $(top_builddir) -p huambo generate-cpp
++
++huambo-fru-read-gen.cpp: scripts/readfru.mako.cpp scripts/fru_gen.py @HUAMBO_FRU_YAML_GEN@
++	$(AM_V_GEN)@HUAMBO_FRUGEN@ -o $(top_builddir) -p huambo generate-cpp
+
+ providers_LTLIBRARIES += libipmi20.la
+ if FEATURE_TRANSPORT_OEM
+diff --git a/configure.ac b/configure.ac
+index dcf5e79..4d6887a 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -125,20 +125,95 @@ if test -z "$WHITELIST_CONF"; then
+         WHITELIST_CONF=${srcdir}/host-ipmid-whitelist.conf
+ fi
+
+-AS_IF([test "x$SENSOR_YAML_GEN" == "x"], [SENSOR_YAML_GEN="$srcdir/scripts/sensor-example.yaml"])
+-SENSORGEN="$PYTHON ${srcdir}/scripts/sensor_gen.py -i $SENSOR_YAML_GEN"
+-AC_SUBST(SENSOR_YAML_GEN)
+-AC_SUBST(SENSORGEN)
+-
+-AS_IF([test "x$INVSENSOR_YAML_GEN" == "x"], [INVSENSOR_YAML_GEN="$srcdir/scripts/inventory-sensor-example.yaml"])
+-INVSENSORGEN="$PYTHON ${srcdir}/scripts/inventory-sensor.py -i $INVSENSOR_YAML_GEN"
+-AC_SUBST(INVSENSOR_YAML_GEN)
+-AC_SUBST(INVSENSORGEN)
+-
+-AS_IF([test "x$FRU_YAML_GEN" == "x"], [FRU_YAML_GEN="$srcdir/scripts/fru-read-example.yaml"])
+-FRUGEN="$PYTHON $srcdir/scripts/fru_gen.py -i $FRU_YAML_GEN"
+-AC_SUBST(FRU_YAML_GEN)
+-AC_SUBST(FRUGEN)
++AS_IF([test "x$GALENA_SENSOR_YAML_GEN" == "x"], [GALENA_SENSOR_YAML_GEN="$srcdir/scripts/sensor-example.yaml"])
++GALENA_SENSORGEN="$PYTHON ${srcdir}/scripts/sensor_gen.py -i $GALENA_SENSOR_YAML_GEN"
++AC_SUBST(GALENA_SENSOR_YAML_GEN)
++AC_SUBST(GALENA_SENSORGEN)
++
++AS_IF([test "x$GALENA_INVSENSOR_YAML_GEN" == "x"], [GALENA_INVSENSOR_YAML_GEN="$srcdir/scripts/inventory-sensor-example.yaml"])
++GALENA_INVSENSORGEN="$PYTHON ${srcdir}/scripts/inventory-sensor.py -i $GALENA_INVSENSOR_YAML_GEN"
++AC_SUBST(GALENA_INVSENSOR_YAML_GEN)
++AC_SUBST(GALENA_INVSENSORGEN)
++
++AS_IF([test "x$GALENA_FRU_YAML_GEN" == "x"], [GALENA_FRU_YAML_GEN="$srcdir/scripts/fru-read-example.yaml"])
++GALENA_FRUGEN="$PYTHON $srcdir/scripts/fru_gen.py -i $GALENA_FRU_YAML_GEN"
++AC_SUBST(GALENA_FRU_YAML_GEN)
++AC_SUBST(GALENA_FRUGEN)
++
++AS_IF([test "x$RECLUSE_SENSOR_YAML_GEN" == "x"], [RECLUSE_SENSOR_YAML_GEN="$srcdir/scripts/sensor-example.yaml"])
++RECLUSE_SENSORGEN="$PYTHON ${srcdir}/scripts/sensor_gen.py -i $RECLUSE_SENSOR_YAML_GEN"
++AC_SUBST(RECLUSE_SENSOR_YAML_GEN)
++AC_SUBST(RECLUSE_SENSORGEN)
++
++AS_IF([test "x$RECLUSE_INVSENSOR_YAML_GEN" == "x"], [RECLUSE_INVSENSOR_YAML_GEN="$srcdir/scripts/inventory-sensor-example.yaml"])
++RECLUSE_INVSENSORGEN="$PYTHON ${srcdir}/scripts/inventory-sensor.py -i $RECLUSE_INVSENSOR_YAML_GEN"
++AC_SUBST(RECLUSE_INVSENSOR_YAML_GEN)
++AC_SUBST(RECLUSE_INVSENSORGEN)
++
++AS_IF([test "x$RECLUSE_FRU_YAML_GEN" == "x"], [RECLUSE_FRU_YAML_GEN="$srcdir/scripts/fru-read-example.yaml"])
++RECLUSE_FRUGEN="$PYTHON $srcdir/scripts/fru_gen.py -i $RECLUSE_FRU_YAML_GEN"
++AC_SUBST(RECLUSE_FRU_YAML_GEN)
++AC_SUBST(RECLUSE_FRUGEN)
++
++AS_IF([test "x$CHALUPA_SENSOR_YAML_GEN" == "x"], [CHALUPA_SENSOR_YAML_GEN="$srcdir/scripts/sensor-example.yaml"])
++CHALUPA_SENSORGEN="$PYTHON ${srcdir}/scripts/sensor_gen.py -i $CHALUPA_SENSOR_YAML_GEN"
++AC_SUBST(CHALUPA_SENSOR_YAML_GEN)
++AC_SUBST(CHALUPA_SENSORGEN)
++
++AS_IF([test "x$CHALUPA_INVSENSOR_YAML_GEN" == "x"], [CHALUPA_INVSENSOR_YAML_GEN="$srcdir/scripts/inventory-sensor-example.yaml"])
++CHALUPA_INVSENSORGEN="$PYTHON ${srcdir}/scripts/inventory-sensor.py -i $CHALUPA_INVSENSOR_YAML_GEN"
++AC_SUBST(CHALUPA_INVSENSOR_YAML_GEN)
++AC_SUBST(CHALUPA_INVSENSORGEN)
++
++AS_IF([test "x$CHALUPA_FRU_YAML_GEN" == "x"], [CHALUPA_FRU_YAML_GEN="$srcdir/scripts/fru-read-example.yaml"])
++CHALUPA_FRUGEN="$PYTHON $srcdir/scripts/fru_gen.py -i $CHALUPA_FRU_YAML_GEN"
++AC_SUBST(CHALUPA_FRU_YAML_GEN)
++AC_SUBST(CHALUPA_FRUGEN)
++
++AS_IF([test "x$PURICO_SENSOR_YAML_GEN" == "x"], [PURICO_SENSOR_YAML_GEN="$srcdir/scripts/sensor-example.yaml"])
++PURICO_SENSORGEN="$PYTHON ${srcdir}/scripts/sensor_gen.py -i $PURICO_SENSOR_YAML_GEN"
++AC_SUBST(PURICO_SENSOR_YAML_GEN)
++AC_SUBST(PURICO_SENSORGEN)
++
++AS_IF([test "x$PURICO_INVSENSOR_YAML_GEN" == "x"], [PURICO_INVSENSOR_YAML_GEN="$srcdir/scripts/inventory-sensor-example.yaml"])
++PURICO_INVSENSORGEN="$PYTHON ${srcdir}/scripts/inventory-sensor.py -i $PURICO_INVSENSOR_YAML_GEN"
++AC_SUBST(PURICO_INVSENSOR_YAML_GEN)
++AC_SUBST(PURICO_INVSENSORGEN)
++
++AS_IF([test "x$PURICO_FRU_YAML_GEN" == "x"], [PURICO_FRU_YAML_GEN="$srcdir/scripts/fru-read-example.yaml"])
++PURICO_FRUGEN="$PYTHON $srcdir/scripts/fru_gen.py -i $PURICO_FRU_YAML_GEN"
++AC_SUBST(PURICO_FRU_YAML_GEN)
++AC_SUBST(PURICO_FRUGEN)
++
++AS_IF([test "x$VOLCANO_SENSOR_YAML_GEN" == "x"], [VOLCANO_SENSOR_YAML_GEN="$srcdir/scripts/sensor-example.yaml"])
++VOLCANO_SENSORGEN="$PYTHON ${srcdir}/scripts/sensor_gen.py -i $VOLCANO_SENSOR_YAML_GEN"
++AC_SUBST(VOLCANO_SENSOR_YAML_GEN)
++AC_SUBST(VOLCANO_SENSORGEN)
++
++AS_IF([test "x$VOLCANO_INVSENSOR_YAML_GEN" == "x"], [VOLCANO_INVSENSOR_YAML_GEN="$srcdir/scripts/inventory-sensor-example.yaml"])
++VOLCANO_INVSENSORGEN="$PYTHON ${srcdir}/scripts/inventory-sensor.py -i $VOLCANO_INVSENSOR_YAML_GEN"
++AC_SUBST(VOLCANO_INVSENSOR_YAML_GEN)
++AC_SUBST(VOLCANO_INVSENSORGEN)
++
++AS_IF([test "x$VOLCANO_FRU_YAML_GEN" == "x"], [VOLCANO_FRU_YAML_GEN="$srcdir/scripts/fru-read-example.yaml"])
++VOLCANO_FRUGEN="$PYTHON $srcdir/scripts/fru_gen.py -i $VOLCANO_FRU_YAML_GEN"
++AC_SUBST(VOLCANO_FRU_YAML_GEN)
++AC_SUBST(VOLCANO_FRUGEN)
++
++AS_IF([test "x$HUAMBO_SENSOR_YAML_GEN" == "x"], [HUAMBO_SENSOR_YAML_GEN="$srcdir/scripts/sensor-example.yaml"])
++HUAMBO_SENSORGEN="$PYTHON ${srcdir}/scripts/sensor_gen.py -i $HUAMBO_SENSOR_YAML_GEN"
++AC_SUBST(HUAMBO_SENSOR_YAML_GEN)
++AC_SUBST(HUAMBO_SENSORGEN)
++
++AS_IF([test "x$HUAMBO_INVSENSOR_YAML_GEN" == "x"], [HUAMBO_INVSENSOR_YAML_GEN="$srcdir/scripts/inventory-sensor-example.yaml"])
++HUAMBO_INVSENSORGEN="$PYTHON ${srcdir}/scripts/inventory-sensor.py -i $HUAMBO_INVSENSOR_YAML_GEN"
++AC_SUBST(HUAMBO_INVSENSOR_YAML_GEN)
++AC_SUBST(HUAMBO_INVSENSORGEN)
++
++AS_IF([test "x$HUAMBO_FRU_YAML_GEN" == "x"], [HUAMBO_FRU_YAML_GEN="$srcdir/scripts/fru-read-example.yaml"])
++HUAMBO_FRUGEN="$PYTHON $srcdir/scripts/fru_gen.py -i $HUAMBO_FRU_YAML_GEN"
++AC_SUBST(HUAMBO_FRU_YAML_GEN)
++AC_SUBST(HUAMBO_FRUGEN)
+
+ AS_IF([test "x$ENTITY_YAML_GEN" == "x"], [ENTITY_YAML_GEN="$srcdir/scripts/entity-example.yaml"])
+ ENTITYGEN="$PYTHON $srcdir/scripts/entity_gen.py -i $ENTITY_YAML_GEN"
+diff --git a/fruread.hpp b/fruread.hpp
+index a2fb650..8b46a3e 100644
+--- a/fruread.hpp
++++ b/fruread.hpp
+@@ -34,3 +34,10 @@ using FruInstanceVec = std::vector<FruInstance>;
+
+ using FruId = uint32_t;
+ using FruMap = std::map<FruId, FruInstanceVec>;
++
++extern const FruMap  galena_frus;
++extern const FruMap  recluse_frus;
++extern const FruMap  chalupa_frus;
++extern const FruMap  purico_frus;
++extern const FruMap  volcano_frus;
++extern const FruMap  huambo_frus;
+diff --git a/scripts/fru_gen.py b/scripts/fru_gen.py
+index 4375086..0e573d2 100755
+--- a/scripts/fru_gen.py
++++ b/scripts/fru_gen.py
+@@ -7,7 +7,7 @@ import argparse
+ from mako.template import Template
+
+
+-def generate_cpp(inventory_yaml, output_dir):
++def generate_cpp(inventory_yaml, output_dir, plat_name):
+     with open(inventory_yaml, 'r') as f:
+         ifile = yaml.safe_load(f)
+         if not isinstance(ifile, dict):
+@@ -19,9 +19,9 @@ def generate_cpp(inventory_yaml, output_dir):
+                      script_dir,
+                      "readfru.mako.cpp"))
+
+-        output_hpp = os.path.join(output_dir, "fru-read-gen.cpp")
++        output_hpp = os.path.join(output_dir, plat_name+"-fru-read-gen.cpp")
+         with open(output_hpp, 'w') as fd:
+-            fd.write(t.render(fruDict=ifile))
++            fd.write(t.render(fruDict=ifile, platform=plat_name))
+
+
+ def main():
+@@ -41,6 +41,11 @@ def main():
+         default=".",
+         help="output directory")
+
++    parser.add_argument(
++        "-p", "--platform", dest="platform",
++        default="amd",
++        help="platform name")
++
+     parser.add_argument(
+         'command', metavar='COMMAND', type=str,
+         choices=valid_commands.keys(),
+@@ -52,7 +57,7 @@ def main():
+         sys.exit("Can not find input yaml file " + args.inventory_yaml)
+
+     function = valid_commands[args.command]
+-    function(args.inventory_yaml, args.outputdir)
++    function(args.inventory_yaml, args.outputdir, args.platform)
+
+ if __name__ == '__main__':
+     script_dir = os.path.dirname(os.path.realpath(__file__))
+diff --git a/scripts/inventory-sensor.py b/scripts/inventory-sensor.py
+index 1a4e5db..e3f46cf 100755
+--- a/scripts/inventory-sensor.py
++++ b/scripts/inventory-sensor.py
+@@ -7,7 +7,7 @@ import argparse
+ from mako.template import Template
+
+
+-def generate_cpp(sensor_yaml, output_dir):
++def generate_cpp(sensor_yaml, output_dir, plat_name):
+     with open(sensor_yaml, 'r') as f:
+         ifile = yaml.safe_load(f)
+         if not isinstance(ifile, dict):
+@@ -19,9 +19,9 @@ def generate_cpp(sensor_yaml, output_dir):
+                      script_dir,
+                      "inventorysensor.mako.cpp"))
+
+-        output_cpp = os.path.join(output_dir, "inventory-sensor-gen.cpp")
++        output_cpp = os.path.join(output_dir, plat_name+"-inventory-sensor-gen.cpp")
+         with open(output_cpp, 'w') as fd:
+-            fd.write(t.render(sensorDict=ifile))
++            fd.write(t.render(sensorDict=ifile, platform=plat_name))
+
+
+ def main():
+@@ -41,6 +41,11 @@ def main():
+         default=".",
+         help="output directory")
+
++    parser.add_argument(
++        "-p", "--platform", dest="platform",
++        default="amd",
++        help="platform name")
++
+     parser.add_argument(
+         'command', metavar='COMMAND', type=str,
+         choices=valid_commands.keys(),
+@@ -52,7 +57,7 @@ def main():
+         sys.exit("Can not find input yaml file " + args.sensor_yaml)
+
+     function = valid_commands[args.command]
+-    function(args.sensor_yaml, args.outputdir)
++    function(args.sensor_yaml, args.outputdir, args.platform)
+
+
+ if __name__ == '__main__':
+diff --git a/scripts/inventorysensor.mako.cpp b/scripts/inventorysensor.mako.cpp
+index 68af3e8..7930cb5 100644
+--- a/scripts/inventorysensor.mako.cpp
++++ b/scripts/inventorysensor.mako.cpp
+@@ -4,9 +4,10 @@
+ // !!! WARNING: This is a GENERATED Code..Please do NOT Edit !!!
+
+ #include <ipmid/types.hpp>
+-using namespace ipmi::sensor;
++#include "selutility.hpp"
+
+-extern const InvObjectIDMap invSensors = {
++using namespace ipmi::sensor;
++const InvObjectIDMap ${platform}_invSensors = {
+ % for key in sensorDict.keys():
+    % if key:
+ {"${key}",
+diff --git a/scripts/readfru.mako.cpp b/scripts/readfru.mako.cpp
+index 57265be..9ab86cb 100644
+--- a/scripts/readfru.mako.cpp
++++ b/scripts/readfru.mako.cpp
+@@ -2,7 +2,7 @@
+ #include <iostream>
+ #include "fruread.hpp"
+
+-extern const FruMap frus = {
++const FruMap ${platform}_frus = {
+ % for key in fruDict.keys():
+    {${key},{
+ <%
+diff --git a/scripts/sensor_gen.py b/scripts/sensor_gen.py
+index f03bea8..24ffce3 100755
+--- a/scripts/sensor_gen.py
++++ b/scripts/sensor_gen.py
+@@ -7,7 +7,7 @@ import argparse
+ from mako.template import Template
+
+
+-def generate_cpp(sensor_yaml, output_dir):
++def generate_cpp(sensor_yaml, output_dir, plat_name):
+     with open(sensor_yaml, 'r') as f:
+         ifile = yaml.safe_load(f)
+         if not isinstance(ifile, dict):
+@@ -19,9 +19,9 @@ def generate_cpp(sensor_yaml, output_dir):
+                      script_dir,
+                      "writesensor.mako.cpp"))
+
+-        output_cpp = os.path.join(output_dir, "sensor-gen.cpp")
++        output_cpp = os.path.join(output_dir, plat_name+"-sensor-gen.cpp")
+         with open(output_cpp, 'w') as fd:
+-            fd.write(t.render(sensorDict=ifile))
++            fd.write(t.render(sensorDict=ifile, platform=plat_name))
+
+
+ def main():
+@@ -41,6 +41,11 @@ def main():
+         default=".",
+         help="output directory")
+
++    parser.add_argument(
++        "-p", "--platform", dest="platform",
++        default="amd",
++        help="platform name")
++
+     parser.add_argument(
+         'command', metavar='COMMAND', type=str,
+         choices=valid_commands.keys(),
+@@ -52,7 +57,7 @@ def main():
+         sys.exit("Can not find input yaml file " + args.sensor_yaml)
+
+     function = valid_commands[args.command]
+-    function(args.sensor_yaml, args.outputdir)
++    function(args.sensor_yaml, args.outputdir, args.platform)
+
+
+ if __name__ == '__main__':
+diff --git a/scripts/writesensor.mako.cpp b/scripts/writesensor.mako.cpp
+index 8b26805..c96a047 100644
+--- a/scripts/writesensor.mako.cpp
++++ b/scripts/writesensor.mako.cpp
+@@ -32,7 +32,7 @@ sensorNameMaxLength = 16
+ namespace ipmi {
+ namespace sensor {
+
+-extern const IdInfoMap sensors = {
++const IdInfoMap ${platform}_sensors = {
+ % for key in sensorDict.keys():
+    % if key:
+ {${key},{
+diff --git a/selutility.cpp b/selutility.cpp
+index 11b2fb9..647e15a 100644
+--- a/selutility.cpp
++++ b/selutility.cpp
+@@ -12,7 +12,7 @@
+ #include <vector>
+ #include <xyz/openbmc_project/Common/error.hpp>
+
+-extern const ipmi::sensor::InvObjectIDMap invSensors;
++
+ using namespace phosphor::logging;
+ using InternalFailure =
+     sdbusplus::xyz::openbmc_project::Common::Error::InternalFailure;
+diff --git a/selutility.hpp b/selutility.hpp
+index 06fc453..e2ef4ae 100644
+--- a/selutility.hpp
++++ b/selutility.hpp
+@@ -5,6 +5,14 @@
+ #include <ipmid/types.hpp>
+ #include <sdbusplus/server.hpp>
+
++extern ipmi::sensor::InvObjectIDMap invSensors;
++extern const ipmi::sensor::InvObjectIDMap galena_invSensors;
++extern const ipmi::sensor::InvObjectIDMap recluse_invSensors;
++extern const ipmi::sensor::InvObjectIDMap chalupa_invSensors;
++extern const ipmi::sensor::InvObjectIDMap purico_invSensors;
++extern const ipmi::sensor::InvObjectIDMap volcano_invSensors;
++extern const ipmi::sensor::InvObjectIDMap huambo_invSensors;
++
+ namespace ipmi
+ {
+
+diff --git a/sensorhandler.cpp b/sensorhandler.cpp
+index 6b29c21..f051617 100644
+--- a/sensorhandler.cpp
++++ b/sensorhandler.cpp
+@@ -28,15 +28,7 @@ static constexpr uint8_t BMCSlaveAddress = 0x20;
+ extern int updateSensorRecordFromSSRAESC(const void*);
+ extern sd_bus* bus;
+
+-namespace ipmi
+-{
+-namespace sensor
+-{
+-extern const IdInfoMap sensors;
+-} // namespace sensor
+-} // namespace ipmi
+-
+-extern const FruMap frus;
++extern FruMap frus;
+
+ using namespace phosphor::logging;
+ using InternalFailure =
+diff --git a/sensorhandler.hpp b/sensorhandler.hpp
+index cf9bda0..5f820f8 100644
+--- a/sensorhandler.hpp
++++ b/sensorhandler.hpp
+@@ -727,3 +727,16 @@ inline void enableScanning(ipmi::sensor::GetSensorResponse* resp)
+ } // namespace sensor
+
+ } // namespace ipmi
++
++namespace ipmi {
++namespace sensor {
++
++extern IdInfoMap sensors;
++extern const IdInfoMap galena_sensors;
++extern const IdInfoMap recluse_sensors;
++extern const IdInfoMap chalupa_sensors;
++extern const IdInfoMap purico_sensors;
++extern const IdInfoMap volcano_sensors;
++extern const IdInfoMap huambo_sensors;
++}
++}
+diff --git a/storagehandler.cpp b/storagehandler.cpp
+index 3f09940..7495e57 100644
+--- a/storagehandler.cpp
++++ b/storagehandler.cpp
+@@ -24,6 +24,26 @@
+ #include <variant>
+ #include <xyz/openbmc_project/Common/error.hpp>
+
++
++// Platform Type
++constexpr auto GALENA_1       = 104;   //0x68
++constexpr auto GALENA_2       = 112;   //0x70
++constexpr auto GALENA_3       = 113;   //0x71
++constexpr auto RECLUSE        = 105;   //0x69
++constexpr auto CHALUPA_1      = 102;   //0x66
++constexpr auto CHALUPA_2      = 110;   //0x6E
++constexpr auto CHALUPA_3      = 111;   //0x6F
++constexpr auto PURICO_1       = 106;   //0x6A
++constexpr auto PURICO_2       = 114;   //0x72
++constexpr auto PURICO_3       = 115;   //0x73
++constexpr auto VOLCANO_1      = 107;   //0x6B
++constexpr auto VOLCANO_2      = 116;   //0x74
++constexpr auto VOLCANO_3      = 117;   //0x75
++constexpr auto HUAMBO         = 103;   //0x67
++
++#define COMMAND_BOARD_ID    ("/sbin/fw_printenv -n board_id")
++#define COMMAND_LEN         3
++
+ void register_netfn_storage_functions() __attribute__((constructor));
+
+ unsigned int g_sel_time = 0xFFFFFFFF;
+@@ -31,11 +51,12 @@ namespace ipmi
+ {
+ namespace sensor
+ {
+-extern const IdInfoMap sensors;
++IdInfoMap sensors;
+ } // namespace sensor
+ } // namespace ipmi
+
+-extern const FruMap frus;
++FruMap frus;
++ipmi::sensor::InvObjectIDMap invSensors;
+ constexpr uint8_t eventDataSize = 3;
+ namespace
+ {
+@@ -750,8 +771,117 @@ ipmi::RspType<uint8_t,  // SDR version
+                                  operationSupport);
+ }
+
++std::string getPlatformID()
++{
++    FILE *pf;
++    char data[COMMAND_LEN] = {0};
++    std::stringstream ss;
++    unsigned int board_id = 0;
++
++    // Setup pipe for reading and execute to get u-boot environment
++    // variable board_id.
++    pf = popen(COMMAND_BOARD_ID,"r");
++
++    if(pf > 0)
++    {   // no error
++        if (fgets(data, COMMAND_LEN , pf) != NULL)
++        {
++            ss << std::hex << (std::string)data;
++            ss >> board_id;
++        }
++        pclose(pf);
++        if ( board_id > 0 || board_id < 0xFF )
++        {
++            switch (board_id)
++            {
++                case GALENA_1:
++                case GALENA_2:
++                case GALENA_3:
++                   return "galena";
++                case RECLUSE:
++                   return "recluse";
++                case PURICO_1:
++                case PURICO_2:
++                case PURICO_3:
++                    return "purico";
++                case CHALUPA_1:
++                case CHALUPA_2:
++                case CHALUPA_3:
++                    return "chalupa";
++                case VOLCANO_1:
++                case VOLCANO_2:
++                case VOLCANO_3:
++                    return "volcano";
++                case HUAMBO:
++                   return "huambo";
++               default:
++                    return "chalupa";
++            }//switch
++        }
++    }
++    else
++    {
++        log<level::DEBUG>("Unable to determine platform",
++                          entry("Defaulting to 2P"));
++    }
++
++    return "chalupa";
++}
++
+ void register_netfn_storage_functions()
+ {
++
++    // Load the right device symbols based on platform
++
++    std::string platform = getPlatformID();
++    if (platform.compare("chalupa") == 0)
++     {
++        log<level::INFO>("Loading Chalupa configuration");
++        frus = chalupa_frus;
++        invSensors = chalupa_invSensors;
++        ipmi::sensor::sensors = ipmi::sensor::chalupa_sensors;
++     }
++    else if (platform.compare("galena") == 0)
++     {
++        log<level::INFO>("Loading Galena configuration");
++        frus = galena_frus;
++        invSensors = galena_invSensors;
++        ipmi::sensor::sensors = ipmi::sensor::galena_sensors;
++     }
++    else if (platform.compare("purico") == 0)
++     {
++        log<level::INFO>("Loading Purico configuration");
++        frus = purico_frus;
++        invSensors = purico_invSensors;
++        ipmi::sensor::sensors = ipmi::sensor::purico_sensors;
++     }
++    else if (platform.compare("volcano") == 0)
++     {
++        log<level::INFO>("Loading Volcano configuration");
++        frus = volcano_frus;
++        invSensors = volcano_invSensors;
++        ipmi::sensor::sensors = ipmi::sensor::volcano_sensors;
++    }
++        else if (platform.compare("recluse") == 0)
++    {
++        log<level::INFO>("Loading Recluse configuration");
++        frus = recluse_frus;
++        invSensors = recluse_invSensors;
++        ipmi::sensor::sensors = ipmi::sensor::recluse_sensors;
++    }
++            else if (platform.compare("huambo") == 0)
++    {
++        log<level::INFO>("Loading Huambo configuration");
++        frus = huambo_frus;
++        invSensors = huambo_invSensors;
++        ipmi::sensor::sensors = ipmi::sensor::huambo_sensors;
++     }
++    else
++    {
++        log<level::ERR>("Unknown platform?!",
++                          entry("Registration failed"));
++    }
++
+     // <Get SEL Info>
+     ipmi::registerHandler(ipmi::prioOpenBmcBase, ipmi::netFnStorage,
+                           ipmi::storage::cmdGetSelInfo, ipmi::Privilege::User,
+--
+2.17.1
+
