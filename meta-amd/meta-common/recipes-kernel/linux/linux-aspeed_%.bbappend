@@ -19,4 +19,5 @@ SRC_URI += "file://0001-drivers-soc-aspeed-Add-MCTP-driver.patch \
             file://0017-ARM-dts-aspeed-Initial-device-tree-for-AMD-Siena-Pla.patch \
             file://0018-ARM-dts-aspeed-Initial-device-tree-for-AMD-Turin-Pla.patch \
             file://0019-ARM-dts-aspeed-Initial-device-tree-for-AMD-MI-300-Pl.patch \
+            file://0020-ARM-dts-aspeed-Add-UART-routing-to-Turin.patch \
            "
