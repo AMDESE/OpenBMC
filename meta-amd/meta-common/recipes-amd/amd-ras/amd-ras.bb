@@ -25,6 +25,7 @@ DEPENDS += " \
     sdbusplus \
     libgpiod \
     boost \
+    nlohmann-json \
     "
 
 FILES_${PN} += "${systemd_unitdir}/system/com.amd.crashdump.service"
