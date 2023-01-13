@@ -14,5 +14,6 @@ SRC_URI += "file://0001-Reset-server-settings-only-changes-to-invoke-CMOS.patch 
             file://0007-enable-power-cap-based-on-limit-value.patch \
             file://0008-To-display-Processors-information-using-redfish-API.patch \
             file://0009-bmcweb-Added-support-for-PPIN.patch \
+            file://0010-recipes-bmcweb-Add-redfish-implementation-of-RAS-con.patch \
             "
 
