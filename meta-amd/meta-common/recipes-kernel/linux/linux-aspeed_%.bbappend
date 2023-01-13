@@ -1,6 +1,7 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/linux-aspeed:"
 
-SRC_URI += "file://0001-drivers-soc-aspeed-Add-MCTP-driver.patch \
+SRC_URI += "file://amd-bmc-baseline.cfg \
+            file://0001-drivers-soc-aspeed-Add-MCTP-driver.patch \
             file://0002-drivers-i3c-Modify-I3C-driver.patch \
             file://0003-drivers-soc-aspeed-Add-eSPI-drivers.patch \
             file://0004-drivers-jtag-Add-JTAG-driver.patch \
