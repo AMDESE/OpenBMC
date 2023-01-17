@@ -1,0 +1,46 @@
+From 61f121838f14ed407ba8da55821113e870b06e47 Mon Sep 17 00:00:00 2001
+From: Alisha Kulkarni <ALISHA.KULKARNI@amd.com>
+Date: Fri, 23 Dec 2022 22:28:16 -0600
+Subject: [PATCH 1/1] ARM-dts-aspeed-Initial-device-tree-for-Galena-Recluse
+
+Signed-off-by: Alisha Kulkarni <ALISHA.KULKARNI@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-galena.dts  | 5 -----
+ arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts | 5 -----
+ 2 files changed, 10 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts b/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
+index 80bc71f51e34..b477750e6a1b 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
+@@ -213,11 +213,6 @@
+ 				compatible = "infineon,xdpe12284";
+ 				reg = <0x42>;
+ 			};
+-			vdd11susvrm@70 {
+-				//VDD core1 VRM
+-				compatible = "infineon,xdpe12284";
+-				reg = <0x70>;
+-			};
+ 			vdd33dualvrm@16 {
+ 				//VDD 33 DUAL VRM
+ 				compatible = "infineon,xdpe12284";
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts b/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
+index 487ac64cf36c..dc5515389ee4 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
+@@ -213,11 +213,6 @@
+ 				compatible = "infineon,xdpe12284";
+ 				reg = <0x42>;
+ 			};
+-			vdd11susvrm@70 {
+-				//VDD core1 VRM
+-				compatible = "infineon,xdpe12284";
+-				reg = <0x70>;
+-			};
+ 			vdd33dualvrm@16 {
+ 				//VDD 33 DUAL VRM
+ 				compatible = "infineon,xdpe12284";
+--
+2.17.1
+

@@ -21,4 +21,5 @@ SRC_URI += "file://0001-drivers-soc-aspeed-Add-MCTP-driver.patch \
             file://0019-ARM-dts-aspeed-Initial-device-tree-for-AMD-MI-300-Pl.patch \
             file://0020-ARM-dts-aspeed-Add-UART-routing-to-Turin.patch \
             file://0021-drivers-hwmon-add-aspeed-chassis-driver.patch \
+            file://0022-ARM-dts-aspeed-Initial-device-tree-for-Galena-Recluse.patch \
            "
