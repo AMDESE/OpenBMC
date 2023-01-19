@@ -110,21 +110,33 @@ CHIPS_HUAMBO = " \
         bus@1e7a0000/i3c5@7000/sbtsi@48,22400000001 \
         bus@1e7a0000/i3c4@6000/sbrmi@3c,22400000002 \
         bus@1e7a0000/i3c5@7000/sbrmi@38,22400000002 \
-        bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@0/i2cswitch@77/i2c@0/amd_cpld@28 \
-        bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@0/i2cswitch@77/i2c@3/lm75a@4b \
-        bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@1/lm75a@48 \
-        bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@1/lm75a@49 \
-        bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@1/lm75a@4a \
-        bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@1/lm75a@4b \
-        bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@1/lm75a@4c \
-        bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@6/lm75a@4a \
-        bus@1e78a000/i2c-bus@300/pvdd11_s3_p0@63 \
-        bus@1e78a000/i2c-bus@300/pvddcr_soc_p0@61 \
-        bus@1e78a000/i2c-bus@300/pvddio_p0@62 \
-        bus@1e78a000/i2c-bus@380/pvdd11_s3_p1@74 \
-        bus@1e78a000/i2c-bus@380/pvddcr_soc_p1@72 \
-        bus@1e78a000/i2c-bus@380/pvddio_p1@75 \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@0/emc2305@4d \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@1/emc2305@4d \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@2/emc2305@4d \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@3/emc2305@4d \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@4/emc2305@4d \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@48 \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@49 \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4a \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4b \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4c \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4d \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4e \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4f \
+        bus@1e78a000/i2c-bus@300/i2cswitch@70/i2c@0/p0_vdd_core0_run@60 \
+        bus@1e78a000/i2c-bus@300/i2cswitch@70/i2c@0/p0_vdd_core1_run@61 \
+        bus@1e78a000/i2c-bus@300/i2cswitch@70/i2c@0/p0_vdd_vddio_run@62 \
+        bus@1e78a000/i2c-bus@300/i2cswitch@70/i2c@0/p0_vdd_11_sus@63 \
+        bus@1e78a000/i2c-bus@300/i2cswitch@70/i2c@0/p0_vdd_18_dual@64 \
+        bus@1e78a000/i2c-bus@300/i2cswitch@70/i2c@0/p0_vdd_33_dual@65 \
+        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@0/p1_vdd_core0_run@60 \
+        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@0/p1_vdd_core1_run@61 \
+        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@0/p1_vdd_vddio_run@62 \
+        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@0/p1_vdd_11_sus@63 \
+        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@0/p1_vdd_18_dual@64 \
+        bus@1e78a000/i2c-bus@380/i2cswitch@70/i2c@0/p1_vdd_33_dual@65 \
         "
+
 # Volcano specific sensors
 CHIPS_VOLCANO = " \
         bus@1e7a0000/i3c4@6000/sbtsi@4c,22400000001 \
