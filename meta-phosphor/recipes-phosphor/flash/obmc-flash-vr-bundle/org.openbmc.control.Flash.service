@@ -1,5 +1,5 @@
 [Unit]
-Description=Phosphor VR Code Update
+Description=Phosphor VR bundle Code Update
 Wants=mapper-wait@-org-openbmc-managers-Download.service
 After=mapper-wait@-org-openbmc-managers-Download.service
 

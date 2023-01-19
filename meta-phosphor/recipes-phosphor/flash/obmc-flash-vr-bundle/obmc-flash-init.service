@@ -1,0 +1,12 @@
+[Unit]
+Description=Initialize VR Bundle Flash
+Wants=mapper-wait@-org-openbmc-control-flash-vr-bundle.service
+After=mapper-wait@-org-openbmc-control-flash-vr-bundle.service
+
+[Service]
+Restart=no
+ExecStart=/bin/sh -c "busctl call `mapper get-service /org/openbmc/control/flash/vr_bundle` /org/openbmc/control/flash/vr_bundle org.openbmc.Flash init"
+SyslogIdentifier=obmc-flash-vr-bundle-init
+
+[Install]
+WantedBy=multi-user.target
