@@ -1,0 +1,878 @@
+From 6465775200609c7668fbe174e706df693772bacb Mon Sep 17 00:00:00 2001
+From: Mohsen Dolaty <mohsen.dolaty@amd.com>
+Date: Thu, 19 Jan 2023 16:01:09 -0600
+Subject: [PATCH 1/1] aspeed: initial Huambo DTS file for AMD Turin
+
+Huambo Device Table is a copy of Chalupa Device Table
+
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts | 803 +++++++++++++-------
+ 1 file changed, 514 insertions(+), 289 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts b/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
+index c0d5abdbe93e..44bc0209822a 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
+@@ -66,7 +66,8 @@ iio-hwmon-adc121c {
+ 		oemname3 = "LOM_VDD_33";
+ 		oemname4 = "LOM_VDD_12";
+ 		oemname5 = "VDD_12_DUAL";
+-		io-channels = <&adc0 0>, <&adc1 0>, <&adc2 0>, <&adc4 0>, <&adc5 0>;
++		io-channels = <&adc0 0>, <&adc1 0>, <&adc2 0>, <&adc3 0>,
++					<&adc4 0>, <&adc5 0>;
+ 	};
+ };
+
+@@ -87,7 +88,7 @@ &mac2 {
+ 	status = "okay";
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&pinctrl_rmii3_default>;
+-	clock-names = "MACCLK",	"RCLK";
++	clock-names = "MACCLK", "RCLK";
+ 	use-ncsi;
+ };
+
+@@ -149,8 +150,8 @@ &vuart1 {
+ 	status = "okay";
+ };
+ #else
+-// Host Serial console
+ &uart1 {
++	//Host console
+ 	compatible = "aspeed,ast2600-uart";
+ 	/delete-property/ reg-shift;
+ 	/delete-property/ reg-io-width;
+@@ -160,23 +161,525 @@ &uart1 {
+ };
+ #endif
+
+-// BMC Serial Console
++//BMC Console
+ &uart5 {
+ 	status = "okay";
+ };
+
+-// HPM FPGA
++// I2C configs
+ &i2c0 {
+-	//Net name i2c9 - MB FPGA slave
++	//Net name i2c9 (SCM_I2C9)- MB FPGA slave
+ 	status = "okay";
+ };
+
+-// Post Code LCD
+ &i2c1 {
+-	//Net name i2c12
++	//Net name i2c12 (SCM_I2C12) - LCD at 50KHz
++	// Connected to TCA9546A and to LCD HDR
+ 	status = "okay";
++#ifdef OPENBMC_LCD_DRIVER
++	i2cswitch@70 {
++		compatible = "nxp,pca9546";
++		reg = <0x70>;
++		//<TBD> Define LCD details here
++	};
++#endif //OPENBMC_LCD_DRIVER
++};
++
++&i2c4 {
++	// Net name i2c1 (SCM_I2C1)
++	status = "okay";
++};
++
++// BMC Huambo P0 VRs
++&i2c5 {
++	// Net name i2c2 (SCM_I2C2)
++	status = "okay";
++
++	i2cswitch@70 {
++		compatible = "nxp,pca9546";
++		reg = <0x70>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++                i2c@0 {
++                        #address-cells = <1>;
++                        #size-cells = <0>;
++                        reg = <0>;
++
++                        p0_vdd_core0_run@60 {
++                                //VDD core0 run/soc
++                                compatible = "isil,isl68137";
++                                reg = <0x60>;
++                        };
++
++                        p0_vdd_core1_run@61 {
++                                //VDD core1 run
++                                compatible = "isil,isl68137";
++                                reg = <0x61>;
++                        };
++
++                        p0_vdd_vddio_run@62 {
++                                //VDD IO RUN
++                                compatible = "isil,isl68137";
++                                reg = <0x62>;
++                        };
++
++                        p0_vdd_11_sus@63 {
++                                //VDD 11 sus
++                                compatible = "isil,isl68137";
++                                reg = <0x63>;
++                        };
++
++                        p0_vdd_18_dual@64 {
++                                //VDD 18 DUAL
++                                compatible = "isil,isl68137";
++                                reg = <0x64>;
++                        };
++
++                        p0_vdd_33_dual@65 {
++                                //VDD 33 DUAL VRM
++                                compatible = "isil,isl68137";
++                                reg = <0x65>;
++                        };
++                };
++	};
++};
++
++// BMC Huambo P1 VRs
++&i2c6 {
++	// Net name i2c3 (SCM_I2C3)
++	status = "okay";
++
++	i2cswitch@70 {
++		compatible = "nxp,pca9546";
++		reg = <0x70>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++                i2c@0 {
++                        #address-cells = <1>;
++                        #size-cells = <0>;
++                        reg = <0>;
++
++                        p1_vdd_core0_run@60 {
++                                //VDD core0 run/soc
++                                compatible = "isil,isl68137";
++                                reg = <0x60>;
++                        };
++
++                        p1_vdd_core1_run@61 {
++                                //VDD core1 run
++                                compatible = "isil,isl68137";
++                                reg = <0x61>;
++                        };
++
++                        p1_vdd_vddio_run@62 {
++                                //VDD IO RUN
++                                compatible = "isil,isl68137";
++                                reg = <0x62>;
++                        };
++
++                        p1_vdd_11_sus@63 {
++                                //VDD 11 sus
++                                compatible = "isil,isl68137";
++                                reg = <0x63>;
++                        };
++
++                        p1_vdd_18_dual@64 {
++                                //VDD 18 DUAL
++                                compatible = "isil,isl68137";
++                                reg = <0x64>;
++                        };
++
++                        p1_vdd_33_dual@65 {
++                                //VDD 33 DUAL VRM
++                                compatible = "isil,isl68137";
++                                reg = <0x65>;
++                        };
++                };
++	};
++};
++
++&i2c7 {
++	// Net name i2c4 (SCM_I2C4) - HPM BRD ID
++	status = "okay";
++
++	mbeeprom@50 {
++		compatible = "microchip,24lc256","atmel,24c256";
++		reg = <0x50>;
++	};
++};
++
++&i2c8 {
++	// Net name i2c5 (SCM_I2C5) - PSU
++	status = "okay";
++};
++
++&i2c9 {
++	// Net name i2c6 (SCM_I2C6) - FAN/LM75/ADC
++	status = "okay";
++
++	i2cswitch@70 {
++		compatible = "nxp,pca9548";
++		reg = <0x70>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		//  port 0 to 4 connected to 5 fan controllers which controls 5 fans each
++		i2c@0 {
++			reg = <0>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			emc2305@4d {
++				compatible = "smsc,emc2305";
++				reg = <0x4d>;
++				#cooling-cells = <0x02>;
++
++				fan@0 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++				fan@1 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@2 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@3 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@4 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++			};
++		};
++
++		i2c@1 {
++			reg = <1>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			emc2305@4d {
++				compatible = "smsc,emc2305";
++				reg = <0x4d>;
++				#cooling-cells = <0x02>;
++
++				fan@0 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++				fan@1 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@2 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@3 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@4 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++			};
++		};
++
++		i2c@2 {
++			reg = <2>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			emc2305@4d {
++				compatible = "smsc,emc2305";
++				reg = <0x4d>;
++				#cooling-cells = <0x02>;
++
++				fan@0 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++				fan@1 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@2 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@3 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@4 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++			};
++		};
++
++		i2c@3 {
++			reg = <3>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			emc2305@4d {
++				compatible = "smsc,emc2305";
++				reg = <0x4d>;
++				#cooling-cells = <0x02>;
++
++				fan@0 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++				fan@1 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@2 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@3 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@4 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++			};
++		};
++
++		i2c@4 {
++			reg = <4>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			emc2305@4d {
++				compatible = "smsc,emc2305";
++				reg = <0x4d>;
++				#cooling-cells = <0x02>;
++
++				fan@0 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++				fan@1 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@2 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@3 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@4 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++			};
++		};
++
++		i2c@5 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <5>;
++
++			lm75a@48 {
++				compatible = "national,lm75a";
++				reg = <0x48>;
++			};
++
++			lm75a@49 {
++				compatible = "national,lm75a";
++				reg = <0x49>;
++			};
++
++			lm75a@4a {
++				compatible = "national,lm75a";
++				reg = <0x4a>;
++			};
++
++			lm75a@4b {
++				compatible = "national,lm75a";
++				reg = <0x4b>;
++			};
++
++			lm75a@4c {
++				compatible = "national,lm75a";
++				reg = <0x4c>;
++			};
++
++			lm75a@4d {
++				compatible = "national,lm75a";
++				reg = <0x4d>;
++			};
++
++			lm75a@4e {
++				compatible = "national,lm75a";
++				reg = <0x4e>;
++			};
++
++			lm75a@4f {
++				compatible = "national,lm75a";
++				reg = <0x4f>;
++			};
++		};
++
++		i2c@6 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <6>;
++
++			adc0: fpga_vdd_core@50 {
++				compatible = "ti,adc121c";
++				reg = <0x50>;
++				#io-channel-cells = <1>;
++				label = "fpga_vdd_core";
++			};
++			adc1: fpga_vdd_18@51 {
++				compatible = "ti,adc121c";
++				reg = <0x51>;
++				#io-channel-cells = <1>;
++				label = "fpga_vdd_18";
++			};
++			adc2: fpga_vdd_33@52 {
++				compatible = "ti,adc121c";
++				reg = <0x52>;
++				#io-channel-cells = <1>;
++				label = "fpga_vdd_33";
++			};
++			adc3: lom_vdd_33@54 {
++				compatible = "ti,adc121c";
++				reg = <0x54>;
++				#io-channel-cells = <1>;
++				label = "lom_vdd_33";
++			};
++			adc4: lom_vdd_12@55 {
++				compatible = "ti,adc121c";
++				reg = <0x55>;
++				#io-channel-cells = <1>;
++				label = "lom_vdd_12";
++			};
++			adc5: vdd_12_dual@56 {
++				compatible = "ti,adc121c";
++				reg = <0x56>;
++				#io-channel-cells = <1>;
++				label = "vdd_12_dual";
++			};
++		};
++	};
++};
++
++&i2c10 {
++	// Net name i2c7 (SCM_I2C7)
++	status = "okay";
++
++#ifdef EEPROM_PROG_ENABLE
++	i2cswitch@70 {
++		compatible = "nxp,pca9548";
++		reg = <0x70>;
++
++	};
++
++	i2cswitch@71 {
++		compatible = "nxp,pca9546";
++		reg = <0x71>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		i2c@0 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0>;
++
++			p0brdreveeprom@50 {
++				//P0 QUARTZ BRD ID
++				compatible = "microchip,24lc256","atmel,24c256";
++				reg = <0x50>;
++			};
++
++			p0scmbrdeeprom@51 {
++				//P0 SCM BRD ID
++				compatible = "microchip,24lc256","atmel,24c256";
++				reg = <0x51>;
++			};
++		};
++
++		i2c@1 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <1>;
++
++			p1brdreveeprom@50 {
++				//P1 QUARTZ BRD ID
++				compatible = "microchip,24lc256","atmel,24c256";
++				reg = <0x50>;
++			};
++
++			p2scmbrdeeprom@51 {
++				//P1 SCM BRD ID
++				compatible = "microchip,24lc256","atmel,24c256";
++				reg = <0x51>;
++			};
++		};
++	};
++
++	i2cswitch@72 {
++		compatible = "nxp,pca9546";
++		reg = <0x70>;
++	};
++#endif
++};
++
++&i2c11 {
++	// Net name i2c8 (SCM_I2C8) - MB LOM
++	status = "okay";
++};
++
++&i2c12 {
++	// LOCAL MGMT - FPGA slave
++	status = "okay";
++};
+
+-	//<TBD> Define LCD details here
++&i2c14 {
++	// LOCAL MGMT - EEPROM, RTC
++	status = "okay";
++	bmceeprom@50 {
++	compatible = "microchip,24lc512","atmel,24c512";
++	reg = <0x50>;
++	};
++};
++
++&i2c15 {
++	// RoT
++	status = "okay";
+ };
+
+ // i3c
+@@ -607,285 +1110,10 @@ sbrmi_p1_1: sbrmi@38,22400000002 {
+ 		reg = <0x38 0x224 0x00000002>;
+ 		assigned-address = <0x38>;
+ 	};
+-};
++ };
+
+ #endif  // ENABLE_I2C_APML
+
+-// Misc Regulators
+-&i2c4 {
+-	// Net name i2c1
+-	status = "okay";
+-};
+-
+-// Huambo P0 VRs
+-&i2c5 {
+-	// Net name i2c2 (SCM_I2C2)
+-	status = "okay";
+-       pvddcr_soc_p0@61 {
+-           compatible = "isil,isl68137";
+-           reg = <0x61>;
+-       };
+-       pvdd33_s5_p0@19 {
+-           compatible = "isil,isl68137";
+-           reg = <0x19>;
+-       };
+-       pvdd11_s3_p0@63 {
+-           compatible = "isil,isl68137";
+-           reg = <0x63>;
+-       };
+-       pvddio_p0@62 {
+-           compatible = "isil,isl68137";
+-           reg = <0x62>;
+-       };
+-       pvdd18_s5_p0@17 {
+-           compatible = "isil,isl68137";
+-           reg = <0x17>;
+-       };
+-
+-};
+-
+-// Huambo P1 VRs
+-&i2c6 {
+-	// Net name i2c3 (SCM_I2C3)
+-	status = "okay";
+-       pvddcr_soc_p1@72 {
+-           compatible = "isil,isl68137";
+-           reg = <0x72>;
+-       };
+-       pvddio_p1@75 {
+-           compatible = "isil,isl68137";
+-           reg = <0x75>;
+-       };
+-       pvdd11_s3_p1@74 {
+-           compatible = "isil,isl68137";
+-           reg = <0x74>;
+-       };
+-       pvdd18_s5_p1@18 {
+-           compatible = "isil,isl68137";
+-           reg = <0x18>;
+-       };
+-
+-};
+-
+-// HPM Board ID
+-&i2c7 {
+-	// Net name i2c4
+-	status = "okay";
+-
+-	mbeeprom@50 {
+-		compatible = "microchip,24lc256","atmel,24c256";
+-		reg = <0x50>;
+-	};
+-};
+-
+-// PSUs
+-&i2c8 {
+-	// Net name i2c5
+-	status = "okay";
+-};
+-
+-// Fan, Temp, ADC sensors
+-&i2c9 {
+-	// Net name i2c6
+-	status = "okay";
+-
+-	i2cswitch@71 {
+-		compatible = "nxp,pca9548";
+-		reg = <0x71>;
+-		#address-cells = <1>;
+-		#size-cells = <0>;
+-
+-		i2c@0 {
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-			reg = <0>;
+-
+-			// FAN Band
+-			i2cswitch@77 {
+-				compatible = "nxp,pca9546";
+-				#address-cells = <1>;
+-				#size-cells = <0>;
+-				reg = <0x77>;
+-
+-				//  port 0 connected to CPLD on FAN BD
+-				i2c@0 {
+-					#address-cells = <1>;
+-					#size-cells = <0>;
+-					reg = <0>;
+-
+-					// 6 dual rotter Fans are controlled by cpld
+-					amd_cpld@28 {
+-						compatible="amd_cpld,amd_cpld";
+-						reg = <0x28>;
+-					};
+-				};
+-
+-				i2c@3 {
+-					#address-cells = <1>;
+-					#size-cells = <0>;
+-					reg = <3>;
+-
+-					lm75a@4b {	// FAN BD
+-						compatible = "national,lm75a";
+-						reg = <0x4b>;
+-					};
+-				};
+-			};
+-		};
+-
+-		i2c@1 {
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-			reg = <1>;
+-
+-			lm75a@48 {	// SYS OUTLET
+-				compatible = "national,lm75a";
+-				reg = <0x48>;
+-			};
+-
+-			lm75a@49 {	// OCP INLET
+-				compatible = "national,lm75a";
+-				reg = <0x49>;
+-			};
+-			lm75a@4a {	// SCM INLET
+-				compatible = "national,lm75a";
+-				reg = <0x4a>;
+-			};
+-
+-			lm75a@4b {	// CPU1 INLET
+-				compatible = "national,lm75a";
+-				reg = <0x4b>;
+-			};
+-
+-			lm75a@4c {	// CPU0 INLET
+-				compatible = "national,lm75a";
+-				reg = <0x4c>;
+-			};
+-		};
+-
+-		i2c@2 {
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-			reg = <2>;
+-
+-			adc0: p1v0_aux@50 {
+-				compatible = "ti,adc121c";
+-				reg = <0x50>;
+-				#io-channel-cells = <1>;
+-				label = "p1v0_aux";
+-			};
+-			adc1: p1v8_aux@51 {
+-				compatible = "ti,adc121c";
+-				reg = <0x51>;
+-				#io-channel-cells = <1>;
+-				label = "p1v8_aux";
+-			};
+-			adc2: p3v3_aux@52 {
+-				compatible = "ti,adc121c";
+-				reg = <0x52>;
+-				#io-channel-cells = <1>;
+-				label = "p3v3_aux";
+-			};
+-			adc4: p1v27_aux@55 {
+-				compatible = "ti,adc121c";
+-				reg = <0x55>;
+-				#io-channel-cells = <1>;
+-				label = "p1v27_aux";
+-			};
+-			adc5: p12v_aux@56 {
+-				compatible = "ti,adc121c";
+-				reg = <0x56>;
+-				#io-channel-cells = <1>;
+-				label = "p12v_aux";
+-			};
+-		};
+-
+-		i2c@6 {
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-			reg = <6>;
+-
+-			lm75a@4a {	// SYS INLET
+-				compatible = "national,lm75a";
+-				reg = <0x4a>;
+-			};
+-		};
+-	};
+-};
+-
+-// Huambo brd_id
+-&i2c10 {
+-	// Net name i2c7
+-	status = "okay";
+-#ifdef EEPROM_PROG_ENABLE
+-	// SCM brd_id, Huambo brd_id, CLK
+-	i2cswitch@71 {
+-		compatible = "nxp,pca9848";
+-		reg = <0x71>;
+-		#address-cells = <1>;
+-		#size-cells = <0>;
+-
+-		i2c@0 {
+-			reg = <0>;
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-
+-			// BRD ID eeprom
+-			brdreveeprom@50 {
+-				compatible = "microchip,24lc256","atmel,24c256";
+-				reg = <0x50>;
+-			};
+-			// SCM BRD ID eeprom
+-			scmbrdeeprom@51 {
+-				compatible = "microchip,24lc256","atmel,24c256";
+-				reg = <0x51>;
+-			};
+-
+-			// Usually the eeproms are at 0x50 and 0x51 address,
+-			// but some systems (Rev A) have eeprom address 0x54
+-			// SCM BRD ID eeprom
+-			scmbrdeeprom@54 {
+-				compatible = "microchip,24lc256","atmel,24c256";
+-				reg = <0x54>;
+-			};
+-		};
+-	};
+-	// Midpalne, Raiser cards, SATA, etc
+-	i2cswitch@75 {
+-		compatible = "nxp,pca9848";
+-		reg = <0x75>;
+-		#address-cells = <1>;
+-		#size-cells = <0>;
+-	};
+-#endif
+-};
+-
+-// 1G ROM
+-&i2c11 {
+-	// Net name i2c8
+-	status = "okay";
+-};
+-
+-// LOCAL MGMT - FPGA slave
+-&i2c12 {
+-	status = "okay";
+-};
+-
+-// LOCAL MGMT - EEPROM, RTC
+-&i2c14 {
+-	status = "okay";
+-
+-	bmceeprom@50 {
+-		compatible = "microchip,24lc512","atmel,24c512";
+-		reg = <0x50>;
+-	};
+-};
+-
+-// ROT
+-&i2c15 {
+-	status = "okay";
+-};
+-
+ &espi_ctrl {
+ 	status = "okay";
+
+@@ -926,10 +1154,7 @@ &gpio0 {
+ 	/*W0-W7*/	"","","","","","","","",
+ 	/*X0-X7*/	"","","","","","","","",
+ 	/*Y0-Y7*/	"","","","","","","","",
+-	/*Z0-Z7*/	"","","","","","","","",
+-	/*AA0-AA7*/	"","","","","","","","",
+-	/*AB0-AB7*/	"","","","","","","","",
+-	/*AC0-AC7*/	"","","","","","","","";
++	/*Z0-Z7*/	"","","","","","","","";
+ };
+
+ &jtag1 {
+--
+2.25.1

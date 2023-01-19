@@ -22,4 +22,5 @@ SRC_URI += "file://0001-drivers-soc-aspeed-Add-MCTP-driver.patch \
             file://0020-ARM-dts-aspeed-Add-UART-routing-to-Turin.patch \
             file://0021-drivers-hwmon-add-aspeed-chassis-driver.patch \
             file://0022-ARM-dts-aspeed-Initial-device-tree-for-Galena-Recluse.patch \
+            file://0023-ARM-dts-aspeed-initial-Huambo-DTS-file-for-AMD-Turin.patch \
            "
