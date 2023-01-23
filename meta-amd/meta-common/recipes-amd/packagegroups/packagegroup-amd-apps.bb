@@ -39,6 +39,7 @@ RDEPENDS_${PN}-flash = " \
 SUMMARY_${PN}-system = "AMD System"
 RDEPENDS_${PN}-system = " \
         amd-apml \
+        amd-bmc-ubm \
         amd-clear-cmos \
         amd-dimm \
         amd-lcd-lib \
