@@ -1,0 +1,625 @@
+From d0ca89d027da7b4958d95915bf757f3edeedfe48 Mon Sep 17 00:00:00 2001
+From: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
+Date: Fri, 27 Jan 2023 12:04:45 -0600
+Subject: [PATCH 1/1] drivers/hwmon: Add nct7362 fan controller driver
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+Adds nct7362 fan controller driver.
+
+The NCT7362/7363Y is a FAN controller which provides up to 16
+independent FAN input monitors. NCT7363Y can report each FAN input count
+values and compare its count limitation. Alert signal can be output when
+FAN speed is lower than the speed set by host in order to inform other
+devices.
+NCT7363Y also provides up to 16 independent PWM output. Each PWM can
+output specific PWM signal by manual mode to control the FAN duty
+outside.
+The NCT7363Y is also a general purpose input/output IC with SMBusTM
+which provides 16 GPIO pins. Meanwhile, it supports SMBusTM address
+setting pins to set the address during power- on reset or from external
+reset.
+
+Signed-off-by: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
+---
+ drivers/hwmon/Kconfig   |  11 +
+ drivers/hwmon/Makefile  |   1 +
+ drivers/hwmon/nct7362.c | 552 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 564 insertions(+)
+ create mode 100644 drivers/hwmon/nct7362.c
+
+diff --git a/drivers/hwmon/Kconfig b/drivers/hwmon/Kconfig
+index 35cc3910c12e..f04a227f43ce 100644
+--- a/drivers/hwmon/Kconfig
++++ b/drivers/hwmon/Kconfig
+@@ -1398,6 +1398,17 @@ config SENSORS_NCT6683
+ 	  This driver can also be built as a module. If so, the module
+ 	  will be called nct6683.
+
++config SENSORS_NCT7362
++	tristate "Nuvoton NCT7362Y"
++	depends on I2C
++	select REGMAP_I2C
++	help
++	  If you say yes here you get support for the Nuvoton NCT7362Y
++	  hardware monitoring chip.
++
++	  This driver can also be built as a module. If so, the module
++	  will be called nct7362.
++
+ config SENSORS_NCT6775
+ 	tristate "Nuvoton NCT6775F and compatibles"
+ 	depends on !PPC
+diff --git a/drivers/hwmon/Makefile b/drivers/hwmon/Makefile
+index bb3cf72b884e..1055b80bc0aa 100644
+--- a/drivers/hwmon/Makefile
++++ b/drivers/hwmon/Makefile
+@@ -148,6 +148,7 @@ obj-$(CONFIG_SENSORS_MENF21BMC_HWMON) += menf21bmc_hwmon.o
+ obj-$(CONFIG_SENSORS_MR75203)	+= mr75203.o
+ obj-$(CONFIG_SENSORS_NCT6683)	+= nct6683.o
+ obj-$(CONFIG_SENSORS_NCT6775)	+= nct6775.o
++obj-$(CONFIG_SENSORS_NCT7362)	+= nct7362.o
+ obj-$(CONFIG_SENSORS_NCT7802)	+= nct7802.o
+ obj-$(CONFIG_SENSORS_NCT7904)	+= nct7904.o
+ obj-$(CONFIG_SENSORS_NPCM7XX)	+= npcm750-pwm-fan.o
+diff --git a/drivers/hwmon/nct7362.c b/drivers/hwmon/nct7362.c
+new file mode 100644
+index 000000000000..268c26042e3b
+--- /dev/null
++++ b/drivers/hwmon/nct7362.c
+@@ -0,0 +1,552 @@
++/*
++    nct7362.c - Linux kernel driver for hardware monitoring
++    Copyright (C) 2008 Nuvoton Technology Corp.
++                  Wei Song
++                  2016 Nuvoton Technology Corp.
++                        Sheng-Yuan Huang
++                  2020 Nuvoton Technology Corp.
++                        Kuan-Wei Ho
++                  2023 AMD Inc.
++                        Supreeth Venkatesh
++
++    This program is free software; you can redistribute it and/or modify
++    it under the terms of the GNU General Public License as published by
++    the Free Software Foundation - version 2.
++
++    This program is distributed in the hope that it will be useful,
++    but WITHOUT ANY WARRANTY; without even the implied warranty of
++    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++    GNU General Public License for more details.
++
++    You should have received a copy of the GNU General Public License
++    along with this program; if not, write to the Free Software
++    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
++    02110-1301 USA.
++
++
++    Supports following chips:
++*/
++
++#include <linux/module.h>
++#include <linux/init.h>
++#include <linux/slab.h>
++#include <linux/i2c.h>
++#include <linux/hwmon.h>
++#include <linux/hwmon-vid.h>
++#include <linux/hwmon-sysfs.h>
++#include <linux/err.h>
++#include <linux/mutex.h>
++#include <linux/jiffies.h>
++
++/* Addresses to scan */
++static unsigned short normal_i2c[] = { 0x20, 0x21, 0x22, 0x23, I2C_CLIENT_END };
++
++/* Insmod parameters */
++static unsigned short force_subclients[4];
++module_param_array(force_subclients, short, NULL, 0);
++MODULE_PARM_DESC(force_subclients, "List of subclient addresses: "
++		       "{bus, clientaddr, subclientaddr1, subclientaddr2}");
++
++static bool reset;
++module_param(reset, bool, 0);
++MODULE_PARM_DESC(reset, "Set to 1 to reset chip, not recommended");
++
++#define DRVNAME "nct7362"
++#define NCT7362_REG_DID   0xFD
++#define NCT7362_ID_MASK	0xFFFFFF
++#define NCT7362_ID		(0x491988 & NCT7362_ID_MASK)	/* Chip ID */
++
++#define NCT7362_REG_I2C_ADDR    0x46
++#define NCT7362_REG_GLOBAL_CONTROL  0x00
++
++#define NCT7362_REG_FAN(index)    (0x48 + (index)*2 )
++#define NCT7362_REG_FAN_LSB(index)    (0x49 + (index)*2 )
++#define NCT7362_FAN_LSB_MASK	0x1F
++#define NCT7362_REG_PWM_CTRL1 0x38
++#define NCT7362_REG_PWM_CTRL2 0x39
++#define NCT7362_REG_FANIN_CTRL1 0x41
++#define NCT7362_REG_FANIN_CTRL2 0x42
++
++#define NCT7362_REG_PWM(index)    (0x90 + (index)*2 )
++
++static inline unsigned long FAN_FROM_REG(u16 val)
++{
++	if ((val >= 0x1fff) || (val == 0))
++		return	0;
++	return (1350000UL / val);
++}
++
++static inline u16 FAN_TO_REG(long rpm)
++{
++	if (rpm <= 0)
++		return 0x1fff;
++	return clamp_val((1350000 + (rpm >> 1)) / rpm, 1, 0x1fff);
++}
++
++static inline unsigned long TIME_FROM_REG(u8 reg)
++{
++	return (reg * 100);
++}
++
++static inline u8 TIME_TO_REG(unsigned long val)
++{
++	return clamp_val((val + 50) / 100, 0, 0xff);
++}
++
++enum chip_types {nct7362d};
++
++struct nct7362_data {
++	struct device *hwmon_dev;
++	struct mutex update_lock;
++	unsigned long last_updated;	/* In jiffies */
++	enum chip_types chip_type; /* For recording what the chip is */
++	const struct attribute_group *groups[3];
++
++	struct i2c_client *client;
++
++	u16 has_fan;	/* Enable fan 0-16 */
++	u16 fan[16];		/* Register value combine */
++
++	u16 has_pwm;	/* Enable pwm 0-16 */
++	u16 pwm[16];		/* Register value combine */
++
++	char valid;
++};
++
++static u8 nct7362_read_value(struct i2c_client *client, u16 reg);
++static int nct7362_write_value(struct i2c_client *client, u16 reg, u8 value);
++static int nct7362_probe(struct i2c_client *client,
++			const struct i2c_device_id *id);
++static int nct7362_detect(struct i2c_client *client,
++			 struct i2c_board_info *info);
++//static int nct7362_remove(struct i2c_client *client);
++
++static void nct7362_init_client(struct i2c_client *client);
++static struct nct7362_data *nct7362_update_device(struct device *dev);
++
++
++#define ALARM_STATUS      0
++
++static ssize_t
++show_fan(struct device *dev, struct device_attribute *attr, char *buf)
++{
++	struct sensor_device_attribute_2 *sensor_attr =
++	    to_sensor_dev_attr_2(attr);
++	int index = sensor_attr->index;
++	struct nct7362_data *data = nct7362_update_device(dev);
++	u16 val;
++
++	val = data->fan[index] & 0x1fff;
++	printk("nct7362_show_fan: FAN[0x%x] = 0x%x", index, FAN_FROM_REG(val));
++
++	return sprintf(buf, "%lu\n", FAN_FROM_REG(val));
++}
++
++static ssize_t
++show_pwm(struct device *dev, struct device_attribute *attr, char *buf)
++{
++	struct sensor_device_attribute_2 *sensor_attr =
++	    to_sensor_dev_attr_2(attr);
++	int index = sensor_attr->index;
++	struct nct7362_data *data = nct7362_update_device(dev);
++	u16 val;
++
++	val = data->pwm[index] & 0xff;
++	printk("nct7362_show_pwm: PWM[0x%x] = 0x%x", index, val);
++
++	return sprintf(buf, "%u\n", (val));
++}
++
++static ssize_t
++store_pwm(struct device *dev, struct device_attribute *attr,
++	 const char *buf, size_t count)
++{
++	struct sensor_device_attribute_2 *sensor_attr =
++	    to_sensor_dev_attr_2(attr);
++	int index = sensor_attr->index;
++	struct nct7362_data *data = nct7362_update_device(dev);
++	struct i2c_client *client = data->client;
++	unsigned long tmpVal;
++	int err;
++
++	err = kstrtoul(buf, 10, &tmpVal);
++	if (err){
++		return 0;
++	}
++	mutex_lock(&data->update_lock);
++	data->pwm[index] = tmpVal;
++	nct7362_write_value(client, NCT7362_REG_PWM(index), tmpVal & 0xFF);
++	mutex_unlock(&data->update_lock);
++
++	printk("nct7362_store_pwm: PWM[0x%x] set to 0x%x", index, tmpVal);
++	return count;
++}
++
++static umode_t nct7362_fan_is_visible(struct kobject *kobj,
++				     struct attribute *attr, int index)
++{
++	struct device *dev = container_of(kobj, struct device, kobj);
++	struct nct7362_data *data = dev_get_drvdata(dev);
++	int fan = index;	/* fan index */
++
++	if (!(data->has_fan & (1 << fan)))
++		return 0;
++
++	return attr->mode;
++}
++
++static umode_t nct7362_pwm_is_visible(struct kobject *kobj,
++				     struct attribute *attr, int index)
++{
++	struct device *dev = container_of(kobj, struct device, kobj);
++	struct nct7362_data *data = dev_get_drvdata(dev);
++	int pwm = index;	/* pwm index */
++
++	if (!(data->has_pwm & (1 << pwm)))
++		return 0;
++
++	return attr->mode;
++}
++
++#define NOT_USED			-1
++
++#define FAN_INPUT     0
++#define SENSOR_DEV_ATTR_FAN(index)						\
++		static SENSOR_DEVICE_ATTR_2(fan##index##_input, S_IRUGO, show_fan,		\
++			NULL, FAN_INPUT, index); \
++
++#define DEV_ATTR_ATTR_LIST_FAN(index)	\
++	&sensor_dev_attr_fan##index##_input.dev_attr.attr
++
++SENSOR_DEV_ATTR_FAN(0);
++SENSOR_DEV_ATTR_FAN(1);
++SENSOR_DEV_ATTR_FAN(2);
++SENSOR_DEV_ATTR_FAN(3);
++SENSOR_DEV_ATTR_FAN(4);
++SENSOR_DEV_ATTR_FAN(5);
++SENSOR_DEV_ATTR_FAN(6);
++SENSOR_DEV_ATTR_FAN(7);
++SENSOR_DEV_ATTR_FAN(8);
++SENSOR_DEV_ATTR_FAN(9);
++SENSOR_DEV_ATTR_FAN(10);
++SENSOR_DEV_ATTR_FAN(11);
++SENSOR_DEV_ATTR_FAN(12);
++SENSOR_DEV_ATTR_FAN(13);
++SENSOR_DEV_ATTR_FAN(14);
++SENSOR_DEV_ATTR_FAN(15);
++
++static struct attribute *nct7362_attributes_fan[] = {
++	DEV_ATTR_ATTR_LIST_FAN(0),
++	DEV_ATTR_ATTR_LIST_FAN(1),
++	DEV_ATTR_ATTR_LIST_FAN(2),
++	DEV_ATTR_ATTR_LIST_FAN(3),
++	DEV_ATTR_ATTR_LIST_FAN(4),
++	DEV_ATTR_ATTR_LIST_FAN(5),
++	DEV_ATTR_ATTR_LIST_FAN(6),
++	DEV_ATTR_ATTR_LIST_FAN(7),
++	DEV_ATTR_ATTR_LIST_FAN(8),
++	DEV_ATTR_ATTR_LIST_FAN(9),
++	DEV_ATTR_ATTR_LIST_FAN(10),
++	DEV_ATTR_ATTR_LIST_FAN(11),
++	DEV_ATTR_ATTR_LIST_FAN(12),
++	DEV_ATTR_ATTR_LIST_FAN(13),
++	DEV_ATTR_ATTR_LIST_FAN(14),
++	DEV_ATTR_ATTR_LIST_FAN(15),
++	NULL
++};
++
++static const struct attribute_group nct7362_group_fan = {
++	.attrs = nct7362_attributes_fan,
++	.is_visible = nct7362_fan_is_visible,
++};
++
++#define PWM_OUTPUT     0
++#define SENSOR_DEV_ATTR_PWM(index) \
++	static SENSOR_DEVICE_ATTR_2(pwm##index, S_IRUGO | S_IWUSR, show_pwm, \
++			store_pwm, PWM_OUTPUT, index);
++
++#define DEV_ATTR_ATTR_LIST_PWM(index)	\
++	&sensor_dev_attr_pwm##index.dev_attr.attr
++
++SENSOR_DEV_ATTR_PWM(0);
++SENSOR_DEV_ATTR_PWM(1);
++SENSOR_DEV_ATTR_PWM(2);
++SENSOR_DEV_ATTR_PWM(3);
++SENSOR_DEV_ATTR_PWM(4);
++SENSOR_DEV_ATTR_PWM(5);
++SENSOR_DEV_ATTR_PWM(6);
++SENSOR_DEV_ATTR_PWM(7);
++SENSOR_DEV_ATTR_PWM(8);
++SENSOR_DEV_ATTR_PWM(9);
++SENSOR_DEV_ATTR_PWM(10);
++SENSOR_DEV_ATTR_PWM(11);
++SENSOR_DEV_ATTR_PWM(12);
++SENSOR_DEV_ATTR_PWM(13);
++SENSOR_DEV_ATTR_PWM(14);
++SENSOR_DEV_ATTR_PWM(15);
++
++static struct attribute *nct7362_attributes_pwm[] = {
++	DEV_ATTR_ATTR_LIST_PWM(0),
++	DEV_ATTR_ATTR_LIST_PWM(1),
++	DEV_ATTR_ATTR_LIST_PWM(2),
++	DEV_ATTR_ATTR_LIST_PWM(3),
++	DEV_ATTR_ATTR_LIST_PWM(4),
++	DEV_ATTR_ATTR_LIST_PWM(5),
++	DEV_ATTR_ATTR_LIST_PWM(6),
++	DEV_ATTR_ATTR_LIST_PWM(7),
++	DEV_ATTR_ATTR_LIST_PWM(8),
++	DEV_ATTR_ATTR_LIST_PWM(9),
++	DEV_ATTR_ATTR_LIST_PWM(10),
++	DEV_ATTR_ATTR_LIST_PWM(11),
++	DEV_ATTR_ATTR_LIST_PWM(12),
++	DEV_ATTR_ATTR_LIST_PWM(13),
++	DEV_ATTR_ATTR_LIST_PWM(14),
++	DEV_ATTR_ATTR_LIST_PWM(15),
++	NULL
++};
++
++static const struct attribute_group nct7362_group_pwm = {
++	.attrs = nct7362_attributes_pwm,
++	.is_visible = nct7362_pwm_is_visible,
++};
++
++static void nct7362_init_client(struct i2c_client *client)
++{
++	// OEM initial setting (multi-function pins, and monitor channal)
++	nct7362_write_value(client, 0x20, 0xA9); // PWM0, TACH 9 ~ 11
++	nct7362_write_value(client, 0x21, 0x2A); // TACH 12 ~ 14
++	nct7362_write_value(client, 0x22, 0xA9); // PWM 8, TACH 1 ~ 3
++	nct7362_write_value(client, 0x23, 0x2A); // TACH 4 ~ 6
++	nct7362_write_value(client, 0x38, 0x01); // Enable PWM 0
++	nct7362_write_value(client, 0x39, 0x01); // Enable PWM 8
++	nct7362_write_value(client, 0x41, 0x7E); // ENABLE TACH 9 ~ 14
++	nct7362_write_value(client, 0x42, 0x7E); // ENABLE TACH 1 ~ 6
++	/* Start monitoring: nct7362 has no this register */
++}
++
++static int __init nct7362d_find(int addr, struct i2c_client *client, struct i2c_board_info *info)
++{
++	int err;
++	u32 devid = 0;
++
++	struct i2c_adapter *adapter = client->adapter;
++
++	err = -ENODEV;
++
++	devid = (nct7362_read_value(client, addr) & 0xFF);
++	devid = (devid<<8) | (nct7362_read_value(client, addr+1) & 0xFF);
++	devid = (devid<<8) | (nct7362_read_value(client, addr+2) & 0xFF);
++	devid = devid & NCT7362_ID_MASK;
++
++	switch (devid) {
++	case NCT7362_ID:
++	/* Fill in the remaining client fields and put into the global list */
++	strlcpy(info->type, "nct7362", I2C_NAME_SIZE);
++	dev_info(&adapter->dev, "Detected Nuvoton %s chip at 0x%02x\n", "nct7362", client->addr);
++		break;
++	default:
++		pr_info(DRVNAME ": Unsupported device 0x%08x\n", devid);
++		goto err;
++	}
++	err = 0;
++
++err:
++	return err;
++}
++
++/* Return 0 if detection is successful, -ENODEV otherwise */
++static int nct7362_detect(struct i2c_client *client,
++			 struct i2c_board_info *info)
++{
++	int ret;
++
++	printk(DRVNAME ": nct7362_detect: nct7362_detect...\n");
++
++	if (!i2c_check_functionality(client->adapter, I2C_FUNC_SMBUS_BYTE_DATA)) {
++		return -ENODEV;
++	}
++	ret = nct7362d_find(NCT7362_REG_DID, client, info);
++	if ( ret != 0){
++		return ret; //error
++	}
++
++	return 0;
++}
++
++#define TMP_MASK 0x3
++static int nct7362_probe(struct i2c_client *client,
++			const struct i2c_device_id *id)
++{
++	int i;
++	struct device *dev = &client->dev;
++	struct nct7362_data *data;
++	struct device *hwmon_dev;
++
++	printk("nct7362: nct7362_probe\n");
++
++	if (!(data = devm_kzalloc(dev,sizeof(struct nct7362_data), GFP_KERNEL))) {
++		return -ENOMEM;
++	}
++
++	i2c_set_clientdata(client, data);
++	mutex_init(&data->update_lock);
++
++	data->client = client;
++
++	/* Initialize the chip */
++	nct7362_init_client(client);
++
++	/* Check chip type*/
++	data->chip_type = nct7362d;
++
++	data->has_fan = nct7362_read_value(client, NCT7362_REG_FANIN_CTRL1);
++	data->has_fan |= (nct7362_read_value(client, NCT7362_REG_FANIN_CTRL2) << 8);
++
++	data->has_pwm = nct7362_read_value(client, NCT7362_REG_PWM_CTRL1);
++	data->has_pwm |= (nct7362_read_value(client, NCT7362_REG_PWM_CTRL2) << 8);
++
++	printk("nct7362: FAN: 0x%x PWM: 0x%x", data->has_fan, data->has_pwm);
++
++
++	/* Multi-Function detecting for Volt and TR/TD.
++	   Just deal with the DISABLE in has_xxxx because
++	   if it is not monitored, multi-function selection is useless.*/
++
++	/* First update fan */
++	for (i = 0; i < ARRAY_SIZE(data->fan); i++) {
++		if (!(data->has_fan & (1 << i))) {
++			printk("nct7362: Skipping FANIN0x%x", i);
++			continue;
++		}
++		data->fan[i] =
++			((u16)(nct7362_read_value(client, NCT7362_REG_FAN(i))) << 5);
++		data->fan[i] |=
++		  (nct7362_read_value(client, NCT7362_REG_FAN_LSB(i)) & NCT7362_FAN_LSB_MASK);
++	}
++	/* First update pwm */
++	for (i = 0; i < ARRAY_SIZE(data->pwm); i++) {
++		if (!(data->has_pwm & (1 << i))) {
++			printk("nct7362: Skipping PWM0x%x", i);
++			continue;
++		}
++		data->pwm[i] =
++			((u16)nct7362_read_value(client, NCT7362_REG_PWM(i)));
++	}
++
++	/* Prepare for sysfs hooks */
++	data->groups[0] = &nct7362_group_fan;
++	data->groups[1] = &nct7362_group_pwm;
++	data->groups[2] = NULL;
++
++	hwmon_dev = devm_hwmon_device_register_with_groups(dev,
++					client->name,
++					data, data->groups);
++	return PTR_ERR_OR_ZERO(hwmon_dev);
++}
++
++static struct nct7362_data *nct7362_update_device(struct device *dev)
++{
++	struct nct7362_data *data = dev_get_drvdata(dev);
++	struct i2c_client *client = data->client;
++	int i;
++
++	mutex_lock(&data->update_lock);
++
++	if (!(time_after(jiffies, data->last_updated + HZ * 2)
++	      || !data->valid))
++		goto END;
++
++	/* Update fan */
++	for (i = 0; i < ARRAY_SIZE(data->fan); i++) {
++		if (!(data->has_fan & (1 << i))) {
++			continue;
++		}
++		data->fan[i] =
++			((u16)nct7362_read_value(client, NCT7362_REG_FAN(i))) << 5;
++		data->fan[i] |=
++		  nct7362_read_value(client, NCT7362_REG_FAN_LSB(i)) & NCT7362_FAN_LSB_MASK;
++	}
++	/* Update pwm */
++	for (i = 0; i < ARRAY_SIZE(data->pwm); i++) {
++		if (!(data->has_pwm & (1 << i))) {
++			continue;
++		}
++		data->pwm[i] =
++			((u16)nct7362_read_value(client, NCT7362_REG_PWM(i)));
++	}
++	data->last_updated = jiffies;
++	data->valid = 1;
++
++END:
++	mutex_unlock(&data->update_lock);
++	return data;
++}
++
++/* Ignore the possibility that somebody change bank outside the driver
++   Must be called with data->update_lock held, except during initialization */
++static u8 nct7362_read_value(struct i2c_client *client, u16 reg)
++{
++	u8 res = 0xff;
++
++	res = i2c_smbus_read_byte_data(client, reg & 0xff);
++	return res;
++}
++
++/* Must be called with data->update_lock held, except during initialization */
++static int nct7362_write_value(struct i2c_client *client, u16 reg, u8 value)
++{
++	int res;
++
++	res = i2c_smbus_write_byte_data(client, reg & 0xff, value);
++	return res;
++}
++
++static const struct i2c_device_id nct7362_id[] = {
++	{ "nct7362", 0 },
++	{},
++};
++
++//MODULE_DEVICE_TABLE(i2c, nct7362_id);
++
++static struct i2c_driver nct7362_driver = {
++	.driver = {
++			.owner = THIS_MODULE,
++			.name = DRVNAME,
++	},
++	.class		= I2C_CLASS_HWMON,
++	.probe		= nct7362_probe,
++	//.remove		= nct7362_remove,
++	.id_table	= nct7362_id,
++	.detect		= nct7362_detect,
++	.address_list	= normal_i2c,
++};
++
++#ifdef DBG_INIT_FUNCTION
++
++static int __init sensors_nct7362_init(void)
++{
++	printk("nct7362: sensors_nct7362_init\n");
++
++	return i2c_add_driver(&nct7362_driver);
++}
++
++static void __exit sensors_nct7362_exit(void)
++{
++	printk("nct7362: sensors_nct7362_exit\n");
++
++	i2c_del_driver(&nct7362_driver);
++}
++
++module_init(sensors_nct7362_init);
++module_exit(sensors_nct7362_exit);
++
++#else
++
++module_i2c_driver(nct7362_driver);
++
++#endif
++
++MODULE_AUTHOR("Sheng-Yuan Huang");
++MODULE_DESCRIPTION("NCT7362 driver");
++MODULE_LICENSE("GPL");
++
+--
+2.17.1
+
