@@ -1,0 +1,267 @@
+From 27a788d2cedd6e27e2639da663db9aec56a3a5fa Mon Sep 17 00:00:00 2001
+From: Mohsen Dolaty <mohsen.dolaty@amd.com>
+Date: Thu, 26 Jan 2023 19:31:17 -0600
+Subject: [PATCH 1/1] linux-aspeed: Add new HWMON for Turin Lenovo
+
+Add NCT7362 HWMON to Lenovo Platforms
+Delete EMC2305 HWMON from Lenovo platforms
+Also cleaned up LM75s and PVDD in Lenovo platforms
+
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-purico.dts  |  60 +++--------
+ arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts | 101 ++++++++-----------
+ 2 files changed, 57 insertions(+), 104 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+index cfc30a389ad9..ba46c3d2fbd3 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+@@ -144,13 +144,13 @@ flash@0 {
+
+ };
+
+-// Host Serial console
+ #ifdef HOST_SERIAL_ESPI_VUART
+ // eSPI Virtual UART - 0x3F8
+ &vuart1 {
+ 	status = "okay";
+ };
+ #else
++// Host Serial console
+ &uart1 {
+ 	compatible = "aspeed,ast2600-uart";
+ 	/delete-property/ reg-shift;
+@@ -263,30 +263,20 @@ i2c@0 {
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+
+-			emc2305@4d {
+-				compatible = "smsc,emc2305";
+-				reg = <0x4d>;
+-				#cooling-cells = <0x02>;
+-
+-				fan@0 {
+-					min-rpm = /bits/ 16 <1000>;
+-					max-rpm = /bits/ 16 <16000>;
+-				};
+-
+-				fan@1 {
+-					min-rpm = /bits/ 16 <1000>;
+-					max-rpm = /bits/ 16 <16000>;
+-				};
+-
+-				fan@2 {
+-					min-rpm = /bits/ 16 <1000>;
+-					max-rpm = /bits/ 16 <16000>;
+-				};
+-
+-				fan@3 {
+-					min-rpm = /bits/ 16 <1000>;
+-					max-rpm = /bits/ 16 <16000>;
+-				};
++			nct7362@20 {
++				compatible = "nuvoton,nct7362";
++				reg = <0x20>;
++			};
++		};
++
++		i2c@3 {
++			reg = <3>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			nct7362@20 {
++				compatible = "nuvoton,nct7362";
++				reg = <0x20>;
+ 			};
+ 		};
+
+@@ -310,30 +300,10 @@ lm75a@4a {
+ 				reg = <0x4a>;
+ 			};
+
+-			lm75a@4b {
+-				compatible = "national,lm75a";
+-				reg = <0x4b>;
+-			};
+-
+ 			lm75a@4c {
+ 				compatible = "national,lm75a";
+ 				reg = <0x4c>;
+ 			};
+-
+-			lm75a@4d {
+-				compatible = "national,lm75a";
+-				reg = <0x4d>;
+-			};
+-
+-			lm75a@4e {
+-				compatible = "national,lm75a";
+-				reg = <0x4e>;
+-			};
+-
+-			lm75a@4f {
+-				compatible = "national,lm75a";
+-				reg = <0x4f>;
+-			};
+ 		};
+
+ 		i2c@6 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts b/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
+index 9bc0b76b9707..17c3812b0b9d 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
+@@ -143,13 +143,13 @@ flash@0 {
+
+ };
+
+-// Host Serial console
+ #ifdef HOST_SERIAL_ESPI_VUART
+ // eSPI Virtual UART - 0x3F8
+ &vuart1 {
+ 	status = "okay";
+ };
+ #else
++// Host Serial console
+ &uart1 {
+ 	compatible = "aspeed,ast2600-uart";
+ 	/delete-property/ reg-shift;
+@@ -621,26 +621,26 @@ &i2c4 {
+ &i2c5 {
+ 	// Net name i2c2 (SCM_I2C2)
+ 	status = "okay";
+-       pvddcr_soc_p0@61 {
+-           compatible = "isil,isl68137";
+-           reg = <0x61>;
+-       };
+-       pvdd33_s5_p0@19 {
+-           compatible = "isil,isl68137";
+-           reg = <0x19>;
+-       };
+-       pvdd11_s3_p0@63 {
+-           compatible = "isil,isl68137";
+-           reg = <0x63>;
+-       };
+-       pvddio_p0@62 {
+-           compatible = "isil,isl68137";
+-           reg = <0x62>;
+-       };
+-       pvdd18_s5_p0@17 {
+-           compatible = "isil,isl68137";
+-           reg = <0x17>;
+-       };
++	pvddcr_soc_p0@61 {
++		compatible = "isil,isl68137";
++		reg = <0x61>;
++	};
++	pvdd33_s5_p0@19 {
++		compatible = "isil,isl68137";
++		reg = <0x19>;
++	};
++	pvdd11_s3_p0@62 {
++		compatible = "isil,isl68137";
++		reg = <0x63>;
++	};
++	pvddio_p0@63 {
++		compatible = "isil,isl68137";
++		reg = <0x62>;
++	};
++	pvdd18_s5_p0@17 {
++		compatible = "isil,isl68137";
++		reg = <0x17>;
++	};
+
+ };
+
+@@ -699,37 +699,19 @@ i2c@0 {
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 			reg = <0>;
++			nct7362@20 {
++				compatible = "nuvoton,nct7362";
++				reg = <0x20>;
++			};
++		};
+
+-			// FAN Band
+-			i2cswitch@77 {
+-				compatible = "nxp,pca9546";
+-				#address-cells = <1>;
+-				#size-cells = <0>;
+-				reg = <0x77>;
+-
+-				//  port 0 connected to CPLD on FAN BD
+-				i2c@0 {
+-					#address-cells = <1>;
+-					#size-cells = <0>;
+-					reg = <0>;
+-
+-					// 6 dual rotter Fans are controlled by cpld
+-					amd_cpld@28 {
+-						compatible="amd_cpld,amd_cpld";
+-						reg = <0x28>;
+-					};
+-				};
+-
+-				i2c@3 {
+-					#address-cells = <1>;
+-					#size-cells = <0>;
+-					reg = <3>;
+-
+-					lm75a@4b {	// FAN BD
+-						compatible = "national,lm75a";
+-						reg = <0x4b>;
+-					};
+-				};
++		i2c@7 { //Liquid Cooling Fan
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <7>;
++			nct7362@20 {
++				compatible = "nuvoton,nct7362";
++				reg = <0x20>;
+ 			};
+ 		};
+
+@@ -738,29 +720,30 @@ i2c@1 {
+ 			#size-cells = <0>;
+ 			reg = <1>;
+
+-			lm75a@48 {	// SYS OUTLET
++			lm75a@48 {  // CPU0 R-VR
+ 				compatible = "national,lm75a";
+ 				reg = <0x48>;
+ 			};
+-
+-			lm75a@49 {	// OCP INLET
++			lm75a@49 {  // OUTLET
+ 				compatible = "national,lm75a";
+ 				reg = <0x49>;
+ 			};
+-			lm75a@4a {	// SCM INLET
++			lm75a@4a {  // SCM OUTLET
+ 				compatible = "national,lm75a";
+ 				reg = <0x4a>;
+ 			};
+-
+-			lm75a@4b {	// CPU1 INLET
++			lm75a@4b {  // CPU0 F-VR
+ 				compatible = "national,lm75a";
+ 				reg = <0x4b>;
+ 			};
+-
+-			lm75a@4c {	// CPU0 INLET
++			lm75a@4c {  // CPU1 F-VR
+ 				compatible = "national,lm75a";
+ 				reg = <0x4c>;
+ 			};
++			lm75a@4d {  // CPU1 R-VR
++				compatible = "national,lm75a";
++				reg = <0x4d>;
++			};
+ 		};
+
+ 		i2c@2 {
+--
+2.25.1
