@@ -25,4 +25,5 @@ SRC_URI += "file://0001-drivers-soc-aspeed-Add-MCTP-driver.patch \
             file://0023-ARM-dts-aspeed-initial-Huambo-DTS-file-for-AMD-Turin.patch \
             file://0024-drivers-hwmon-Add-nct7362-fan-controller-driver.patch \
             file://0025-ARM-dts-aspeed-Add-new-HWMON-for-Turin-Lenovo.patch \
+            file://0026-ARM-dts-aspeed-Add-UART-routing-to-sh5.patch \
            "

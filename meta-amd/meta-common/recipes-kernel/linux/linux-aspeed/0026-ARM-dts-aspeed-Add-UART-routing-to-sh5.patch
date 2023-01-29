@@ -1,0 +1,47 @@
+From 1559f2dcb8a86550e51bcdf1a0ab47d37abd31c7 Mon Sep 17 00:00:00 2001
+From: Alisha Kulkarni <ALISHA.KULKARNI@amd.com>
+Date: Sat, 28 Jan 2023 19:57:08 -0600
+Subject: [PATCH 1/1] ARM-dts-aspeed-Add-UART-routing-to-SH5
+
+Signed-off-by: Alisha Kulkarni <ALISHA.KULKARNI@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-sh5d807.dts | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-sh5d807.dts b/arch/arm/boot/dts/aspeed-bmc-amd-sh5d807.dts
+index adaf1b99bb60..39952c4df6b1 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-sh5d807.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-sh5d807.dts
+@@ -144,6 +144,12 @@
+
+ };
+
++#ifdef HOST_SERIAL_ESPI_VUART
++// eSPI Virtual UART - 0x3F8
++&vuart1 {
++	status = "okay";
++};
++#else
+ &uart1 {
+ 	//Host console
+ 	compatible = "aspeed,ast2600-uart";
+@@ -153,6 +159,7 @@
+ 	dma-channel = <0>;
+ 	status = "okay";
+ };
++#endif
+
+ //BMC Console
+ &uart5 {
+@@ -858,7 +865,6 @@
+ 	aspeed,lpc-io-reg = <0xCA2>;
+ };
+
+-// eSPI Virtual UART - 0x3F8
+-&vuart1 {
++&uart_routing {
+ 	status = "okay";
+ };
+--
+2.17.1
+
