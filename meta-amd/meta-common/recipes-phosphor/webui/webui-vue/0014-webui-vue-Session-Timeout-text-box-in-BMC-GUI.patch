@@ -1,0 +1,498 @@
+From d9f6dc0c9cd8d413a4a55b1691ad28caa2b6b407 Mon Sep 17 00:00:00 2001
+From: Ashok Kumar <ashok2.kumar@amd.com>
+Date: Tue, 31 Jan 2023 12:04:40 -0600
+Subject: [PATCH] webui-vue: Session Timeout text box in BMC GUI
+
+Added new Session Timeout text box in BMC GUI
+Fixes: FWDEV-23887
+
+Signed-off-by: Ashok Kumar <ashok2.kumar@amd.com>
+---
+ src/locales/en-US.json                        |   6 +-
+ src/store/index.js                            |   2 +
+ .../SecurityAndAccess/SessionTimeoutStore.js  |  48 ++++
+ .../Sessions/SessionTimeout.vue               | 133 +++++++++++
+ .../SecurityAndAccess/Sessions/Sessions.vue   | 219 +++++++++---------
+ 5 files changed, 300 insertions(+), 108 deletions(-)
+ create mode 100644 src/store/modules/SecurityAndAccess/SessionTimeoutStore.js
+ create mode 100644 src/views/SecurityAndAccess/Sessions/SessionTimeout.vue
+
+diff --git a/src/locales/en-US.json b/src/locales/en-US.json
+index d38a22c..2f63711 100644
+--- a/src/locales/en-US.json
++++ b/src/locales/en-US.json
+@@ -166,6 +166,8 @@
+     "username": "Username"
+   },
+   "pageSessions": {
++    "sessionTimeoutLabel": "Session Time out value (in seconds)",
++    "sessionTimeoutLableTextInfo": "The mininum & maximum allowed values for session timeout are 30 seconds and 86400 seconds respectively as per the session service schema",
+     "action": {
+       "disconnect": "Disconnect"
+     },
+@@ -181,7 +183,9 @@
+     },
+     "toast": {
+       "errorDelete": "Error disconnecting %{count} session. | Error disconnecting %{count} sessions.",
+-      "successDelete": "Successfully disconnected %{count} session. | Successfully disconnected %{count} sessions."
++      "successDelete": "Successfully disconnected %{count} session. | Successfully disconnected %{count} sessions.",
++      "errorSaveSettings": "Error saving settings.",
++      "successSaveSettings": "Session Timeout updated successfully."
+     }
+   },
+   "pageDateTime": {
+diff --git a/src/store/index.js b/src/store/index.js
+index 2408055..239bb61 100644
+--- a/src/store/index.js
++++ b/src/store/index.js
+@@ -4,6 +4,7 @@ import Vuex from 'vuex';
+ import GlobalStore from './modules/GlobalStore';
+ import AuthenticationStore from './modules/Authentication/AuthenticanStore';
+ import SessionsStore from './modules/SecurityAndAccess/SessionsStore';
++import SessionTimeoutStore from './modules/SecurityAndAccess/SessionTimeoutStore';
+ import LdapStore from './modules/SecurityAndAccess/LdapStore';
+ import UserManagementStore from './modules/SecurityAndAccess/UserManagementStore';
+ import CertificatesStore from './modules/SecurityAndAccess/CertificatesStore';
+@@ -41,6 +42,7 @@ export default new Vuex.Store({
+     global: GlobalStore,
+     authentication: AuthenticationStore,
+     sessions: SessionsStore,
++    sessionTimeout: SessionTimeoutStore,
+     dateTime: DateTimeStore,
+     ldap: LdapStore,
+     userManagement: UserManagementStore,
+diff --git a/src/store/modules/SecurityAndAccess/SessionTimeoutStore.js b/src/store/modules/SecurityAndAccess/SessionTimeoutStore.js
+new file mode 100644
+index 0000000..e3176fe
+--- /dev/null
++++ b/src/store/modules/SecurityAndAccess/SessionTimeoutStore.js
+@@ -0,0 +1,48 @@
++import api from '@/store/api';
++import i18n from '@/i18n';
++
++const SessionTimeoutStore = {
++  namespaced: true,
++  state: {
++    sessionTimeoutValue: null,
++    powerConsumptionValue: null,
++  },
++  getters: {
++    sessionTimeoutValue: (state) => state.sessionTimeoutValue,
++    powerConsumptionValue: (state) => state.powerConsumptionValue,
++  },
++  mutations: {
++    setSessionTimeoutValue: (state, sessionTimeoutValue) =>
++      (state.sessionTimeoutValue = sessionTimeoutValue),
++    setPowerConsumptionValue: (state, powerConsumptionValue) =>
++      (state.powerConsumptionValue = powerConsumptionValue),
++  },
++  actions: {
++    setSessTimeoutUpdatedValue({ commit }, value) {
++      commit('setSessionTimeoutValue', value);
++    },
++    async getSessionTimeoutConrol({ commit }) {
++      return await api
++        .get('/redfish/v1/SessionService')
++        .then((response) => {
++          const sessTimeout = response.data.SessionTimeout;
++          commit('setSessionTimeoutValue', sessTimeout);
++        })
++        .catch((error) => {
++          console.log('Session Timeout', error);
++        });
++    },
++    async setSessionTimeoutControl(_, sessionTimeoutValue) {
++      const data = { SessionTimeout: sessionTimeoutValue };
++      return await api
++        .patch('/redfish/v1/SessionService', data)
++        .then(() => i18n.t('pageSessions.toast.successSaveSettings'))
++        .catch((error) => {
++          console.log(error);
++          throw new Error(i18n.t('pageSessions.toast.errorSaveSettings'));
++        });
++    },
++  },
++};
++
++export default SessionTimeoutStore;
+diff --git a/src/views/SecurityAndAccess/Sessions/SessionTimeout.vue b/src/views/SecurityAndAccess/Sessions/SessionTimeout.vue
+new file mode 100644
+index 0000000..b48fce0
+--- /dev/null
++++ b/src/views/SecurityAndAccess/Sessions/SessionTimeout.vue
+@@ -0,0 +1,133 @@
++<template>
++  <b-container fluid="xl">
++    <b-form @submit.prevent="submitForm">
++      <b-form-group :disabled="loading">
++        <b-row>
++          <b-col sm="8" md="6" xl="3">
++            <b-form-group
++              id="input-group-1"
++              :label="$t('pageSessions.sessionTimeoutLabel')"
++              label-class="font-weight-bold pt-0"
++              label-size="md"
++              label-for="input-1"
++            >
++              <b-form-text id="sessiontimeout-help-text">
++                {{
++                  $t('pageSessions.sessionTimeoutLableTextInfo', {
++                    min: 1,
++                    max: 10000,
++                  })
++                }}
++              </b-form-text>
++
++              <b-form-input
++                id="input-1"
++                v-model.number="sessionTimeoutValue"
++                :disabled="!isSessionTimeoutFieldEnabled"
++                data-test-id="session-input-sessionTimeoutValue"
++                type="number"
++                aria-describedby="sessiontimeout-help-text"
++                :state="getValidationState($v.sessionTimeoutValue)"
++              ></b-form-input>
++
++              <b-form-invalid-feedback id="input-live-feedback" role="alert">
++                <template v-if="!$v.sessionTimeoutValue.required">
++                  {{ $t('global.form.fieldRequired') }}
++                </template>
++                <template v-else-if="!$v.sessionTimeoutValue.between">
++                  {{ $t('global.form.invalidValue') }}
++                </template>
++              </b-form-invalid-feedback>
++            </b-form-group>
++          </b-col>
++        </b-row>
++
++        <b-button
++          variant="primary"
++          type="submit"
++          data-test-id="session-button-saveSessionTimeoutValue"
++        >
++          {{ $t('global.action.save') }}
++        </b-button>
++      </b-form-group>
++    </b-form>
++  </b-container>
++</template>
++
++<script>
++//import PageTitle from '@/components/Global/PageTitle';
++import LoadingBarMixin, { loading } from '@/components/Mixins/LoadingBarMixin';
++import VuelidateMixin from '@/components/Mixins/VuelidateMixin.js';
++import BVToastMixin from '@/components/Mixins/BVToastMixin';
++import { requiredIf, between } from 'vuelidate/lib/validators';
++
++export default {
++  name: 'SessionTimeout',
++  mixins: [VuelidateMixin, BVToastMixin, LoadingBarMixin],
++  beforeRouteLeave(to, from, next) {
++    this.hideLoader();
++    next();
++  },
++  data() {
++    return {
++      loading,
++    };
++  },
++  computed: {
++    isSessionTimeoutFieldEnabled: {
++      get() {
++        return this.powerCapValue !== null;
++      },
++      set(value) {
++        let newValue = value ? '' : null;
++        this.$v.$reset();
++        this.$store.dispatch(
++          'sessionTimeout/setSessTimeoutUpdatedValue',
++          newValue
++        );
++      },
++    },
++    sessionTimeoutValue: {
++      get() {
++        return this.$store.getters['sessionTimeout/sessionTimeoutValue'];
++      },
++      set(value) {
++        this.$v.$touch();
++        this.$store.dispatch(
++          'sessionTimeout/setSessTimeoutUpdatedValue',
++          value
++        );
++      },
++    },
++  },
++  created() {
++    this.startLoader();
++    this.$store
++      .dispatch('sessionTimeout/getSessionTimeoutConrol')
++      .finally(() => this.endLoader());
++  },
++  validations: {
++    sessionTimeoutValue: {
++      between: between(30, 86400),
++      required: requiredIf(function () {
++        return this.isSessionTimeoutFieldEnabled;
++      }),
++    },
++  },
++  methods: {
++    submitForm() {
++      this.$v.$touch();
++      if (this.$v.$invalid) return;
++      this.startLoader();
++      this.$store
++        .dispatch(
++          'sessionTimeout/setSessionTimeoutControl',
++          this.sessionTimeoutValue
++        )
++        .then((message) => this.successToast(message))
++        .catch(({ message }) => this.errorToast(message))
++        .finally(() => this.endLoader());
++    },
++  },
++};
++</script>
+diff --git a/src/views/SecurityAndAccess/Sessions/Sessions.vue b/src/views/SecurityAndAccess/Sessions/Sessions.vue
+index 9782e7f..a452e23 100644
+--- a/src/views/SecurityAndAccess/Sessions/Sessions.vue
++++ b/src/views/SecurityAndAccess/Sessions/Sessions.vue
+@@ -1,118 +1,122 @@
+ <template>
+   <b-container fluid="xl">
+     <page-title />
+-    <b-row class="align-items-end">
+-      <b-col sm="6" md="5" xl="4">
+-        <search
+-          :placeholder="$t('pageSessions.table.searchSessions')"
+-          data-test-id="sessions-input-searchSessions"
+-          @change-search="onChangeSearchInput"
+-          @clear-search="onClearSearchInput"
+-        />
+-      </b-col>
+-      <b-col sm="3" md="3" xl="2">
+-        <table-cell-count
+-          :filtered-items-count="filteredRows"
+-          :total-number-of-cells="allConnections.length"
+-        ></table-cell-count>
+-      </b-col>
+-    </b-row>
+-    <b-row>
+-      <b-col>
+-        <table-toolbar
+-          ref="toolbar"
+-          :selected-items-count="selectedRows.length"
+-          :actions="batchActions"
+-          @clear-selected="clearSelectedRows($refs.table)"
+-          @batch-action="onBatchAction"
+-        >
+-        </table-toolbar>
+-        <b-table
+-          id="table-session-logs"
+-          ref="table"
+-          responsive="md"
+-          selectable
+-          no-select-on-click
+-          hover
+-          show-empty
+-          sort-by="clientID"
+-          :fields="fields"
+-          :items="allConnections"
+-          :filter="searchFilter"
+-          :empty-text="$t('global.table.emptyMessage')"
+-          :per-page="perPage"
+-          :current-page="currentPage"
+-          @filtered="onFiltered"
+-          @row-selected="onRowSelected($event, allConnections.length)"
+-        >
+-          <!-- Checkbox column -->
+-          <template #head(checkbox)>
+-            <b-form-checkbox
+-              v-model="tableHeaderCheckboxModel"
+-              data-test-id="sessions-checkbox-selectAll"
+-              :indeterminate="tableHeaderCheckboxIndeterminate"
+-              @change="onChangeHeaderCheckbox($refs.table)"
+-            >
+-              <span class="sr-only">{{ $t('global.table.selectAll') }}</span>
+-            </b-form-checkbox>
+-          </template>
+-          <template #cell(checkbox)="row">
+-            <b-form-checkbox
+-              v-model="row.rowSelected"
+-              :data-test-id="`sessions-checkbox-selectRow-${row.index}`"
+-              @change="toggleSelectRow($refs.table, row.index)"
+-            >
+-              <span class="sr-only">{{ $t('global.table.selectItem') }}</span>
+-            </b-form-checkbox>
+-          </template>
+-
+-          <!-- Actions column -->
+-          <template #cell(actions)="row" class="ml-3">
+-            <table-row-action
+-              v-for="(action, index) in row.item.actions"
+-              :key="index"
+-              :value="action.value"
+-              :title="action.title"
+-              :row-data="row.item"
+-              :btn-icon-only="false"
+-              :data-test-id="`sessions-button-disconnect-${row.index}`"
+-              @click-table-action="onTableRowAction($event, row.item)"
+-            ></table-row-action>
+-          </template>
+-        </b-table>
+-      </b-col>
+-    </b-row>
+-
+-    <!-- Table pagination -->
+-    <b-row>
+-      <b-col sm="6">
+-        <b-form-group
+-          class="table-pagination-select"
+-          :label="$t('global.table.itemsPerPage')"
+-          label-for="pagination-items-per-page"
+-        >
+-          <b-form-select
+-            id="pagination-items-per-page"
+-            v-model="perPage"
+-            :options="itemsPerPageOptions"
++    <page-section>
++      <session-timeout />
++    </page-section>
++    <page-section>
++      <b-row class="align-items-end">
++        <b-col sm="6" md="5" xl="4">
++          <search
++            :placeholder="$t('pageSessions.table.searchSessions')"
++            data-test-id="sessions-input-searchSessions"
++            @change-search="onChangeSearchInput"
++            @clear-search="onClearSearchInput"
++          />
++        </b-col>
++        <b-col sm="3" md="3" xl="2">
++          <table-cell-count
++            :filtered-items-count="filteredRows"
++            :total-number-of-cells="allConnections.length"
++          ></table-cell-count>
++        </b-col>
++      </b-row>
++      <b-row>
++        <b-col>
++          <table-toolbar
++            ref="toolbar"
++            :selected-items-count="selectedRows.length"
++            :actions="batchActions"
++            @clear-selected="clearSelectedRows($refs.table)"
++            @batch-action="onBatchAction"
++          >
++          </table-toolbar>
++          <b-table
++            id="table-session-logs"
++            ref="table"
++            responsive="md"
++            selectable
++            no-select-on-click
++            hover
++            show-empty
++            sort-by="clientID"
++            :fields="fields"
++            :items="allConnections"
++            :filter="searchFilter"
++            :empty-text="$t('global.table.emptyMessage')"
++            :per-page="perPage"
++            :current-page="currentPage"
++            @filtered="onFiltered"
++            @row-selected="onRowSelected($event, allConnections.length)"
++          >
++            <!-- Checkbox column -->
++            <template #head(checkbox)>
++              <b-form-checkbox
++                v-model="tableHeaderCheckboxModel"
++                data-test-id="sessions-checkbox-selectAll"
++                :indeterminate="tableHeaderCheckboxIndeterminate"
++                @change="onChangeHeaderCheckbox($refs.table)"
++              >
++                <span class="sr-only">{{ $t('global.table.selectAll') }}</span>
++              </b-form-checkbox>
++            </template>
++            <template #cell(checkbox)="row">
++              <b-form-checkbox
++                v-model="row.rowSelected"
++                :data-test-id="`sessions-checkbox-selectRow-${row.index}`"
++                @change="toggleSelectRow($refs.table, row.index)"
++              >
++                <span class="sr-only">{{ $t('global.table.selectItem') }}</span>
++              </b-form-checkbox>
++            </template>
++            <!-- Actions column -->
++            <template #cell(actions)="row" class="ml-3">
++              <table-row-action
++                v-for="(action, index) in row.item.actions"
++                :key="index"
++                :value="action.value"
++                :title="action.title"
++                :row-data="row.item"
++                :btn-icon-only="false"
++                :data-test-id="`sessions-button-disconnect-${row.index}`"
++                @click-table-action="onTableRowAction($event, row.item)"
++              ></table-row-action>
++            </template>
++          </b-table>
++        </b-col>
++      </b-row>
++      <!-- Table pagination -->
++      <b-row>
++        <b-col sm="6">
++          <b-form-group
++            class="table-pagination-select"
++            :label="$t('global.table.itemsPerPage')"
++            label-for="pagination-items-per-page"
++          >
++            <b-form-select
++              id="pagination-items-per-page"
++              v-model="perPage"
++              :options="itemsPerPageOptions"
++            />
++          </b-form-group>
++        </b-col>
++        <b-col sm="6">
++          <b-pagination
++            v-model="currentPage"
++            first-number
++            last-number
++            :per-page="perPage"
++            :total-rows="getTotalRowCount(filteredRows)"
++            aria-controls="table-session-logs"
+           />
+-        </b-form-group>
+-      </b-col>
+-      <b-col sm="6">
+-        <b-pagination
+-          v-model="currentPage"
+-          first-number
+-          last-number
+-          :per-page="perPage"
+-          :total-rows="getTotalRowCount(filteredRows)"
+-          aria-controls="table-session-logs"
+-        />
+-      </b-col>
+-    </b-row>
++        </b-col>
++      </b-row>
++    </page-section>
+   </b-container>
+ </template>
+
+ <script>
++import SessionTimeout from './SessionTimeout';
+ import PageTitle from '@/components/Global/PageTitle';
+ import Search from '@/components/Global/Search';
+ import TableCellCount from '@/components/Global/TableCellCount';
+@@ -137,6 +141,7 @@ import SearchFilterMixin, {
+
+ export default {
+   components: {
++    SessionTimeout,
+     PageTitle,
+     Search,
+     TableCellCount,
