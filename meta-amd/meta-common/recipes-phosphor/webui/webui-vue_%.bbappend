@@ -16,4 +16,5 @@ SRC_URI += "file://0001-webvue-ui-Support-HPM-and-SCM-FPGA-firmware-updates.patc
             file://0012-increase-firmware-update-max-timeout.patch \
             file://0013-allow-zero-as-power-limit-value.patch \
             file://0014-webui-vue-Session-Timeout-text-box-in-BMC-GUI.patch \
+            file://0015-webui-vue-Removed-CPU-info-from-Overview-Page.patch \
             "

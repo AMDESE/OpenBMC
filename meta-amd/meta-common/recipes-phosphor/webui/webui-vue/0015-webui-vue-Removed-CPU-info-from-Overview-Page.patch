@@ -1,0 +1,183 @@
+From 554e42ce733b98afd3781da547be74368c2f22d9 Mon Sep 17 00:00:00 2001
+From: Ashok Kumar <ashok2.kumar@amd.com>
+Date: Tue, 31 Jan 2023 22:41:46 -0600
+Subject: [PATCH] webui-vue: Removed CPU info from Overview Page
+
+Processor information will be dispaly on Hardware
+status page, as per redfish schema
+
+Signed-off-by: Ashok Kumar <ashok2.kumar@amd.com>
+---
+ src/locales/en-US.json                        |  5 --
+ .../ResourceManagement/PowerControlStore.js   | 48 -------------------
+ src/views/Overview/Overview.vue               | 44 -----------------
+ 3 files changed, 97 deletions(-)
+
+diff --git a/src/locales/en-US.json b/src/locales/en-US.json
+index 2f63711..df250e0 100644
+--- a/src/locales/en-US.json
++++ b/src/locales/en-US.json
+@@ -581,11 +581,6 @@
+     "powerConsumption": "Power consumption",
+     "serialNumber": "Serial number",
+     "serverInformation": "Server information",
+-    "cpuId": "CPU information",
+-    "socket":"Socket",
+-    "familyId":"Family ID",
+-    "modelId":"Model ID",
+-    "steppingId":"Stepping ID",
+     "events": {
+       "date": "Date",
+       "description": "Description",
+diff --git a/src/store/modules/ResourceManagement/PowerControlStore.js b/src/store/modules/ResourceManagement/PowerControlStore.js
+index b061bfe..751aabf 100644
+--- a/src/store/modules/ResourceManagement/PowerControlStore.js
++++ b/src/store/modules/ResourceManagement/PowerControlStore.js
+@@ -1,40 +1,21 @@
+ import api from '@/store/api';
+ import i18n from '@/i18n';
+
+-const UNKNOWN = 'UnKnown';
+ const PowerControlStore = {
+   namespaced: true,
+   state: {
+     powerCapValue: null,
+     powerConsumptionValue: null,
+-    cpuId1Value: [],
+-    cpuId2Value: [],
+   },
+   getters: {
+     powerCapValue: (state) => state.powerCapValue,
+     powerConsumptionValue: (state) => state.powerConsumptionValue,
+-    cpuId1Value: (state) => state.cpuId1Value,
+-    cpuId2Value: (state) => state.cpuId2Value,
+   },
+   mutations: {
+     setPowerCapValue: (state, powerCapValue) =>
+       (state.powerCapValue = powerCapValue),
+     setPowerConsumptionValue: (state, powerConsumptionValue) =>
+       (state.powerConsumptionValue = powerConsumptionValue),
+-    setcpuId1Value: (state, cpuId1) => {
+-      const cpuId1Value = {};
+-      cpuId1Value.familyId = cpuId1.familyId;
+-      cpuId1Value.modelId = cpuId1.modelId;
+-      cpuId1Value.stepId = cpuId1.stepId;
+-      state.cpuId1Value = [cpuId1Value];
+-    },
+-    setcpuId2Value: (state, cpuId2) => {
+-      const cpuId2Value = {};
+-      cpuId2Value.familyId = cpuId2.familyId;
+-      cpuId2Value.modelId = cpuId2.modelId;
+-      cpuId2Value.stepId = cpuId2.stepId;
+-      state.cpuId2Value = [cpuId2Value];
+-    },
+   },
+   actions: {
+     setPowerCapUpdatedValue({ commit }, value) {
+@@ -48,37 +29,8 @@ const PowerControlStore = {
+           const powerCap = powerControl[0].PowerLimit.LimitInWatts;
+           // If system is powered off, power consumption does not exist in the PowerControl
+           const powerConsumption = powerControl[0].PowerConsumedWatts || null;
+-          // process CPU1 values
+-          //const cpu1 = powerControl[0].CpuIDs.CPU1;
+-          //const tempArr = 'family1#model1#step1';
+-          const cpuId1 = [];
+-          if (powerControl[0].CpuIDs.CPU1 === '') {
+-            cpuId1['familyId'] = UNKNOWN;
+-            cpuId1['modelId'] = UNKNOWN;
+-            cpuId1['stepId'] = UNKNOWN;
+-          } else {
+-            var cpu1Arr = powerControl[0].CpuIDs.CPU1.split('#');
+-            cpuId1['familyId'] = cpu1Arr.length > 0 ? cpu1Arr.at(0) : UNKNOWN;
+-            cpuId1['modelId'] = cpu1Arr.length > 1 ? cpu1Arr.at(1) : UNKNOWN;
+-            cpuId1['stepId'] = cpu1Arr.length > 2 ? cpu1Arr.at(2) : UNKNOWN;
+-          }
+-          // process CPU2 values
+-          //const cpuId2 = powerControl[0].CpuIDs.CPU2;
+-          const cpuId2 = [];
+-          if (powerControl[0].CpuIDs.CPU2 === '') {
+-            cpuId2['familyId'] = UNKNOWN;
+-            cpuId2['modelId'] = UNKNOWN;
+-            cpuId2['stepId'] = UNKNOWN;
+-          } else {
+-            var cpu2Arr = powerControl[0].CpuIDs.CPU2.split('#');
+-            cpuId2['familyId'] = cpu2Arr.length > 0 ? cpu2Arr.at(0) : UNKNOWN;
+-            cpuId2['modelId'] = cpu2Arr.length > 0 ? cpu2Arr.at(1) : UNKNOWN;
+-            cpuId2['stepId'] = cpu2Arr.length > 0 ? cpu2Arr.at(2) : UNKNOWN;
+-          }
+           commit('setPowerCapValue', powerCap);
+           commit('setPowerConsumptionValue', powerConsumption);
+-          commit('setcpuId1Value', cpuId1);
+-          commit('setcpuId2Value', cpuId2);
+         })
+         .catch((error) => {
+           console.log('Power control', error);
+diff --git a/src/views/Overview/Overview.vue b/src/views/Overview/Overview.vue
+index 2ac37c3..2436e39 100644
+--- a/src/views/Overview/Overview.vue
++++ b/src/views/Overview/Overview.vue
+@@ -25,24 +25,6 @@
+             </page-section>
+           </b-col>
+         </b-row>
+-        <b-row>
+-          <b-col>
+-            <page-section :section-title="$t('pageOverview.cpuId')">
+-              <dl>
+-                <dt>{{ $t('pageOverview.socket') + ' ' + '0' }}</dt>
+-                <div>{{ $t('pageOverview.familyId') + ' : ' + familyId1 }}</div>
+-                <div>{{ $t('pageOverview.modelId') + ' : ' + modelId1 }}</div>
+-                <div>{{ $t('pageOverview.steppingId') + ' : ' + stepId1 }}</div>
+-              </dl>
+-              <dl>
+-                <dt>{{ $t('pageOverview.socket') + ' ' + '1' }}</dt>
+-                <div>{{ $t('pageOverview.familyId') + ' : ' + familyId2 }}</div>
+-                <div>{{ $t('pageOverview.modelId') + ' : ' + modelId2 }}</div>
+-                <div>{{ $t('pageOverview.steppingId') + ' : ' + stepId2 }}</div>
+-              </dl>
+-            </page-section>
+-          </b-col>
+-        </b-row>
+       </b-col>
+       <b-col>
+         <page-section :section-title="$t('pageOverview.serverInformation')">
+@@ -128,8 +110,6 @@ export default {
+       powerCapValue: (state) => state.powerControl.powerCapValue,
+       powerConsumptionValue: (state) =>
+         state.powerControl.powerConsumptionValue,
+-      cpuId1Value: (state) => state.powerControl.cpuId1Value[0],
+-      cpuId2Value: (state) => state.powerControl.cpuId2Value[0],
+       serverManufacturer() {
+         if (this.server) return this.server.manufacturer || '--';
+         return '--';
+@@ -142,30 +122,6 @@ export default {
+         if (this.server) return this.server.serialNumber || '--';
+         return '--';
+       },
+-      familyId1() {
+-        if (this.cpuId1Value) return this.cpuId1Value.familyId || '--';
+-        return '--';
+-      },
+-      modelId1() {
+-        if (this.cpuId1Value) return this.cpuId1Value.modelId || '--';
+-        return '--';
+-      },
+-      stepId1() {
+-        if (this.cpuId1Value) return this.cpuId1Value.stepId || '--';
+-        return '--';
+-      },
+-      familyId2() {
+-        if (this.cpuId2Value) return this.cpuId2Value.familyId || '--';
+-        return '--';
+-      },
+-      modelId2() {
+-        if (this.cpuId2Value) return this.cpuId2Value.modelId || '--';
+-        return '--';
+-      },
+-      stepId2() {
+-        if (this.cpuId2Value) return this.cpuId2Value.stepId || '--';
+-        return '--';
+-      },
+     }),
+     activeHostFirmware() {
+       return this.$store.getters[`firmware/activeHostFirmware`];
