@@ -1,0 +1,108 @@
+From 85b5e28244333211cf43209a1eec00be74d0181a Mon Sep 17 00:00:00 2001
+From: Ashok Kumar <ashok2.kumar@amd.com>
+Date: Wed, 1 Feb 2023 08:42:40 -0600
+Subject: [PATCH] Added Processor info in Hardware Inventory page
+
+Processor information will be dispaly on Hardware status page, as per redfish schema
+Feature: Use Processor Redfish scehma for CPU Info
+
+Signed-off-by: Ashok Kumar <ashok2.kumar@amd.com>
+---
+ src/locales/en-US.json                           |  6 +++++-
+ .../modules/HardwareStatus/ProcessorStore.js     |  9 +++++++--
+ .../Inventory/InventoryTableProcessors.vue       | 16 ++++++++++++++++
+ 3 files changed, 28 insertions(+), 3 deletions(-)
+
+diff --git a/src/locales/en-US.json b/src/locales/en-US.json
+index df250e0..777a29c 100644
+--- a/src/locales/en-US.json
++++ b/src/locales/en-US.json
+@@ -437,7 +437,11 @@
+       "totalCores": "Total cores",
+       "totalThreads": "Total threads",
+       "uuid": "UUID",
+-      "version": "Version"
++      "version": "Version",
++      "family": "Family",
++      "step": "Step",
++      "microcodeInfo": "MicrocodeInfo",
++      "protectedIdentificationNumber": "Protected Identification Number"
+     },
+     "toast": {
+       "errorDisableIdentifyLed": "Error disabling Identify LED.",
+diff --git a/src/store/modules/HardwareStatus/ProcessorStore.js b/src/store/modules/HardwareStatus/ProcessorStore.js
+index 1c91eac..f33c270 100644
+--- a/src/store/modules/HardwareStatus/ProcessorStore.js
++++ b/src/store/modules/HardwareStatus/ProcessorStore.js
+@@ -15,12 +15,12 @@ const ProcessorStore = {
+         const {
+           Id,
+           Status = {},
++          ProcessorId = {},
+           PartNumber,
+           SerialNumber,
+           SparePartNumber,
+           InstructionSet,
+           Manufacturer,
+-          Model,
+           Name,
+           ProcessorArchitecture,
+           ProcessorType,
+@@ -43,7 +43,7 @@ const ProcessorStore = {
+           statusState: Status.State,
+           instructionSet: InstructionSet,
+           manufacturer: Manufacturer,
+-          model: Model,
++          model: ProcessorId.Model,
+           name: Name,
+           processorArchitecture: ProcessorArchitecture,
+           processorType: ProcessorType,
+@@ -55,6 +55,11 @@ const ProcessorStore = {
+           totalThreads: TotalThreads,
+           locationNumber: LocationNumber,
+           identifyLed: LocationIndicatorActive,
++          family: ProcessorId.Family,
++          step: ProcessorId.Step,
++          microcodeInfo: ProcessorId.MicrocodeInfo,
++          protectedIdentificationNumber:
++            ProcessorId.ProtectedIdentificationNumber,
+           uri: processor['@odata.id'],
+         };
+       });
+diff --git a/src/views/HardwareStatus/Inventory/InventoryTableProcessors.vue b/src/views/HardwareStatus/Inventory/InventoryTableProcessors.vue
+index 85f1272..ed32dd7 100644
+--- a/src/views/HardwareStatus/Inventory/InventoryTableProcessors.vue
++++ b/src/views/HardwareStatus/Inventory/InventoryTableProcessors.vue
+@@ -82,9 +82,15 @@
+                 <!-- Spare Part Number -->
+                 <dt>{{ $t('pageInventory.table.sparePartNumber') }}:</dt>
+                 <dd>{{ tableFormatter(item.sparePartNumber) }}</dd>
++                <!-- Family -->
++                <dt>{{ $t('pageInventory.table.family') }}:</dt>
++                <dd>{{ tableFormatter(item.family) }}</dd>
+                 <!-- Model -->
+                 <dt>{{ $t('pageInventory.table.model') }}:</dt>
+                 <dd>{{ tableFormatter(item.model) }}</dd>
++                <!-- Step -->
++                <dt>{{ $t('pageInventory.table.step') }}:</dt>
++                <dd>{{ tableFormatter(item.step) }}</dd>
+                 <!-- Asset Tag -->
+                 <dt>{{ $t('pageInventory.table.assetTag') }}:</dt>
+                 <dd>{{ tableFormatter(item.assetTag) }}</dd>
+@@ -120,6 +126,16 @@
+                 <!-- Version -->
+                 <dt>{{ $t('pageInventory.table.version') }}:</dt>
+                 <dd>{{ tableFormatter(item.version) }}</dd>
++                <!-- MicrocodeInfo -->
++                <dt>{{ $t('pageInventory.table.microcodeInfo') }}:</dt>
++                <dd>{{ tableFormatter(item.microcodeInfo) }}</dd>
++                <!-- ProtectedIdentificationNumber -->
++                <dt>
++                  {{ $t('pageInventory.table.protectedIdentificationNumber') }}:
++                </dt>
++                <dd>
++                  {{ tableFormatter(item.protectedIdentificationNumber) }}
++                </dd>
+               </dl>
+             </b-col>
+             <b-col class="mt-1" sm="6" xl="6">
