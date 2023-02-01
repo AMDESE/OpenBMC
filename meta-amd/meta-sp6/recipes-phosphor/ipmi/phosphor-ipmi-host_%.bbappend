@@ -14,10 +14,8 @@ EXTRA_OECONF_sp6 = " \
     "
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
-SRC_URI += "file://0001-set-BIOS-boot-type-to-EFI.patch \
-            file://0002-script-changes-for-mako-templates-and-platforms.patch \
-            file://0003-platformization-changes-for-sp6-platforms.patch \
-            file://0004-Add-Set-Sensor-threshold-IPMI-command.patch \
-            file://0005-Merge-shale64-and-shale96-platforms.patch \
+SRC_URI += "file://0001-script-changes-for-mako-templates-and-platforms.patch \
+            file://0002-platformization-changes-for-sp6-platforms.patch \
+            file://0003-Merge-shale64-and-shale96-platforms.patch \
             "
 

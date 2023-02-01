@@ -11,9 +11,7 @@ EXTRA_OECONF_sh5 = " \
     "
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
-SRC_URI += "file://0001-set-BIOS-boot-type-to-EFI.patch \
-            file://0002-script-changes-for-mako-templates-and-platforms.patch \
-            file://0003-phosphor-ipmi-host-Modify-platformization-changes-for-sh5.patch \
-            file://0004-Add-Set-Sensor-threshold-IPMI-command.patch \
+SRC_URI += "file://0001-script-changes-for-mako-templates-and-platforms.patch \
+            file://0002-phosphor-ipmi-host-Modify-platformization-changes-for-sh5.patch \
             "
 
