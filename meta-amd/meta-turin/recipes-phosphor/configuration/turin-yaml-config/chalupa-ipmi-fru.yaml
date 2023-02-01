@@ -151,6 +151,18 @@
         PartNumber:
           IPMIFruProperty: Part Number
           IPMIFruSection: Chassis
+  /system/processor/P0:
+    entityID: 8
+    entityInstance: 1
+    interfaces:
+      xyz.openbmc_project.Inventory.Item.Cpu:
+      xyz.openbmc_project.Inventory.Decorator.Asset:
+  /system/processor/P1:
+    entityID: 8
+    entityInstance: 1
+    interfaces:
+      xyz.openbmc_project.Inventory.Item.Cpu:
+      xyz.openbmc_project.Inventory.Decorator.Asset:
   /system:
     entityID: 7
     entityInstance: 2
