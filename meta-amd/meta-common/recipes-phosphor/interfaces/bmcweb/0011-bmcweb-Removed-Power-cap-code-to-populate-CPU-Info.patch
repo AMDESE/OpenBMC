@@ -1,0 +1,54 @@
+From 473672d5d3b3ef4faa20363b8f817e2971b847e3 Mon Sep 17 00:00:00 2001
+From: Ashok Kumar <ashok2.kumar@amd.com>
+Date: Tue, 31 Jan 2023 22:01:07 -0600
+Subject: [PATCH] bmcweb: Removed Power cap code to populate CPU Info
+
+For CPU info System/Processor redfish api will be used,
+so removed Power cap code to populate CPU Info
+
+Signed-off-by: Ashok Kumar <ashok2.kumar@amd.com>
+---
+ redfish-core/lib/power.hpp | 23 -----------------------
+ 1 file changed, 23 deletions(-)
+
+diff --git a/redfish-core/lib/power.hpp b/redfish-core/lib/power.hpp
+index 8b7d0000..1c24fc99 100644
+--- a/redfish-core/lib/power.hpp
++++ b/redfish-core/lib/power.hpp
+@@ -269,7 +269,6 @@ class Power : public Node
+                     }
+
+                     nlohmann::json& sensorJson = tempArray.back();
+-                    nlohmann::json& cpuJson = tempArray.back();
+
+                     bool enabled = false;
+                     double powerCap = 0.0;
+@@ -278,28 +277,6 @@ class Power : public Node
+                     for (const std::pair<std::string, SensorVariant>& property :
+                          properties)
+                     {
+-                        if (!property.first.compare("CPUID1")){
+-                            const std::string* cp = std::get_if<std::string>(&property.second);
+-                            if (cp != nullptr) {
+-                                 cpuJson["CpuIDs"]["CPU1"] = *cp;
+-                             }
+-                             else{
+-                                 cpuJson["CpuIDs"]["CPU1"] = "UnKnown";
+-                             }
+-                          }
+-
+-                         if (!property.first.compare("CPUID2")){
+-                            const std::string* cp = std::get_if<std::string>(&property.second);
+-
+-                            if (cp != nullptr) {
+-                                 cpuJson["CpuIDs"]["CPU2"] = *cp;
+-                            }
+-                            else
+-                            {
+-                                 cpuJson["CpuIDs"]["CPU2"] = "UnKnown";
+-                            }
+-                        }
+-
+                         if (!property.first.compare("Scale"))
+                         {
+                             const int64_t* i =
