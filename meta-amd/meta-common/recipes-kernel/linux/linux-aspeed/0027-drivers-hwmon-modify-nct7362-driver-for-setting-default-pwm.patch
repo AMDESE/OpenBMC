@@ -1,0 +1,169 @@
+From 0cb40fe43b4b415cae6ece30d858d2b11c8aa7d1 Mon Sep 17 00:00:00 2001
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Wed, 1 Feb 2023 11:34:09 -0600
+Subject: [PATCH 1/1] drivers-hwmon-modify-nct7362-driver-for-setting-default pwm at 30% duty cycle
+
+Modified nct7362 driver to set the default pwm at 30% duty cycle.
+Driver need to set the pwm atleast once to enable the Fan speed to read.
+
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ drivers/hwmon/nct7362.c | 55 +++++++++++++++++++----------------------
+ 1 file changed, 25 insertions(+), 30 deletions(-)
+
+diff --git a/drivers/hwmon/nct7362.c b/drivers/hwmon/nct7362.c
+index 268c26042e3b..d976d547317c 100644
+--- a/drivers/hwmon/nct7362.c
++++ b/drivers/hwmon/nct7362.c
+@@ -69,6 +69,8 @@ MODULE_PARM_DESC(reset, "Set to 1 to reset chip, not recommended");
+
+ #define NCT7362_REG_PWM(index)    (0x90 + (index)*2 )
+
++#define DEFAULT_PWM (0x4c)
++
+ static inline unsigned long FAN_FROM_REG(u16 val)
+ {
+ 	if ((val >= 0x1fff) || (val == 0))
+@@ -137,7 +139,6 @@ show_fan(struct device *dev, struct device_attribute *attr, char *buf)
+ 	u16 val;
+
+ 	val = data->fan[index] & 0x1fff;
+-	printk("nct7362_show_fan: FAN[0x%x] = 0x%x", index, FAN_FROM_REG(val));
+
+ 	return sprintf(buf, "%lu\n", FAN_FROM_REG(val));
+ }
+@@ -152,7 +153,6 @@ show_pwm(struct device *dev, struct device_attribute *attr, char *buf)
+ 	u16 val;
+
+ 	val = data->pwm[index] & 0xff;
+-	printk("nct7362_show_pwm: PWM[0x%x] = 0x%x", index, val);
+
+ 	return sprintf(buf, "%u\n", (val));
+ }
+@@ -178,7 +178,6 @@ store_pwm(struct device *dev, struct device_attribute *attr,
+ 	nct7362_write_value(client, NCT7362_REG_PWM(index), tmpVal & 0xFF);
+ 	mutex_unlock(&data->update_lock);
+
+-	printk("nct7362_store_pwm: PWM[0x%x] set to 0x%x", index, tmpVal);
+ 	return count;
+ }
+
+@@ -360,8 +359,6 @@ static int nct7362_detect(struct i2c_client *client,
+ {
+ 	int ret;
+
+-	printk(DRVNAME ": nct7362_detect: nct7362_detect...\n");
+-
+ 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_SMBUS_BYTE_DATA)) {
+ 		return -ENODEV;
+ 	}
+@@ -382,8 +379,6 @@ static int nct7362_probe(struct i2c_client *client,
+ 	struct nct7362_data *data;
+ 	struct device *hwmon_dev;
+
+-	printk("nct7362: nct7362_probe\n");
+-
+ 	if (!(data = devm_kzalloc(dev,sizeof(struct nct7362_data), GFP_KERNEL))) {
+ 		return -ENOMEM;
+ 	}
+@@ -405,17 +400,24 @@ static int nct7362_probe(struct i2c_client *client,
+ 	data->has_pwm = nct7362_read_value(client, NCT7362_REG_PWM_CTRL1);
+ 	data->has_pwm |= (nct7362_read_value(client, NCT7362_REG_PWM_CTRL2) << 8);
+
+-	printk("nct7362: FAN: 0x%x PWM: 0x%x", data->has_fan, data->has_pwm);
+-
+-
+ 	/* Multi-Function detecting for Volt and TR/TD.
+ 	   Just deal with the DISABLE in has_xxxx because
+ 	   if it is not monitored, multi-function selection is useless.*/
+
++	/* First update pwm */
++	for (i = 0; i < ARRAY_SIZE(data->pwm); i++) {
++		if (!(data->has_pwm & (1 << i))) {
++			continue;
++		}
++		/* Set the default PWM at 30% duty cycle */
++		nct7362_write_value(client, NCT7362_REG_PWM(i), DEFAULT_PWM);
++		data->pwm[i] =
++			((u16)nct7362_read_value(client, NCT7362_REG_PWM(i)));
++	}
++
+ 	/* First update fan */
+ 	for (i = 0; i < ARRAY_SIZE(data->fan); i++) {
+ 		if (!(data->has_fan & (1 << i))) {
+-			printk("nct7362: Skipping FANIN0x%x", i);
+ 			continue;
+ 		}
+ 		data->fan[i] =
+@@ -423,15 +425,7 @@ static int nct7362_probe(struct i2c_client *client,
+ 		data->fan[i] |=
+ 		  (nct7362_read_value(client, NCT7362_REG_FAN_LSB(i)) & NCT7362_FAN_LSB_MASK);
+ 	}
+-	/* First update pwm */
+-	for (i = 0; i < ARRAY_SIZE(data->pwm); i++) {
+-		if (!(data->has_pwm & (1 << i))) {
+-			printk("nct7362: Skipping PWM0x%x", i);
+-			continue;
+-		}
+-		data->pwm[i] =
+-			((u16)nct7362_read_value(client, NCT7362_REG_PWM(i)));
+-	}
++
+
+ 	/* Prepare for sysfs hooks */
+ 	data->groups[0] = &nct7362_group_fan;
+@@ -441,7 +435,15 @@ static int nct7362_probe(struct i2c_client *client,
+ 	hwmon_dev = devm_hwmon_device_register_with_groups(dev,
+ 					client->name,
+ 					data, data->groups);
+-	return PTR_ERR_OR_ZERO(hwmon_dev);
++
++	if (IS_ERR(hwmon_dev))
++		return PTR_ERR(hwmon_dev);
++
++	dev_info(dev, "%s: sensor '%s'\n", dev_name(hwmon_dev), client->name);
++
++	return 0;
++
++
+ }
+
+ static struct nct7362_data *nct7362_update_device(struct device *dev)
+@@ -506,16 +508,13 @@ static const struct i2c_device_id nct7362_id[] = {
+ 	{},
+ };
+
+-//MODULE_DEVICE_TABLE(i2c, nct7362_id);
+-
+ static struct i2c_driver nct7362_driver = {
+ 	.driver = {
+-			.owner = THIS_MODULE,
+-			.name = DRVNAME,
++		.owner = THIS_MODULE,
++		.name = DRVNAME,
+ 	},
+ 	.class		= I2C_CLASS_HWMON,
+ 	.probe		= nct7362_probe,
+-	//.remove		= nct7362_remove,
+ 	.id_table	= nct7362_id,
+ 	.detect		= nct7362_detect,
+ 	.address_list	= normal_i2c,
+@@ -525,15 +524,11 @@ static struct i2c_driver nct7362_driver = {
+
+ static int __init sensors_nct7362_init(void)
+ {
+-	printk("nct7362: sensors_nct7362_init\n");
+-
+ 	return i2c_add_driver(&nct7362_driver);
+ }
+
+ static void __exit sensors_nct7362_exit(void)
+ {
+-	printk("nct7362: sensors_nct7362_exit\n");
+-
+ 	i2c_del_driver(&nct7362_driver);
+ }
+
+--
+2.17.1
+
