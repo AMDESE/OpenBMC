@@ -45,7 +45,6 @@ RDEPENDS_${PN}-system = " \
         amd-lcd-lib \
         amd-mctp-tool \
         amd-ras \
-        amd-yaap \
         bmcweb \
         cpu-info \
         debug-apps \
