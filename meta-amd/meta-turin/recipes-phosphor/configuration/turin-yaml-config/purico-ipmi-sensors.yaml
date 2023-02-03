@@ -840,7 +840,7 @@
             type: double
   multiplierM: 110
   mutability: Mutability::Write|Mutability::Read
-  path: /xyz/openbmc_project/sensors/fan_tach/Chassis_Fan1
+  path: /xyz/openbmc_project/sensors/fan_tach/Chassis_Fan1r0
   rExp: 0
   readingType: readingData
   scale: 0
@@ -862,7 +862,7 @@
             type: double
   multiplierM: 110
   mutability: Mutability::Write|Mutability::Read
-  path: /xyz/openbmc_project/sensors/fan_tach/Chassis_Fan2
+  path: /xyz/openbmc_project/sensors/fan_tach/Chassis_Fan1r1
   rExp: 0
   readingType: readingData
   scale: 0
@@ -884,7 +884,7 @@
             type: double
   multiplierM: 110
   mutability: Mutability::Write|Mutability::Read
-  path: /xyz/openbmc_project/sensors/fan_tach/Chassis_Fan3
+  path: /xyz/openbmc_project/sensors/fan_tach/Chassis_Fan2r0
   rExp: 0
   readingType: readingData
   scale: 0
@@ -906,7 +906,7 @@
             type: double
   multiplierM: 110
   mutability: Mutability::Write|Mutability::Read
-  path: /xyz/openbmc_project/sensors/fan_tach/Chassis_Fan4
+  path: /xyz/openbmc_project/sensors/fan_tach/Chassis_Fan2r1
   rExp: 0
   readingType: readingData
   scale: 0
@@ -917,6 +917,226 @@
   unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
 
 0x34:
+  bExp: 0
+  entityID: 29
+  entityInstance: 1
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: double
+  multiplierM: 110
+  mutability: Mutability::Write|Mutability::Read
+  path: /xyz/openbmc_project/sensors/fan_tach/Chassis_Fan3r0
+  rExp: 0
+  readingType: readingData
+  scale: 0
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 4
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
+
+0x35:
+  bExp: 0
+  entityID: 29
+  entityInstance: 1
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: double
+  multiplierM: 110
+  mutability: Mutability::Write|Mutability::Read
+  path: /xyz/openbmc_project/sensors/fan_tach/Chassis_Fan3r1
+  rExp: 0
+  readingType: readingData
+  scale: 0
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 4
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
+
+0x36:
+  bExp: 0
+  entityID: 29
+  entityInstance: 1
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: double
+  multiplierM: 110
+  mutability: Mutability::Write|Mutability::Read
+  path: /xyz/openbmc_project/sensors/fan_tach/Chassis_Fan4r0
+  rExp: 0
+  readingType: readingData
+  scale: 0
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 4
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
+
+0x37:
+  bExp: 0
+  entityID: 29
+  entityInstance: 1
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: double
+  multiplierM: 110
+  mutability: Mutability::Write|Mutability::Read
+  path: /xyz/openbmc_project/sensors/fan_tach/Chassis_Fan4r1
+  rExp: 0
+  readingType: readingData
+  scale: 0
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 4
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
+
+0x38:
+  bExp: 0
+  entityID: 29
+  entityInstance: 1
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: double
+  multiplierM: 110
+  mutability: Mutability::Write|Mutability::Read
+  path: /xyz/openbmc_project/sensors/fan_tach/Chassis_Fan5r0
+  rExp: 0
+  readingType: readingData
+  scale: 0
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 4
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
+
+0x39:
+  bExp: 0
+  entityID: 29
+  entityInstance: 1
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: double
+  multiplierM: 110
+  mutability: Mutability::Write|Mutability::Read
+  path: /xyz/openbmc_project/sensors/fan_tach/Chassis_Fan5r1
+  rExp: 0
+  readingType: readingData
+  scale: 0
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 4
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
+
+0x3A:
+  bExp: 0
+  entityID: 29
+  entityInstance: 1
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: double
+  multiplierM: 110
+  mutability: Mutability::Write|Mutability::Read
+  path: /xyz/openbmc_project/sensors/fan_tach/Chassis_Fan6r0
+  rExp: 0
+  readingType: readingData
+  scale: 0
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 4
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
+
+0x3B:
+  bExp: 0
+  entityID: 29
+  entityInstance: 1
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: double
+  multiplierM: 110
+  mutability: Mutability::Write|Mutability::Read
+  path: /xyz/openbmc_project/sensors/fan_tach/Chassis_Fan6r1
+  rExp: 0
+  readingType: readingData
+  scale: 0
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 4
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
+
+0x3C:
+  bExp: 0
+  entityID: 29
+  entityInstance: 1
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: double
+  multiplierM: 110
+  mutability: Mutability::Write|Mutability::Read
+  path: /xyz/openbmc_project/sensors/fan_tach/P0_WaterPump_Fanr0
+  rExp: 0
+  readingType: readingData
+  scale: 0
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 4
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
+
+0x3D:
+  bExp: 0
+  entityID: 29
+  entityInstance: 1
+  interfaces:
+    xyz.openbmc_project.Sensor.Value:
+      Value:
+        Offsets:
+          255:
+            type: double
+  multiplierM: 110
+  mutability: Mutability::Write|Mutability::Read
+  path: /xyz/openbmc_project/sensors/fan_tach/P0_WaterPump_Fanr1
+  rExp: 0
+  readingType: readingData
+  scale: 0
+  sensorNamePattern: nameLeaf
+  sensorReadingType: 1
+  sensorType: 4
+  serviceInterface: org.freedesktop.DBus.Properties
+  unit: xyz.openbmc_project.Sensor.Value.Unit.RPMS
+
+0x40:
   sensorType: 0x01
   entityID: 0x20
   path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_C_Temp
@@ -936,7 +1156,7 @@
           0xFF:
             type: double
 
-0x35:
+0x41:
   sensorType: 0x01
   entityID: 0x20
   path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_E_Temp
@@ -956,7 +1176,7 @@
           0xFF:
             type: double
 
-0x36:
+0x42:
   sensorType: 0x01
   entityID: 0x20
   path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_F_Temp
@@ -976,7 +1196,7 @@
           0xFF:
             type: double
 
-0x37:
+0x43:
   sensorType: 0x01
   entityID: 0x20
   path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_A_Temp
@@ -996,7 +1216,7 @@
           0xFF:
             type: double
 
-0x38:
+0x44:
   sensorType: 0x01
   entityID: 0x20
   path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_B_Temp
@@ -1016,7 +1236,7 @@
           0xFF:
             type: double
 
-0x39:
+0x45:
   sensorType: 0x01
   entityID: 0x20
   path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_D_Temp
@@ -1036,7 +1256,7 @@
           0xFF:
             type: double
 
-0x3A:
+0x46:
   sensorType: 0x01
   entityID: 0x20
   path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_I_Temp
@@ -1056,7 +1276,7 @@
           0xFF:
             type: double
 
-0x3B:
+0x47:
   sensorType: 0x01
   entityID: 0x20
   path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_K_Temp
@@ -1076,7 +1296,7 @@
           0xFF:
             type: double
 
-0x3C:
+0x48:
   sensorType: 0x01
   entityID: 0x20
   path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_L_Temp
@@ -1096,7 +1316,7 @@
           0xFF:
             type: double
 
-0x3D:
+0x49:
   sensorType: 0x01
   entityID: 0x20
   path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_G_Temp
@@ -1116,7 +1336,7 @@
           0xFF:
             type: double
 
-0x3E:
+0x4A:
   sensorType: 0x01
   entityID: 0x20
   path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_H_Temp
@@ -1136,7 +1356,7 @@
           0xFF:
             type: double
 
-0x3F:
+0x4B:
   sensorType: 0x01
   entityID: 0x20
   path: /xyz/openbmc_project/sensors/temperature/P0_DIMM_J_Temp
