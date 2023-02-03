@@ -143,8 +143,8 @@ CHIPS_VOLCANO = " \
         bus@1e7a0000/i3c5@7000/sbtsi@48,22400000001 \
         bus@1e7a0000/i3c4@6000/sbrmi@3c,22400000002 \
         bus@1e7a0000/i3c5@7000/sbrmi@38,22400000002 \
-        bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@0/i2cswitch@77/i2c@0/amd_cpld@28 \
-        bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@0/i2cswitch@77/i2c@3/lm75a@4b \
+        bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@0/nct7362@20 \
+        bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@7/nct7362@20 \
         bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@1/lm75a@48 \
         bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@1/lm75a@49 \
         bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@1/lm75a@4a \
