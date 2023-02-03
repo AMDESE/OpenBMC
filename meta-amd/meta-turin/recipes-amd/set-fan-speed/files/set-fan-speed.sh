@@ -91,7 +91,7 @@ set_emc2305_pump_fan_speed()
         # Pump fan is on emc2305 controller# 3, fan#4
         echo "Setting Turin-1P Pump Fans at full speed.... " $speed_val
         i2cset -f -y ${i2c_bus_array[2]} $EMC2305_DEV ${FAN_SET_REG[3]} $speed_val
-        if [ $? -ne 0 ]; then
+        if [[ $? -ne 0 ]]; then
             echo "Error: Setting Pump fan speed failed.."
         fi
    elif [[ $curr_emc2305_ctrl -eq 5 ]]; then
@@ -101,7 +101,7 @@ set_emc2305_pump_fan_speed()
         for (( j=3; j < 5; j++ ));
         do
             i2cset -f -y ${i2c_bus_array[4]} $EMC2305_DEV ${FAN_SET_REG[j]} $speed_val
-            if [ $? -ne 0 ]; then
+            if [[ $? -ne 0 ]]; then
                 echo "Error: Setting Pump fan speed failed.."
             fi
         done
@@ -124,12 +124,12 @@ else
 fi
 
 case "$board_id" in
-    "6A" | "6a" | "72" | "73")
+    "6A" | "72" | "73")
     echo "Set Purico Fans "
     set_nct7362
     set_nct7362_fan_speed
     ;;
-    "6B" | "6b" | "74" | "75")
+    "6B" | "74" | "75")
     echo "Set Volcano Fans "
     set_nct7362
     set_nct7362_fan_speed
