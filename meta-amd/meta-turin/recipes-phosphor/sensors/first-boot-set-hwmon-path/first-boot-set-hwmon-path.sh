@@ -10,16 +10,16 @@ sync_hwmon_path() {
     boardID=`fw_printenv board_id | sed -n "s/^board_id=//p"`
 
     case $boardID in
-           "68")  # galena board_ids
+           "68" | "70" | "71")  # galena board_ids
                 ln -s  /etc/default/obmc/hwmon_galena/ /etc/default/obmc/hwmon
            ;;
            "69")  # recluse board_ids
                 ln -s  /etc/default/obmc/hwmon_recluse/ /etc/default/obmc/hwmon
            ;;
-           "6A")  # purico board_ids
+           "6A" | "72" | "73")  # purico board_ids
                 ln -s  /etc/default/obmc/hwmon_purico/ /etc/default/obmc/hwmon
            ;;
-           "66")  # chalupa board_ids
+           "66"| "6E" | "6F")  # chalupa board_ids
                 ln -s  /etc/default/obmc/hwmon_chalupa/ /etc/default/obmc/hwmon
            ;;
            "67")  # huambo board_ids
@@ -31,7 +31,6 @@ sync_hwmon_path() {
            *)  # Default set to galena board
                 ln -s  /etc/default/obmc/hwmon_galena/ /etc/default/obmc/hwmon
     esac
-
 }
 
 # Set soft link for /etc/default/obmc/hwmon based on the platfrom

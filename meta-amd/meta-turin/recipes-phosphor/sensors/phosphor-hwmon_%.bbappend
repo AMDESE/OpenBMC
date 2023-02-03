@@ -90,7 +90,8 @@ CHIPS_CHALUPA = " \
 CHIPS_PURICO = " \
         bus@1e7a0000/i3c4@6000/sbtsi@4c,22400000001 \
         bus@1e7a0000/i3c4@6000/sbrmi@3c,22400000002 \
-        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@0/emc2305@4d \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@0/nct7362@20 \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@3/nct7362@20 \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@48 \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@49 \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4a \
