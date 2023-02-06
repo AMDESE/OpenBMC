@@ -2,98 +2,50 @@
     "version" : "AMD-Volcano-Stepwise-v01",
     "sensors" : [
         {
-            "name": "FAN_SYS0_0",
+            "name": "Chassis_Fan1r0",
             "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS0_0",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS0_0",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan1r0",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan1r0",
             "min": 0,
             "max": 100
         },
         {
-            "name": "FAN_SYS0_1",
+            "name": "Chassis_Fan2r0",
             "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS0_1",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS0_1",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan2r0",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan2r0",
             "min": 0,
             "max": 100
         },
         {
-            "name": "FAN_SYS1_0",
+            "name": "Chassis_Fan3r0",
             "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS1_0",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS1_0",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan3r0",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan3r0",
             "min": 0,
             "max": 100
         },
         {
-            "name": "FAN_SYS1_1",
+            "name": "Chassis_Fan4r0",
             "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS1_1",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS1_1",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan4r0",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan4r0",
             "min": 0,
             "max": 100
         },
         {
-            "name": "FAN_SYS2_0",
+            "name": "Chassis_Fan5r0",
             "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS2_0",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS2_0",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan5r0",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan5r0",
             "min": 0,
             "max": 100
         },
         {
-            "name": "FAN_SYS2_1",
+            "name": "Chassis_Fan6r0",
             "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS2_1",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS2_1",
-            "min": 0,
-            "max": 100
-        },
-        {
-            "name": "FAN_SYS3_0",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS3_0",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS3_0",
-            "min": 0,
-            "max": 100
-        },
-        {
-            "name": "FAN_SYS3_1",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS3_1",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS3_1",
-            "min": 0,
-            "max": 100
-        },
-        {
-            "name": "FAN_SYS4_0",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS4_0",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS4_0",
-            "min": 0,
-            "max": 100
-        },
-        {
-            "name": "FAN_SYS4_1",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS4_1",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS4_1",
-            "min": 0,
-            "max": 100
-        },
-        {
-            "name": "FAN_SYS5_0",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS5_0",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS5_0",
-            "min": 0,
-            "max": 100
-        },
-        {
-            "name": "FAN_SYS5_1",
-            "type": "fan",
-            "readPath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS5_1",
-            "writePath": "/xyz/openbmc_project/sensors/fan_tach/FAN_SYS5_1",
+            "readPath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan6r0",
+            "writePath": "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan6r0",
             "min": 0,
             "max": 100
         },
@@ -101,13 +53,6 @@
             "name": "CPU0_Temp",
             "type": "temp",
             "readPath": "/xyz/openbmc_project/sensors/temperature/CPU0_Temp",
-            "ignoreDbusMinMax": true,
-            "timeout": 0
-        },
-        {
-            "name": "CPU1_Temp",
-            "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/CPU1_Temp",
             "ignoreDbusMinMax": true,
             "timeout": 0
         },
@@ -288,20 +233,14 @@
             "failsafePercent": 30.0,
             "pids": [
                 {
-                    "name": "FAN_SYS0_0-5_1",
+                    "name": "Chassis_Fan1_6",
                     "type": "fan",
-                    "inputs": ["FAN_SYS0_0",
-                               "FAN_SYS0_1",
-                               "FAN_SYS1_0",
-                               "FAN_SYS1_1",
-                               "FAN_SYS2_0",
-                               "FAN_SYS2_1",
-                               "FAN_SYS3_0",
-                               "FAN_SYS3_1",
-                               "FAN_SYS4_0",
-                               "FAN_SYS4_1",
-                               "FAN_SYS5_0",
-                               "FAN_SYS5_1"],
+                    "inputs": ["Chassis_Fan1r0",
+                               "Chassis_Fan2r0",
+                               "Chassis_Fan3r0",
+                               "Chassis_Fan4r0",
+                               "Chassis_Fan5r0",
+                               "Chassis_Fan6r0"],
                     "setpoint": 20.0,
                     "pid": {
                         "samplePeriod": 1.0,
@@ -318,9 +257,9 @@
                     }
                 },
                 {
-                    "name": "CPU0-1",
+                    "name": "CPU0",
                     "type": "stepwise",
-                    "inputs": ["CPU0_Temp", "CPU1_Temp"],
+                    "inputs": ["CPU0_Temp"],
                     "setpoint": 20.0,
                     "pid": {
                         "samplePeriod": 1.0,
