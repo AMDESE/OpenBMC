@@ -46,11 +46,6 @@
   sensorID: 0x07
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/FAN_BD_Temp:
-  eventReadingType: 1
-  sensorID: 0x08
-  sensorType: 1
-  offset: 0xff
 /xyz/openbmc_project/sensors/voltage/ADC_P1V0_AUX:
   eventReadingType: 1
   sensorID: 0x09
@@ -76,64 +71,85 @@
   sensorID: 0x0D
   sensorType: 2
   offset: 0xff
-/xyz/openbmc_project/sensors/fan_tach/FAN_SYS0_0:
+
+/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan1r0:
   eventReadingType: 1
-  sensorID: 0x0E
+  sensorID: 0x70
   sensorType: 4
   offset: 0xff
-/xyz/openbmc_project/sensors/fan_tach/FAN_SYS0_1:
+/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan1r1:
   eventReadingType: 1
-  sensorID: 0x0F
+  sensorID: 0x71
   sensorType: 4
   offset: 0xff
-/xyz/openbmc_project/sensors/fan_tach/FAN_SYS1_0:
+/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan2r0:
   eventReadingType: 1
-  sensorID: 0x10
+  sensorID: 0x72
   sensorType: 4
   offset: 0xff
-/xyz/openbmc_project/sensors/fan_tach/FAN_SYS1_1:
+/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan2r1:
   eventReadingType: 1
-  sensorID: 0x11
+  sensorID: 0x73
   sensorType: 4
   offset: 0xff
-/xyz/openbmc_project/sensors/fan_tach/FAN_SYS2_0:
+/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan3r0:
   eventReadingType: 1
-  sensorID: 0x12
+  sensorID: 0x74
   sensorType: 4
   offset: 0xff
-/xyz/openbmc_project/sensors/fan_tach/FAN_SYS2_1:
+/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan3r1:
   eventReadingType: 1
-  sensorID: 0x13
+  sensorID: 0x75
   sensorType: 4
   offset: 0xff
-/xyz/openbmc_project/sensors/fan_tach/FAN_SYS3_0:
+/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan4r0:
   eventReadingType: 1
-  sensorID: 0x14
+  sensorID: 0x76
   sensorType: 4
   offset: 0xff
-/xyz/openbmc_project/sensors/fan_tach/FAN_SYS3_1:
+/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan4r1:
   eventReadingType: 1
-  sensorID: 0x15
+  sensorID: 0x77
   sensorType: 4
   offset: 0xff
-/xyz/openbmc_project/sensors/fan_tach/FAN_SYS4_0:
+/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan5r0:
   eventReadingType: 1
-  sensorID: 0x16
+  sensorID: 0x78
   sensorType: 4
   offset: 0xff
-/xyz/openbmc_project/sensors/fan_tach/FAN_SYS4_1:
+/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan5r1:
   eventReadingType: 1
-  sensorID: 0x17
+  sensorID: 0x79
   sensorType: 4
   offset: 0xff
-/xyz/openbmc_project/sensors/fan_tach/FAN_SYS5_0:
+/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan6r0:
   eventReadingType: 1
-  sensorID: 0x18
+  sensorID: 0x7A
   sensorType: 4
   offset: 0xff
-/xyz/openbmc_project/sensors/fan_tach/FAN_SYS5_1:
+/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan6r1:
   eventReadingType: 1
-  sensorID: 0x19
+  sensorID: 0x7B
+  sensorType: 4
+  offset: 0xff
+/xyz/openbmc_project/sensors/fan_tach/P0_WaterPump_Fanr0:
+  eventReadingType: 1
+  sensorID: 0x7C
+  sensorType: 4
+  offset: 0xff
+/xyz/openbmc_project/sensors/fan_tach/P0_WaterPump_Fanr1:
+  eventReadingType: 1
+  sensorID: 0x7D
+  sensorType: 4
+  offset: 0xff
+/xyz/openbmc_project/sensors/fan_tach/P1_WaterPump_Fanr0:
+  eventReadingType: 1
+  sensorID: 0x7E
+  sensorType: 4
+  offset: 0xff
+/xyz/openbmc_project/sensors/fan_tach/P1_WaterPump_Fanr1:
+  eventReadingType: 1
+  sensorID: 0x7F
   sensorType: 4
   offset: 0xff
 /xyz/openbmc_project/sensors/temperature/P0_DIMM_C_Temp:
