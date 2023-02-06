@@ -28,4 +28,5 @@ SRC_URI += "file://amd-bmc-baseline.cfg \
             file://0025-ARM-dts-aspeed-Add-new-HWMON-for-Turin-Lenovo.patch \
             file://0026-ARM-dts-aspeed-Add-UART-routing-to-sh5.patch \
             file://0027-drivers-hwmon-modify-nct7362-driver-for-setting-default-pwm.patch \
+            file://0028-ARM-dts-aspeed-modify-Volcano-device-tree-for-VR-device-id.patch \
            "
