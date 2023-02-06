@@ -15,16 +15,16 @@ sync_associations_path() {
         "69")  # Recluse board_ids
             ln -s  /usr/share/phosphor-inventory-manager/recluse-associations.json /usr/share/phosphor-inventory-manager/associations.json
         ;;
-        "6A" | "6a" | "72" | "73")  # Purico board_ids
+        "6A" | "72" | "73")  # Purico board_ids
             ln -s  /usr/share/phosphor-inventory-manager/purico-associations.json /usr/share/phosphor-inventory-manager/associations.json
         ;;
-        "66" | "6E" | "6e" | "6F" | "6f")  # Chalupa board_ids
+        "66" | "6E" | "6F" )  # Chalupa board_ids
             ln -s  /usr/share/phosphor-inventory-manager/chalupa-associations.json /usr/share/phosphor-inventory-manager/associations.json
         ;;
         "67")  # Huambo board_ids
             ln -s  /usr/share/phosphor-inventory-manager/huambo-associations.json /usr/share/phosphor-inventory-manager/associations.json
         ;;
-        "6B" | "6b" | "74" | "75")  # Volcano board_ids
+        "6B" | "74" | "75")  # Volcano board_ids
             ln -s  /usr/share/phosphor-inventory-manager/volcano-associations.json /usr/share/phosphor-inventory-manager/associations.json
         ;;
         *)  # Default set to galena board
