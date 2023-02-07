@@ -14,7 +14,7 @@ SRC_URI += "file://amd-bmc-baseline.cfg \
             file://0011-drivers-hwmon-Extend-support-for-infineon-xdpe19283-.patch \
             file://0012-drivers-net-Suppress-warning-message-from-network-dr.patch \
             file://0013-drivers-i2c-Hack-to-restrict-i2c-bus-to-50-KHz-for-l.patch \
-            file://0014-drivers-pmbus-Add-hardware-monitoring-driver-for-MPS.patch \
+            file://0014-linux-aspeed-modify-MP2975-VR-driver-to-support-MP2862-controller.patch \
             file://0015-drivers-misc-Add-APML-SB-TSI-and-SB-RMI-drivers.patch \
             file://0016-ARM-dts-aspeed-Initial-device-tree-for-AMD-Genoa-Pla.patch \
             file://0017-ARM-dts-aspeed-Initial-device-tree-for-AMD-Siena-Pla.patch \
