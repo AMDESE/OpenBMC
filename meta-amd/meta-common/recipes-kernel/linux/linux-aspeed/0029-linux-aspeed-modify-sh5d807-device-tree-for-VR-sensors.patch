@@ -1,0 +1,116 @@
+From 8accd6ab0af0ead06218814f593a401d4d881fbe Mon Sep 17 00:00:00 2001
+Message-Id: <8accd6ab0af0ead06218814f593a401d4d881fbe.1671575138.git.vinu.vaghasia@amd.com>
+In-Reply-To: <6c2fb3ac513e24b6953b655a0bac2ec253a59ae6.1671575138.git.vinu.vaghasia@amd.com>
+References: <6c2fb3ac513e24b6953b655a0bac2ec253a59ae6.1671575138.git.vinu.vaghasia@amd.com>
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Tue, 20 Dec 2022 16:23:00 -0600
+Subject: [PATCH 2/2] linux-aspeed: modify sh5d807 device tree for VR sensors
+
+VR dsensor configuration modified as per the HW team's requirements.
+
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-sh5d807.dts | 49 ++++++++++----------
+ 1 file changed, 25 insertions(+), 24 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-sh5d807.dts b/arch/arm/boot/dts/aspeed-bmc-amd-sh5d807.dts
+index adaf1b99bb60..63804d19950c 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-sh5d807.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-sh5d807.dts
+@@ -181,17 +181,17 @@
+ &i2c4 { // SCM_I2C1 - Misc VRs, PMbus
+ 	status = "okay";
+
+-	vdd_33_run@13 {
++	vdd_33_run@43 {
+ 		compatible = "infineon,xdpe12284";
+ 		reg = <0x13>;
+ 	};
+
+-	vdd_33_dual@14 {
++	vdd_33_dual@44 {
+ 		compatible = "infineon,xdpe12284";
+ 		reg = <0x14>;
+ 	};
+
+-	vdd_5_dual@15 {
++	vdd_5_dual@45 {
+ 		compatible = "infineon,xdpe12284";
+ 		reg = <0x15>;
+ 	};
+@@ -213,27 +213,28 @@
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+
+-			vdd_io_e32@3f {
+-				compatible = "mps,MP2862";
+-				reg = <0x3f>;
+-			};
+-
+-			vdd_33_s5@36 {
+-				compatible = "mps,MP2862";
++			vddcr_soc@36 {
++				compatible = "mps,mp2975";
+ 				reg = <0x36>;
+ 			};
+
+-			vddcr_socio_a@3c {
+-				compatible = "mps,MP2862";
++			vddcr_vdd3@3c {
++				compatible = "mps,mp2975";
+ 				reg = <0x3c>;
+ 			};
+-			vddcr_socio_c@41 {
+-				compatible = "mps,MP2862";
++
++			vddcr_vdd0@3f {
++				compatible = "mps,mp2975";
++				reg = <0x3f>;
++			};
++
++			vddcr_11_hbm_b@41 {
++				compatible = "mps,mp2975";
+ 				reg = <0x41>;
+ 			};
+
+-			vddio_04_hbm_b@44 {
+-				compatible = "mps,MP2862";
++			vdd_075_hbm_b@44 {
++				compatible = "mps,mp2975";
+ 				reg = <0x44>;
+ 			};
+ 		};
+@@ -243,22 +244,22 @@
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+
+-			vdd_18@33 {
+-				compatible = "mps,MP2862";
++			vddcr_vdd1@33 {
++				compatible = "mps,mp2975";
+ 				reg = <0x33>;
+ 			};
+
+-			vdd_18_s5@39 {
+-				compatible = "mps,MP2862";
++			vddcr_vdd2@39 {
++				compatible = "mps,mp2975";
+ 				reg = <0x39>;
+ 			};
+
+-			vddio_04_hbm_d@47 {
+-				compatible = "mps,MP2862";
++			vddcr_11_hbm_d@47 {
++				compatible = "mps,mp2975";
+ 				reg = <0x47>;
+ 			};
+-			vdd_075_usr@4a {
+-				compatible = "mps,MP2862";
++			vdd_075_hbm_d@4a {
++				compatible = "mps,mp2975";
+ 				reg = <0x4a>;
+ 			};
+ 		};
+--
+2.17.1
+
