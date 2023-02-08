@@ -73,13 +73,12 @@ printf 'I2C Map Version:   %d \n'  $(read_reg 2)
 if [ $(read_reg 2) -ne $SCRIPT_REG_MAP_VER ] ; then
         echo "Register map version mismatch"
 fi
-MAJOR=$(read_reg 3)
-MINOR=$(read_reg 4)
-REV=$(printf "\x$(printf %x $(read_reg 5))")
-echo "FPGA FW version:  "   $MAJOR.$MINOR.$REV
+REV_W=$(read_reg 6)
+REV_X=$(read_reg 5)
+REV_Y=$(read_reg 4)
+REV_Z=$(read_reg 3)
+echo "FPGA FW version:  "   $REV_W.$REV_X.$REV_Y.$REV_Z
 printf 'SGPIO Map Version: %x \n' $(read_reg 7)
-printf '\n'
-printf 'Reg 0x06 (RSVD)=     \t 0x%x \n' $(read_reg 6)
 printf '\n'
 printf 'Reg 0x08 (S1 Switch)=\t 0x%x \n' $(read_reg 8)
 printf 'Reg 0x09 (S2 Switch)=\t 0x%x \n' $(read_reg 9)
