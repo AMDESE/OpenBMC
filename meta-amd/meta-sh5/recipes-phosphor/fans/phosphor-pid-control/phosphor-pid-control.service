@@ -12,4 +12,4 @@ StartLimitInterval=0
 ExecStopPost=/usr/bin/set-platform-json-config.sh
 
 [Install]
-WantedBy=basic.target
+#WantedBy=basic.target
