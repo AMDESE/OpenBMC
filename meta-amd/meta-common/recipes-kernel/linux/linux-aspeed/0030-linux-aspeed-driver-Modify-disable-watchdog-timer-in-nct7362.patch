@@ -1,0 +1,106 @@
+From e7588a4602aa229e5658800a851bc552d4721c33 Mon Sep 17 00:00:00 2001
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Tue, 14 Feb 2023 14:26:57 -0600
+Subject: [PATCH 1/1] linux-aspeed/driver: Modify disable watchdog timer in
+ nct7362 driver
+
+Watchdog timer disabled in nct7362 driver. Bydefault it was enabled and
+was monitoring SMbus line, if there is no data on that line within
+certain time, it reset the controller. It was causing the issue on
+Purico and Volcano platforms.
+
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ drivers/hwmon/nct7362.c | 41 ++++++++++++++++++++++++++---------------
+ 1 file changed, 26 insertions(+), 15 deletions(-)
+
+diff --git a/drivers/hwmon/nct7362.c b/drivers/hwmon/nct7362.c
+index f0d5b9517401..9fbc22c74a3c 100644
+--- a/drivers/hwmon/nct7362.c
++++ b/drivers/hwmon/nct7362.c
+@@ -69,7 +69,21 @@ MODULE_PARM_DESC(reset, "Set to 1 to reset chip, not recommended");
+
+ #define NCT7362_REG_PWM(index)    (0x90 + (index)*2 )
+
+-#define DEFAULT_PWM (0x4c)
++#define NCT7362_REG_PIN_FUNC_CONFIG1      (0x20)  // GPIO00-03 PWM0
++#define NCT7362_REG_PIN_FUNC_CONFIG2      (0x21)  // GPIO04-07 TACH 12-14
++#define NCT7362_REG_PIN_FUNC_CONFIG3      (0x22)  // GPIO010-13 PWM8
++#define NCT7362_REG_PIN_FUNC_CONFIG4      (0x23)  // GPIO14-17 TACH 4-6
++#define NCT7362_REG_WATCHDOG_TIMER_CONFIG (0x2A)
++
++#define PWM0_TACM9_11   (0xA9)  // PWM0, TACH 9 ~ 11
++#define TACH12_14       (0x2A)  // TACH 12 ~ 14
++#define PWM8_TACM1_3    (0xA9)  // PWM8, TACH 1 ~ 3
++#define TACH4_6         (0x2A)  // TACH 4 ~ 6
++#define ENABLE_PWM0     (0x01)  // Enable PWM 0
++#define ENABLE_PWM8     (0x01)  // Enable PWM 8
++#define ENABLE_TACH9_14 (0x7E)  // Enable TACH 9 - 14
++#define ENABLE_TACH1_6  (0x7E)  // Enable TACH 1 - 6
++#define DISABLE_WDT     (0x00)  // Disable Watch dog
+
+ static inline unsigned long FAN_FROM_REG(u16 val)
+ {
+@@ -312,14 +326,15 @@ static const struct attribute_group nct7362_group_pwm = {
+ static void nct7362_init_client(struct i2c_client *client)
+ {
+ 	// OEM initial setting (multi-function pins, and monitor channal)
+-	nct7362_write_value(client, 0x20, 0xA9); // PWM0, TACH 9 ~ 11
+-	nct7362_write_value(client, 0x21, 0x2A); // TACH 12 ~ 14
+-	nct7362_write_value(client, 0x22, 0xA9); // PWM 8, TACH 1 ~ 3
+-	nct7362_write_value(client, 0x23, 0x2A); // TACH 4 ~ 6
+-	nct7362_write_value(client, 0x38, 0x01); // Enable PWM 0
+-	nct7362_write_value(client, 0x39, 0x01); // Enable PWM 8
+-	nct7362_write_value(client, 0x41, 0x7E); // ENABLE TACH 9 ~ 14
+-	nct7362_write_value(client, 0x42, 0x7E); // ENABLE TACH 1 ~ 6
++	nct7362_write_value(client, NCT7362_REG_PIN_FUNC_CONFIG1, PWM0_TACM9_11); // PWM0, TACH 9 ~ 11
++	nct7362_write_value(client, NCT7362_REG_PIN_FUNC_CONFIG2, TACH12_14); // TACH 12 ~ 14
++	nct7362_write_value(client, NCT7362_REG_PIN_FUNC_CONFIG3, PWM8_TACM1_3); // PWM 8, TACH 1 ~ 3
++	nct7362_write_value(client, NCT7362_REG_PIN_FUNC_CONFIG4, TACH4_6); // TACH 4 ~ 6
++	nct7362_write_value(client, NCT7362_REG_PWM_CTRL1, ENABLE_PWM0); // Enable PWM 0
++	nct7362_write_value(client, NCT7362_REG_PWM_CTRL2, ENABLE_PWM8); // Enable PWM 8
++	nct7362_write_value(client, NCT7362_REG_FANIN_CTRL1, ENABLE_TACH9_14); // ENABLE TACH 9 ~ 14
++	nct7362_write_value(client, NCT7362_REG_FANIN_CTRL2, ENABLE_TACH1_6); // ENABLE TACH 1 ~ 6
++	nct7362_write_value(client, NCT7362_REG_WATCHDOG_TIMER_CONFIG, DISABLE_WDT); // Disable Watch dog
+ 	/* Start monitoring: nct7362 has no this register */
+ }
+
+@@ -328,8 +343,7 @@ static int __init nct7362d_find(int addr, struct i2c_client *client, struct i2c_
+ 	int err;
+ 	u32 devid = 0;
+
+-	struct i2c_adapter *adapter = client->adapter;
+-
++	struct device *dev = &client->dev;
+ 	err = -ENODEV;
+
+ 	devid = (nct7362_read_value(client, addr) & 0xFF);
+@@ -341,7 +355,7 @@ static int __init nct7362d_find(int addr, struct i2c_client *client, struct i2c_
+ 	case NCT7362_ID:
+ 	/* Fill in the remaining client fields and put into the global list */
+ 	strlcpy(info->type, "nct7362", I2C_NAME_SIZE);
+-	dev_info(&adapter->dev, "Detected Nuvoton %s chip at 0x%02x\n", "nct7362", client->addr);
++	dev_info(dev, "Detected Nuvoton %s chip at 0x%02x\n", "nct7362", client->addr);
+ 		break;
+ 	default:
+ 		pr_info(DRVNAME ": Unsupported device 0x%08x\n", devid);
+@@ -409,8 +423,6 @@ static int nct7362_probe(struct i2c_client *client,
+ 		if (!(data->has_pwm & (1 << i))) {
+ 			continue;
+ 		}
+-		/* Set the default PWM at 30% duty cycle */
+-		nct7362_write_value(client, NCT7362_REG_PWM(i), DEFAULT_PWM);
+ 		data->pwm[i] =
+ 			((u16)nct7362_read_value(client, NCT7362_REG_PWM(i)));
+ 	}
+@@ -426,7 +438,6 @@ static int nct7362_probe(struct i2c_client *client,
+ 		  (nct7362_read_value(client, NCT7362_REG_FAN_LSB(i)) & NCT7362_FAN_LSB_MASK);
+ 	}
+
+-
+ 	/* Prepare for sysfs hooks */
+ 	data->groups[0] = &nct7362_group_fan;
+ 	data->groups[1] = &nct7362_group_pwm;
+--
+2.17.1
+
