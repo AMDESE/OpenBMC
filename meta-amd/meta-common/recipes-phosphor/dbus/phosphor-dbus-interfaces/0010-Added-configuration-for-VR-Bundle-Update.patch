@@ -1,0 +1,111 @@
+From 25f976f4057a5297853a4d1b30428f422be23efc Mon Sep 17 00:00:00 2001
+From: Ashok Kumar <ashok2.kumar@amd.com>
+Date: Wed, 15 Feb 2023 13:24:58 -0600
+Subject: [PATCH] Added configuration for VR Bundle Update
+
+Added vr_bundle_active, version purpose in phosphor-dbus-interfaces
+for software version service
+
+Signed-off-by: Ashok Kumar <ashok2.kumar@amd.com>
+
+---
+ .../Software/BundleVersion/meson.build        | 14 ++++++++++
+ gen/xyz/openbmc_project/Software/meson.build  | 15 +++++++++++
+ .../Software/BundleVersion.interface.yaml     | 27 +++++++++++++++++++
+ .../Software/Version.interface.yaml           |  4 +--
+ 4 files changed, 58 insertions(+), 2 deletions(-)
+ create mode 100644 gen/xyz/openbmc_project/Software/BundleVersion/meson.build
+ create mode 100644 xyz/openbmc_project/Software/BundleVersion.interface.yaml
+
+diff --git a/gen/xyz/openbmc_project/Software/BundleVersion/meson.build b/gen/xyz/openbmc_project/Software/BundleVersion/meson.build
+new file mode 100644
+index 0000000..9dbb4ff
+--- /dev/null
++++ b/gen/xyz/openbmc_project/Software/BundleVersion/meson.build
+@@ -0,0 +1,14 @@
++# Generated file; do not modify.
++generated_sources += custom_target(
++    'xyz/openbmc_project/Software/BundleVersion__cpp'.underscorify(),
++    input: [ meson.project_source_root() / 'xyz/openbmc_project/Software/BundleVersion.interface.yaml',  ],
++    output: [ 'server.cpp', 'server.hpp', 'client.hpp',  ],
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'cpp',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.project_source_root(),
++        'xyz/openbmc_project/Software/BundleVersion',
++    ],
++)
++
+diff --git a/gen/xyz/openbmc_project/Software/meson.build b/gen/xyz/openbmc_project/Software/meson.build
+index 685ba10..2bd1dff 100644
+--- a/gen/xyz/openbmc_project/Software/meson.build
++++ b/gen/xyz/openbmc_project/Software/meson.build
+@@ -134,3 +134,18 @@ generated_others += custom_target(
+     build_by_default: true,
+ )
+
++subdir('BundleVersion')
++generated_others += custom_target(
++    'xyz/openbmc_project/Software/BundleVersion__markdown'.underscorify(),
++    input: [ meson.project_source_root() / 'xyz/openbmc_project/Software/BundleVersion.interface.yaml',  ],
++    output: [ 'BundleVersion.md' ],
++    command: [
++        sdbuspp_gen_meson_prog, '--command', 'markdown',
++        '--output', meson.current_build_dir(),
++        '--tool', sdbusplusplus_prog,
++        '--directory', meson.project_source_root(),
++        'xyz/openbmc_project/Software/BundleVersion',
++    ],
++    build_by_default: true,
++)
++
+diff --git a/xyz/openbmc_project/Software/BundleVersion.interface.yaml b/xyz/openbmc_project/Software/BundleVersion.interface.yaml
+new file mode 100644
+index 0000000..7ac0a8e
+--- /dev/null
++++ b/xyz/openbmc_project/Software/BundleVersion.interface.yaml
+@@ -0,0 +1,27 @@
++description: >
++    An extended version string for a xyz.openbmc_project.Software.BundleVersion.
++properties:
++    - name: FirmwareID
++      type: array[string]
++      description: >
++          Firmware IDs associated with each firmware.
++    - name: Versions
++      type: array[string]
++      description: >
++          Array of all firmware versions.
++    - name: Status
++      type: array[string]
++      description: >
++          Array consist status of all firmware flashed in Bundle.
++    - name: SlaveAddress
++      type: array[string]
++      description: >
++          Array of all slave address.
++    - name: Processor
++      type: array[string]
++      description: >
++          Array consist processor details of VR.
++    - name: Checksum
++      type: array[string]
++      description: >
++          Array consist checksum details of VR.
+diff --git a/xyz/openbmc_project/Software/Version.interface.yaml b/xyz/openbmc_project/Software/Version.interface.yaml
+index be35a64..f110b6b 100644
+--- a/xyz/openbmc_project/Software/Version.interface.yaml
++++ b/xyz/openbmc_project/Software/Version.interface.yaml
+@@ -44,9 +44,9 @@ enumerations:
+         - name: HPM_FPGA
+           description: >
+             The version is a version for a HPM FPGA.
+-        - name: VR
++        - name: VR_BUNDLE
+           description: >
+-            The version is a version for a VR.
++            The version is a version for a VR BUNDLE.
+         - name: RETIMER
+           description: >
+             The version is a version for PCIe Retimer

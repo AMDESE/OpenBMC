@@ -11,5 +11,6 @@ SRC_URI += "file://0001-recipes-phosphor-dbus-Add-enumeration-SCM_FPGA-for-v.pat
             file://0007-recipe-phosphor-dbus-Added-processor-DBus-property.patch \
             file://0008-phosphor-dbus-interfaces-Added-PPIN-entry.patch \
             file://0009-Power-cap-CPUID1-and-CPUID2-will-not-be-used-for-CPU.patch \
+            file://0010-Added-configuration-for-VR-Bundle-Update.patch \
             "
 
