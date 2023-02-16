@@ -11,42 +11,42 @@
 # DO NOT EDIT above entries for system and motherboard.
 # map non-IPMI-SEL to the system event sensor as "Undetermined system hardware failure."
 # Non-IPMI (OEM SELs) are grouped under above inventory sensor by default
-/xyz/openbmc_project/sensors/temperature/LM75A_48:
+/xyz/openbmc_project/sensors/temperature/CPU0_REAR_Temp:
   eventReadingType: 1
   sensorID: 0x01
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/LM75A_49:
+/xyz/openbmc_project/sensors/temperature/OCP_INLET_Temp:
   eventReadingType: 1
   sensorID: 0x02
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/LM75A_4A:
+/xyz/openbmc_project/sensors/temperature/SCM_INLET_Temp:
   eventReadingType: 1
   sensorID: 0x03
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/LM75A_4B:
+/xyz/openbmc_project/sensors/temperature/CPU0_FRONT_Temp:
   eventReadingType: 1
   sensorID: 0x04
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/LM75A_4C:
+/xyz/openbmc_project/sensors/voltage/VDD18_DUAL_VOUT:
   eventReadingType: 1
   sensorID: 0x05
-  sensorType: 1
+  sensorType: 2
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/LM75A_4D:
+/xyz/openbmc_project/sensors/current/VDD18_DUAL_IOUT:
   eventReadingType: 1
   sensorID: 0x06
-  sensorType: 1
+  sensorType: 3
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/LM75A_4E:
+/xyz/openbmc_project/sensors/temperature/VDD18_DUAL_TEMP:
   eventReadingType: 1
   sensorID: 0x07
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/LM75A_4F:
+/xyz/openbmc_project/sensors/temperature/VDD33_DUAL_TEMP:
   eventReadingType: 1
   sensorID: 0x08
   sensorType: 1
@@ -355,4 +355,14 @@
   eventReadingType: 1
   sensorID: 0x4B
   sensorType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/voltage/VDD33_DUAL_VOUT:
+  eventReadingType: 1
+  sensorID: 0x4C
+  sensorType: 2
+  offset: 0xff
+/xyz/openbmc_project/sensors/current/VDD33_DUAL_IOUT:
+  eventReadingType: 1
+  sensorID: 0x4D
+  sensorType: 3
   offset: 0xff

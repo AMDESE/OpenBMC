@@ -95,14 +95,12 @@ CHIPS_PURICO = " \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@48 \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@49 \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4a \
-        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4b \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4c \
-        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4d \
-        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4e \
-        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4f \
         bus@1e78a000/i2c-bus@300/i2cswitch@70/i2c@0/vddcr_core0_soc@61 \
         bus@1e78a000/i2c-bus@300/i2cswitch@70/i2c@0/vddcr_core1_11@62 \
         bus@1e78a000/i2c-bus@300/i2cswitch@70/i2c@0/vddcr_vddio_33@63 \
+        bus@1e78a000/i2c-bus@300/i2cswitch@70/i2c@0/vdd33dualvrm@19 \
+        bus@1e78a000/i2c-bus@300/i2cswitch@70/i2c@0/vdd18dualvrm@17 \
         "
 
 # Huambo specific sensors
