@@ -1,0 +1,190 @@
+From 3f8e194423d84e50b3ab751bfb981e3dcb96c8a2 Mon Sep 17 00:00:00 2001
+From: Alisha Kulkarni <ALISHA.KULKARNI@amd.com>
+Date: Thu, 16 Feb 2023 17:22:44 -0600
+Subject: [PATCH 1/1] ARM: dts: aspeed: Initial device tree for AMD G304
+ Platform
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+Initial introduction of AMD G304 platform equipped with
+Aspeed ast2600 SMC manufactured by AMD.
+
+AMD G304 platform is an AMD customer reference board with an
+Aspeed ast2600 SMC manufactured by AMD.
+
+This adds AMD SMC G304 device tree file with UART, SPI, I2c
+device nodes including the flash layout.
+
+Signed-off-by: Alisha Kulkarni <ALISHA.KULKARNI@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-g304.dts | 158 ++++++++++++++++++++++
+ 1 file changed, 158 insertions(+)
+ create mode 100644 arch/arm/boot/dts/aspeed-bmc-amd-g304.dts
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-g304.dts b/arch/arm/boot/dts/aspeed-bmc-amd-g304.dts
+new file mode 100644
+index 000000000000..d1e82c7e7cbc
+--- /dev/null
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-g304.dts
+@@ -0,0 +1,158 @@
++// SPDX-License-Identifier: GPL-2.0
++// Copyright (c) 2022 AMD Inc.
++// Author: Alisha Kulkarni <ALISHA.KULKARNI@amd.com>
++
++
++/dts-v1/;
++
++#include "aspeed-g6.dtsi"
++#include "dt-bindings/gpio/aspeed-gpio.h"
++
++/ {
++	model = "AMD G304 BMC";
++	compatible = "amd,g304-smc ", "aspeed,ast2600";
++
++	aliases {
++		serial4 = &uart5;
++	};
++
++	chosen {
++		stdout-path = &uart5;
++		bootargs = "console=ttyS4,115200 earlycon vmalloc=512MB";
++	};
++
++	memory@80000000 {
++		device_type = "memory";
++		reg = <0x80000000 0x80000000>;
++	};
++};
++
++&fmc {
++	status = "okay";
++	fmc-spi-user-mode;
++	flash@0 {
++		compatible = "jedec,spi-nor";
++		status = "okay";
++		label = "bmc";
++		spi-tx-bus-width = <4>;
++		spi-rx-bus-width = <4>;
++		#include "openbmc-flash-layout-128.dtsi"
++	};
++};
++
++&spi1 {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_spi1_default &pinctrl_qspi1_default>;
++	fmc-spi-user-mode;
++	compatible = "aspeed,ast2600-spi";
++
++	flash@0 {
++		compatible = "jedec,spi-nor";
++		label = "pnor";
++		status = "okay";
++	};
++
++	flash@1 {
++		compatible = "jedec,spi-nor";
++		label = "pnor";
++		status = "okay";
++	};
++};
++
++&spi2 {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_spi2_default &pinctrl_qspi2_default>;
++	fmc-spi-user-mode;
++	compatible = "aspeed,ast2600-spi";
++
++	flash@0 {
++		compatible = "jedec,spi-nor";
++		label = "pnor";
++		status = "okay";
++	};
++};
++
++&uart1 {
++	//Host console
++	compatible = "aspeed,ast2600-uart";
++	/delete-property/ reg-shift;
++	/delete-property/ reg-io-width;
++	dma-mode;
++	dma-channel = <0>;
++	status = "okay";
++};
++
++//BMC Console - UART
++&uart5 {
++	status = "okay";
++};
++
++&uart_routing {
++	status = "okay";
++};
++
++// I2C configs
++&i2c0 {
++	status = "okay";
++};
++
++&i2c1 {
++	status = "okay";
++};
++
++&i2c2 {
++	status = "okay";
++};
++
++&i2c3 {
++	status = "okay";
++};
++
++&i2c4 {
++	status = "okay";
++};
++
++&i2c5 {
++	status = "okay";
++};
++
++&i2c6 {
++	status = "okay";
++};
++
++&i2c7 {
++	status = "okay";
++};
++
++&i2c8 {
++	status = "okay";
++};
++&i2c9 {
++	status = "okay";
++};
++&i2c10 {
++	status = "okay";
++};
++
++&i2c11 {
++	status = "okay";
++};
++
++&i2c12 {
++	status = "okay";
++};
++
++&i2c13 {
++	status = "okay";
++};
++
++&i2c14 {
++	status = "okay";
++};
++
++&i2c15 {
++	status = "okay";
++};
++
+--
+2.17.1
+
