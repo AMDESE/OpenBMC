@@ -46,6 +46,7 @@ RDEPENDS_${PN}-system = " \
         amd-mctp-tool \
         amd-ras \
         amd-yaap \
+        auto-notify \
         bmcweb \
         cpu-info \
         debug-apps \
