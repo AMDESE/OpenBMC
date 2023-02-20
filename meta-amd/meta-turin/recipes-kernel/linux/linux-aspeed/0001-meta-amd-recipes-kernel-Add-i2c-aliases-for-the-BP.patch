@@ -1,0 +1,426 @@
+From b8ba0e2bfe00e57da032bf7745f4cc31a4030887 Mon Sep 17 00:00:00 2001
+From: Andrew Peng <pengms1@lenovo.com>
+Date: Mon, 20 Feb 2023 10:34:52 +0800
+Subject: [PATCH] meta-amd/recipes-kernel: Add i2c aliases for the BP
+
+    - BP1 FRU: /sys/bus/i2c/devices/250-0050/eeprom
+    - BP2 FRU: /sys/bus/i2c/devices/251-0050/eeprom
+    - BP3 FRU: /sys/bus/i2c/devices/252-0050/eeprom
+    - BP1 PSOC1 I2C Bus: 255
+    - BP1 PSOC2 I2C Bus: 256
+    - BP2 PSOC1 I2C Bus: 257
+    - BP2 PSOC2 I2C Bus: 258
+    - BP3 PSOC1 I2C Bus: 259
+    - BP3 PSOC2 I2C Bus: 260
+
+Signed-off-by: Andrew Peng <pengms1@lenovo.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-purico.dts  | 175 +++++++++++++++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts | 175 ++++++++++++++++++-
+ 2 files changed, 347 insertions(+), 3 deletions(-)
+ mode change 100644 => 100755 arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+ mode change 100644 => 100755 arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+old mode 100644
+new mode 100755
+index ba46c3d2fbd3..122523958ded
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+@@ -16,6 +16,22 @@
+ 		serial4 = &uart5;
+ 		ethernet0 = &mac3;
+ 		ethernet1 = &mac2;
++		i2c240 = &channel_10_10; //U63
++		i2c241 = &channel_10_11;
++		i2c242 = &channel_10_12;
++		i2c243 = &channel_10_13;
++		i2c244 = &channel_10_14;
++		i2c245 = &channel_10_15;
++		i2c246 = &channel_10_16;
++		i2c250 = &BP1;			//U134
++		i2c251 = &BP2;
++		i2c252 = &BP3;
++		i2c255 = &BP1_Crtl0;	//U6
++		i2c256 = &BP1_Crtl1;
++		i2c257 = &BP2_Crtl0;
++		i2c258 = &BP2_Crtl1;
++		i2c259 = &BP3_Crtl0;
++		i2c260 = &BP3_Crtl1;
+ 	};
+ 
+ 	chosen {
+@@ -387,6 +403,165 @@
+ 		};
+ 	};
+ #endif
++
++	i2cswitch@75 {
++		compatible = "nxp,pca9548";
++		reg = <0x75>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		channel_10_10: i2c@0 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0>;
++		};
++
++		channel_10_11: i2c@1 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <1>;
++		};
++
++		channel_10_12: i2c@2 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <2>;
++		};
++
++		channel_10_13: i2c@3 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <3>;
++
++			// BP
++			i2cswitch@70 {
++				compatible = "nxp,pca9545";
++				#address-cells = <1>;
++				#size-cells = <0>;
++				reg = <0x70>;
++
++				//  channel 0 connected to BP1
++				BP1: i2c@0 {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					reg = <0>;
++
++					bp1_eeprom: eeprom@50 {
++						compatible = "atmel,24c32";
++						reg = <0x50>;
++						pagesize = <32>;
++					};
++
++					i2cswitch@71 {
++						compatible = "nxp,pca9545";
++						#address-cells = <1>;
++						#size-cells = <0>;
++						reg = <0x71>;
++
++						//  channel 0 connected to PSOC0
++						BP1_Crtl0: i2c@0 {
++							#address-cells = <1>;
++							#size-cells = <0>;
++							reg = <0>;
++						};
++
++						//  channel 1 connected to PSOC1
++						BP1_Crtl1: i2c@1 {
++							#address-cells = <1>;
++							#size-cells = <0>;
++							reg = <1>;
++						};
++					};
++				};
++
++				//  channel 1 connected to BP2
++				BP2: i2c@1 {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					reg = <1>;
++
++					bp2_eeprom: eeprom@50 {
++						compatible = "atmel,24c32";
++						reg = <0x50>;
++						pagesize = <32>;
++					};
++
++					i2cswitch@71 {
++						compatible = "nxp,pca9545";
++						#address-cells = <1>;
++						#size-cells = <0>;
++						reg = <0x71>;
++
++						//  channel 0 connected to PSOC0
++						BP2_Crtl0: i2c@0 {
++							#address-cells = <1>;
++							#size-cells = <0>;
++							reg = <0>;
++						};
++
++						//  channel 1 connected to PSOC1
++						BP2_Crtl1: i2c@1 {
++							#address-cells = <1>;
++							#size-cells = <0>;
++							reg = <1>;
++						};
++					};
++				};
++
++				//  channel 2 connected to BP3
++				BP3: i2c@2 {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					reg = <2>;
++
++					bp3_eeprom: eeprom@50 {
++						compatible = "atmel,24c32";
++						reg = <0x50>;
++						pagesize = <32>;
++					};
++
++					i2cswitch@71 {
++						compatible = "nxp,pca9545";
++						#address-cells = <1>;
++						#size-cells = <0>;
++						reg = <0x71>;
++
++						//  channel 0 connected to PSOC0
++						BP3_Crtl0: i2c@0 {
++							#address-cells = <1>;
++							#size-cells = <0>;
++							reg = <0>;
++						};
++
++						//  channel 1 connected to PSOC1
++						BP3_Crtl1: i2c@1 {
++							#address-cells = <1>;
++							#size-cells = <0>;
++							reg = <1>;
++						};
++					};
++				};
++			};
++		};
++
++		channel_10_14: i2c@4 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <4>;
++		};
++
++		channel_10_15: i2c@5 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <5>;
++		};
++
++		channel_10_16: i2c@6 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <6>;
++		};
++	};
+ };
+ 
+ // BCM5720 LOM
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts b/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
+old mode 100644
+new mode 100755
+index 17c3812b0b9d..d4950aea26e6
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
+@@ -16,6 +16,22 @@
+ 		serial4 = &uart5;
+ 		ethernet0 = &mac3;
+ 		ethernet1 = &mac2;
++		i2c240 = &channel_10_10; //U63
++		i2c241 = &channel_10_11;
++		i2c242 = &channel_10_12;
++		i2c243 = &channel_10_13;
++		i2c244 = &channel_10_14;
++		i2c245 = &channel_10_15;
++		i2c246 = &channel_10_16;
++		i2c250 = &BP1;			//U134
++		i2c251 = &BP2;
++		i2c252 = &BP3;
++		i2c255 = &BP1_Crtl0;	//U6
++		i2c256 = &BP1_Crtl1;
++		i2c257 = &BP2_Crtl0;
++		i2c258 = &BP2_Crtl1;
++		i2c259 = &BP3_Crtl0;
++		i2c260 = &BP3_Crtl1;
+ 	};
+ 
+ 	chosen {
+@@ -803,7 +819,7 @@
+ #ifdef EEPROM_PROG_ENABLE
+ 	// SCM brd_id, Volcano brd_id, CLK
+ 	i2cswitch@71 {
+-		compatible = "nxp,pca9848";
++		compatible = "nxp,pca9548";
+ 		reg = <0x71>;
+ 		#address-cells = <1>;
+ 		#size-cells = <0>;
+@@ -833,14 +849,167 @@
+ 			};
+ 		};
+ 	};
++#endif
+ 	// Midpalne, Raiser cards, SATA, etc
+ 	i2cswitch@75 {
+-		compatible = "nxp,pca9848";
++		compatible = "nxp,pca9548";
+ 		reg = <0x75>;
+ 		#address-cells = <1>;
+ 		#size-cells = <0>;
++
++		channel_10_10: i2c@0 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0>;
++		};
++
++		channel_10_11: i2c@1 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <1>;
++		};
++
++		channel_10_12: i2c@2 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <2>;
++		};
++
++		channel_10_13: i2c@3 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <3>;
++
++			// BP
++			i2cswitch@70 {
++				compatible = "nxp,pca9545";
++				#address-cells = <1>;
++				#size-cells = <0>;
++				reg = <0x70>;
++
++				//  channel 0 connected to BP1
++				BP1: i2c@0 {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					reg = <0>;
++
++					bp1_eeprom: eeprom@50 {
++						compatible = "atmel,24c32";
++						reg = <0x50>;
++						pagesize = <32>;
++					};
++
++					i2cswitch@71 {
++						compatible = "nxp,pca9545";
++						#address-cells = <1>;
++						#size-cells = <0>;
++						reg = <0x71>;
++
++						//  channel 0 connected to PSOC0
++						BP1_Crtl0: i2c@0 {
++							#address-cells = <1>;
++							#size-cells = <0>;
++							reg = <0>;
++						};
++
++						//  channel 1 connected to PSOC1
++						BP1_Crtl1: i2c@1 {
++							#address-cells = <1>;
++							#size-cells = <0>;
++							reg = <1>;
++						};
++					};
++				};
++
++				//  channel 1 connected to BP2
++				BP2: i2c@1 {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					reg = <1>;
++
++					bp2_eeprom: eeprom@50 {
++						compatible = "atmel,24c32";
++						reg = <0x50>;
++						pagesize = <32>;
++					};
++
++					i2cswitch@71 {
++						compatible = "nxp,pca9545";
++						#address-cells = <1>;
++						#size-cells = <0>;
++						reg = <0x71>;
++
++						//  channel 0 connected to PSOC0
++						BP2_Crtl0: i2c@0 {
++							#address-cells = <1>;
++							#size-cells = <0>;
++							reg = <0>;
++						};
++
++						//  channel 1 connected to PSOC1
++						BP2_Crtl1: i2c@1 {
++							#address-cells = <1>;
++							#size-cells = <0>;
++							reg = <1>;
++						};
++					};
++				};
++
++				//  channel 2 connected to BP3
++				BP3: i2c@2 {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					reg = <2>;
++
++					bp3_eeprom: eeprom@50 {
++						compatible = "atmel,24c32";
++						reg = <0x50>;
++						pagesize = <32>;
++					};
++
++					i2cswitch@71 {
++						compatible = "nxp,pca9545";
++						#address-cells = <1>;
++						#size-cells = <0>;
++						reg = <0x71>;
++
++						//  channel 0 connected to PSOC0
++						BP3_Crtl0: i2c@0 {
++							#address-cells = <1>;
++							#size-cells = <0>;
++							reg = <0>;
++						};
++
++						//  channel 1 connected to PSOC1
++						BP3_Crtl1: i2c@1 {
++							#address-cells = <1>;
++							#size-cells = <0>;
++							reg = <1>;
++						};
++					};
++				};
++			};
++		};
++
++		channel_10_14: i2c@4 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <4>;
++		};
++
++		channel_10_15: i2c@5 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <5>;
++		};
++
++		channel_10_16: i2c@6 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <6>;
++		};
+ 	};
+-#endif
++
+ };
+ 
+ // 1G ROM
