@@ -149,13 +149,17 @@ CHIPS_VOLCANO = " \
         bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@1/lm75a@4a \
         bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@1/lm75a@4b \
         bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@1/lm75a@4c \
+        bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@1/lm75a@4d \
         bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@6/lm75a@4a \
-        bus@1e78a000/i2c-bus@300/pvdd11_s3_p0@63 \
+        bus@1e78a000/i2c-bus@300/pvdd11_s3_p0@62 \
         bus@1e78a000/i2c-bus@300/pvddcr_soc_p0@61 \
-        bus@1e78a000/i2c-bus@300/pvddio_p0@62 \
+        bus@1e78a000/i2c-bus@300/pvddio_p0@63 \
+        bus@1e78a000/i2c-bus@300/pvdd18_s5_p0@17 \
+        bus@1e78a000/i2c-bus@300/pvdd33_s5_p0@19 \
         bus@1e78a000/i2c-bus@380/pvdd11_s3_p1@74 \
         bus@1e78a000/i2c-bus@380/pvddcr_soc_p1@72 \
         bus@1e78a000/i2c-bus@380/pvddio_p1@75 \
+        bus@1e78a000/i2c-bus@380/pvdd18_s5_p1@18 \
         "
 
 ITEMSFMT = "ahb/apb/{0}.conf"
