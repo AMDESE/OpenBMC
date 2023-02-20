@@ -32,4 +32,5 @@ SRC_URI += "file://amd-bmc-baseline.cfg \
             file://0029-linux-aspeed-modify-sh5d807-device-tree-for-VR-sensors.patch \
             file://0030-linux-aspeed-driver-Modify-disable-watchdog-timer-in-nct7362.patch \
             file://0031-ARM-dts-aspeed-Initial-device-tree-for-AMD-G304-Plat.patch \
+            file://0032-ARM-dts-aspeed-Add-Volcano-sensors.patch \
            "

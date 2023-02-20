@@ -1,0 +1,126 @@
+From b09acd7713f40131613120a427c5666244f0a879 Mon Sep 17 00:00:00 2001
+From: Mohsen Dolaty <mohsen.dolaty@amd.com>
+Date: Mon, 20 Feb 2023 12:33:19 -0600
+Subject: [PATCH 1/1] linux-aspeed: Add Volcano sensors
+
+Add Turin Volcano ADC and VR sensors
+based on the schematics
+
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts | 67 ++++++++++----------
+ 1 file changed, 33 insertions(+), 34 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts b/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
+index b894e36799f7..bdb0c567c070 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
+@@ -60,13 +60,9 @@ pcc_memory: pccbuffer {
+
+ 	iio-hwmon-adc121c {
+ 		compatible = "iio-hwmon";
+-		oemname0 = "FPGA_VDD_CORE";
+-		oemname1 = "FPGA_VDD_18";
+-		oemname2 = "FPGA_VDD_33";
+-		oemname3 = "LOM_VDD_33";
+-		oemname4 = "LOM_VDD_12";
+-		oemname5 = "VDD_12_DUAL";
+-		io-channels = <&adc0 0>, <&adc1 0>, <&adc2 0>, <&adc4 0>, <&adc5 0>;
++		oemname0 = "ADC_P1V27_AUX";
++		oemname1 = "ADC_P12V_AUX";
++		io-channels = <&adc0 0>, <&adc1 0>;
+ 	};
+ };
+
+@@ -615,6 +611,34 @@ sbrmi_p1_1: sbrmi@38,22400000002 {
+ &i2c4 {
+ 	// Net name i2c1
+ 	status = "okay";
++	p1v8_aux@08 {
++		compatible = "isil,isl68137";
++		reg = <0x08>;
++	};
++	p1v2_auxa@09 {
++		compatible = "isil,isl68137";
++		reg = <0x09>;
++	};
++	p1v2_auxb@0a {
++		compatible = "isil,isl68137";
++		reg = <0x0a>;
++	};
++	p1v0_aux@0b {
++		compatible = "isil,isl68137";
++		reg = <0x0b>;
++	};
++	p3v3@16 {
++		compatible = "isil,isl68137";
++		reg = <0x16>;
++	};
++	p3v3_aux@1b {
++		compatible = "isil,isl68137";
++		reg = <0x1b>;
++	};
++	p5v_aux@1d {
++		compatible = "isil,isl68137";
++		reg = <0x1d>;
++	};
+ };
+
+ // Volcano P0 VRs
+@@ -625,10 +649,6 @@ pvddcr_soc_p0@61 {
+ 		compatible = "isil,isl68137";
+ 		reg = <0x61>;
+ 	};
+-	pvdd33_s5_p0@19 {
+-		compatible = "isil,isl68137";
+-		reg = <0x19>;
+-	};
+ 	pvdd11_s3_p0@62 {
+ 		compatible = "isil,isl68137";
+ 		reg = <0x62>;
+@@ -647,9 +667,6 @@ pvdd33_s5_p0@19 {
+ 		compatible = "isil,isl68137";
+ 		reg = <0x19>;
+ 	};
+-
+-
+-
+ };
+
+ // Volcano P1 VRs
+@@ -759,31 +776,13 @@ i2c@2 {
+ 			#size-cells = <0>;
+ 			reg = <2>;
+
+-			adc0: p1v0_aux@50 {
+-				compatible = "ti,adc121c";
+-				reg = <0x50>;
+-				#io-channel-cells = <1>;
+-				label = "p1v0_aux";
+-			};
+-			adc1: p1v8_aux@51 {
+-				compatible = "ti,adc121c";
+-				reg = <0x51>;
+-				#io-channel-cells = <1>;
+-				label = "p1v8_aux";
+-			};
+-			adc2: p3v3_aux@52 {
+-				compatible = "ti,adc121c";
+-				reg = <0x52>;
+-				#io-channel-cells = <1>;
+-				label = "p3v3_aux";
+-			};
+-			adc4: p1v27_aux@55 {
++			adc0: p1v27_aux@55 {
+ 				compatible = "ti,adc121c";
+ 				reg = <0x55>;
+ 				#io-channel-cells = <1>;
+ 				label = "p1v27_aux";
+ 			};
+-			adc5: p12v_aux@56 {
++			adc1: p12v_aux@56 {
+ 				compatible = "ti,adc121c";
+ 				reg = <0x56>;
+ 				#io-channel-cells = <1>;
+--
+2.25.1
