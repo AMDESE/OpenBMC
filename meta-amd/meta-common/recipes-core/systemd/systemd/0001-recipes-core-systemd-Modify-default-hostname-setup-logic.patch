@@ -1,0 +1,86 @@
+From b8b8a8aaed18bfda1529582c69b4025a3537fdf2 Mon Sep 17 00:00:00 2001
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Tue, 21 Feb 2023 13:53:17 -0600
+Subject: [PATCH 1/1] recipes-core/systemd: Modify default hostname setup logic
+
+Hostname setup logic modified to set the default hostname as per
+/etc/hostname  file  insted of setting from bootargs.
+
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ src/core/hostname-setup.c | 50 +++++++++++++++++++++++++--------------
+ 1 file changed, 32 insertions(+), 18 deletions(-)
+
+diff --git a/src/core/hostname-setup.c b/src/core/hostname-setup.c
+index 867ea19905..22d6d8a0a7 100644
+--- a/src/core/hostname-setup.c
++++ b/src/core/hostname-setup.c
+@@ -14,33 +14,47 @@
+ #include "string-util.h"
+ #include "util.h"
+
++#define HOSTNAME_CMD_LEN (256)
++
+ int hostname_setup(void) {
+         _cleanup_free_ char *b = NULL;
+         const char *hn = NULL;
+         bool enoent = false;
+         int r;
++        char hn_cmd_buff[HOSTNAME_CMD_LEN];
+
+-        r = proc_cmdline_get_key("systemd.hostname", 0, &b);
+-        if (r < 0)
+-                log_warning_errno(r, "Failed to retrieve system hostname from kernel command line, ignoring: %m");
+-        else if (r > 0) {
+-                if (hostname_is_valid(b, true))
+-                        hn = b;
+-                else  {
+-                        log_warning("Hostname specified on kernel command line is invalid, ignoring: %s", b);
+-                        b = mfree(b);
+-                }
++        /* Read hostname from /etc/hostname file */
++        r = read_etc_hostname(NULL, &b);
++        if (r < 0) {
++                if (r == -ENOENT)
++                        enoent = true;
++                else
++                        log_warning_errno(r, "Failed to read configured hostname: %m");
++        } else {
++            if ( b && hostname_is_valid(b, true))
++                /* Set hostname as per /etc/hostname */
++                hn = b;
+         }
+
+         if (!hn) {
+-                r = read_etc_hostname(NULL, &b);
+-                if (r < 0) {
+-                        if (r == -ENOENT)
+-                                enoent = true;
+-                        else
+-                                log_warning_errno(r, "Failed to read configured hostname: %m");
+-                } else
+-                        hn = b;
++            /* Read hostname from Kernel bootargs */
++            r = proc_cmdline_get_key("systemd.hostname", 0, &b);
++            if (r < 0)
++                    log_warning_errno(r, "Failed to retrieve system hostname from kernel command line, ignoring: %m");
++            else if (r > 0) {
++                    if (hostname_is_valid(b, true)) {
++                            hn = b;
++                            /* Update hostname to /etc/hostname file */
++                            sprintf(hn_cmd_buff, "echo %s > /etc/hostname", hn);
++                            r = system(hn_cmd_buff);
++                            if ( r < 0)
++                                    return log_warning_errno(r, "Failed writing <%s> to /etc/hostname file: %m", hn);
++                        }
++                    else  {
++                            log_warning("Hostname specified on kernel command line is invalid, ignoring: %s", b);
++                            b = mfree(b);
++                    }
++            }
+         }
+
+         if (isempty(hn)) {
+--
+2.17.1
+
