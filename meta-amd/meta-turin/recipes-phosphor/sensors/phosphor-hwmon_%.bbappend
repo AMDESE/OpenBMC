@@ -5,8 +5,8 @@ SRC_URI += "file://0001-Add-power-on-monitor-mechanism.patch \
 	   "
 # Galena specific sensors
 CHIPS_GALENA = " \
-        bus@1e7a0000/i3c4@6000/sbtsi@4c,22400000001 \
-        bus@1e7a0000/i3c4@6000/sbrmi@3c,22400000002 \
+        bus@1e78a000/i2c-bus@180/sbtsi@4c \
+        bus@1e78a000/i2c-bus@180/sbrmi@3c \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@0/emc2305@4d \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@1/emc2305@4d \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@2/emc2305@4d \
@@ -30,8 +30,8 @@ CHIPS_GALENA = " \
 
 # Recluse specific sensors
 CHIPS_RECLUSE = " \
-        bus@1e7a0000/i3c4@6000/sbtsi@4c,22400000001 \
-        bus@1e7a0000/i3c4@6000/sbrmi@3c,22400000002 \
+        bus@1e78a000/i2c-bus@180/sbtsi@4c \
+        bus@1e78a000/i2c-bus@180/sbrmi@3c \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@0/emc2305@4d \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@1/emc2305@4d \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@2/emc2305@4d \
@@ -55,10 +55,10 @@ CHIPS_RECLUSE = " \
 
 # Chalupa specific sensors
 CHIPS_CHALUPA = " \
-        bus@1e7a0000/i3c4@6000/sbtsi@4c,22400000001 \
-        bus@1e7a0000/i3c5@7000/sbtsi@48,22400000001 \
-        bus@1e7a0000/i3c4@6000/sbrmi@3c,22400000002 \
-        bus@1e7a0000/i3c5@7000/sbrmi@38,22400000002 \
+        bus@1e78a000/i2c-bus@180/sbtsi@4c \
+        bus@1e78a000/i2c-bus@180/sbrmi@3c \
+        bus@1e78a000/i2c-bus@200/sbtsi@48 \
+        bus@1e78a000/i2c-bus@200/sbrmi@38 \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@0/emc2305@4d \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@1/emc2305@4d \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@2/emc2305@4d \
@@ -88,8 +88,8 @@ CHIPS_CHALUPA = " \
 
 # Purico specific sensors
 CHIPS_PURICO = " \
-        bus@1e7a0000/i3c4@6000/sbtsi@4c,22400000001 \
-        bus@1e7a0000/i3c4@6000/sbrmi@3c,22400000002 \
+        bus@1e78a000/i2c-bus@180/sbtsi@4c \
+        bus@1e78a000/i2c-bus@180/sbrmi@3c \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@0/nct7362@20 \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@3/nct7362@20 \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@48 \
@@ -105,10 +105,10 @@ CHIPS_PURICO = " \
 
 # Huambo specific sensors
 CHIPS_HUAMBO = " \
-        bus@1e7a0000/i3c4@6000/sbtsi@4c,22400000001 \
-        bus@1e7a0000/i3c5@7000/sbtsi@48,22400000001 \
-        bus@1e7a0000/i3c4@6000/sbrmi@3c,22400000002 \
-        bus@1e7a0000/i3c5@7000/sbrmi@38,22400000002 \
+        bus@1e78a000/i2c-bus@180/sbtsi@4c \
+        bus@1e78a000/i2c-bus@180/sbrmi@3c \
+        bus@1e78a000/i2c-bus@200/sbtsi@48 \
+        bus@1e78a000/i2c-bus@200/sbrmi@38 \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@0/emc2305@4d \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@1/emc2305@4d \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@2/emc2305@4d \
@@ -138,10 +138,10 @@ CHIPS_HUAMBO = " \
 
 # Volcano specific sensors
 CHIPS_VOLCANO = " \
-        bus@1e7a0000/i3c4@6000/sbtsi@4c,22400000001 \
-        bus@1e7a0000/i3c5@7000/sbtsi@48,22400000001 \
-        bus@1e7a0000/i3c4@6000/sbrmi@3c,22400000002 \
-        bus@1e7a0000/i3c5@7000/sbrmi@38,22400000002 \
+        bus@1e78a000/i2c-bus@180/sbtsi@4c \
+        bus@1e78a000/i2c-bus@180/sbrmi@3c \
+        bus@1e78a000/i2c-bus@200/sbtsi@48 \
+        bus@1e78a000/i2c-bus@200/sbrmi@38 \
         bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@0/nct7362@20 \
         bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@7/nct7362@20 \
         bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@1/lm75a@48 \
