@@ -1,0 +1,91 @@
+From 65f2d5fe55eb0ed45307ea7a5ed00a1738c20400 Mon Sep 17 00:00:00 2001
+From: Mohsen Dolaty <mohsen.dolaty@amd.com>
+Date: Mon, 20 Feb 2023 19:34:39 -0600
+Subject: [PATCH 1/1] linux-aspeed: APML over I2C
+
+Change APML to use I2C bus in platform Device Tables
+
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts | 1 +
+ arch/arm/boot/dts/aspeed-bmc-amd-galena.dts  | 1 +
+ arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts  | 1 +
+ arch/arm/boot/dts/aspeed-bmc-amd-purico.dts  | 1 +
+ arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts | 1 +
+ arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts | 1 +
+ 6 files changed, 6 insertions(+)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
+index 14837fe1724a..0f0f0a9aed7e 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
+@@ -1032,6 +1032,7 @@ rcd_3_5: rcd@5d,2C000000005 {
+ 	};
+ };
+
++#define ENABLE_I2C_APML (1)
+ #ifdef ENABLE_I2C_APML
+
+ &i2c2 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts b/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
+index 28a71cf6246c..b54a92d25b4d 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
+@@ -735,6 +735,7 @@ rcd_1_5: rcd@5d,2C000000005 {
+ 	};
+ };
+
++#define ENABLE_I2C_APML (1)
+ #ifdef ENABLE_I2C_APML
+
+ &i2c2 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts b/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
+index 44bc0209822a..6eb922ebccac 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
+@@ -1032,6 +1032,7 @@ rcd_3_5: rcd@5d,2C000000005 {
+ 	};
+ };
+
++#define ENABLE_I2C_APML (1)
+ #ifdef ENABLE_I2C_APML
+
+ &i2c2 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+index ba46c3d2fbd3..fa66061a3aea 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+@@ -764,6 +764,7 @@ rcd_3_5: rcd@5d,2C000000005 {
+         };
+ };
+
++#define ENABLE_I2C_APML (1)
+ #ifdef ENABLE_I2C_APML
+
+ &i2c2 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts b/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
+index 00be9320133c..99894cdf9b41 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
+@@ -735,6 +735,7 @@ rcd_1_5: rcd@5d,2C000000005 {
+ 	};
+ };
+
++#define ENABLE_I2C_APML (1)
+ #ifdef ENABLE_I2C_APML
+
+ &i2c2 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts b/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
+index bdb0c567c070..fe7a712bb2d8 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
+@@ -525,6 +525,7 @@ rcd_3_5: rcd@5d,2C000000005 {
+ 	};
+ };
+
++#define ENABLE_I2C_APML (1)
+ #ifdef ENABLE_I2C_APML
+
+ &i2c2 {
+--
+2.25.1
