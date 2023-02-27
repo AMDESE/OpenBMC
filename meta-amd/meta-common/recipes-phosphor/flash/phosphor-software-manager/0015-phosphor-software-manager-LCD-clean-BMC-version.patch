@@ -1,0 +1,42 @@
+From a079338c11a5c416f47da31b6326984999e2dac9 Mon Sep 17 00:00:00 2001
+From: Mohsen Dolaty <mohsen.dolaty@amd.com>
+Date: Mon, 27 Feb 2023 16:17:51 -0600
+Subject: [PATCH 1/1] phosphor-software-manager: LCD clean BMC version
+
+BMC version is now greater than 20 Characters
+Only display the BMC version values after v2.XX
+
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
+---
+ version.cpp | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/version.cpp b/version.cpp
+index 2c004cd..09f01a6 100644
+--- a/version.cpp
++++ b/version.cpp
+@@ -210,6 +210,8 @@ std::string Version::getBMCExtendedVersion(const std::string& releaseFilePath)
+ std::string Version::getBMCVersion(const std::string& releaseFilePath)
+ {
+     char bmcVer[LCD_BUFF_SIZE];
++    char bmc[LCD_BUFF_SIZE];
++    char *bmcPtr=NULL;
+
+     std::string versionKey = "VERSION_ID=";
+     std::string versionValue{};
+@@ -254,7 +256,12 @@ std::string Version::getBMCVersion(const std::string& releaseFilePath)
+     else
+     {
+         if(initLCDflag == 0) {
+-            snprintf(bmcVer, LCD_BUFF_SIZE, "BMC: %s  \n", version.c_str());
++            snprintf(bmc, LCD_BUFF_SIZE, "%s     \n", version.c_str());
++            bmcPtr = strstr(bmc,"v2.");
++            if(bmcPtr == NULL)
++                snprintf(bmcVer, LCD_BUFF_SIZE, "BMC: %s  \n", version.c_str());
++            else
++                snprintf(bmcVer, LCD_BUFF_SIZE, "BMC: %s  \n", bmcPtr);
+             initLCD(bmcVer);
+             initLCDflag++;
+         }
+--
+2.25.1

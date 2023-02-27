@@ -17,6 +17,7 @@ SRC_URI += "file://bios-update.sh \
             file://0012-read-HPM-FPGA-version-from-FPGA-i2c-slave.patch \
             file://0013-add-host-factory-reset-to-resetAll-handler.patch \
             file://0014-phosphor-software-manager-Modify-to-call-u-boot-env-script.patch \
+            file://0015-phosphor-software-manager-LCD-clean-BMC-version.patch \
             "
 DEPENDS += "amd-lcd-lib"
 
