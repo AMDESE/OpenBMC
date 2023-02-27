@@ -1,0 +1,1105 @@
+From 52fe58bebc8eb44f5c8c932610fedf188589c9e8 Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Mon, 27 Feb 2023 04:06:32 -0600
+Subject: [PATCH] drivers/usb/gadget: aspeed virtual hub updates
+
+updates from upstream for gadget drivers and aspeed virtual hub drivers.
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+---
+ drivers/usb/gadget/function/f_hid.c       |  57 +++-
+ drivers/usb/gadget/udc/aspeed-vhub/core.c |  86 +++---
+ drivers/usb/gadget/udc/aspeed-vhub/dev.c  |  51 +++-
+ drivers/usb/gadget/udc/aspeed-vhub/ep0.c  |   7 +
+ drivers/usb/gadget/udc/aspeed-vhub/epn.c  |  38 ++-
+ drivers/usb/gadget/udc/aspeed-vhub/hub.c  | 333 ++++++----------------
+ drivers/usb/gadget/udc/aspeed-vhub/vhub.h |  38 +--
+ 7 files changed, 272 insertions(+), 338 deletions(-)
+
+diff --git a/drivers/usb/gadget/function/f_hid.c b/drivers/usb/gadget/function/f_hid.c
+index 1125f4715830..e4d71410a4b1 100644
+--- a/drivers/usb/gadget/function/f_hid.c
++++ b/drivers/usb/gadget/function/f_hid.c
+@@ -41,6 +41,7 @@ struct f_hidg {
+ 	unsigned char			bInterfaceSubClass;
+ 	unsigned char			bInterfaceProtocol;
+ 	unsigned char			protocol;
++	unsigned char			idle;
+ 	unsigned short			report_desc_length;
+ 	char				*report_desc;
+ 	unsigned short			report_length;
+@@ -88,7 +89,7 @@ static struct usb_interface_descriptor hidg_interface_desc = {
+ static struct hid_descriptor hidg_desc = {
+ 	.bLength			= sizeof hidg_desc,
+ 	.bDescriptorType		= HID_DT_HID,
+-	.bcdHID				= 0x0101,
++	.bcdHID				= cpu_to_le16(0x0101),
+ 	.bCountryCode			= 0x00,
+ 	.bNumDescriptors		= 0x1,
+ 	/*.desc[0].bDescriptorType	= DYNAMIC */
+@@ -252,6 +253,9 @@ static ssize_t f_hidg_read(struct file *file, char __user *buffer,
+ 	if (!count)
+ 		return 0;
+
++	if (!access_ok(buffer, count))
++		return -EFAULT;
++
+ 	spin_lock_irqsave(&hidg->read_spinlock, flags);
+
+ #define READ_COND (!list_empty(&hidg->completed_out_req))
+@@ -336,8 +340,16 @@ static ssize_t f_hidg_write(struct file *file, const char __user *buffer,
+ 	unsigned long flags;
+ 	ssize_t status = -ENOMEM;
+
++	if (!access_ok(buffer, count))
++		return -EFAULT;
++
+ 	spin_lock_irqsave(&hidg->write_spinlock, flags);
+
++	if (!hidg->req) {
++		spin_unlock_irqrestore(&hidg->write_spinlock, flags);
++		return -ESHUTDOWN;
++	}
++
+ #define WRITE_COND (!hidg->write_pending)
+ try_again:
+ 	/* write queue */
+@@ -358,8 +370,14 @@ static ssize_t f_hidg_write(struct file *file, const char __user *buffer,
+ 	count  = min_t(unsigned, count, hidg->report_length);
+
+ 	spin_unlock_irqrestore(&hidg->write_spinlock, flags);
+-	status = copy_from_user(req->buf, buffer, count);
+
++	if (!req) {
++		ERROR(hidg->func.config->cdev, "hidg->req is NULL\n");
++		status = -ESHUTDOWN;
++		goto release_write_pending;
++	}
++
++	status = copy_from_user(req->buf, buffer, count);
+ 	if (status != 0) {
+ 		ERROR(hidg->func.config->cdev,
+ 			"copy_from_user error\n");
+@@ -387,14 +405,17 @@ static ssize_t f_hidg_write(struct file *file, const char __user *buffer,
+
+ 	spin_unlock_irqrestore(&hidg->write_spinlock, flags);
+
++	if (!hidg->in_ep->enabled) {
++		ERROR(hidg->func.config->cdev, "in_ep is disabled\n");
++		status = -ESHUTDOWN;
++		goto release_write_pending;
++	}
++
+ 	status = usb_ep_queue(hidg->in_ep, req, GFP_ATOMIC);
+-	if (status < 0) {
+-		ERROR(hidg->func.config->cdev,
+-			"usb_ep_queue error on int endpoint %zd\n", status);
++	if (status < 0)
+ 		goto release_write_pending;
+-	} else {
++	else
+ 		status = count;
+-	}
+
+ 	return status;
+ release_write_pending:
+@@ -477,7 +498,7 @@ static void hidg_set_report_complete(struct usb_ep *ep, struct usb_request *req)
+ 		break;
+ 	default:
+ 		ERROR(cdev, "Set report failed %d\n", req->status);
+-		fallthrough;
++		/* FALLTHROUGH */
+ 	case -ECONNABORTED:		/* hardware forced ep reset */
+ 	case -ECONNRESET:		/* request dequeued */
+ 	case -ESHUTDOWN:		/* disconnect from host */
+@@ -523,6 +544,14 @@ static int hidg_setup(struct usb_function *f,
+ 		goto respond;
+ 		break;
+
++	case ((USB_DIR_IN | USB_TYPE_CLASS | USB_RECIP_INTERFACE) << 8
++		  | HID_REQ_GET_IDLE):
++		VDBG(cdev, "get_idle\n");
++		length = min_t(unsigned int, length, 1);
++		((u8 *) req->buf)[0] = hidg->idle;
++		goto respond;
++		break;
++
+ 	case ((USB_DIR_OUT | USB_TYPE_CLASS | USB_RECIP_INTERFACE) << 8
+ 		  | HID_REQ_SET_REPORT):
+ 		VDBG(cdev, "set_report | wLength=%d\n", ctrl->wLength);
+@@ -546,6 +575,14 @@ static int hidg_setup(struct usb_function *f,
+ 		goto stall;
+ 		break;
+
++	case ((USB_DIR_OUT | USB_TYPE_CLASS | USB_RECIP_INTERFACE) << 8
++		  | HID_REQ_SET_IDLE):
++		VDBG(cdev, "set_idle\n");
++		length = 0;
++		hidg->idle = value >> 8;
++		goto respond;
++		break;
++
+ 	case ((USB_DIR_IN | USB_TYPE_STANDARD | USB_RECIP_INTERFACE) << 8
+ 		  | USB_REQ_GET_DESCRIPTOR):
+ 		switch (value >> 8) {
+@@ -773,6 +810,7 @@ static int hidg_bind(struct usb_configuration *c, struct usb_function *f)
+ 	hidg_interface_desc.bInterfaceSubClass = hidg->bInterfaceSubClass;
+ 	hidg_interface_desc.bInterfaceProtocol = hidg->bInterfaceProtocol;
+ 	hidg->protocol = HID_REPORT_PROTOCOL;
++	hidg->idle = 1;
+ 	hidg_ss_in_ep_desc.wMaxPacketSize = cpu_to_le16(hidg->report_length);
+ 	hidg_ss_in_comp_desc.wBytesPerInterval =
+ 				cpu_to_le16(hidg->report_length);
+@@ -802,7 +840,8 @@ static int hidg_bind(struct usb_configuration *c, struct usb_function *f)
+ 		hidg_fs_out_ep_desc.bEndpointAddress;
+
+ 	status = usb_assign_descriptors(f, hidg_fs_descriptors,
+-			hidg_hs_descriptors, hidg_ss_descriptors, NULL);
++			hidg_hs_descriptors, hidg_ss_descriptors,
++			hidg_ss_descriptors);
+ 	if (status)
+ 		goto fail;
+
+diff --git a/drivers/usb/gadget/udc/aspeed-vhub/core.c b/drivers/usb/gadget/udc/aspeed-vhub/core.c
+index d11d3d14313f..270d7b5768d2 100644
+--- a/drivers/usb/gadget/udc/aspeed-vhub/core.c
++++ b/drivers/usb/gadget/udc/aspeed-vhub/core.c
+@@ -32,6 +32,38 @@
+
+ #include "vhub.h"
+
++struct ast_vhub_config {
++	u32 max_ports;	/* max number of downstream ports */
++	u32 max_epns;	/* max number of generic endpoints */
++};
++
++static const struct ast_vhub_config ast2400_config = {
++	.max_ports = 5,
++	.max_epns = 15,
++};
++
++static const struct ast_vhub_config ast2600_config = {
++	.max_ports = 7,
++	.max_epns = 21,
++};
++
++static const struct of_device_id ast_vhub_dt_ids[] = {
++	{
++		.compatible = "aspeed,ast2400-usb-vhub",
++		.data = &ast2400_config,
++	},
++	{
++		.compatible = "aspeed,ast2500-usb-vhub",
++		.data = &ast2400_config,
++	},
++	{
++		.compatible = "aspeed,ast2600-usb-vhub",
++		.data = &ast2600_config,
++	},
++	{ }
++};
++MODULE_DEVICE_TABLE(of, ast_vhub_dt_ids);
++
+ void ast_vhub_done(struct ast_vhub_ep *ep, struct ast_vhub_req *req,
+ 		   int status)
+ {
+@@ -42,7 +74,7 @@ void ast_vhub_done(struct ast_vhub_ep *ep, struct ast_vhub_req *req,
+
+ 	list_del_init(&req->queue);
+
+-	if (req->req.status == -EINPROGRESS)
++	if ((req->req.status == -EINPROGRESS) ||  (status == -EOVERFLOW))
+ 		req->req.status = status;
+
+ 	if (req->req.dma) {
+@@ -135,11 +167,11 @@ static irqreturn_t ast_vhub_irq(int irq, void *data)
+ 	}
+
+ 	/* Handle device interrupts */
+-	if (istat & vhub->port_irq_mask) {
+-		for (i = 0; i < vhub->max_ports; i++) {
+-			if (istat & VHUB_DEV_IRQ(i))
+-				ast_vhub_dev_irq(&vhub->ports[i].dev);
+-		}
++	for (i = 0; i < vhub->max_ports; i++) {
++		u32 dev_mask = VHUB_IRQ_DEVICE1 << i;
++
++		if (istat & dev_mask)
++			ast_vhub_dev_irq(&vhub->ports[i].dev);
+ 	}
+
+ 	/* Handle top-level vHub EP0 interrupts */
+@@ -245,6 +277,7 @@ void ast_vhub_init_hw(struct ast_vhub *vhub)
+ 	if (vhub->force_usb1)
+ 		ctrl |= VHUB_CTRL_FULL_SPEED_ONLY;
+
++	ctrl |= VHUB_CTRL_AUTO_REMOTE_WAKEUP;
+ 	ctrl |= VHUB_CTRL_UPSTREAM_CONNECT;
+ 	writel(ctrl, vhub->regs + AST_VHUB_CTRL);
+
+@@ -283,8 +316,7 @@ static int ast_vhub_remove(struct platform_device *pdev)
+ 	       VHUB_CTRL_PHY_RESET_DIS,
+ 	       vhub->regs + AST_VHUB_CTRL);
+
+-	if (vhub->clk)
+-		clk_disable_unprepare(vhub->clk);
++	clk_disable_unprepare(vhub->clk);
+
+ 	spin_unlock_irqrestore(&vhub->lock, flags);
+
+@@ -305,27 +337,25 @@ static int ast_vhub_probe(struct platform_device *pdev)
+ 	struct ast_vhub *vhub;
+ 	struct resource *res;
+ 	int i, rc = 0;
+-	const struct device_node *np = pdev->dev.of_node;
++	const struct of_device_id *ofdid;
++	const struct ast_vhub_config *config;
+
+ 	vhub = devm_kzalloc(&pdev->dev, sizeof(*vhub), GFP_KERNEL);
+ 	if (!vhub)
+ 		return -ENOMEM;
+
+-	rc = of_property_read_u32(np, "aspeed,vhub-downstream-ports",
+-				  &vhub->max_ports);
+-	if (rc < 0)
+-		vhub->max_ports = AST_VHUB_NUM_PORTS;
++	ofdid = of_match_node(ast_vhub_dt_ids, pdev->dev.of_node);
++	if (!ofdid)
++		return -EINVAL;
++	config = ofdid->data;
+
++	vhub->max_ports = config->max_ports;
+ 	vhub->ports = devm_kcalloc(&pdev->dev, vhub->max_ports,
+ 				   sizeof(*vhub->ports), GFP_KERNEL);
+ 	if (!vhub->ports)
+ 		return -ENOMEM;
+
+-	rc = of_property_read_u32(np, "aspeed,vhub-generic-endpoints",
+-				  &vhub->max_epns);
+-	if (rc < 0)
+-		vhub->max_epns = AST_VHUB_NUM_GEN_EPs;
+-
++	vhub->max_epns = config->max_epns;
+ 	vhub->epns = devm_kcalloc(&pdev->dev, vhub->max_epns,
+ 				  sizeof(*vhub->epns), GFP_KERNEL);
+ 	if (!vhub->epns)
+@@ -333,8 +363,6 @@ static int ast_vhub_probe(struct platform_device *pdev)
+
+ 	spin_lock_init(&vhub->lock);
+ 	vhub->pdev = pdev;
+-	vhub->port_irq_mask = GENMASK(VHUB_IRQ_DEV1_BIT + vhub->max_ports - 1,
+-				      VHUB_IRQ_DEV1_BIT);
+
+ 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+ 	vhub->regs = devm_ioremap_resource(&pdev->dev, res);
+@@ -405,9 +433,7 @@ static int ast_vhub_probe(struct platform_device *pdev)
+ 		goto err;
+
+ 	/* Init hub emulation */
+-	rc = ast_vhub_init_hub(vhub);
+-	if (rc)
+-		goto err;
++	ast_vhub_init_hub(vhub);
+
+ 	/* Initialize HW */
+ 	ast_vhub_init_hw(vhub);
+@@ -421,20 +447,6 @@ static int ast_vhub_probe(struct platform_device *pdev)
+ 	return rc;
+ }
+
+-static const struct of_device_id ast_vhub_dt_ids[] = {
+-	{
+-		.compatible = "aspeed,ast2400-usb-vhub",
+-	},
+-	{
+-		.compatible = "aspeed,ast2500-usb-vhub",
+-	},
+-	{
+-		.compatible = "aspeed,ast2600-usb-vhub",
+-	},
+-	{ }
+-};
+-MODULE_DEVICE_TABLE(of, ast_vhub_dt_ids);
+-
+ static struct platform_driver ast_vhub_driver = {
+ 	.probe		= ast_vhub_probe,
+ 	.remove		= ast_vhub_remove,
+diff --git a/drivers/usb/gadget/udc/aspeed-vhub/dev.c b/drivers/usb/gadget/udc/aspeed-vhub/dev.c
+index d268306a7bfe..de08bbc26086 100644
+--- a/drivers/usb/gadget/udc/aspeed-vhub/dev.c
++++ b/drivers/usb/gadget/udc/aspeed-vhub/dev.c
+@@ -115,15 +115,30 @@ static int ast_vhub_dev_feature(struct ast_vhub_dev *d,
+ 				u16 wIndex, u16 wValue,
+ 				bool is_set)
+ {
++	u32 val;
++
+ 	DDBG(d, "%s_FEATURE(dev val=%02x)\n",
+ 	     is_set ? "SET" : "CLEAR", wValue);
+
+-	if (wValue != USB_DEVICE_REMOTE_WAKEUP)
+-		return std_req_driver;
++	if (wValue == USB_DEVICE_REMOTE_WAKEUP) {
++		d->wakeup_en = is_set;
++		val = readl(d->vhub->regs + AST_VHUB_CTRL);
++		if (is_set)
++			writel(val | VHUB_CTRL_AUTO_REMOTE_WAKEUP,
++			       d->vhub->regs + AST_VHUB_CTRL);
++
++		return std_req_complete;
+
+-	d->wakeup_en = is_set;
++	} else if (wValue == USB_DEVICE_TEST_MODE) {
++		val = readl(d->vhub->regs + AST_VHUB_CTRL);
++		val &= ~GENMASK(10, 8);
++		val |= VHUB_CTRL_SET_TEST_MODE((wIndex >> 8) & 0x7);
++		writel(val, d->vhub->regs + AST_VHUB_CTRL);
+
+-	return std_req_complete;
++		return std_req_complete;
++	}
++
++	return std_req_driver;
+ }
+
+ static int ast_vhub_ep_feature(struct ast_vhub_dev *d,
+@@ -165,7 +180,7 @@ static int ast_vhub_dev_status(struct ast_vhub_dev *d,
+
+ 	DDBG(d, "GET_STATUS(dev)\n");
+
+-	st0 = d->gadget.is_selfpowered << USB_DEVICE_SELF_POWERED;
++	st0 = d->gadget.is_selfpowered;
+ 	if (d->wakeup_en)
+ 		st0 |= 1 << USB_DEVICE_REMOTE_WAKEUP;
+
+@@ -231,7 +246,19 @@ int ast_vhub_std_dev_request(struct ast_vhub_ep *ep,
+
+ 	/* First packet, grab speed */
+ 	if (d->gadget.speed == USB_SPEED_UNKNOWN) {
++		u32 reg = 0;
+ 		d->gadget.speed = ep->vhub->speed;
++      	reg = readl(d->regs + AST_VHUB_DEV_EN_CTRL);
++		if (reg & VHUB_DEV_EN_SPEED_SEL_HIGH) {
++		   if (d->gadget.speed != USB_SPEED_HIGH) {
++			   reg &= ~VHUB_DEV_EN_SPEED_SEL_HIGH;
++			   writel(reg, d->regs + AST_VHUB_DEV_EN_CTRL);
++		   }
++		}
++		else if (d->gadget.speed == USB_SPEED_HIGH) {
++			reg |= VHUB_DEV_EN_SPEED_SEL_HIGH;
++			writel(reg, d->regs + AST_VHUB_DEV_EN_CTRL);
++		}
+ 		if (d->gadget.speed > d->driver->max_speed)
+ 			d->gadget.speed = d->driver->max_speed;
+ 		DDBG(d, "fist packet, captured speed %d\n",
+@@ -458,6 +485,19 @@ static int ast_vhub_udc_stop(struct usb_gadget *gadget)
+ 	return 0;
+ }
+
++static int ast_vhub_udc_set_selfpowered(struct usb_gadget *gadget,
++					int is_selfpowered)
++{
++	struct ast_vhub_dev *d = to_ast_dev(gadget);
++	unsigned long flags;
++
++	spin_lock_irqsave(&d->vhub->lock, flags);
++	d->gadget.is_selfpowered = (is_selfpowered != 0);
++	spin_unlock_irqrestore(&d->vhub->lock, flags);
++
++	return 0;
++}
++
+ static const struct usb_gadget_ops ast_vhub_udc_ops = {
+ 	.get_frame	= ast_vhub_udc_get_frame,
+ 	.wakeup		= ast_vhub_udc_wakeup,
+@@ -465,6 +505,7 @@ static const struct usb_gadget_ops ast_vhub_udc_ops = {
+ 	.udc_start	= ast_vhub_udc_start,
+ 	.udc_stop	= ast_vhub_udc_stop,
+ 	.match_ep	= ast_vhub_udc_match_ep,
++	.set_selfpowered = ast_vhub_udc_set_selfpowered,
+ };
+
+ void ast_vhub_dev_suspend(struct ast_vhub_dev *d)
+diff --git a/drivers/usb/gadget/udc/aspeed-vhub/ep0.c b/drivers/usb/gadget/udc/aspeed-vhub/ep0.c
+index 022b777b85f8..78989618d3b8 100644
+--- a/drivers/usb/gadget/udc/aspeed-vhub/ep0.c
++++ b/drivers/usb/gadget/udc/aspeed-vhub/ep0.c
+@@ -256,6 +256,13 @@ static void ast_vhub_ep0_do_receive(struct ast_vhub_ep *ep, struct ast_vhub_req
+ 		len = remain;
+ 		rc = -EOVERFLOW;
+ 	}
++
++	/* HW return wrong data len */
++	if (len < ep->ep.maxpacket && len != remain) {
++		EPDBG(ep, "using expected data len instead\n");
++		len = remain;
++	}
++
+ 	if (len && req->req.buf)
+ 		memcpy(req->req.buf + req->req.actual, ep->buf, len);
+ 	req->req.actual += len;
+diff --git a/drivers/usb/gadget/udc/aspeed-vhub/epn.c b/drivers/usb/gadget/udc/aspeed-vhub/epn.c
+index cb164c615e6f..b321744b1626 100644
+--- a/drivers/usb/gadget/udc/aspeed-vhub/epn.c
++++ b/drivers/usb/gadget/udc/aspeed-vhub/epn.c
+@@ -89,6 +89,7 @@ static void ast_vhub_epn_handle_ack(struct ast_vhub_ep *ep)
+ {
+ 	struct ast_vhub_req *req;
+ 	unsigned int len;
++	int status = 0;
+ 	u32 stat;
+
+ 	/* Read EP status */
+@@ -124,9 +125,15 @@ static void ast_vhub_epn_handle_ack(struct ast_vhub_ep *ep)
+ 	len = VHUB_EP_DMA_TX_SIZE(stat);
+
+ 	/* If not using DMA, copy data out if needed */
+-	if (!req->req.dma && !ep->epn.is_in && len)
+-		memcpy(req->req.buf + req->req.actual, ep->buf, len);
+-
++	if (!req->req.dma && !ep->epn.is_in && len) {
++		if (req->req.actual + len > req->req.length) {
++			req->last_desc = 1;
++			status = -EOVERFLOW;
++			goto done;
++		} else {
++			memcpy(req->req.buf + req->req.actual, ep->buf, len);
++		}
++	}
+ 	/* Adjust size */
+ 	req->req.actual += len;
+
+@@ -134,9 +141,10 @@ static void ast_vhub_epn_handle_ack(struct ast_vhub_ep *ep)
+ 	if (len < ep->ep.maxpacket)
+ 		req->last_desc = 1;
+
++done:
+ 	/* That's it ? complete the request and pick a new one */
+ 	if (req->last_desc >= 0) {
+-		ast_vhub_done(ep, req, 0);
++		ast_vhub_done(ep, req, status);
+ 		req = list_first_entry_or_null(&ep->queue, struct ast_vhub_req,
+ 					       queue);
+
+@@ -330,6 +338,20 @@ void ast_vhub_epn_ack_irq(struct ast_vhub_ep *ep)
+ 		ast_vhub_epn_handle_ack(ep);
+ }
+
++static void ast_vhub_epn_flush(struct usb_ep* u_ep)
++{
++	struct ast_vhub_ep *ep = to_ast_ep(u_ep);
++	struct ast_vhub *vhub = ep->vhub;
++	unsigned long flags;
++
++	EPDBG(ep, "flushing !\n");
++
++	spin_lock_irqsave(&vhub->lock, flags);
++	// This will clear out all the request of the endpoint and send requests done messages.
++	ast_vhub_nuke(ep, 0);
++	spin_unlock_irqrestore(&vhub->lock, flags);
++}
++
+ static int ast_vhub_epn_queue(struct usb_ep* u_ep, struct usb_request *u_req,
+ 			      gfp_t gfp_flags)
+ {
+@@ -386,6 +408,11 @@ static int ast_vhub_epn_queue(struct usb_ep* u_ep, struct usb_request *u_req,
+ 	} else
+ 		u_req->dma = 0;
+
++	if (ep->dev->wakeup_en) {
++		EPVDBG(ep, "Wakeup host first\n");
++		ast_vhub_hub_wake_all(vhub);
++	}
++
+ 	EPVDBG(ep, "enqueue req @%p\n", req);
+ 	EPVDBG(ep, " l=%d dma=0x%x zero=%d noshort=%d noirq=%d is_in=%d\n",
+ 	       u_req->length, (u32)u_req->dma, u_req->zero,
+@@ -435,7 +462,7 @@ static void ast_vhub_stop_active_req(struct ast_vhub_ep *ep,
+ 		udelay(1);
+ 	}
+ 	if (loops >= 1000)
+-		dev_warn(&ep->vhub->pdev->dev, "Timeout waiting for DMA\n");
++		dev_warn(&ep->vhub->pdev->dev, "Timeout waiting for DMA state [%x]\n", state);
+
+ 	/* If we don't have to restart the endpoint, that's it */
+ 	if (!restart_ep)
+@@ -792,6 +819,7 @@ static const struct usb_ep_ops ast_vhub_epn_ops = {
+ 	.set_wedge	= ast_vhub_epn_set_wedge,
+ 	.alloc_request	= ast_vhub_alloc_request,
+ 	.free_request	= ast_vhub_free_request,
++	.fifo_flush 	= ast_vhub_epn_flush,
+ };
+
+ struct ast_vhub_ep *ast_vhub_alloc_epn(struct ast_vhub_dev *d, u8 addr)
+diff --git a/drivers/usb/gadget/udc/aspeed-vhub/hub.c b/drivers/usb/gadget/udc/aspeed-vhub/hub.c
+index bfd8e77788e2..f2835ec1893b 100644
+--- a/drivers/usb/gadget/udc/aspeed-vhub/hub.c
++++ b/drivers/usb/gadget/udc/aspeed-vhub/hub.c
+@@ -50,7 +50,6 @@
+ #define KERNEL_VER	bin2bcd(((LINUX_VERSION_CODE >> 8) & 0x0ff))
+
+ enum {
+-	AST_VHUB_STR_INDEX_MAX = 4,
+ 	AST_VHUB_STR_MANUF = 3,
+ 	AST_VHUB_STR_PRODUCT = 2,
+ 	AST_VHUB_STR_SERIAL = 1,
+@@ -73,6 +72,25 @@ static const struct usb_device_descriptor ast_vhub_dev_desc = {
+ 	.bNumConfigurations	= 1,
+ };
+
++static const struct usb_qualifier_descriptor ast_vhub_qual_desc = {
++	.bLength = 0xA,
++	.bDescriptorType = USB_DT_DEVICE_QUALIFIER,
++	.bcdUSB = cpu_to_le16(0x0200),
++	.bDeviceClass = USB_CLASS_HUB,
++	.bDeviceSubClass = 0,
++	.bDeviceProtocol = 0,
++	.bMaxPacketSize0 = 64,
++	.bNumConfigurations = 1,
++	.bRESERVED = 0,
++};
++
++/* Patches to the above when forcing USB1 mode */
++static void ast_vhub_patch_dev_desc_usb1(struct usb_device_descriptor *desc)
++{
++	desc->bcdUSB = cpu_to_le16(0x0100);
++	desc->bDeviceProtocol = 0;
++}
++
+ /*
+  * Configuration descriptor: same comments as above
+  * regarding handling USB1 mode.
+@@ -87,7 +105,11 @@ static const struct usb_device_descriptor ast_vhub_dev_desc = {
+ 				 USB_DT_INTERFACE_SIZE + \
+ 				 USB_DT_ENDPOINT_SIZE)
+
+-static const struct ast_vhub_full_cdesc ast_vhub_conf_desc = {
++static const struct ast_vhub_full_cdesc {
++	struct usb_config_descriptor	cfg;
++	struct usb_interface_descriptor intf;
++	struct usb_endpoint_descriptor	ep;
++} __attribute__ ((packed)) ast_vhub_conf_desc = {
+ 	.cfg = {
+ 		.bLength		= USB_DT_CONFIG_SIZE,
+ 		.bDescriptorType	= USB_DT_CONFIG,
+@@ -123,10 +145,13 @@ static const struct ast_vhub_full_cdesc ast_vhub_conf_desc = {
+
+ #define AST_VHUB_HUB_DESC_SIZE	(USB_DT_HUB_NONVAR_SIZE + 2)
+
+-static const struct usb_hub_descriptor ast_vhub_hub_desc = {
++/*
++ * "bNbrPorts" field is updated in "ast_vhub_init_hub" function based on
++ * "max_ports" of the vhub.
++ */
++static struct usb_hub_descriptor ast_vhub_hub_desc = {
+ 	.bDescLength			= AST_VHUB_HUB_DESC_SIZE,
+ 	.bDescriptorType		= USB_DT_HUB,
+-	.bNbrPorts			= AST_VHUB_NUM_PORTS,
+ 	.wHubCharacteristics		= cpu_to_le16(HUB_CHAR_NO_LPSM),
+ 	.bPwrOn2PwrGood			= 10,
+ 	.bHubContrCurrent		= 0,
+@@ -205,17 +230,27 @@ static int ast_vhub_hub_dev_feature(struct ast_vhub_ep *ep,
+ 				    u16 wIndex, u16 wValue,
+ 				    bool is_set)
+ {
++	u32 val;
++
+ 	EPDBG(ep, "%s_FEATURE(dev val=%02x)\n",
+ 	      is_set ? "SET" : "CLEAR", wValue);
+
+-	if (wValue != USB_DEVICE_REMOTE_WAKEUP)
+-		return std_req_stall;
++	if (wValue == USB_DEVICE_REMOTE_WAKEUP) {
++		ep->vhub->wakeup_en = is_set;
++		EPDBG(ep, "Hub remote wakeup %s\n",
++		      is_set ? "enabled" : "disabled");
++		return std_req_complete;
+
+-	ep->vhub->wakeup_en = is_set;
+-	EPDBG(ep, "Hub remote wakeup %s\n",
+-	      is_set ? "enabled" : "disabled");
++	} else if (wValue == USB_DEVICE_TEST_MODE) {
++		val = readl(ep->vhub->regs + AST_VHUB_CTRL);
++		val &= ~GENMASK(10, 8);
++		val |= VHUB_CTRL_SET_TEST_MODE((wIndex >> 8) & 0x7);
++		writel(val, ep->vhub->regs + AST_VHUB_CTRL);
+
+-	return std_req_complete;
++		return std_req_complete;
++	}
++
++	return std_req_stall;
+ }
+
+ static int ast_vhub_hub_ep_feature(struct ast_vhub_ep *ep,
+@@ -256,7 +291,6 @@ static int ast_vhub_rep_desc(struct ast_vhub_ep *ep,
+ 			     u8 desc_type, u16 len)
+ {
+ 	size_t dsize;
+-	struct ast_vhub *vhub = ep->vhub;
+
+ 	EPDBG(ep, "GET_DESCRIPTOR(type:%d)\n", desc_type);
+
+@@ -272,22 +306,28 @@ static int ast_vhub_rep_desc(struct ast_vhub_ep *ep,
+ 	switch(desc_type) {
+ 	case USB_DT_DEVICE:
+ 		dsize = USB_DT_DEVICE_SIZE;
+-		memcpy(ep->buf, &vhub->vhub_dev_desc, dsize);
+-		BUILD_BUG_ON(dsize > sizeof(vhub->vhub_dev_desc));
++		memcpy(ep->buf, &ast_vhub_dev_desc, dsize);
++		BUILD_BUG_ON(dsize > sizeof(ast_vhub_dev_desc));
+ 		BUILD_BUG_ON(USB_DT_DEVICE_SIZE >= AST_VHUB_EP0_MAX_PACKET);
+ 		break;
++	case USB_DT_OTHER_SPEED_CONFIG:
+ 	case USB_DT_CONFIG:
+ 		dsize = AST_VHUB_CONF_DESC_SIZE;
+-		memcpy(ep->buf, &vhub->vhub_conf_desc, dsize);
+-		BUILD_BUG_ON(dsize > sizeof(vhub->vhub_conf_desc));
++		memcpy(ep->buf, &ast_vhub_conf_desc, dsize);
++		((u8 *)ep->buf)[1] = desc_type;
++		BUILD_BUG_ON(dsize > sizeof(ast_vhub_conf_desc));
+ 		BUILD_BUG_ON(AST_VHUB_CONF_DESC_SIZE >= AST_VHUB_EP0_MAX_PACKET);
+ 		break;
+ 	case USB_DT_HUB:
+ 		dsize = AST_VHUB_HUB_DESC_SIZE;
+-		memcpy(ep->buf, &vhub->vhub_hub_desc, dsize);
+-		BUILD_BUG_ON(dsize > sizeof(vhub->vhub_hub_desc));
++		memcpy(ep->buf, &ast_vhub_hub_desc, dsize);
++		BUILD_BUG_ON(dsize > sizeof(ast_vhub_hub_desc));
+ 		BUILD_BUG_ON(AST_VHUB_HUB_DESC_SIZE >= AST_VHUB_EP0_MAX_PACKET);
+ 		break;
++	case USB_DT_DEVICE_QUALIFIER:
++		dsize = sizeof(ast_vhub_qual_desc);
++		memcpy(ep->buf, &ast_vhub_qual_desc, dsize);
++		break;
+ 	default:
+ 		return std_req_stall;
+ 	}
+@@ -296,81 +336,30 @@ static int ast_vhub_rep_desc(struct ast_vhub_ep *ep,
+ 	if (len > dsize)
+ 		len = dsize;
+
++	/* Patch it if forcing USB1 */
++	if (desc_type == USB_DT_DEVICE && ep->vhub->force_usb1)
++		ast_vhub_patch_dev_desc_usb1(ep->buf);
++
+ 	/* Shoot it from the EP buffer */
+ 	return ast_vhub_reply(ep, NULL, len);
+ }
+
+-static struct usb_gadget_strings*
+-ast_vhub_str_of_container(struct usb_gadget_string_container *container)
+-{
+-	return (struct usb_gadget_strings *)container->stash;
+-}
+-
+-static int ast_vhub_collect_languages(struct ast_vhub *vhub, void *buf,
+-				      size_t size)
+-{
+-	int rc, hdr_len, nlangs, max_langs;
+-	struct usb_gadget_strings *lang_str;
+-	struct usb_gadget_string_container *container;
+-	struct usb_string_descriptor *sdesc = buf;
+-
+-	nlangs = 0;
+-	hdr_len = sizeof(struct usb_descriptor_header);
+-	max_langs = (size - hdr_len) / sizeof(sdesc->wData[0]);
+-	list_for_each_entry(container, &vhub->vhub_str_desc, list) {
+-		if (nlangs >= max_langs)
+-			break;
+-
+-		lang_str = ast_vhub_str_of_container(container);
+-		sdesc->wData[nlangs++] = cpu_to_le16(lang_str->language);
+-	}
+-
+-	rc = hdr_len + nlangs * sizeof(sdesc->wData[0]);
+-	sdesc->bLength = rc;
+-	sdesc->bDescriptorType = USB_DT_STRING;
+-
+-	return rc;
+-}
+-
+-static struct usb_gadget_strings *ast_vhub_lookup_string(struct ast_vhub *vhub,
+-							 u16 lang_id)
+-{
+-	struct usb_gadget_strings *lang_str;
+-	struct usb_gadget_string_container *container;
+-
+-	list_for_each_entry(container, &vhub->vhub_str_desc, list) {
+-		lang_str = ast_vhub_str_of_container(container);
+-		if (lang_str->language == lang_id)
+-			return lang_str;
+-	}
+-
+-	return NULL;
+-}
+-
+ static int ast_vhub_rep_string(struct ast_vhub_ep *ep,
+ 			       u8 string_id, u16 lang_id,
+ 			       u16 len)
+ {
+-	int rc;
+-	u8 buf[256];
+-	struct ast_vhub *vhub = ep->vhub;
+-	struct usb_gadget_strings *lang_str;
++	int rc = usb_gadget_get_string (&ast_vhub_strings, string_id, ep->buf);
+
+-	if (string_id == 0) {
+-		rc = ast_vhub_collect_languages(vhub, buf, sizeof(buf));
+-	} else {
+-		lang_str = ast_vhub_lookup_string(vhub, lang_id);
+-		if (!lang_str)
+-			return std_req_stall;
+-
+-		rc = usb_gadget_get_string(lang_str, string_id, buf);
+-	}
++	/*
++	 * This should never happen unless we put too big strings in
++	 * the array above
++	 */
++	BUG_ON(rc >= AST_VHUB_EP0_MAX_PACKET);
+
+-	if (rc < 0 || rc >= AST_VHUB_EP0_MAX_PACKET)
++	if (rc < 0)
+ 		return std_req_stall;
+
+ 	/* Shoot it from the EP buffer */
+-	memcpy(ep->buf, buf, rc);
+ 	return ast_vhub_reply(ep, NULL, min_t(u16, rc, len));
+ }
+
+@@ -422,10 +411,9 @@ enum std_req_rc ast_vhub_std_hub_request(struct ast_vhub_ep *ep,
+
+ 		/* GET/SET_CONFIGURATION */
+ 	case DeviceRequest | USB_REQ_GET_CONFIGURATION:
+-		return ast_vhub_simple_reply(ep, 1);
++		return ast_vhub_simple_reply(ep, vhub->current_config);
+ 	case DeviceOutRequest | USB_REQ_SET_CONFIGURATION:
+-		if (wValue != 1)
+-			return std_req_stall;
++		vhub->current_config = wValue;
+ 		return std_req_complete;
+
+ 		/* GET_DESCRIPTOR */
+@@ -433,6 +421,8 @@ enum std_req_rc ast_vhub_std_hub_request(struct ast_vhub_ep *ep,
+ 		switch (wValue >> 8) {
+ 		case USB_DT_DEVICE:
+ 		case USB_DT_CONFIG:
++		case USB_DT_DEVICE_QUALIFIER:
++		case USB_DT_OTHER_SPEED_CONFIG:
+ 			return ast_vhub_rep_desc(ep, wValue >> 8,
+ 						 wLength);
+ 		case USB_DT_STRING:
+@@ -648,6 +638,9 @@ static enum std_req_rc ast_vhub_set_port_feature(struct ast_vhub_ep *ep,
+ 		ast_vhub_port_reset(vhub, port);
+ 		return std_req_complete;
+ 	case USB_PORT_FEAT_POWER:
++		ast_vhub_change_port_stat(vhub, port,
++					  0, USB_PORT_STAT_POWER,
++					  false);
+ 		/*
+ 		 * On Power-on, we mark the connected flag changed,
+ 		 * if there's a connected device, some hosts will
+@@ -725,9 +718,6 @@ static enum std_req_rc ast_vhub_get_port_stat(struct ast_vhub_ep *ep,
+ 	stat = vhub->ports[port].status;
+ 	chg = vhub->ports[port].change;
+
+-	/* We always have power */
+-	stat |= USB_PORT_STAT_POWER;
+-
+ 	EPDBG(ep, " port status=%04x change=%04x\n", stat, chg);
+
+ 	return ast_vhub_simple_reply(ep,
+@@ -876,175 +866,14 @@ void ast_vhub_hub_reset(struct ast_vhub *vhub)
+ 	writel(0, vhub->regs + AST_VHUB_EP1_STS_CHG);
+ }
+
+-static void ast_vhub_of_parse_dev_desc(struct ast_vhub *vhub,
+-				       const struct device_node *vhub_np)
+-{
+-	u16 id;
+-	u32 data;
+-
+-	if (!of_property_read_u32(vhub_np, "vhub-vendor-id", &data)) {
+-		id = (u16)data;
+-		vhub->vhub_dev_desc.idVendor = cpu_to_le16(id);
+-	}
+-	if (!of_property_read_u32(vhub_np, "vhub-product-id", &data)) {
+-		id = (u16)data;
+-		vhub->vhub_dev_desc.idProduct = cpu_to_le16(id);
+-	}
+-	if (!of_property_read_u32(vhub_np, "vhub-device-revision", &data)) {
+-		id = (u16)data;
+-		vhub->vhub_dev_desc.bcdDevice = cpu_to_le16(id);
+-	}
+-}
+-
+-static void ast_vhub_fixup_usb1_dev_desc(struct ast_vhub *vhub)
+-{
+-	vhub->vhub_dev_desc.bcdUSB = cpu_to_le16(0x0100);
+-	vhub->vhub_dev_desc.bDeviceProtocol = 0;
+-}
+-
+-static struct usb_gadget_string_container*
+-ast_vhub_str_container_alloc(struct ast_vhub *vhub)
+-{
+-	unsigned int size;
+-	struct usb_string *str_array;
+-	struct usb_gadget_strings *lang_str;
+-	struct usb_gadget_string_container *container;
+-
+-	size = sizeof(*container);
+-	size += sizeof(struct usb_gadget_strings);
+-	size += sizeof(struct usb_string) * AST_VHUB_STR_INDEX_MAX;
+-	container = devm_kzalloc(&vhub->pdev->dev, size, GFP_KERNEL);
+-	if (!container)
+-		return ERR_PTR(-ENOMEM);
+-
+-	lang_str = ast_vhub_str_of_container(container);
+-	str_array = (struct usb_string *)(lang_str + 1);
+-	lang_str->strings = str_array;
+-	return container;
+-}
+-
+-static void ast_vhub_str_deep_copy(struct usb_gadget_strings *dest,
+-				   const struct usb_gadget_strings *src)
+-{
+-	struct usb_string *src_array = src->strings;
+-	struct usb_string *dest_array = dest->strings;
+-
+-	dest->language = src->language;
+-	if (src_array && dest_array) {
+-		do {
+-			*dest_array = *src_array;
+-			dest_array++;
+-			src_array++;
+-		} while (src_array->s);
+-	}
+-}
+-
+-static int ast_vhub_str_alloc_add(struct ast_vhub *vhub,
+-				  const struct usb_gadget_strings *src_str)
+-{
+-	struct usb_gadget_strings *dest_str;
+-	struct usb_gadget_string_container *container;
+-
+-	container = ast_vhub_str_container_alloc(vhub);
+-	if (IS_ERR(container))
+-		return PTR_ERR(container);
+-
+-	dest_str = ast_vhub_str_of_container(container);
+-	ast_vhub_str_deep_copy(dest_str, src_str);
+-	list_add_tail(&container->list, &vhub->vhub_str_desc);
+-
+-	return 0;
+-}
+-
+-static const struct {
+-	const char *name;
+-	u8 id;
+-} str_id_map[] = {
+-	{"manufacturer",	AST_VHUB_STR_MANUF},
+-	{"product",		AST_VHUB_STR_PRODUCT},
+-	{"serial-number",	AST_VHUB_STR_SERIAL},
+-	{},
+-};
+-
+-static int ast_vhub_of_parse_str_desc(struct ast_vhub *vhub,
+-				      const struct device_node *desc_np)
+-{
+-	u32 langid;
+-	int ret = 0;
+-	int i, offset;
+-	const char *str;
+-	struct device_node *child;
+-	struct usb_string str_array[AST_VHUB_STR_INDEX_MAX];
+-	struct usb_gadget_strings lang_str = {
+-		.strings = (struct usb_string *)str_array,
+-	};
+-
+-	for_each_child_of_node(desc_np, child) {
+-		if (of_property_read_u32(child, "reg", &langid))
+-			continue; /* no language identifier specified */
+-
+-		if (!usb_validate_langid(langid))
+-			continue; /* invalid language identifier */
+-
+-		lang_str.language = langid;
+-		for (i = offset = 0; str_id_map[i].name; i++) {
+-			str = of_get_property(child, str_id_map[i].name, NULL);
+-			if (str) {
+-				str_array[offset].s = str;
+-				str_array[offset].id = str_id_map[i].id;
+-				offset++;
+-			}
+-		}
+-		str_array[offset].id = 0;
+-		str_array[offset].s = NULL;
+-
+-		ret = ast_vhub_str_alloc_add(vhub, &lang_str);
+-		if (ret) {
+-			of_node_put(child);
+-			break;
+-		}
+-	}
+-
+-	return ret;
+-}
+-
+-static int ast_vhub_init_desc(struct ast_vhub *vhub)
+-{
+-	int ret;
+-	struct device_node *desc_np;
+-	const struct device_node *vhub_np = vhub->pdev->dev.of_node;
+-
+-	/* Initialize vhub Device Descriptor. */
+-	memcpy(&vhub->vhub_dev_desc, &ast_vhub_dev_desc,
+-		sizeof(vhub->vhub_dev_desc));
+-	ast_vhub_of_parse_dev_desc(vhub, vhub_np);
+-	if (vhub->force_usb1)
+-		ast_vhub_fixup_usb1_dev_desc(vhub);
+-
+-	/* Initialize vhub Configuration Descriptor. */
+-	memcpy(&vhub->vhub_conf_desc, &ast_vhub_conf_desc,
+-		sizeof(vhub->vhub_conf_desc));
+-
+-	/* Initialize vhub Hub Descriptor. */
+-	memcpy(&vhub->vhub_hub_desc, &ast_vhub_hub_desc,
+-		sizeof(vhub->vhub_hub_desc));
+-	vhub->vhub_hub_desc.bNbrPorts = vhub->max_ports;
+-
+-	/* Initialize vhub String Descriptors. */
+-	INIT_LIST_HEAD(&vhub->vhub_str_desc);
+-	desc_np = of_get_child_by_name(vhub_np, "vhub-strings");
+-	if (desc_np)
+-		ret = ast_vhub_of_parse_str_desc(vhub, desc_np);
+-	else
+-		ret = ast_vhub_str_alloc_add(vhub, &ast_vhub_strings);
+-
+-	return ret;
+-}
+-
+-int ast_vhub_init_hub(struct ast_vhub *vhub)
++void ast_vhub_init_hub(struct ast_vhub *vhub)
+ {
+ 	vhub->speed = USB_SPEED_UNKNOWN;
+ 	INIT_WORK(&vhub->wake_work, ast_vhub_wake_work);
+
+-	return ast_vhub_init_desc(vhub);
++	/*
++	 * Fixup number of ports in hub descriptor.
++	 */
++	ast_vhub_hub_desc.bNbrPorts = vhub->max_ports;
+ }
++
+diff --git a/drivers/usb/gadget/udc/aspeed-vhub/vhub.h b/drivers/usb/gadget/udc/aspeed-vhub/vhub.h
+index 87a5dea12d3c..a5d3f292ac59 100644
+--- a/drivers/usb/gadget/udc/aspeed-vhub/vhub.h
++++ b/drivers/usb/gadget/udc/aspeed-vhub/vhub.h
+@@ -2,9 +2,6 @@
+ #ifndef __ASPEED_VHUB_H
+ #define __ASPEED_VHUB_H
+
+-#include <linux/usb.h>
+-#include <linux/usb/ch11.h>
+-
+ /*****************************
+  *                           *
+  * VHUB register definitions *
+@@ -51,11 +48,14 @@
+ #define VHUB_CTRL_UPSTREAM_CONNECT		(1 << 0)
+
+ /* IER & ISR */
+-#define VHUB_IRQ_DEV1_BIT			9
+ #define VHUB_IRQ_USB_CMD_DEADLOCK		(1 << 18)
+ #define VHUB_IRQ_EP_POOL_NAK			(1 << 17)
+ #define VHUB_IRQ_EP_POOL_ACK_STALL		(1 << 16)
+-#define VHUB_IRQ_DEVICE1			(1 << (VHUB_IRQ_DEV1_BIT))
++#define VHUB_IRQ_DEVICE5			(1 << 13)
++#define VHUB_IRQ_DEVICE4			(1 << 12)
++#define VHUB_IRQ_DEVICE3			(1 << 11)
++#define VHUB_IRQ_DEVICE2			(1 << 10)
++#define VHUB_IRQ_DEVICE1			(1 << 9)
+ #define VHUB_IRQ_BUS_RESUME			(1 << 8)
+ #define VHUB_IRQ_BUS_SUSPEND 			(1 << 7)
+ #define VHUB_IRQ_BUS_RESET 			(1 << 6)
+@@ -67,9 +67,6 @@
+ #define VHUB_IRQ_HUB_EP0_SETUP			(1 << 0)
+ #define VHUB_IRQ_ACK_ALL			0x1ff
+
+-/* Downstream device IRQ mask. */
+-#define VHUB_DEV_IRQ(n)				(VHUB_IRQ_DEVICE1 << (n))
+-
+ /* SW reset reg */
+ #define VHUB_SW_RESET_EP_POOL			(1 << 9)
+ #define VHUB_SW_RESET_DMA_CONTROLLER		(1 << 8)
+@@ -205,13 +202,6 @@
+  *                                      *
+  ****************************************/
+
+-/*
+- * AST_VHUB_NUM_GEN_EPs and AST_VHUB_NUM_PORTS are kept to avoid breaking
+- * existing AST2400/AST2500 platforms. AST2600 and future vhub revisions
+- * should define number of downstream ports and endpoints in device tree.
+- */
+-#define AST_VHUB_NUM_GEN_EPs	15	/* Generic non-0 EPs */
+-#define AST_VHUB_NUM_PORTS	5	/* vHub ports */
+ #define AST_VHUB_EP0_MAX_PACKET	64	/* EP0's max packet size */
+ #define AST_VHUB_EPn_MAX_PACKET	1024	/* Generic EPs max packet size */
+ #define AST_VHUB_DESCS_COUNT	256	/* Use 256 descriptor mode (valid
+@@ -312,7 +302,7 @@ struct ast_vhub_ep {
+ 			/* Registers */
+ 			void __iomem   		*regs;
+
+-			/* Index in global pool (zero-based) */
++			/* Index in global pool (0..14) */
+ 			unsigned int		g_idx;
+
+ 			/* DMA Descriptors */
+@@ -374,12 +364,6 @@ struct ast_vhub_port {
+ 	struct ast_vhub_dev	dev;
+ };
+
+-struct ast_vhub_full_cdesc {
+-	struct usb_config_descriptor	cfg;
+-	struct usb_interface_descriptor intf;
+-	struct usb_endpoint_descriptor	ep;
+-} __packed;
+-
+ /* Global vhub structure */
+ struct ast_vhub {
+ 	struct platform_device		*pdev;
+@@ -402,7 +386,6 @@ struct ast_vhub {
+ 	/* Per-port info */
+ 	struct ast_vhub_port		*ports;
+ 	u32				max_ports;
+-	u32				port_irq_mask;
+
+ 	/* Generic EP data structures */
+ 	struct ast_vhub_ep		*epns;
+@@ -419,12 +402,7 @@ struct ast_vhub {
+
+ 	/* Upstream bus speed captured at bus reset */
+ 	unsigned int			speed;
+-
+-	/* Standard USB Descriptors of the vhub. */
+-	struct usb_device_descriptor	vhub_dev_desc;
+-	struct ast_vhub_full_cdesc	vhub_conf_desc;
+-	struct usb_hub_descriptor	vhub_hub_desc;
+-	struct list_head		vhub_str_desc;
++	u8				current_config;
+ };
+
+ /* Standard request handlers result codes */
+@@ -534,7 +512,7 @@ int __ast_vhub_simple_reply(struct ast_vhub_ep *ep, int len, ...);
+ 			       __VA_ARGS__)
+
+ /* hub.c */
+-int ast_vhub_init_hub(struct ast_vhub *vhub);
++void ast_vhub_init_hub(struct ast_vhub *vhub);
+ enum std_req_rc ast_vhub_std_hub_request(struct ast_vhub_ep *ep,
+ 					 struct usb_ctrlrequest *crq);
+ enum std_req_rc ast_vhub_class_hub_request(struct ast_vhub_ep *ep,
+--
+2.17.1
+
