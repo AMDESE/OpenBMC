@@ -14,7 +14,8 @@ SRC_URI += "git://git@github.com/amd/apml_library.git;protocol=ssh"
 SRCREV_pn-amd-apml = "${AUTOREV}"
 
 SRC_URI += "file://0001-amd-apml-Enable-apml-library-with-i3c.patch \
-            "
+            file://0002-amd-apml-select-APML-over-i2c-i3c.patch  \
+           "
 
 S="${WORKDIR}/git"
 
