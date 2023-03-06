@@ -1,0 +1,130 @@
+From 550453894b9780d9ad98c7e80c6ee229537c2350 Mon Sep 17 00:00:00 2001
+From: Mohsen Dolaty <mohsen.dolaty@amd.com>
+Date: Mon, 6 Mar 2023 16:48:20 -0600
+Subject: [PATCH 1/1] u-boot: APML over i2c i3c
+
+Allow user select APML over I3C or I2C bus
+by setting apml_i3c env parameter to true/false
+Add new Turin Platforms CHARZ1 and CHARZ2
+as a new varities of Galena
+
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
+---
+ common/image-fit.c      | 36 ++++++++++++++++++++++++++++++------
+ common/main.c           |  2 ++
+ include/amd-platforms.h |  5 +++++
+ 3 files changed, 37 insertions(+), 6 deletions(-)
+
+diff --git a/common/image-fit.c b/common/image-fit.c
+index f4208da863..a5853be364 100644
+--- a/common/image-fit.c
++++ b/common/image-fit.c
+@@ -1818,6 +1818,7 @@ int fit_image_load(bootm_headers_t *images, ulong addr,
+ 	char *conf_name;
+ 	char *platform_id;
+ 	int board_id;
++	char *apml_i3c;
+
+ 	size_t size;
+ 	int type_ok, os_ok;
+@@ -1862,6 +1863,9 @@ int fit_image_load(bootm_headers_t *images, ulong addr,
+ 			platform_id = env_get("board_id");
+ 			// Convert bd_id string to integer
+ 			board_id = str2hex(platform_id);
++			// Reading APML I3C bus parameter from ENV
++			apml_i3c = env_get("apml_i3c");
++			printf("   APML I3C is %s\n",apml_i3c);
+ 			// select the  device tree configuration based on board_id
+ 			switch (board_id)
+ 			{
+@@ -1914,28 +1918,48 @@ int fit_image_load(bootm_headers_t *images, ulong addr,
+ 				case CHALUPA:
+ 				case CHALUPA_1:
+ 				case CHALUPA_2:
+-					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-chalupa.dtb");
++					if (strncmp(apml_i3c, "true", APML_I3C_CHAR_CNT) == 0)
++						sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-chalupa-i3c.dtb");
++					else
++						sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-chalupa.dtb");
+ 					break;
+ 				case HUAMBO:
+-					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-huambo.dtb");
++					if (strncmp(apml_i3c, "true", APML_I3C_CHAR_CNT) == 0)
++						sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-huambo-i3c.dtb");
++					else
++						sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-huambo.dtb");
+ 					break;
+ 				case GALENA:
+ 				case GALENA_1:
+ 				case GALENA_2:
+-					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-galena.dtb");
++				case GALENA_CHARZ1:
++				case GALENA_CHARZ2:
++					if (strncmp(apml_i3c, "true", APML_I3C_CHAR_CNT) == 0)
++						sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-galena-i3c.dtb");
++					else
++						sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-galena.dtb");
+ 					break;
+ 				case RECLUSE:
+-					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-recluse.dtb");
++					if (strncmp(apml_i3c, "true", APML_I3C_CHAR_CNT) == 0)
++						sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-recluse-i3c.dtb");
++					else
++						sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-recluse.dtb");
+ 					break;
+ 				case PURICO:
+ 				case PURICO_1:
+ 				case PURICO_2:
+-					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-purico.dtb");
++					if (strncmp(apml_i3c, "true", APML_I3C_CHAR_CNT) == 0)
++						sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-purico-i3c.dtb");
++					else
++						sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-purico.dtb");
+ 					break;
+ 				case VOLCANO:
+ 				case VOLCANO_1:
+ 				case VOLCANO_2:
+-					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-volcano.dtb");
++					if (strncmp(apml_i3c, "true", APML_I3C_CHAR_CNT) == 0)
++						sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-volcano-i3c.dtb");
++					else
++						sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-volcano.dtb");
+ 					break;
+ 				default :
+ 					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-quartz.dtb");
+diff --git a/common/main.c b/common/main.c
+index 665083e8b3..1a98b3ea21 100644
+--- a/common/main.c
++++ b/common/main.c
+@@ -132,6 +132,8 @@ void set_hostname()
+ 				case GALENA:
+ 				case GALENA_1:
+ 				case GALENA_2:
++				case GALENA_CHARZ1:
++				case GALENA_CHARZ2:
+ 					sprintf(hostname, "galena-%02x%02x", octate_5, octate_6);
+ 					break;
+ 				case RECLUSE:
+diff --git a/include/amd-platforms.h b/include/amd-platforms.h
+index 935ef18ab7..2f398d9a6f 100644
+--- a/include/amd-platforms.h
++++ b/include/amd-platforms.h
+@@ -77,6 +77,8 @@
+ #define VOLCANO         107 // 0x6B
+ #define VOLCANO_1       116 // 0x74
+ #define VOLCANO_2       117 // 0x75
++#define GALENA_CHARZ1   119 // 0x77
++#define GALENA_CHARZ2   120 // 0x78
+
+ // EEPROM info
+ #define EEPROM_I2C_BUS          7
+@@ -95,4 +97,7 @@
+ // Sys Scratch reg that holds sys_rst info
+ #define ASPEED_SYS_SCRATCH_1FC 0x1e6e21fc
+
++// APML
++#define APML_I3C_CHAR_CNT       (4)
++
+ #endif /* _AMD_PLATFOMS_H */
+--
+2.25.1
