@@ -1,0 +1,391 @@
+From f571d6b69e15103d6147d022410220ee1172e6ff Mon Sep 17 00:00:00 2001
+Message-Id: <f571d6b69e15103d6147d022410220ee1172e6ff.1678315299.git.vinu.vaghasia@amd.com>
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Wed, 8 Mar 2023 16:35:18 -0600
+Subject: [PATCH 1/2] linux-aspeed/driver/i2c: Add i2c slave backend driver
+ with kernel
+
+i2c slave driver added for BMC to act as backend slave device.
+
+Signed-off-by: Fabrizio Damato <fadamato@amd.com>
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ drivers/i2c/Kconfig             |   5 +
+ drivers/i2c/Makefile            |   1 +
+ drivers/i2c/i2c-slave-backend.c | 338 ++++++++++++++++++++++++++++++++
+ 3 files changed, 344 insertions(+)
+
+diff --git a/drivers/i2c/Kconfig b/drivers/i2c/Kconfig
+index 438905e2a1d0..01d2bda8c986 100644
+--- a/drivers/i2c/Kconfig
++++ b/drivers/i2c/Kconfig
+@@ -133,6 +133,11 @@ config I2C_SLAVE_TESTUNIT
+ 	  multi-master, SMBus Host Notify, etc. Please read
+ 	  Documentation/i2c/slave-testunit-backend.rst for further details.
+
++config I2C_SLAVE_BACKEND
++	tristate "I2C slave backend driver "
++	help
++	  This driver is for i2c slave backend devices
++
+ endif
+
+ config I2C_DEBUG_CORE
+diff --git a/drivers/i2c/Makefile b/drivers/i2c/Makefile
+index c1d493dc9bac..3f8606e4fee4 100644
+--- a/drivers/i2c/Makefile
++++ b/drivers/i2c/Makefile
+@@ -17,5 +17,6 @@ obj-y				+= algos/ busses/ muxes/
+ obj-$(CONFIG_I2C_STUB)		+= i2c-stub.o
+ obj-$(CONFIG_I2C_SLAVE_EEPROM)	+= i2c-slave-eeprom.o
+ obj-$(CONFIG_I2C_SLAVE_TESTUNIT)	+= i2c-slave-testunit.o
++obj-$(CONFIG_I2C_SLAVE_BACKEND)	+= i2c-slave-backend.o
+
+ ccflags-$(CONFIG_I2C_DEBUG_CORE) := -DDEBUG
+diff --git a/drivers/i2c/i2c-slave-backend.c b/drivers/i2c/i2c-slave-backend.c
+new file mode 100644
+index 000000000000..a0caac167a9e
+--- /dev/null
++++ b/drivers/i2c/i2c-slave-backend.c
+@@ -0,0 +1,338 @@
++// -----------------------------------------------------------------------------
++// Copyright 2023 by AMD Inc.  All rights reserved.
++//
++// This document contains proprietary, confidential information that
++// may be used, copied and/or disclosed only as authorized by a
++// valid licensing agreement with AMD Inc. This copyright
++// notice must be retained on all authorized copies.
++//
++// This code is provided "as is".  AMD Inc. makes, and
++// the end user receives, no warranties or conditions, express,
++// implied, statutory or otherwise, and AMD Inc.
++// specifically disclaims any implied warranties of merchantability,
++// non-infringement, or fitness for a particular purpose.
++//
++// -----------------------------------------------------------------------------
++#include <linux/bitops.h>
++#include <linux/i2c.h>
++#include <linux/init.h>
++#include <linux/module.h>
++#include <linux/of.h>
++#include <linux/slab.h>
++#include <linux/workqueue.h>
++#include <linux/cdev.h>
++#include <linux/device.h>
++#include <linux/kernel.h>
++#include <linux/fs.h>
++#include <linux/uaccess.h>
++#include <linux/list.h>
++
++#define DEVICE_NAME "i2c-slave-backend"
++#define CLASS_NAME "i2c"
++#define BUFFER_SIZE 0x1000u
++
++// Arbitrary number for device class
++#define I2C_SLAVE_MAJOR_ID 47
++
++struct i2c_slave_work_data {
++    struct work_struct worker;
++    u8 *buffer;
++    u32 size;
++    enum i2c_slave_event event;
++};
++
++struct i2c_buffer_list {
++    struct list_head list;
++    u8 *buffer;
++    u32 size;
++};
++
++struct buffer_slice {
++    u8 data[BUFFER_SIZE * 2];
++    u32 idx;
++    u8 slice;
++};
++
++struct i2c_slave_backend_data {
++    struct buffer_slice _buffer;
++    struct list_head buffer_list;
++    struct mutex lock;
++    bool is_dev_open;
++    struct i2c_client *client;
++    struct cdev i2c_slave_dev;
++    struct i2c_slave_work_data work_data;
++};
++
++static void delete_i2c_buffer_list(struct i2c_slave_backend_data *data)
++{
++    struct list_head *i;
++    list_for_each(i, &data->buffer_list) {
++        struct i2c_buffer_list *bf = list_entry(i, struct i2c_buffer_list, list);
++        kfree(bf->buffer);
++        list_del(&bf->list);
++    }
++
++}
++
++static int i2c_slave_dev_open(struct inode *inode, struct file *file)
++{
++    struct i2c_slave_backend_data *data = container_of(inode->i_cdev, struct i2c_slave_backend_data, i2c_slave_dev);
++    if (data->is_dev_open)
++        return -EBUSY;
++    data->is_dev_open = true;
++    file->private_data = data;
++    return 0;
++}
++
++static int i2c_slave_dev_release(struct inode *inode, struct file *file)
++{
++    struct i2c_slave_backend_data *data = (struct i2c_slave_backend_data *) file->private_data;
++    data->is_dev_open = false;
++    file->private_data = NULL;
++    return 0;
++}
++
++static ssize_t i2c_slave_dev_write(struct file *file, const char __user *buf, size_t count, loff_t *offset)
++{
++    printk(KERN_INFO "i2c_slave_dev_release: not supported\n");
++    return -ENOTSUPP;
++}
++
++static ssize_t i2c_slave_dev_read(struct file *file, char __user *buf, size_t count, loff_t *offset)
++{
++    struct i2c_buffer_list *q = NULL;
++    struct i2c_slave_backend_data *data = (struct i2c_slave_backend_data *) file->private_data;
++
++    // if file is not opened return error
++    if (!data->is_dev_open) {
++        printk(KERN_INFO "i2c_slave_dev_read: file is not opened \n");
++        return 0;
++    }
++
++    // lock the device
++    if (!mutex_trylock(&data->lock)) {
++        return 0;
++    }
++
++    // if data not availabe return 0
++    if (list_empty(&data->buffer_list)) {
++        mutex_unlock(&data->lock);
++        return 0;
++    }
++
++    // Retrieve fist element from the list
++    q = list_first_entry(&data->buffer_list, struct i2c_buffer_list, list);
++
++    // if User Buffer is bigger than needed resize count
++    if (count > q->size) {
++        count = q->size;
++    }
++
++    // Copy Data to User
++    if (copy_to_user(buf, q->buffer, count)) {
++        mutex_unlock(&data->lock);
++        return 0;
++    }
++
++    // free data and remove entry
++    kfree(q->buffer);
++    list_del(&q->list);
++
++    // Unlock the device
++    mutex_unlock(&data->lock);
++
++    return count;
++}
++
++static struct file_operations i2c_slave_fops =
++{
++   .open = i2c_slave_dev_open,
++   .read = i2c_slave_dev_read,
++   .write = i2c_slave_dev_write,
++   .release = i2c_slave_dev_release,
++};
++
++static void i2c_slave_backend_wq_handled(struct work_struct *work)
++{
++    struct i2c_buffer_list *buffer_list;
++    struct i2c_slave_work_data *work_data = (struct i2c_slave_work_data *)work;
++
++    // Save input data on stack before acquiring mutex
++    u32 buffer_size = work_data->size;
++    u8 *buffer = work_data->buffer;
++
++    // Retrieve i2c_data
++    struct i2c_slave_backend_data *data = container_of(work_data, struct i2c_slave_backend_data, work_data);
++
++    // Lock mutex
++    mutex_lock(&data->lock);
++
++    // Allocate new list (and copy data)
++    buffer_list = kzalloc(sizeof(struct i2c_buffer_list), GFP_KERNEL);
++    buffer_list->buffer = kmalloc(buffer_size, GFP_KERNEL);
++    buffer_list->size = buffer_size;
++    memcpy(buffer_list->buffer, buffer, buffer_size);
++
++    // Add list
++    list_add_tail(&buffer_list->list, &data->buffer_list);
++
++    // Unlock mutex
++    mutex_unlock(&data->lock);
++}
++
++static int i2c_slave_backend_slave_cb(struct i2c_client *client,
++                                      enum i2c_slave_event event, u8 *val)
++{
++    u32 offset;
++    int rc = 0;
++    struct i2c_slave_backend_data *data = i2c_get_clientdata(client);
++    if (!data) {
++        printk(KERN_ALERT "i2c_slave_backend_slave_cb: No data associated to the device \n");
++        return -EIO;
++    }
++
++    offset = (u32)data->_buffer.slice * BUFFER_SIZE;
++    switch (event) {
++        case I2C_SLAVE_WRITE_RECEIVED:
++        case I2C_SLAVE_WRITE_REQUESTED:
++            if (data->_buffer.idx < BUFFER_SIZE)
++                data->_buffer.data[data->_buffer.idx++ + offset] = *val;
++            break;
++        case I2C_SLAVE_STOP:
++            // Add last byte
++            if (data->_buffer.idx < BUFFER_SIZE)
++                data->_buffer.data[data->_buffer.idx + offset] = *val;
++
++            // Save data for queue
++            data->work_data.size = data->_buffer.idx;
++            data->work_data.buffer = &data->_buffer.data[offset];
++
++            // Queue Work
++            queue_work(system_long_wq, &data->work_data.worker);
++
++            // Ping-Pong on Buffers
++            data->_buffer.slice++;
++            data->_buffer.slice %= 2;
++
++            // Reset idx
++            data->_buffer.idx = 0;
++            break;
++        // for now supports only I2C_SLAVE_WRITE
++        default:
++            rc = -ENOTSUPP;
++            break;
++    }
++
++    return rc;
++}
++
++static int register_i2c_slave_device(struct i2c_slave_backend_data *data)
++{
++    int rc;
++
++    // register char Device
++    rc = register_chrdev_region(MKDEV(I2C_SLAVE_MAJOR_ID, 0), 1, DEVICE_NAME);
++    if (rc != 0) {
++        printk(KERN_ALERT "register_i2c_slave_device: error %d in register_chrdev_region \n", rc);
++        return rc;
++    }
++
++    // initialize char device
++    cdev_init(&data->i2c_slave_dev, &i2c_slave_fops);
++
++    // add char device
++    cdev_add(&data->i2c_slave_dev, MKDEV(I2C_SLAVE_MAJOR_ID, 0), 1);
++
++    return 0;
++}
++
++static int i2c_slave_backend_remove(struct i2c_client *client)
++{
++    struct i2c_slave_backend_data *data = i2c_get_clientdata(client);
++
++    // delete char device
++    cdev_del(&data->i2c_slave_dev);
++
++    // unregister char device region
++    unregister_chrdev_region(MKDEV(I2C_SLAVE_MAJOR_ID, 0), 1);
++
++    // cancel any on progress work
++    cancel_work_sync(&data->work_data.worker);
++
++    // delete lists
++    delete_i2c_buffer_list(data);
++
++    // free data
++    kfree(data);
++
++    // unregister slave device
++    i2c_slave_unregister(client);
++    return 0;
++}
++
++static int i2c_slave_backend_probe(struct i2c_client *client)
++{
++    struct i2c_slave_backend_data *data;
++    int rc;
++
++    // Initialized data
++    data = devm_kzalloc(&client->dev, sizeof(struct i2c_slave_backend_data), GFP_KERNEL);
++    if (!data)
++        return -ENOMEM;
++
++    // Initialize lock
++    mutex_init(&data->lock);
++    // Initialize buffer list
++    INIT_LIST_HEAD(&data->buffer_list);
++    data->client = client;
++    i2c_set_clientdata(client, data);
++
++    // Register slave device
++    rc = i2c_slave_register(client, i2c_slave_backend_slave_cb);
++    if (rc) {
++        printk(KERN_ALERT "i2c_slave_backend_probe: error %d in i2c_slave_register \n", rc);
++        return rc;
++    }
++
++    // Initialize workqueue
++    INIT_WORK(&data->work_data.worker, i2c_slave_backend_wq_handled);
++
++    // Register char device (use the same minor as the associated i2c-dev driver)
++    rc = register_i2c_slave_device(data);
++    if (rc) {
++        printk(KERN_ALERT "i2c_slave_back_endprobe: cannot register char device \n");
++        i2c_slave_backend_remove(client);
++        return -EIO;
++    }
++
++    return 0;
++};
++
++static const struct i2c_device_id i2c_slave_backend_id[] = {
++    { "i2c-slave-backend", 0 },
++    {}
++};
++
++MODULE_DEVICE_TABLE(i2c, i2c_slave_backend_id);
++
++static const struct of_device_id i2c_slave_backend_of_match[] = {
++	{ .compatible = "i2c-slave-backend" },
++	{},
++};
++
++MODULE_DEVICE_TABLE(of, i2c_slave_backend_of_match);
++
++static struct i2c_driver i2c_slave_backend_driver = {
++    .driver = {
++        .name = DEVICE_NAME,
++		.of_match_table = i2c_slave_backend_of_match
++    },
++    .probe_new = i2c_slave_backend_probe,
++    .remove = i2c_slave_backend_remove,
++    .id_table = i2c_slave_backend_id,
++};
++module_i2c_driver(i2c_slave_backend_driver);
++
++MODULE_AUTHOR("Fabrizio Damato <fadamato@amd.com>");
++MODULE_DESCRIPTION("I2C slave backend driver");
++MODULE_LICENSE("GPL v2");
+--
+2.17.1
+
