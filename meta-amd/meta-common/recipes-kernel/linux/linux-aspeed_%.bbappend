@@ -36,4 +36,5 @@ SRC_URI += "file://amd-bmc-baseline.cfg \
             file://0033-ARM-dts-aspeed-APML-over-I2C.patch \
             file://0034-drivers-usb-gadget-aspeed-virtual-hub-updates.patch \
             file://0035-ARM-dts-aspeed-Add-Turin-Lenovo-UBM.patch \
+            file://0036-ARM-dts-aspeed-Turin-APML-over-i2c-i3c-DTS-changes.patch \
            "
