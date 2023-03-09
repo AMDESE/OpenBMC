@@ -5,6 +5,8 @@ SRC_URI += "file://0001-Add-power-on-monitor-mechanism.patch \
 	   "
 # Onyx specific sensors
 CHIPS_ONYX = " \
+        bus@1e78a000/i2c-bus@180/sbtsi@4c \
+        bus@1e78a000/i2c-bus@180/sbrmi@3c \
         bus@1e7a0000/i3c4@6000/sbtsi@4c,22400000001 \
         bus@1e7a0000/i3c4@6000/sbrmi@3c,22400000002 \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@0/emc2305@4d \
@@ -27,9 +29,12 @@ CHIPS_ONYX = " \
         bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/vdd33dualvrm@16 \
         bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/vdd18dualvrm@17 \
         "
-
 # Quartz specific sensors
 CHIPS_QUARTZ = " \
+        bus@1e78a000/i2c-bus@180/sbtsi@4c \
+        bus@1e78a000/i2c-bus@180/sbrmi@3c \
+        bus@1e78a000/i2c-bus@200/sbtsi@48 \
+        bus@1e78a000/i2c-bus@200/sbrmi@38 \
         bus@1e7a0000/i3c4@6000/sbtsi@4c,22400000001 \
         bus@1e7a0000/i3c5@7000/sbtsi@48,22400000001 \
         bus@1e7a0000/i3c4@6000/sbrmi@3c,22400000002 \
@@ -63,6 +68,8 @@ CHIPS_QUARTZ = " \
 
 # Ruby specific sensors
 CHIPS_RUBY = " \
+        bus@1e78a000/i2c-bus@180/sbtsi@4c \
+        bus@1e78a000/i2c-bus@180/sbrmi@3c \
         bus@1e7a0000/i3c4@6000/sbtsi@4c,22400000001 \
         bus@1e7a0000/i3c4@6000/sbrmi@3c,22400000002 \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@0/emc2305@4d \
@@ -81,6 +88,10 @@ CHIPS_RUBY = " \
 
 # Titanite specific sensors
 CHIPS_TITANITE = " \
+        bus@1e78a000/i2c-bus@180/sbtsi@4c \
+        bus@1e78a000/i2c-bus@180/sbrmi@3c \
+        bus@1e78a000/i2c-bus@200/sbtsi@48 \
+        bus@1e78a000/i2c-bus@200/sbrmi@38 \
         bus@1e7a0000/i3c4@6000/sbtsi@4c,22400000001 \
         bus@1e7a0000/i3c5@7000/sbtsi@48,22400000001 \
         bus@1e7a0000/i3c4@6000/sbrmi@3c,22400000002 \
