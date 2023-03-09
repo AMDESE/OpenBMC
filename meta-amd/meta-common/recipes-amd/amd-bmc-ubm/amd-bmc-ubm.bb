@@ -12,7 +12,7 @@ def get_service(d):
 
 SYSTEMD_SERVICE_${PN} = "${@get_service(d)}"
 SRC_URI = "git://git@github.com:/AMDESE/amd-bmc-ubm.git;branch=main;protocol=ssh"
-SRCREV_pn-amd-bmc-ubm = "${AUTOREV}"
+SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/git"
 

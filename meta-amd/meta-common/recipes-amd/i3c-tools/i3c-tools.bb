@@ -7,7 +7,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}:"
 LICENSE = "CLOSED"
 
 SRC_URI = "git://git@github.com/AspeedTech-BMC/i3c-tools.git;protocol=https"
-SRCREV_pn-i3c-tools = "${AUTOREV}"
+SRCREV = "${AUTOREV}"
 
 S="${WORKDIR}/git"
 
