@@ -1,0 +1,90 @@
+From cd0e4f885c50a97c5575458a68436d437aafff61 Mon Sep 17 00:00:00 2001
+From: Abinaya <abinaya.dhandapani@amd.com>
+Date: Thu, 9 Mar 2023 10:34:55 -0600
+Subject: [PATCH] Redfish Interface for crashdump signature ID
+
+Signed-off-by: Abinaya <abinaya.dhandapani@amd.com>
+---
+ redfish-core/lib/log_services.hpp | 37 ++++++++++++++++++++++++++++---
+ 1 file changed, 34 insertions(+), 3 deletions(-)
+
+diff --git a/redfish-core/lib/log_services.hpp b/redfish-core/lib/log_services.hpp
+index 9db4af22..d3605841 100644
+--- a/redfish-core/lib/log_services.hpp
++++ b/redfish-core/lib/log_services.hpp
+@@ -2848,7 +2848,7 @@ class CrashdumpConfiguration : public Node
+             [asyncResp](
+                 const boost::system::error_code ec,
+                 const std::vector<std::pair<
+-                    std::string, std::variant<uint16_t, bool>>>&
++                    std::string, std::variant<uint16_t, bool, std::vector<std::string>>>>&
+                     propertiesList) {
+                 if (ec)
+                 {
+@@ -2858,7 +2858,7 @@ class CrashdumpConfiguration : public Node
+                 BMCWEB_LOG_DEBUG << "Got " << propertiesList.size()
+                                  << "properties for Crashdump configuration";
+                 for (const std::pair<std::string,
+-                                     std::variant<uint16_t, bool>>&
++                                     std::variant<uint16_t, bool, std::vector<std::string>>>&
+                          property : propertiesList)
+                 {
+                     if (property.first == "apmlRetries")
+@@ -2901,6 +2901,16 @@ class CrashdumpConfiguration : public Node
+                                 .jsonValue["harvestPpin"] = *value;
+                         }
+                     }
++                    if (property.first == "sigIDOffset")
++                    {
++                        const std::vector<std::string>* value =
++                            std::get_if<std::vector<std::string>>(&property.second);
++                        if (value != nullptr)
++                        {
++                            asyncResp->res
++                                .jsonValue["sigIDOffset"] = *value;
++                        }
++                    }
+                 }
+             },
+             crashdumpObject, crashdumpPath,
+@@ -2916,11 +2926,13 @@ class CrashdumpConfiguration : public Node
+         std::optional<uint16_t> systemRecovery;
+         std::optional<bool> harvestuCodeVersion;
+         std::optional<bool> harvestPpin;
++        std::optional<std::vector<std::string>> sigIDOffset;
+
+         if (!json_util::readJson(req, asyncResp->res, "apmlRetries", apmlRetries,
+                                 "systemRecovery", systemRecovery,
+                                 "harvestPpin", harvestPpin,
+-                                "harvestuCodeVersion", harvestuCodeVersion))
++                                "harvestuCodeVersion", harvestuCodeVersion,
++                                "sigIDOffset",sigIDOffset))
+         {
+             return;
+         }
+@@ -3000,6 +3012,25 @@ class CrashdumpConfiguration : public Node
+             crashdumpConfigurationInterface, "harvestuCodeVersion",
+             std::variant<bool>(*harvestuCodeVersion));
+         }
++
++        if(sigIDOffset)
++        {
++            crow::connections::systemBus->async_method_call(
++            [asyncResp](const boost::system::error_code ec) {
++                if (ec)
++                {
++                    BMCWEB_LOG_ERROR << "D-Bus responses error: " << ec;
++                    messages::internalError(asyncResp->res);
++                    return;
++                }
++                messages::success(asyncResp->res);
++                return;
++            },
++            crashdumpObject,crashdumpPath,
++            "org.freedesktop.DBus.Properties", "Set",
++            crashdumpConfigurationInterface, "sigIDOffset",
++            std::variant<std::vector<std::string>>(*sigIDOffset));
++        }
+     }
+ };
+
