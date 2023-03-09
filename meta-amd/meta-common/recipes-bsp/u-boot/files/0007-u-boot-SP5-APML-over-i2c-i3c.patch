@@ -1,0 +1,55 @@
+From ff9e19607c8867954607064cb9fa80925e709cfd Mon Sep 17 00:00:00 2001
+From: Mohsen Dolaty <mohsen.dolaty@amd.com>
+Date: Thu, 9 Mar 2023 06:56:13 -0600
+Subject: [PATCH 1/1] u-boot: SP5 APML over i2c i3c
+
+Add SP5 APML for both i2c and i3c
+User can choose between i2c and i3c by setting
+UBOOT parameter apml_i3c to true or false
+
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
+---
+ common/image-fit.c | 20 ++++++++++++++++----
+ 1 file changed, 16 insertions(+), 4 deletions(-)
+
+diff --git a/common/image-fit.c b/common/image-fit.c
+index a5853be364..fa5f141a81 100644
+--- a/common/image-fit.c
++++ b/common/image-fit.c
+@@ -1873,18 +1873,30 @@ int fit_image_load(bootm_headers_t *images, ulong addr,
+ 				case ONYX_SLT:
+ 				case ONYX_1 ... ONYX_3:
+ 				case ONYX_FR4:
+-					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-onyx.dtb");
++					if (strncmp(apml_i3c, "true", APML_I3C_CHAR_CNT) == 0)
++						sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-onyx-i3c.dtb");
++					else
++						sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-onyx.dtb");
+ 					break;
+ 				case QUARTZ_DAP:
+ 				case QUARTZ_1 ... QUARTZ_3:
+ 				case QUARTZ_FR4:
+-					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-quartz.dtb");
++					if (strncmp(apml_i3c, "true", APML_I3C_CHAR_CNT) == 0)
++						sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-quartz-i3c.dtb");
++					else
++						sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-quartz.dtb");
+ 					break;
+ 				case RUBY_1 ... RUBY_3:
+-					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-ruby.dtb");
++					if (strncmp(apml_i3c, "true", APML_I3C_CHAR_CNT) == 0)
++						sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-ruby-i3c.dtb");
++					else
++						sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-ruby.dtb");
+ 					break;
+ 				case TITANITE_1 ... TITANITE_6:
+-					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-titanite.dtb");
++					if (strncmp(apml_i3c, "true", APML_I3C_CHAR_CNT) == 0)
++						sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-titanite-i3c.dtb");
++					else
++						sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-titanite.dtb");
+ 					break;
+
+ 				/* SH5 Platforms  dts selection */
+--
+2.25.1
