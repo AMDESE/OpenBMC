@@ -1,0 +1,4111 @@
+From 57868fc5fa5bf7f025f58b4d94388df9847ee0a1 Mon Sep 17 00:00:00 2001
+From: Mohsen Dolaty <mohsen.dolaty@amd.com>
+Date: Thu, 9 Mar 2023 07:50:06 -0600
+Subject: [PATCH 1/1] linux-aspeed: SP5 APML over i2c i3c
+
+Separate SP5 DTS files for APML over i2c vs i3c
+so user can select which one they want to run during boot time.
+
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts |  843 ++++++++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts     |   28 -
+ .../boot/dts/aspeed-bmc-amd-quartz-i3c.dts    | 1156 +++++++++++++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts   |   49 -
+ arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts |  896 +++++++++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts     |   28 -
+ .../boot/dts/aspeed-bmc-amd-titanite-i3c.dts  |  935 +++++++++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts |   54 -
+ 8 files changed, 3830 insertions(+), 159 deletions(-)
+ create mode 100644 arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts
+ create mode 100644 arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts
+ create mode 100644 arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts
+ create mode 100644 arch/arm/boot/dts/aspeed-bmc-amd-titanite-i3c.dts
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts
+new file mode 100644
+index 000000000000..48a7731b90ab
+--- /dev/null
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts
+@@ -0,0 +1,843 @@
++// SPDX-License-Identifier: GPL-2.0
++// Copyright (c) 2021 - 2022 AMD Inc.
++// Author: Sreedhar Govardhana <srgovard@amd.com>
++// Author: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
++
++/dts-v1/;
++
++#include "aspeed-g6.dtsi"
++#include "dt-bindings/gpio/aspeed-gpio.h"
++
++/ {
++	model = "AMD Onyx BMC";
++	compatible = "amd,onyx-bmc", "aspeed,ast2600";
++
++	aliases {
++		serial4 = &uart5;
++		ethernet0 = &mac3;
++		ethernet1 = &mac2;
++	};
++
++	chosen {
++		stdout-path = &uart5;
++		bootargs = "console=ttyS4,115200 earlycon vmalloc=512MB";
++	};
++
++	leds {
++		compatible = "gpio-leds";
++
++		fault {
++			gpios = <&gpio0 ASPEED_GPIO(O, 6) GPIO_ACTIVE_HIGH>;
++		};
++
++		identify {
++			gpios = <&gpio0 ASPEED_GPIO(O, 7) GPIO_ACTIVE_HIGH>;
++		};
++	};
++
++	memory@80000000 {
++		device_type = "memory";
++		reg = <0x80000000 0x80000000>;
++	};
++
++	reserved-memory {
++		#address-cells = <1>;
++		#size-cells = <1>;
++		ranges;
++
++		video_engine_memory: jpegbuffer {
++			size = <0x02000000>;	/* 32M */
++			alignment = <0x01000000>;
++			compatible = "shared-dma-pool";
++			reusable;
++		};
++
++		pcc_memory: pccbuffer {
++			no-map;
++			reg = <0xE0000000 0x00001000>; /* 4K */
++		};
++	};
++
++	iio-hwmon-adc121c {
++		compatible = "iio-hwmon";
++		oemname0 = "FPGA_VDD_CORE";
++		oemname1 = "FPGA_VDD_18";
++		oemname2 = "FPGA_VDD_33";
++		oemname3 = "LOM_VDD_33";
++		oemname4 = "LOM_VDD_12";
++		oemname5 = "VDD_12_DUAL";
++		io-channels = <&adc0 0>, <&adc1 0>, <&adc2 0>, <&adc3 0>,
++					<&adc4 0>, <&adc5 0>;
++	};
++};
++
++&mctp0 {
++	status	= "okay";
++};
++
++&mdio0 {
++	status = "okay";
++
++	ethphy0: ethernet-phy@0 {
++		compatible = "ethernet-phy-ieee802.3-c22";
++		reg = <0>;
++	};
++};
++
++&mac2 {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_rmii3_default>;
++	clock-names = "MACCLK",	"RCLK";
++	use-ncsi;
++};
++
++&mac3 {
++	status = "okay";
++	phy-mode = "rgmii";
++	phy-handle = <&ethphy0>;
++
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_rgmii4_default>;
++};
++
++&fmc {
++	status = "okay";
++	fmc-spi-user-mode;
++	flash@0 {
++		compatible = "jedec,spi-nor";
++		status = "okay";
++		label = "bmc";
++		spi-tx-bus-width = <4>;
++		spi-rx-bus-width = <4>;
++		#include "openbmc-flash-layout-128.dtsi"
++	};
++};
++
++&spi1 {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_spi1_default &pinctrl_qspi1_default>;
++	fmc-spi-user-mode;
++	compatible = "aspeed,ast2600-spi";
++
++	flash@0 {
++		compatible = "jedec,spi-nor";
++		label = "pnor";
++		status = "okay";
++	};
++
++};
++
++&spi2 {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_spi2_default &pinctrl_qspi2_default>;
++	fmc-spi-user-mode;
++	compatible = "aspeed,ast2600-spi";
++
++	flash@0 {
++		compatible = "jedec,spi-nor";
++		label = "pnor";
++		status = "okay";
++	};
++
++};
++
++#ifdef HOST_SERIAL_ESPI_VUART
++// eSPI Virtual UART - 0x3F8
++&vuart1 {
++	status = "okay";
++};
++#else
++&uart1 {
++	//Host console
++	compatible = "aspeed,ast2600-uart";
++	/delete-property/ reg-shift;
++	/delete-property/ reg-io-width;
++	dma-mode;
++	dma-channel = <0>;
++	status = "okay";
++};
++#endif
++
++//BMC Console
++&uart5 {
++	status = "okay";
++};
++
++// I2C configs
++&i2c0 {
++	//Net name i2c9 - MB FPGA slave
++	status = "okay";
++};
++
++&i2c1 {
++	//Net name i2c10 - onyx side i2c12
++	// Connected to TCA9546A and to LCD HDR
++	status = "okay";
++#ifdef OPENBMC_LCD_DRIVER
++	tca9546a@70 {
++		compatible = "nxp,pca9546";
++		reg = <0x70>;
++		//<TBD> Define LCD details here
++	};
++#endif //OPENBMC_LCD_DRIVER
++};
++
++&i2c4 {
++	// Net name i2c1
++	status = "okay";
++};
++
++// BMC Onyx VRs
++&i2c5 {
++	// Net name i2c2 (SCM_I2C2)
++	status = "okay";
++
++	i2cswitch@71 {
++		compatible = "nxp,pca9546";
++		reg = <0x71>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		i2c@0 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0>;
++			core0socvrm@40 {
++				//VDD core0/soc VRM
++				compatible = "infineon,xdpe12284";
++				reg = <0x40>;
++			};
++			iovrm@41 {
++				//VDD io VRM
++				compatible = "infineon,xdpe12284";
++				reg = <0x41>;
++			};
++			core1vrm@42 {
++				//VDD core1 VRM
++				compatible = "infineon,xdpe12284";
++				reg = <0x42>;
++			};
++			vdd11susvrm@70 {
++				//VDD core1 VRM
++				compatible = "infineon,xdpe12284";
++				reg = <0x70>;
++			};
++			vdd33dualvrm@16 {
++				//VDD 33 DUAL VRM
++				compatible = "infineon,xdpe12284";
++				reg = <0x16>;
++			};
++			vdd18dualvrm@17 {
++				//VDD 18 DUAL VRM
++				compatible = "infineon,xdpe12284";
++				reg = <0x17>;
++			};
++		};
++	};
++};
++
++&i2c7 {
++	// Net name i2c4
++	status = "okay";
++
++	mbeeprom@50 {
++	compatible = "microchip,24lc256","atmel,24c256";
++	reg = <0x50>;
++	};
++};
++
++&i2c8 {
++	// Net name i2c5 - PSU
++	status = "okay";
++};
++
++&i2c10 {
++	// Net name i2c7
++	status = "okay";
++
++#ifdef EEPROM_PROG_ENABLE
++	i2cswitch@70 {
++		compatible = "nxp,pca9548";
++		reg = <0x70>;
++
++	};
++
++	i2cswitch@71 {
++		compatible = "nxp,pca9546";
++		reg = <0x71>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		i2c@0 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0>;
++
++			brdreveeprom@50 {
++				//ONYX BRD ID
++				compatible = "microchip,24lc256","atmel,24c256";
++				reg = <0x50>;
++			};
++
++			scmbrdeeprom@51 {
++				//SCM BRD ID
++				compatible = "microchip,24lc256","atmel,24c256";
++				reg = <0x51>;
++			};
++		};
++
++	};
++#endif
++};
++
++&i2c11 {
++	// Net name i2c8 - MB LOM
++	status = "okay";
++};
++
++&i2c12 {
++	// LOCAL MGMT - FPGA slave
++	status = "okay";
++};
++
++&i2c14 {
++	// LOCAL MGMT - EEPROM, RTC
++	status = "okay";
++	bmceeprom@50 {
++	compatible = "microchip,24lc512","atmel,24c512";
++	reg = <0x50>;
++	};
++};
++
++&i2c15 {
++	// RoT
++	status = "okay";
++};
++
++&i2c9 {
++	// Net name i2c6
++	status = "okay";
++
++	i2cswitch@70 {
++		compatible = "nxp,pca9548";
++		reg = <0x70>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		//  port 0 to 3 connected to 4 fan controllers which controls 5 fans each
++		i2c@0 {
++			reg = <0>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			emc2305@4d {
++				compatible = "smsc,emc2305";
++				reg = <0x4d>;
++				#cooling-cells = <0x02>;
++
++				fan@0 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++				fan@1 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@2 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@3 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@4 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++			};
++		};
++
++		i2c@1 {
++			reg = <1>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			emc2305@4d {
++				compatible = "smsc,emc2305";
++				reg = <0x4d>;
++				#cooling-cells = <0x02>;
++
++				fan@0 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++				fan@1 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@2 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@3 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@4 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++			};
++		};
++
++		i2c@2 {
++			reg = <2>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			emc2305@4d {
++				compatible = "smsc,emc2305";
++				reg = <0x4d>;
++				#cooling-cells = <0x02>;
++
++				fan@0 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++				fan@1 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@2 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@3 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@4 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++			};
++		};
++
++		i2c@3 {
++			reg = <3>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			emc2305@4d {
++				compatible = "smsc,emc2305";
++				reg = <0x4d>;
++				#cooling-cells = <0x02>;
++
++				fan@0 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++				fan@1 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@3 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++			};
++		};
++
++		i2c@5 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <5>;
++
++			lm75a@48 {
++				compatible = "national,lm75a";
++				reg = <0x48>;
++			};
++
++			lm75a@49 {
++				compatible = "national,lm75a";
++				reg = <0x49>;
++			};
++
++			lm75a@4a {
++				compatible = "national,lm75a";
++				reg = <0x4a>;
++			};
++
++			lm75a@4b {
++				compatible = "national,lm75a";
++				reg = <0x4b>;
++			};
++
++			lm75a@4c {
++				compatible = "national,lm75a";
++				reg = <0x4c>;
++			};
++
++			lm75a@4d {
++				compatible = "national,lm75a";
++				reg = <0x4d>;
++			};
++
++			lm75a@4e {
++				compatible = "national,lm75a";
++				reg = <0x4e>;
++			};
++
++			lm75a@4f {
++				compatible = "national,lm75a";
++				reg = <0x4f>;
++			};
++		};
++
++		i2c@6 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <6>;
++
++			adc0: fpga_vdd_core@50 {
++				compatible = "ti,adc121c";
++				reg = <0x50>;
++				#io-channel-cells = <1>;
++				label = "fpga_vdd_core";
++			};
++			adc1: fpga_vdd_18@51 {
++				compatible = "ti,adc121c";
++				reg = <0x51>;
++				#io-channel-cells = <1>;
++				label = "fpga_vdd_18";
++			};
++			adc2: fpga_vdd_33@52 {
++				compatible = "ti,adc121c";
++				reg = <0x52>;
++				#io-channel-cells = <1>;
++				label = "fpga_vdd_33";
++			};
++			adc3: lom_vdd_33@53 {
++				compatible = "ti,adc121c";
++				reg = <0x53>;
++				#io-channel-cells = <1>;
++				label = "lom_vdd_33";
++			};
++			adc4: lom_vdd_12@54 {
++				compatible = "ti,adc121c";
++				reg = <0x54>;
++				#io-channel-cells = <1>;
++				label = "lom_vdd_12";
++			};
++			adc5: vdd_12_dual@55 {
++				compatible = "ti,adc121c";
++				reg = <0x55>;
++				#io-channel-cells = <1>;
++				label = "vdd_12_dual";
++			};
++		};
++
++		i2c@7 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <7>;
++
++			tmp468@48 {
++				compatible = "ti,tmp468";
++				reg = <0x48>;
++			};
++		};
++	};
++};
++
++// i3c
++
++&i3c0 {
++	// P0 DIMM (A-F) SPD Access
++	status = "okay";
++
++	jdec-spd;
++	bus_id = <0x00>;
++
++	//DIMM A
++	spd5118_0_0: spd@50,3C000000000 {
++		reg = <0x50 0x3C0 0x00000000>;
++		assigned-address = <0x50>;
++	};
++	pmic5xxx_0_0: pmic@48,20400000000 {
++		reg = <0x48 0x204 0x00000000>;
++		assigned-address = <0x48>;
++	};
++	rcd_0_0: rcd@58,2C000000000 {
++		reg = <0x58 0x2C0 0x00000000>;
++		assigned-address = <0x58>;
++	};
++	//DIMM B
++	spd5118_0_1: spd@51,3C000000001 {
++		reg = <0x51 0x3C0 0x00000001>;
++		assigned-address = <0x51>;
++	};
++	pmic5xxx_0_1: pmic@49,20400000001 {
++		reg = <0x49 0x204 0x00000001>;
++		assigned-address = <0x49>;
++	};
++	rcd_0_1: rcd@59,2C000000001 {
++		reg = <0x59 0x2C0 0x00000001>;
++		assigned-address = <0x59>;
++	};
++	//DIMM C
++	spd5118_0_2: spd@52,3C000000002 {
++		reg = <0x52 0x3C0 0x00000002>;
++		assigned-address = <0x52>;
++	};
++	pmic5xxx_0_2: pmic@4a,20400000002 {
++		reg = <0x4a 0x204 0x00000002>;
++		assigned-address = <0x4a>;
++	};
++	rcd_0_2: rcd@5a,2C000000002 {
++		reg = <0x5a 0x2C0 0x00000002>;
++		assigned-address = <0x5a>;
++	};
++	//DIMM D
++	spd5118_0_3: spd@53,3C000000003 {
++		reg = <0x53 0x3C0 0x00000003>;
++		assigned-address = <0x53>;
++	};
++	pmic5xxx_0_3: pmic@4b,20400000003 {
++		reg = <0x4b 0x204 0x00000003>;
++		assigned-address = <0x4b>;
++	};
++	rcd_0_3: rcd@5b,2C000000003 {
++		reg = <0x5b 0x2C0 0x00000003>;
++		assigned-address = <0x5b>;
++	};
++	//DIMM E
++	spd5118_0_4: spd@54,3C000000004 {
++		reg = <0x54 0x3C0 0x00000004>;
++		assigned-address = <0x54>;
++	};
++	pmic5xxx_0_4: pmic@4c,20400000004 {
++		reg = <0x4c 0x204 0x00000004>;
++		assigned-address = <0x4c>;
++	};
++	rcd_0_4: rcd@5c,2C000000004 {
++		reg = <0x5c 0x2C0 0x00000004>;
++		assigned-address = <0x5c>;
++	};
++	//DIMM F
++	spd5118_0_5: spd@55,3C000000005 {
++		reg = <0x55 0x3C0 0x00000005>;
++		assigned-address = <0x55>;
++	};
++	pmic5xxx_0_5: pmic@4d,20400000005 {
++		reg = <0x4d 0x204 0x00000005>;
++		assigned-address = <0x4d>;
++	};
++	rcd_0_5: rcd@5d,2C000000005 {
++		reg = <0x5d 0x2C0 0x00000005>;
++		assigned-address = <0x5d>;
++	};
++};
++
++&i3c1 {
++	// P0 DIMM (G-L) SPD Access
++	status = "okay";
++
++	jdec-spd;
++	bus_id = <0x01>;
++
++	//DIMM G
++	spd5118_1_0: spd@50,3C000000000 {
++		reg = <0x50 0x3C0 0x00000000>;
++		assigned-address = <0x50>;
++	};
++	pmic5xxx_1_0: pmic@48,20400000000 {
++		reg = <0x48 0x204 0x00000000>;
++		assigned-address = <0x48>;
++	};
++	rcd_1_0: rcd@58,2C000000000 {
++		reg = <0x58 0x2C0 0x00000000>;
++		assigned-address = <0x58>;
++	};
++	//DIMM H
++	spd5118_1_1: spd@51,3C000000001 {
++		reg = <0x51 0x3C0 0x00000001>;
++		assigned-address = <0x51>;
++	};
++	pmic5xxx_1_1: pmic@49,20400000001 {
++		reg = <0x49 0x204 0x00000001>;
++		assigned-address = <0x49>;
++	};
++	rcd_1_1: rcd@59,2C000000001 {
++		reg = <0x59 0x2C0 0x00000001>;
++		assigned-address = <0x59>;
++	};
++	//DIMM I
++	spd5118_1_2: spd@52,3C000000002 {
++		reg = <0x52 0x3C0 0x00000002>;
++		assigned-address = <0x52>;
++	};
++	pmic5xxx_1_2: pmic@4a,20400000002 {
++		reg = <0x4a 0x204 0x00000002>;
++		assigned-address = <0x4a>;
++	};
++	rcd_1_2: rcd@5a,2C000000002 {
++		reg = <0x5a 0x2C0 0x00000002>;
++		assigned-address = <0x5a>;
++	};
++	//DIMM J
++	spd5118_1_3: spd@53,3C000000003 {
++		reg = <0x53 0x3C0 0x00000003>;
++		assigned-address = <0x53>;
++	};
++	pmic5xxx_1_3: pmic@4b,20400000003 {
++		reg = <0x4b 0x204 0x00000003>;
++		assigned-address = <0x4b>;
++	};
++	rcd_1_3: rcd@5b,2C000000003 {
++		reg = <0x5b 0x2C0 0x00000003>;
++		assigned-address = <0x5b>;
++	};
++	//DIMM K
++	spd5118_1_4: spd@54,3C000000004 {
++		reg = <0x54 0x3C0 0x00000004>;
++		assigned-address = <0x54>;
++	};
++	pmic5xxx_1_4: pmic@4c,20400000004 {
++		reg = <0x4c 0x204 0x00000004>;
++		assigned-address = <0x4c>;
++	};
++	rcd_1_4: rcd@5c,2C000000004 {
++		reg = <0x5c 0x2C0 0x00000004>;
++		assigned-address = <0x5c>;
++	};
++	//DIMM L
++	spd5118_1_5: spd@55,3C000000005 {
++		reg = <0x55 0x3C0 0x00000005>;
++		assigned-address = <0x55>;
++	};
++	pmic5xxx_1_5: pmic@4d,20400000005 {
++		reg = <0x4d 0x204 0x00000005>;
++		assigned-address = <0x4d>;
++	};
++	rcd_1_5: rcd@5d,2C000000005 {
++		reg = <0x5d 0x2C0 0x00000005>;
++		assigned-address = <0x5d>;
++	};
++};
++
++&i3c4 {
++	// P0 APML
++	status = "okay";
++
++	jdec-spd;
++	set_dasa;
++	bus_id = <0x04>;
++
++	imx3112_p0: i3cmux@70,4CC00000000 {
++		reg = <0x70 0x4CC 0x00000000>;
++		assigned-address = <0x70>;
++	};
++	sbtsi_p0_0: sbtsi@4c,22400000001 {
++		reg = <0x4c 0x224 0x00000001>;
++		assigned-address = <0x4c>;
++	};
++	sbrmi_p0_1: sbrmi@3c,22400000002 {
++		reg = <0x3c 0x224 0x00000002>;
++		assigned-address = <0x3c>;
++	};
++};
++
++&espi_ctrl {
++	status = "okay";
++
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_espi_default &pinctrl_espialt_default>;
++
++	perif,dma-mode;
++};
++
++&espi_mmbi {
++	status = "okay";
++};
++
++&gpio0 {
++	gpio-line-names =
++	/*A0-A7*/	"","","","","","","","",
++	/*B0-B7*/	"","","","","MON_POST_COMPLETE","","","",
++	/*C0-C7*/	"","","","","","","","",
++	/*D0-D7*/	"","","","","","","","",
++	/*E0-E7*/	"","","","","","","","",
++	/*F0-F7*/	"","","","","","","","",
++	/*G0-G7*/	"","","","","","","","",
++	/*H0-H7*/	"","ASSERT_WARM_RST_BTN_L","ASSERT_SOC_RST_BTN_L","","","","","",
++	/*I0-I7*/	"","","","","","","","P0_I3C_APML_ALERT_L",
++	/*J0-J7*/	"","","","","","","","",
++	/*K0-K7*/	"","","","","","","","",
++	/*L0-L7*/	"","","","","","","","",
++	/*M0-M7*/	"","","","","","","","",
++	/*N0-N7*/	"","","","","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
++	/*O0-O7*/	"","","HDT_SEL","HDT_XTRIG5","HDT_XTRIG6","JTAG_TRST_N","","",
++	/*P0-P7*/	"MON_RST_BTN_L","ASSERT_RST_BTN_L","MON_PWR_BTN_L","ASSERT_PWR_BTN_L","HPM_FPGA_LOCKOUT","ASSERT_NMI_BTN_L","MON_PWR_GOOD","",
++	/*Q0-Q7*/	"","","HDT_DBREQ_L","","BIOS_SPD_MUX_CTRL_RELEASED_L","","","",
++	/*R0-R7*/	"","","","","","","","",
++	/*S0-S7*/	"","","","","","","P0_DIMM_AF_ERROR","P0_DIMM_GL_ERROR",
++	/*T0-T7*/	"","","","","","","","",
++	/*U0-U7*/	"","","","","","","","",
++	/*V0-V7*/	"","","","","","","","",
++	/*W0-W7*/	"","","","","","","","",
++	/*X0-X7*/	"","","","","","","","",
++	/*Y0-Y7*/	"","","","","","","","",
++	/*Z0-Z7*/	"","","","","","","","";
++};
++
++&jtag1 {
++	status = "okay";
++};
++
++&video {
++	status = "okay";
++	memory-region = <&video_engine_memory>;
++};
++
++&vhub {
++	status = "okay";
++};
++
++&lpc_ctrl {
++	status = "okay";
++};
++
++&lpc_pcc {
++	port-addr = <0x80>;
++	dma-mode;
++	memory-region = <&pcc_memory>;
++	rec-mode = <0x1>;
++	port-addr-hbits-select = <0x1>;
++	port-addr-xbits = <0x3>;
++
++	status = "okay";
++};
++
++&kcs3 {
++	status = "okay";
++	aspeed,lpc-io-reg = <0xCA2>;
++};
++
++&uart_routing {
++	status = "okay";
++};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+index 67f1748e2ddb..85cfdffac9bb 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+@@ -740,8 +740,6 @@ rcd_1_5: rcd@5d,2C000000005 {
+ 	};
+ };
+
+-#ifdef ENABLE_I2C_APML
+-
+ &i2c2 {
+ 	// P0 APML - i2c10
+ 	status = "okay";
+@@ -758,32 +756,6 @@ sbtsi@4c {
+ 	};
+ };
+
+-#else
+-
+-&i3c4 {
+-	// P0 APML
+-	status = "okay";
+-
+-	jdec-spd;
+-	set_dasa;
+-	bus_id = <0x04>;
+-
+-	imx3112_p0: i3cmux@70,4CC00000000 {
+-		reg = <0x70 0x4CC 0x00000000>;
+-		assigned-address = <0x70>;
+-	};
+-	sbtsi_p0_0: sbtsi@4c,22400000001 {
+-		reg = <0x4c 0x224 0x00000001>;
+-		assigned-address = <0x4c>;
+-	};
+-	sbrmi_p0_1: sbrmi@3c,22400000002 {
+-		reg = <0x3c 0x224 0x00000002>;
+-		assigned-address = <0x3c>;
+-	};
+-};
+-
+-#endif  // ENABLE_I2C_APML
+-
+ &espi_ctrl {
+ 	status = "okay";
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts
+new file mode 100644
+index 000000000000..a12ab44bddde
+--- /dev/null
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts
+@@ -0,0 +1,1156 @@
++// SPDX-License-Identifier: GPL-2.0
++// Copyright (c) 2021 - 2022 AMD Inc.
++// Author: Sreedhar Govardhana <srgovard@amd.com>
++// Author: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
++
++/dts-v1/;
++
++#include "aspeed-g6.dtsi"
++#include "dt-bindings/gpio/aspeed-gpio.h"
++
++/ {
++	model = "AMD Quartz BMC";
++	compatible = "amd,quartz-bmc", "aspeed,ast2600";
++
++	aliases {
++		serial4 = &uart5;
++		ethernet0 = &mac3;
++		ethernet1 = &mac2;
++	};
++
++	chosen {
++		stdout-path = &uart5;
++		bootargs = "console=ttyS4,115200 earlycon vmalloc=512MB";
++	};
++
++	leds {
++		compatible = "gpio-leds";
++
++		fault {
++			gpios = <&gpio0 ASPEED_GPIO(O, 6) GPIO_ACTIVE_HIGH>;
++		};
++
++		identify {
++			gpios = <&gpio0 ASPEED_GPIO(O, 7) GPIO_ACTIVE_HIGH>;
++		};
++	};
++
++	memory@80000000 {
++		device_type = "memory";
++		reg = <0x80000000 0x80000000>;
++	};
++
++	reserved-memory {
++		#address-cells = <1>;
++		#size-cells = <1>;
++		ranges;
++
++		video_engine_memory: jpegbuffer {
++			size = <0x02000000>;	/* 32M */
++			alignment = <0x01000000>;
++			compatible = "shared-dma-pool";
++			reusable;
++		};
++
++		pcc_memory: pccbuffer {
++			no-map;
++			reg = <0xE0000000 0x00001000>; /* 4K */
++		};
++	};
++
++	iio-hwmon-adc121c {
++		compatible = "iio-hwmon";
++		oemname0 = "FPGA_VDD_CORE";
++		oemname1 = "FPGA_VDD_18";
++		oemname2 = "FPGA_VDD_33";
++		oemname3 = "LOM_VDD_33";
++		oemname4 = "LOM_VDD_12";
++		oemname5 = "VDD_12_DUAL";
++		io-channels = <&adc0 0>, <&adc1 0>, <&adc2 0>, <&adc3 0>,
++					<&adc4 0>, <&adc5 0>;
++	};
++};
++
++&mctp0 {
++	status	= "okay";
++};
++
++&mdio0 {
++	status = "okay";
++
++	ethphy0: ethernet-phy@0 {
++		compatible = "ethernet-phy-ieee802.3-c22";
++		reg = <0>;
++	};
++};
++
++&mac2 {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_rmii3_default>;
++	clock-names = "MACCLK", "RCLK";
++	use-ncsi;
++};
++
++&mac3 {
++	status = "okay";
++	phy-mode = "rgmii";
++	phy-handle = <&ethphy0>;
++
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_rgmii4_default>;
++};
++
++&fmc {
++	status = "okay";
++	fmc-spi-user-mode;
++	flash@0 {
++		compatible = "jedec,spi-nor";
++		status = "okay";
++		label = "bmc";
++		spi-tx-bus-width = <4>;
++		spi-rx-bus-width = <4>;
++		#include "openbmc-flash-layout-128.dtsi"
++	};
++};
++
++&spi1 {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_spi1_default &pinctrl_qspi1_default>;
++	fmc-spi-user-mode;
++	compatible = "aspeed,ast2600-spi";
++
++	flash@0 {
++		compatible = "jedec,spi-nor";
++		label = "pnor";
++		status = "okay";
++	};
++
++};
++
++&spi2 {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_spi2_default &pinctrl_qspi2_default>;
++	fmc-spi-user-mode;
++	compatible = "aspeed,ast2600-spi";
++
++	flash@0 {
++		compatible = "jedec,spi-nor";
++		label = "pnor";
++		status = "okay";
++	};
++
++};
++
++#ifdef HOST_SERIAL_ESPI_VUART
++// eSPI Virtual UART - 0x3F8
++&vuart1 {
++	status = "okay";
++};
++#else
++&uart1 {
++	//Host console
++	compatible = "aspeed,ast2600-uart";
++	/delete-property/ reg-shift;
++	/delete-property/ reg-io-width;
++	dma-mode;
++	dma-channel = <0>;
++	status = "okay";
++};
++#endif
++
++//BMC Console
++&uart5 {
++	status = "okay";
++};
++
++// I2C configs
++&i2c0 {
++	//Net name i2c9 (SCM_I2C9)- MB FPGA slave
++	status = "okay";
++};
++
++&i2c1 {
++	//Net name i2c12 (SCM_I2C12) - LCD at 50KHz
++	// Connected to TCA9546A and to LCD HDR
++	status = "okay";
++#ifdef OPENBMC_LCD_DRIVER
++	i2cswitch@70 {
++		compatible = "nxp,pca9546";
++		reg = <0x70>;
++		//<TBD> Define LCD details here
++	};
++#endif //OPENBMC_LCD_DRIVER
++};
++
++&i2c4 {
++	// Net name i2c1 (SCM_I2C1)
++	status = "okay";
++};
++
++// BMC Quartz P0 VRs
++&i2c5 {
++	// Net name i2c2 (SCM_I2C2)
++	status = "okay";
++
++	i2cswitch@70 {
++		compatible = "nxp,pca9546";
++		reg = <0x70>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++                i2c@0 {
++                        #address-cells = <1>;
++                        #size-cells = <0>;
++                        reg = <0>;
++
++                        p0_vdd_core0_run@60 {
++                                //VDD core0 run/soc
++                                compatible = "isil,isl68137";
++                                reg = <0x60>;
++                        };
++
++                        p0_vdd_core1_run@61 {
++                                //VDD core1 run
++                                compatible = "isil,isl68137";
++                                reg = <0x61>;
++                        };
++
++                        p0_vdd_vddio_run@62 {
++                                //VDD IO RUN
++                                compatible = "isil,isl68137";
++                                reg = <0x62>;
++                        };
++
++                        p0_vdd_11_sus@63 {
++                                //VDD 11 sus
++                                compatible = "isil,isl68137";
++                                reg = <0x63>;
++                        };
++
++                        p0_vdd_18_dual@64 {
++                                //VDD 18 DUAL
++                                compatible = "isil,isl68137";
++                                reg = <0x64>;
++                        };
++
++                        p0_vdd_33_dual@65 {
++                                //VDD 33 DUAL VRM
++                                compatible = "isil,isl68137";
++                                reg = <0x65>;
++                        };
++                };
++	};
++};
++
++// BMC Quartz P1 VRs
++&i2c6 {
++	// Net name i2c3 (SCM_I2C3)
++	status = "okay";
++
++	i2cswitch@70 {
++		compatible = "nxp,pca9546";
++		reg = <0x70>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++                i2c@0 {
++                        #address-cells = <1>;
++                        #size-cells = <0>;
++                        reg = <0>;
++
++                        p1_vdd_core0_run@60 {
++                                //VDD core0 run/soc
++                                compatible = "isil,isl68137";
++                                reg = <0x60>;
++                        };
++
++                        p1_vdd_core1_run@61 {
++                                //VDD core1 run
++                                compatible = "isil,isl68137";
++                                reg = <0x61>;
++                        };
++
++                        p1_vdd_vddio_run@62 {
++                                //VDD IO RUN
++                                compatible = "isil,isl68137";
++                                reg = <0x62>;
++                        };
++
++                        p1_vdd_11_sus@63 {
++                                //VDD 11 sus
++                                compatible = "isil,isl68137";
++                                reg = <0x63>;
++                        };
++
++                        p1_vdd_18_dual@64 {
++                                //VDD 18 DUAL
++                                compatible = "isil,isl68137";
++                                reg = <0x64>;
++                        };
++
++                        p1_vdd_33_dual@65 {
++                                //VDD 33 DUAL VRM
++                                compatible = "isil,isl68137";
++                                reg = <0x65>;
++                        };
++                };
++	};
++};
++
++&i2c7 {
++	// Net name i2c4 (SCM_I2C4) - HPM BRD ID
++	status = "okay";
++
++	mbeeprom@50 {
++		compatible = "microchip,24lc256","atmel,24c256";
++		reg = <0x50>;
++	};
++};
++
++&i2c8 {
++	// Net name i2c5 (SCM_I2C5) - PSU
++	status = "okay";
++};
++
++&i2c9 {
++	// Net name i2c6 (SCM_I2C6) - FAN/LM75/ADC
++	status = "okay";
++
++	i2cswitch@70 {
++		compatible = "nxp,pca9548";
++		reg = <0x70>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		//  port 0 to 4 connected to 5 fan controllers which controls 5 fans each
++		i2c@0 {
++			reg = <0>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			emc2305@4d {
++				compatible = "smsc,emc2305";
++				reg = <0x4d>;
++				#cooling-cells = <0x02>;
++
++				fan@0 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++				fan@1 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@2 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@3 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@4 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++			};
++		};
++
++		i2c@1 {
++			reg = <1>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			emc2305@4d {
++				compatible = "smsc,emc2305";
++				reg = <0x4d>;
++				#cooling-cells = <0x02>;
++
++				fan@0 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++				fan@1 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@2 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@3 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@4 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++			};
++		};
++
++		i2c@2 {
++			reg = <2>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			emc2305@4d {
++				compatible = "smsc,emc2305";
++				reg = <0x4d>;
++				#cooling-cells = <0x02>;
++
++				fan@0 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++				fan@1 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@2 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@3 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@4 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++			};
++		};
++
++		i2c@3 {
++			reg = <3>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			emc2305@4d {
++				compatible = "smsc,emc2305";
++				reg = <0x4d>;
++				#cooling-cells = <0x02>;
++
++				fan@0 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++				fan@1 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@2 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@3 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@4 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++			};
++		};
++
++		i2c@4 {
++			reg = <4>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			emc2305@4d {
++				compatible = "smsc,emc2305";
++				reg = <0x4d>;
++				#cooling-cells = <0x02>;
++
++				fan@0 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++				fan@1 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@2 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@3 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@4 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++			};
++		};
++
++		i2c@5 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <5>;
++
++			lm75a@48 {
++				compatible = "national,lm75a";
++				reg = <0x48>;
++			};
++
++			lm75a@49 {
++				compatible = "national,lm75a";
++				reg = <0x49>;
++			};
++
++			lm75a@4a {
++				compatible = "national,lm75a";
++				reg = <0x4a>;
++			};
++
++			lm75a@4b {
++				compatible = "national,lm75a";
++				reg = <0x4b>;
++			};
++
++			lm75a@4c {
++				compatible = "national,lm75a";
++				reg = <0x4c>;
++			};
++
++			lm75a@4d {
++				compatible = "national,lm75a";
++				reg = <0x4d>;
++			};
++
++			lm75a@4e {
++				compatible = "national,lm75a";
++				reg = <0x4e>;
++			};
++
++			lm75a@4f {
++				compatible = "national,lm75a";
++				reg = <0x4f>;
++			};
++		};
++
++		i2c@6 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <6>;
++
++			adc0: fpga_vdd_core@50 {
++				compatible = "ti,adc121c";
++				reg = <0x50>;
++				#io-channel-cells = <1>;
++				label = "fpga_vdd_core";
++			};
++			adc1: fpga_vdd_18@51 {
++				compatible = "ti,adc121c";
++				reg = <0x51>;
++				#io-channel-cells = <1>;
++				label = "fpga_vdd_18";
++			};
++			adc2: fpga_vdd_33@52 {
++				compatible = "ti,adc121c";
++				reg = <0x52>;
++				#io-channel-cells = <1>;
++				label = "fpga_vdd_33";
++			};
++			adc3: lom_vdd_33@54 {
++				compatible = "ti,adc121c";
++				reg = <0x54>;
++				#io-channel-cells = <1>;
++				label = "lom_vdd_33";
++			};
++			adc4: lom_vdd_12@55 {
++				compatible = "ti,adc121c";
++				reg = <0x55>;
++				#io-channel-cells = <1>;
++				label = "lom_vdd_12";
++			};
++			adc5: vdd_12_dual@56 {
++				compatible = "ti,adc121c";
++				reg = <0x56>;
++				#io-channel-cells = <1>;
++				label = "vdd_12_dual";
++			};
++		};
++	};
++};
++
++&i2c10 {
++	// Net name i2c7 (SCM_I2C7)
++	status = "okay";
++
++#ifdef EEPROM_PROG_ENABLE
++	i2cswitch@70 {
++		compatible = "nxp,pca9548";
++		reg = <0x70>;
++
++	};
++
++	i2cswitch@71 {
++		compatible = "nxp,pca9546";
++		reg = <0x71>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		i2c@0 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0>;
++
++			p0brdreveeprom@50 {
++				//P0 QUARTZ BRD ID
++				compatible = "microchip,24lc256","atmel,24c256";
++				reg = <0x50>;
++			};
++
++			p0scmbrdeeprom@51 {
++				//P0 SCM BRD ID
++				compatible = "microchip,24lc256","atmel,24c256";
++				reg = <0x51>;
++			};
++		};
++
++		i2c@1 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <1>;
++
++			p1brdreveeprom@50 {
++				//P1 QUARTZ BRD ID
++				compatible = "microchip,24lc256","atmel,24c256";
++				reg = <0x50>;
++			};
++
++			p2scmbrdeeprom@51 {
++				//P1 SCM BRD ID
++				compatible = "microchip,24lc256","atmel,24c256";
++				reg = <0x51>;
++			};
++		};
++	};
++
++	i2cswitch@72 {
++		compatible = "nxp,pca9546";
++		reg = <0x70>;
++	};
++#endif
++};
++
++&i2c11 {
++	// Net name i2c8 (SCM_I2C8) - MB LOM
++	status = "okay";
++};
++
++&i2c12 {
++	// LOCAL MGMT - FPGA slave
++	status = "okay";
++};
++
++&i2c14 {
++	// LOCAL MGMT - EEPROM, RTC
++	status = "okay";
++	bmceeprom@50 {
++	compatible = "microchip,24lc512","atmel,24c512";
++	reg = <0x50>;
++	};
++};
++
++&i2c15 {
++	// RoT
++	status = "okay";
++};
++
++// i3c
++
++&i3c0 {
++	// P0 DIMM (A-F) SPD Access
++	status = "okay";
++
++	jdec-spd;
++	bus_id = <0x00>;
++
++	//DIMM A
++	spd5118_0_0: spd@50,3C000000000 {
++		reg = <0x50 0x3C0 0x00000000>;
++		assigned-address = <0x50>;
++	};
++	pmic5xxx_0_0: pmic@48,20400000000 {
++		reg = <0x48 0x204 0x00000000>;
++		assigned-address = <0x48>;
++	};
++	rcd_0_0: rcd@58,2C000000000 {
++		reg = <0x58 0x2C0 0x00000000>;
++		assigned-address = <0x58>;
++	};
++	//DIMM B
++	spd5118_0_1: spd@51,3C000000001 {
++		reg = <0x51 0x3C0 0x00000001>;
++		assigned-address = <0x51>;
++	};
++	pmic5xxx_0_1: pmic@49,20400000001 {
++		reg = <0x49 0x204 0x00000001>;
++		assigned-address = <0x49>;
++	};
++	rcd_0_1: rcd@59,2C000000001 {
++		reg = <0x59 0x2C0 0x00000001>;
++		assigned-address = <0x59>;
++	};
++	//DIMM C
++	spd5118_0_2: spd@52,3C000000002 {
++		reg = <0x52 0x3C0 0x00000002>;
++		assigned-address = <0x52>;
++	};
++	pmic5xxx_0_2: pmic@4a,20400000002 {
++		reg = <0x4a 0x204 0x00000002>;
++		assigned-address = <0x4a>;
++	};
++	rcd_0_2: rcd@5a,2C000000002 {
++		reg = <0x5a 0x2C0 0x00000002>;
++		assigned-address = <0x5a>;
++	};
++	//DIMM D
++	spd5118_0_3: spd@53,3C000000003 {
++		reg = <0x53 0x3C0 0x00000003>;
++		assigned-address = <0x53>;
++	};
++	pmic5xxx_0_3: pmic@4b,20400000003 {
++		reg = <0x4b 0x204 0x00000003>;
++		assigned-address = <0x4b>;
++	};
++	rcd_0_3: rcd@5b,2C000000003 {
++		reg = <0x5b 0x2C0 0x00000003>;
++		assigned-address = <0x5b>;
++	};
++	//DIMM E
++	spd5118_0_4: spd@54,3C000000004 {
++		reg = <0x54 0x3C0 0x00000004>;
++		assigned-address = <0x54>;
++	};
++	pmic5xxx_0_4: pmic@4c,20400000004 {
++		reg = <0x4c 0x204 0x00000004>;
++		assigned-address = <0x4c>;
++	};
++	rcd_0_4: rcd@5c,2C000000004 {
++		reg = <0x5c 0x2C0 0x00000004>;
++		assigned-address = <0x5c>;
++	};
++	//DIMM F
++	spd5118_0_5: spd@55,3C000000005 {
++		reg = <0x55 0x3C0 0x00000005>;
++		assigned-address = <0x55>;
++	};
++	pmic5xxx_0_5: pmic@4d,20400000005 {
++		reg = <0x4d 0x204 0x00000005>;
++		assigned-address = <0x4d>;
++	};
++	rcd_0_5: rcd@5d,2C000000005 {
++		reg = <0x5d 0x2C0 0x00000005>;
++		assigned-address = <0x5d>;
++	};
++};
++
++&i3c1 {
++	// P0 DIMM (G-L) SPD Access
++	status = "okay";
++
++	jdec-spd;
++	bus_id = <0x01>;
++
++	//DIMM G
++	spd5118_1_0: spd@50,3C000000000 {
++		reg = <0x50 0x3C0 0x00000000>;
++		assigned-address = <0x50>;
++	};
++	pmic5xxx_1_0: pmic@48,20400000000 {
++		reg = <0x48 0x204 0x00000000>;
++		assigned-address = <0x48>;
++	};
++	rcd_1_0: rcd@58,2C000000000 {
++		reg = <0x58 0x2C0 0x00000000>;
++		assigned-address = <0x58>;
++	};
++	//DIMM H
++	spd5118_1_1: spd@51,3C000000001 {
++		reg = <0x51 0x3C0 0x00000001>;
++		assigned-address = <0x51>;
++	};
++	pmic5xxx_1_1: pmic@49,20400000001 {
++		reg = <0x49 0x204 0x00000001>;
++		assigned-address = <0x49>;
++	};
++	rcd_1_1: rcd@59,2C000000001 {
++		reg = <0x59 0x2C0 0x00000001>;
++		assigned-address = <0x59>;
++	};
++	//DIMM I
++	spd5118_1_2: spd@52,3C000000002 {
++		reg = <0x52 0x3C0 0x00000002>;
++		assigned-address = <0x52>;
++	};
++	pmic5xxx_1_2: pmic@4a,20400000002 {
++		reg = <0x4a 0x204 0x00000002>;
++		assigned-address = <0x4a>;
++	};
++	rcd_1_2: rcd@5a,2C000000002 {
++		reg = <0x5a 0x2C0 0x00000002>;
++		assigned-address = <0x5a>;
++	};
++	//DIMM J
++	spd5118_1_3: spd@53,3C000000003 {
++		reg = <0x53 0x3C0 0x00000003>;
++		assigned-address = <0x53>;
++	};
++	pmic5xxx_1_3: pmic@4b,20400000003 {
++		reg = <0x4b 0x204 0x00000003>;
++		assigned-address = <0x4b>;
++	};
++	rcd_1_3: rcd@5b,2C000000003 {
++		reg = <0x5b 0x2C0 0x00000003>;
++		assigned-address = <0x5b>;
++	};
++	//DIMM K
++	spd5118_1_4: spd@54,3C000000004 {
++		reg = <0x54 0x3C0 0x00000004>;
++		assigned-address = <0x54>;
++	};
++	pmic5xxx_1_4: pmic@4c,20400000004 {
++		reg = <0x4c 0x204 0x00000004>;
++		assigned-address = <0x4c>;
++	};
++	rcd_1_4: rcd@5c,2C000000004 {
++		reg = <0x5c 0x2C0 0x00000004>;
++		assigned-address = <0x5c>;
++	};
++	//DIMM L
++	spd5118_1_5: spd@55,3C000000005 {
++		reg = <0x55 0x3C0 0x00000005>;
++		assigned-address = <0x55>;
++	};
++	pmic5xxx_1_5: pmic@4d,20400000005 {
++		reg = <0x4d 0x204 0x00000005>;
++		assigned-address = <0x4d>;
++	};
++	rcd_1_5: rcd@5d,2C000000005 {
++		reg = <0x5d 0x2C0 0x00000005>;
++		assigned-address = <0x5d>;
++	};
++ };
++
++&i3c2 {
++	// P1 DIMM (A-F) SPD Access
++	status = "okay";
++
++	jdec-spd;
++	bus_id = <0x02>;
++
++	//DIMM A
++	spd5118_2_0: spd@50,3C000000000 {
++		reg = <0x50 0x3C0 0x00000000>;
++		assigned-address = <0x50>;
++	};
++	pmic5xxx_2_0: pmic@48,20400000000 {
++		reg = <0x48 0x204 0x00000000>;
++		assigned-address = <0x48>;
++	};
++	rcd_2_0: rcd@58,2C000000000 {
++		reg = <0x58 0x2C0 0x00000000>;
++		assigned-address = <0x58>;
++	};
++	//DIMM B
++	spd5118_2_1: spd@51,3C000000001 {
++		reg = <0x51 0x3C0 0x00000001>;
++		assigned-address = <0x51>;
++	};
++	pmic5xxx_2_1: pmic@49,20400000001 {
++		reg = <0x49 0x204 0x00000001>;
++		assigned-address = <0x49>;
++	};
++	rcd_2_1: rcd@59,2C000000001 {
++		reg = <0x59 0x2C0 0x00000001>;
++		assigned-address = <0x59>;
++	};
++	//DIMM C
++	spd5118_2_2: spd@52,3C000000002 {
++		reg = <0x52 0x3C0 0x00000002>;
++		assigned-address = <0x52>;
++	};
++	pmic5xxx_2_2: pmic@4a,20400000002 {
++		reg = <0x4a 0x204 0x00000002>;
++		assigned-address = <0x4a>;
++	};
++	rcd_2_2: rcd@5a,2C000000002 {
++		reg = <0x5a 0x2C0 0x00000002>;
++		assigned-address = <0x5a>;
++	};
++	//DIMM D
++	spd5118_2_3: spd@53,3C000000003 {
++		reg = <0x53 0x3C0 0x00000003>;
++		assigned-address = <0x53>;
++	};
++	pmic5xxx_2_3: pmic@4b,20400000003 {
++		reg = <0x4b 0x204 0x00000003>;
++		assigned-address = <0x4b>;
++	};
++	rcd_2_3: rcd@5b,2C000000003 {
++		reg = <0x5b 0x2C0 0x00000003>;
++		assigned-address = <0x5b>;
++	};
++	//DIMM E
++	spd5118_2_4: spd@54,3C000000004 {
++		reg = <0x54 0x3C0 0x00000004>;
++		assigned-address = <0x54>;
++	};
++	pmic5xxx_2_4: pmic@4c,20400000004 {
++		reg = <0x4c 0x204 0x00000004>;
++		assigned-address = <0x4c>;
++	};
++	rcd_2_4: rcd@5c,2C000000004 {
++		reg = <0x5c 0x2C0 0x00000004>;
++		assigned-address = <0x5c>;
++	};
++	//DIMM F
++	spd5118_2_5: spd@55,3C000000005 {
++		reg = <0x55 0x3C0 0x00000005>;
++		assigned-address = <0x55>;
++	};
++	pmic5xxx_2_5: pmic@4d,20400000005 {
++		reg = <0x4d 0x204 0x00000005>;
++		assigned-address = <0x4d>;
++	};
++	rcd_2_5: rcd@5d,2C000000005 {
++		reg = <0x5d 0x2C0 0x00000005>;
++		assigned-address = <0x5d>;
++	};
++};
++
++&i3c3 {
++	// P1 DIMM (G-L) SPD Access
++	status = "okay";
++
++	jdec-spd;
++	bus_id = <0x03>;
++
++	//DIMM G
++	spd5118_3_0: spd@50,3C000000000 {
++		reg = <0x50 0x3C0 0x00000000>;
++		assigned-address = <0x50>;
++	};
++	pmic5xxx_3_0: pmic@48,20400000000 {
++		reg = <0x48 0x204 0x00000000>;
++		assigned-address = <0x48>;
++	};
++	rcd_3_0: rcd@58,2C000000000 {
++		reg = <0x58 0x2C0 0x00000000>;
++		assigned-address = <0x58>;
++	};
++	//DIMM H
++	spd5118_3_1: spd@51,3C000000001 {
++		reg = <0x51 0x3C0 0x00000001>;
++		assigned-address = <0x51>;
++	};
++	pmic5xxx_3_1: pmic@49,20400000001 {
++		reg = <0x49 0x204 0x00000001>;
++		assigned-address = <0x49>;
++	};
++	rcd_3_1: rcd@59,2C000000001 {
++		reg = <0x59 0x2C0 0x00000001>;
++		assigned-address = <0x59>;
++	};
++	//DIMM I
++	spd5118_3_2: spd@52,3C000000002 {
++		reg = <0x52 0x3C0 0x00000002>;
++		assigned-address = <0x52>;
++	};
++	pmic5xxx_3_2: pmic@4a,20400000002 {
++		reg = <0x4a 0x204 0x00000002>;
++		assigned-address = <0x4a>;
++	};
++	rcd_3_2: rcd@5a,2C000000002 {
++		reg = <0x5a 0x2C0 0x00000002>;
++		assigned-address = <0x5a>;
++	};
++	//DIMM J
++	spd5118_3_3: spd@53,3C000000003 {
++		reg = <0x53 0x3C0 0x00000003>;
++		assigned-address = <0x53>;
++	};
++	pmic5xxx_3_3: pmic@4b,20400000003 {
++		reg = <0x4b 0x204 0x00000003>;
++		assigned-address = <0x4b>;
++	};
++	rcd_3_3: rcd@5b,2C000000003 {
++		reg = <0x5b 0x2C0 0x00000003>;
++		assigned-address = <0x5b>;
++	};
++	//DIMM K
++	spd5118_3_4: spd@54,3C000000004 {
++		reg = <0x54 0x3C0 0x00000004>;
++		assigned-address = <0x54>;
++	};
++	pmic5xxx_3_4: pmic@4c,20400000004 {
++		reg = <0x4c 0x204 0x00000004>;
++		assigned-address = <0x4c>;
++	};
++	rcd_3_4: rcd@5c,2C000000004 {
++		reg = <0x5c 0x2C0 0x00000004>;
++		assigned-address = <0x5c>;
++	};
++	//DIMM L
++	spd5118_3_5: spd@55,3C000000005 {
++		reg = <0x55 0x3C0 0x00000005>;
++		assigned-address = <0x55>;
++	};
++	pmic5xxx_3_5: pmic@4d,20400000005 {
++		reg = <0x4d 0x204 0x00000005>;
++		assigned-address = <0x4d>;
++	};
++	rcd_3_5: rcd@5d,2C000000005 {
++		reg = <0x5d 0x2C0 0x00000005>;
++		assigned-address = <0x5d>;
++	};
++};
++
++&i3c4 {
++	// P0 APML
++	status = "okay";
++
++	jdec-spd;
++	set_dasa;
++	bus_id = <0x04>;
++
++	imx3112_p0: i3cmux@70,4CC00000000 {
++		reg = <0x70 0x4CC 0x00000000>;
++		assigned-address = <0x70>;
++	};
++	sbtsi_p0_0: sbtsi@4c,22400000001 {
++		reg = <0x4c 0x224 0x00000001>;
++		assigned-address = <0x4c>;
++	};
++	sbrmi_p0_1: sbrmi@3c,22400000002 {
++		reg = <0x3c 0x224 0x00000002>;
++		assigned-address = <0x3c>;
++	};
++};
++
++&i3c5 {
++	// P1 APML
++	status = "okay";
++
++	jdec-spd;
++	set_dasa;
++	bus_id = <0x05>;
++
++	imx3112_P1: i3cmux@70,4CC00000000 {
++		reg = <0x70 0x4CC 0x00000000>;
++		assigned-address = <0x70>;
++	};
++	sbtsi_p1_0: sbtsi@48,22400000001 {
++		reg = <0x48 0x224 0x00000001>;
++		assigned-address = <0x48>;
++	};
++	sbrmi_p1_1: sbrmi@38,22400000002 {
++		reg = <0x38 0x224 0x00000002>;
++		assigned-address = <0x38>;
++	};
++};
++
++&espi_ctrl {
++	status = "okay";
++
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_espi_default &pinctrl_espialt_default>;
++
++	perif,dma-mode;
++};
++
++&espi_mmbi {
++	status = "okay";
++};
++
++&gpio0 {
++	gpio-line-names =
++	/*A0-A7*/	"","","","","","","","",
++	/*B0-B7*/	"","","","","MON_POST_COMPLETE","","","",
++	/*C0-C7*/	"","","","","","","","",
++	/*D0-D7*/	"","","","","","","","",
++	/*E0-E7*/	"","","","","","","","",
++	/*F0-F7*/	"","","","","","","","",
++	/*G0-G7*/	"","","","","","","","",
++	/*H0-H7*/	"","ASSERT_WARM_RST_BTN_L","ASSERT_SOC_RST_BTN_L","","","","","",
++	/*I0-I7*/	"","","","","","","","P0_I3C_APML_ALERT_L",
++	/*J0-J7*/	"","","","","","","","",
++	/*K0-K7*/	"","","","","","","","",
++	/*L0-L7*/	"","","","","","","","",
++	/*M0-M7*/	"","","","","","","","",
++	/*N0-N7*/	"","","","","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
++	/*O0-O7*/	"","","HDT_SEL","HDT_XTRIG5","HDT_XTRIG6","JTAG_TRST_N","","",
++	/*P0-P7*/	"MON_RST_BTN_L","ASSERT_RST_BTN_L","MON_PWR_BTN_L","ASSERT_PWR_BTN_L","HPM_FPGA_LOCKOUT","ASSERT_NMI_BTN_L","MON_PWR_GOOD","",
++	/*Q0-Q7*/	"","","HDT_DBREQ_L","","BIOS_SPD_MUX_CTRL_RELEASED_L","","","",
++	/*R0-R7*/	"","","","","","","","",
++	/*S0-S7*/	"","","","","P1_DIMM_AF_ERROR","P1_DIMM_GL_ERROR","P0_DIMM_AF_ERROR","P0_DIMM_GL_ERROR",
++	/*T0-T7*/	"","","","","","","","",
++	/*U0-U7*/	"","","","","P1_I3C_APML_ALERT_L","","","",
++	/*V0-V7*/	"","","","","","","","",
++	/*W0-W7*/	"","","","","","","","",
++	/*X0-X7*/	"","","","","","","","",
++	/*Y0-Y7*/	"","","","","","","","",
++	/*Z0-Z7*/	"","","","","","","","";
++};
++
++&jtag1 {
++	status = "okay";
++};
++
++&video {
++	status = "okay";
++	memory-region = <&video_engine_memory>;
++};
++
++&vhub {
++	status = "okay";
++};
++
++&lpc_ctrl {
++	status = "okay";
++};
++
++&lpc_pcc {
++	port-addr = <0x80>;
++	dma-mode;
++	memory-region = <&pcc_memory>;
++	rec-mode = <0x1>;
++	port-addr-hbits-select = <0x1>;
++	port-addr-xbits = <0x3>;
++	status = "okay";
++};
++
++&kcs3 {
++	status = "okay";
++	aspeed,lpc-io-reg = <0xCA2>;
++};
++
++&uart_routing {
++	status = "okay";
++};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+index c45a8183db51..978dac23b5c2 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+@@ -1032,7 +1032,6 @@ rcd_3_5: rcd@5d,2C000000005 {
+ 	};
+ };
+
+-#ifdef ENABLE_I2C_APML
+
+ &i2c2 {
+ 	// P0 APML - i2c10
+@@ -1066,54 +1065,6 @@ sbtsi@48 {
+ 	};
+ };
+
+-#else
+-
+-&i3c4 {
+-	// P0 APML
+-	status = "okay";
+-
+-	jdec-spd;
+-	set_dasa;
+-	bus_id = <0x04>;
+-
+-	imx3112_p0: i3cmux@70,4CC00000000 {
+-		reg = <0x70 0x4CC 0x00000000>;
+-		assigned-address = <0x70>;
+-	};
+-	sbtsi_p0_0: sbtsi@4c,22400000001 {
+-		reg = <0x4c 0x224 0x00000001>;
+-		assigned-address = <0x4c>;
+-	};
+-	sbrmi_p0_1: sbrmi@3c,22400000002 {
+-		reg = <0x3c 0x224 0x00000002>;
+-		assigned-address = <0x3c>;
+-	};
+-};
+-
+-&i3c5 {
+-	// P1 APML
+-	status = "okay";
+-
+-	jdec-spd;
+-	set_dasa;
+-	bus_id = <0x05>;
+-
+-	imx3112_P1: i3cmux@70,4CC00000000 {
+-		reg = <0x70 0x4CC 0x00000000>;
+-		assigned-address = <0x70>;
+-	};
+-	sbtsi_p1_0: sbtsi@48,22400000001 {
+-		reg = <0x48 0x224 0x00000001>;
+-		assigned-address = <0x48>;
+-	};
+-	sbrmi_p1_1: sbrmi@38,22400000002 {
+-		reg = <0x38 0x224 0x00000002>;
+-		assigned-address = <0x38>;
+-	};
+- };
+-
+-#endif  // ENABLE_I2C_APML
+-
+ &espi_ctrl {
+ 	status = "okay";
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts
+new file mode 100644
+index 000000000000..2505124d0a2d
+--- /dev/null
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts
+@@ -0,0 +1,896 @@
++// SPDX-License-Identifier: GPL-2.0
++// Copyright (c) 2021 - 2022 AMD Inc.
++// Author: Vinu Vaghasia <vvaghasi@amd.com>
++// Author: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
++
++/dts-v1/;
++
++#include "aspeed-g6.dtsi"
++#include "dt-bindings/gpio/aspeed-gpio.h"
++
++/ {
++	model = "AMD Ruby BMC";
++	compatible = "amd,ruby-bmc", "aspeed,ast2600";
++
++	aliases {
++		serial4 = &uart5;
++		ethernet0 = &mac3;
++		ethernet1 = &mac2;
++	};
++
++	chosen {
++		stdout-path = &uart5;
++		bootargs = "console=ttyS4,115200 earlycon vmalloc=512MB";
++	};
++
++	leds {
++		compatible = "gpio-leds";
++
++		fault {
++			gpios = <&gpio0 ASPEED_GPIO(O, 6) GPIO_ACTIVE_HIGH>;
++		};
++
++		identify {
++			gpios = <&gpio0 ASPEED_GPIO(O, 7) GPIO_ACTIVE_HIGH>;
++		};
++	};
++
++	memory@80000000 {
++		device_type = "memory";
++		reg = <0x80000000 0x80000000>;
++	};
++
++	reserved-memory {
++		#address-cells = <1>;
++		#size-cells = <1>;
++		ranges;
++
++		video_engine_memory: jpegbuffer {
++			size = <0x02000000>;	/* 32M */
++			alignment = <0x01000000>;
++			compatible = "shared-dma-pool";
++			reusable;
++		};
++
++		pcc_memory: pccbuffer {
++			no-map;
++			reg = <0xE0000000 0x00001000>; /* 4K */
++		};
++	};
++
++	iio-hwmon-adc121c {
++		compatible = "iio-hwmon";
++		oemname0 = "ADC121C_50";
++		oemname1 = "ADC121C_51";
++		oemname2 = "ADC121C_52";
++		oemname4 = "ADC121C_54";
++		oemname5 = "ADC121C_55";
++		oemname6 = "ADC121C_56";
++		io-channels = <&adc0 0>, <&adc1 0>, <&adc2 0>,
++					  <&adc4 0>, <&adc5 0>, <&adc6 0>;
++	};
++};
++
++&mctp0 {
++	status	= "okay";
++};
++
++&mdio0 {
++	status = "okay";
++
++	ethphy0: ethernet-phy@0 {
++		compatible = "ethernet-phy-ieee802.3-c22";
++		reg = <0>;
++	};
++};
++
++&mac2 {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_rmii3_default>;
++	clock-names = "MACCLK",	"RCLK";
++	use-ncsi;
++};
++
++&mac3 {
++	status = "okay";
++	phy-mode = "rgmii";
++	phy-handle = <&ethphy0>;
++
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_rgmii4_default>;
++};
++
++&fmc {
++	status = "okay";
++	fmc-spi-user-mode;
++	flash@0 {
++		compatible = "jedec,spi-nor";
++		status = "okay";
++		label = "bmc";
++		spi-tx-bus-width = <4>;
++		spi-rx-bus-width = <4>;
++		#include "openbmc-flash-layout-128.dtsi"
++	};
++};
++
++&spi1 {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_spi1_default &pinctrl_qspi1_default>;
++	fmc-spi-user-mode;
++	compatible = "aspeed,ast2600-spi";
++
++	flash@0 {
++		compatible = "jedec,spi-nor";
++		label = "pnor";
++		status = "okay";
++	};
++
++};
++
++&spi2 {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_spi2_default &pinctrl_qspi2_default>;
++	fmc-spi-user-mode;
++	compatible = "aspeed,ast2600-spi";
++
++	flash@0 {
++		compatible = "jedec,spi-nor";
++		label = "pnor";
++		status = "okay";
++	};
++
++};
++
++#ifdef HOST_SERIAL_ESPI_VUART
++// eSPI Virtual UART - 0x3F8
++&vuart1 {
++	status = "okay";
++};
++#else
++// Host Serial console
++&uart1 {
++	compatible = "aspeed,ast2600-uart";
++	/delete-property/ reg-shift;
++	/delete-property/ reg-io-width;
++	dma-mode;
++	dma-channel = <0>;
++	status = "okay";
++};
++#endif
++
++// BMC Serial Console
++&uart5 {
++	status = "okay";
++};
++
++// HPM FPGA
++&i2c0 {
++	//Net name i2c9 - MB FPGA slave
++	status = "okay";
++};
++
++// Post Code LCD
++&i2c1 {
++	//Net name i2c12 - Ruby side
++	status = "okay";
++#ifdef OPENBMC_LCD_DRIVER
++	i2cswitch@70 {
++		compatible = "nxp,pca9548";
++		reg = <0x70>;
++		//<TBD> Define LCD details here
++	};
++#endif //OPENBMC_LCD_DRIVER
++};
++
++// Misc Regulators
++&i2c4 {
++	// Net name i2c1
++	status = "okay";
++};
++
++// HPM CPU VRs
++&i2c5 {
++	// Net name i2c2 (SCM_I2C2)
++	status = "okay";
++
++	i2cswitch@70 {
++		compatible = "nxp,pca9548";
++		reg = <0x70>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		i2c@0 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0>;
++
++			vddcr_core0_soc@61 {
++				//VDD core0 soc
++				compatible = "isil,isl68137";
++				reg = <0x61>;
++			};
++
++			vddcr_core1_11@62 {
++				//VDD 11
++				compatible = "isil,isl68137";
++				reg = <0x62>;
++			};
++
++			vddcr_vddio_33@63 {
++				//VDD 11 sus
++				compatible = "isil,isl68137";
++				reg = <0x63>;
++			};
++		};
++
++	};
++};
++
++// HPM Board ID
++&i2c7 {
++	// Net name i2c4
++	status = "okay";
++
++	mbeeprom@50 {
++		compatible = "microchip,24lc256","atmel,24c256";
++		reg = <0x50>;
++	};
++};
++
++// PSUs
++&i2c8 {
++	// Net name i2c5
++	status = "okay";
++};
++
++// Fan, Temp, ADC sensors
++&i2c9 {
++	// Net name i2c6
++	status = "okay";
++
++	i2cswitch@70 {
++		compatible = "nxp,pca9548";
++		reg = <0x70>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		//  port 0 connected to fan controllers which controls 5 fans each
++		i2c@0 {
++			reg = <0>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			emc2305@4d {
++				compatible = "smsc,emc2305";
++				reg = <0x4d>;
++				#cooling-cells = <0x02>;
++
++				fan@0 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@1 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@2 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++
++				fan@3 {
++					min-rpm = /bits/ 16 <1000>;
++					max-rpm = /bits/ 16 <16000>;
++				};
++			};
++		};
++
++		i2c@5 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <5>;
++
++			lm75a@48 {
++				compatible = "national,lm75a";
++				reg = <0x48>;
++			};
++
++			lm75a@49 {
++				compatible = "national,lm75a";
++				reg = <0x49>;
++			};
++
++			lm75a@4a {
++				compatible = "national,lm75a";
++				reg = <0x4a>;
++			};
++
++			lm75a@4b {
++				compatible = "national,lm75a";
++				reg = <0x4b>;
++			};
++
++			lm75a@4c {
++				compatible = "national,lm75a";
++				reg = <0x4c>;
++			};
++
++			lm75a@4d {
++				compatible = "national,lm75a";
++				reg = <0x4d>;
++			};
++
++			lm75a@4e {
++				compatible = "national,lm75a";
++				reg = <0x4e>;
++			};
++
++			lm75a@4f {
++				compatible = "national,lm75a";
++				reg = <0x4f>;
++			};
++		};
++
++		i2c@6 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <6>;
++
++			adc0: adc121c_50@50 {
++				compatible = "ti,adc121c";
++				reg = <0x50>;
++				#io-channel-cells = <1>;
++				label = "adc121c_50";
++			};
++			adc1: adc121c_51@51 {
++				compatible = "ti,adc121c";
++				reg = <0x51>;
++				#io-channel-cells = <1>;
++				label = "adc121c_51";
++			};
++			adc2: adc121c_52@52 {
++				compatible = "ti,adc121c";
++				reg = <0x52>;
++				#io-channel-cells = <1>;
++				label = "adc121c_52";
++			};
++			adc4: adc121c_54@54 {
++				compatible = "ti,adc121c";
++				reg = <0x54>;
++				#io-channel-cells = <1>;
++				label = "adc121c_54";
++			};
++			adc5: adc121c_55@55 {
++				compatible = "ti,adc121c";
++				reg = <0x55>;
++				#io-channel-cells = <1>;
++				label = "adc121c_55";
++			};
++			adc6: adc121c_56@56 {
++				compatible = "ti,adc121c";
++				reg = <0x56>;
++				#io-channel-cells = <1>;
++				label = "adc121c_56";
++			};
++		};
++	};
++};
++
++// Ruby brd_id
++&i2c10 {
++	// Net name i2c7
++	status = "okay";
++#ifdef EEPROM_PROG_ENABLE
++	// UBM
++	i2cswitch@70 {
++		compatible = "nxp,pca9548";
++		reg = <0x70>;
++
++	};
++
++	// SCM brd_id, Ruby brd_id, CLK
++	i2cswitch@71 {
++		compatible = "nxp,pca9548";
++		reg = <0x71>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		i2c@0 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0>;
++			// BRD ID eeprom
++			brdreveeprom@50 {
++				compatible = "microchip,24lc256","atmel,24c256";
++				reg = <0x50>;
++			};
++			// SCM BRD ID eeprom
++			scmbrdeeprom@51 {
++				compatible = "microchip,24lc256","atmel,24c256";
++				reg = <0x51>;
++			};
++		};
++	};
++#endif
++};
++
++// BCM5720 LOM
++&i2c11 {
++	// Net name i2c8
++	status = "okay";
++};
++
++// LOCAL MGMT - FPGA slave
++&i2c12 {
++	status = "okay";
++};
++
++// LOCAL MGMT - EEPROM, RTC
++&i2c14 {
++	status = "okay";
++
++	bmceeprom@50 {
++		compatible = "microchip,24lc512","atmel,24c512";
++		reg = <0x50>;
++	};
++};
++
++// ROT
++&i2c15 {
++	status = "okay";
++};
++
++// i3c
++
++&i3c0 {
++	// P0 DIMM (A-F) SPD Access
++	status = "okay";
++
++	jdec-spd;
++	bus_id = <0x00>;
++
++	//DIMM A
++	spd5118_0_0: spd@50,3C000000000 {
++		reg = <0x50 0x3C0 0x00000000>;
++		assigned-address = <0x50>;
++	};
++	pmic5xxx_0_0: pmic@48,20400000000 {
++		reg = <0x48 0x204 0x00000000>;
++		assigned-address = <0x48>;
++	};
++	rcd_0_0: rcd@58,2C000000000 {
++		reg = <0x58 0x2C0 0x00000000>;
++		assigned-address = <0x58>;
++	};
++	//DIMM B
++	spd5118_0_1: spd@51,3C000000001 {
++		reg = <0x51 0x3C0 0x00000001>;
++		assigned-address = <0x51>;
++	};
++	pmic5xxx_0_1: pmic@49,20400000001 {
++		reg = <0x49 0x204 0x00000001>;
++		assigned-address = <0x49>;
++	};
++	rcd_0_1: rcd@59,2C000000001 {
++		reg = <0x59 0x2C0 0x00000001>;
++		assigned-address = <0x59>;
++	};
++	//DIMM C
++	spd5118_0_2: spd@52,3C000000002 {
++		reg = <0x52 0x3C0 0x00000002>;
++		assigned-address = <0x52>;
++	};
++	pmic5xxx_0_2: pmic@4a,20400000002 {
++		reg = <0x4a 0x204 0x00000002>;
++		assigned-address = <0x4a>;
++	};
++	rcd_0_2: rcd@5a,2C000000002 {
++		reg = <0x5a 0x2C0 0x00000002>;
++		assigned-address = <0x5a>;
++	};
++	//DIMM D
++	spd5118_0_3: spd@53,3C000000003 {
++		reg = <0x53 0x3C0 0x00000003>;
++		assigned-address = <0x53>;
++	};
++	pmic5xxx_0_3: pmic@4b,20400000003 {
++		reg = <0x4b 0x204 0x00000003>;
++		assigned-address = <0x4b>;
++	};
++	rcd_0_3: rcd@5b,2C000000003 {
++		reg = <0x5b 0x2C0 0x00000003>;
++		assigned-address = <0x5b>;
++	};
++	//DIMM E
++	spd5118_0_4: spd@54,3C000000004 {
++		reg = <0x54 0x3C0 0x00000004>;
++		assigned-address = <0x54>;
++	};
++	pmic5xxx_0_4: pmic@4c,20400000004 {
++		reg = <0x4c 0x204 0x00000004>;
++		assigned-address = <0x4c>;
++	};
++	rcd_0_4: rcd@5c,2C000000004 {
++		reg = <0x5c 0x2C0 0x00000004>;
++		assigned-address = <0x5c>;
++	};
++	//DIMM F
++	spd5118_0_5: spd@55,3C000000005 {
++		reg = <0x55 0x3C0 0x00000005>;
++		assigned-address = <0x55>;
++	};
++	pmic5xxx_0_5: pmic@4d,20400000005 {
++		reg = <0x4d 0x204 0x00000005>;
++		assigned-address = <0x4d>;
++	};
++	rcd_0_5: rcd@5d,2C000000005 {
++		reg = <0x5d 0x2C0 0x00000005>;
++		assigned-address = <0x5d>;
++	};
++};
++
++&i3c1 {
++	// P0 DIMM (G-L) SPD Access
++	status = "okay";
++
++	jdec-spd;
++	bus_id = <0x01>;
++
++	//DIMM G
++	spd5118_1_0: spd@50,3C000000000 {
++		reg = <0x50 0x3C0 0x00000000>;
++		assigned-address = <0x50>;
++	};
++	pmic5xxx_1_0: pmic@48,20400000000 {
++		reg = <0x48 0x204 0x00000000>;
++		assigned-address = <0x48>;
++	};
++	rcd_1_0: rcd@58,2C000000000 {
++		reg = <0x58 0x2C0 0x00000000>;
++		assigned-address = <0x58>;
++	};
++	//DIMM H
++	spd5118_1_1: spd@51,3C000000001 {
++		reg = <0x51 0x3C0 0x00000001>;
++		assigned-address = <0x51>;
++	};
++	pmic5xxx_1_1: pmic@49,20400000001 {
++		reg = <0x49 0x204 0x00000001>;
++		assigned-address = <0x49>;
++	};
++	rcd_1_1: rcd@59,2C000000001 {
++		reg = <0x59 0x2C0 0x00000001>;
++		assigned-address = <0x59>;
++	};
++	//DIMM I
++	spd5118_1_2: spd@52,3C000000002 {
++		reg = <0x52 0x3C0 0x00000002>;
++		assigned-address = <0x52>;
++	};
++	pmic5xxx_1_2: pmic@4a,20400000002 {
++		reg = <0x4a 0x204 0x00000002>;
++		assigned-address = <0x4a>;
++	};
++	rcd_1_2: rcd@5a,2C000000002 {
++		reg = <0x5a 0x2C0 0x00000002>;
++		assigned-address = <0x5a>;
++	};
++	//DIMM J
++	spd5118_1_3: spd@53,3C000000003 {
++		reg = <0x53 0x3C0 0x00000003>;
++		assigned-address = <0x53>;
++	};
++	pmic5xxx_1_3: pmic@4b,20400000003 {
++		reg = <0x4b 0x204 0x00000003>;
++		assigned-address = <0x4b>;
++	};
++	rcd_1_3: rcd@5b,2C000000003 {
++		reg = <0x5b 0x2C0 0x00000003>;
++		assigned-address = <0x5b>;
++	};
++	//DIMM K
++	spd5118_1_4: spd@54,3C000000004 {
++		reg = <0x54 0x3C0 0x00000004>;
++		assigned-address = <0x54>;
++	};
++	pmic5xxx_1_4: pmic@4c,20400000004 {
++		reg = <0x4c 0x204 0x00000004>;
++		assigned-address = <0x4c>;
++	};
++	rcd_1_4: rcd@5c,2C000000004 {
++		reg = <0x5c 0x2C0 0x00000004>;
++		assigned-address = <0x5c>;
++	};
++	//DIMM L
++	spd5118_1_5: spd@55,3C000000005 {
++		reg = <0x55 0x3C0 0x00000005>;
++		assigned-address = <0x55>;
++	};
++	pmic5xxx_1_5: pmic@4d,20400000005 {
++		reg = <0x4d 0x204 0x00000005>;
++		assigned-address = <0x4d>;
++	};
++	rcd_1_5: rcd@5d,2C000000005 {
++		reg = <0x5d 0x2C0 0x00000005>;
++		assigned-address = <0x5d>;
++	};
++};
++&i3c2 {
++        // P1 DIMM (A-F) SPD Access
++        status = "okay";
++
++        jdec-spd;
++        bus_id = <0x02>;
++
++        //DIMM A
++        spd5118_2_0: spd@50,3C000000000 {
++                reg = <0x50 0x3C0 0x00000000>;
++                assigned-address = <0x50>;
++        };
++        pmic5xxx_2_0: pmic@48,20400000000 {
++                reg = <0x48 0x204 0x00000000>;
++                assigned-address = <0x48>;
++        };
++        rcd_2_0: rcd@58,2C000000000 {
++                reg = <0x58 0x2C0 0x00000000>;
++                assigned-address = <0x58>;
++        };
++        //DIMM B
++        spd5118_2_1: spd@51,3C000000001 {
++                reg = <0x51 0x3C0 0x00000001>;
++                assigned-address = <0x51>;
++        };
++        pmic5xxx_2_1: pmic@49,20400000001 {
++                reg = <0x49 0x204 0x00000001>;
++                assigned-address = <0x49>;
++        };
++        rcd_2_1: rcd@59,2C000000001 {
++                reg = <0x59 0x2C0 0x00000001>;
++                assigned-address = <0x59>;
++        };
++        //DIMM C
++        spd5118_2_2: spd@52,3C000000002 {
++                reg = <0x52 0x3C0 0x00000002>;
++                assigned-address = <0x52>;
++        };
++        pmic5xxx_2_2: pmic@4a,20400000002 {
++                reg = <0x4a 0x204 0x00000002>;
++                assigned-address = <0x4a>;
++        };
++        rcd_2_2: rcd@5a,2C000000002 {
++                reg = <0x5a 0x2C0 0x00000002>;
++                assigned-address = <0x5a>;
++        };
++        //DIMM D
++        spd5118_2_3: spd@53,3C000000003 {
++                reg = <0x53 0x3C0 0x00000003>;
++                assigned-address = <0x53>;
++        };
++        pmic5xxx_2_3: pmic@4b,20400000003 {
++                reg = <0x4b 0x204 0x00000003>;
++                assigned-address = <0x4b>;
++        };
++        rcd_2_3: rcd@5b,2C000000003 {
++                reg = <0x5b 0x2C0 0x00000003>;
++                assigned-address = <0x5b>;
++        };
++        //DIMM E
++        spd5118_2_4: spd@54,3C000000004 {
++                reg = <0x54 0x3C0 0x00000004>;
++                assigned-address = <0x54>;
++        };
++        pmic5xxx_2_4: pmic@4c,20400000004 {
++                reg = <0x4c 0x204 0x00000004>;
++                assigned-address = <0x4c>;
++        };
++        rcd_2_4: rcd@5c,2C000000004 {
++                reg = <0x5c 0x2C0 0x00000004>;
++                assigned-address = <0x5c>;
++        };
++        //DIMM F
++        spd5118_2_5: spd@55,3C000000005 {
++                reg = <0x55 0x3C0 0x00000005>;
++                assigned-address = <0x55>;
++        };
++        pmic5xxx_2_5: pmic@4d,20400000005 {
++                reg = <0x4d 0x204 0x00000005>;
++                assigned-address = <0x4d>;
++        };
++        rcd_2_5: rcd@5d,2C000000005 {
++                reg = <0x5d 0x2C0 0x00000005>;
++                assigned-address = <0x5d>;
++        };
++};
++
++&i3c3 {
++        // P1 DIMM (G-L) SPD Access
++        status = "okay";
++
++        jdec-spd;
++        bus_id = <0x03>;
++
++        //DIMM G
++        spd5118_3_0: spd@50,3C000000000 {
++                reg = <0x50 0x3C0 0x00000000>;
++                assigned-address = <0x50>;
++        };
++        pmic5xxx_3_0: pmic@48,20400000000 {
++                reg = <0x48 0x204 0x00000000>;
++                assigned-address = <0x48>;
++        };
++        rcd_3_0: rcd@58,2C000000000 {
++                reg = <0x58 0x2C0 0x00000000>;
++                assigned-address = <0x58>;
++        };
++        //DIMM H
++        spd5118_3_1: spd@51,3C000000001 {
++                reg = <0x51 0x3C0 0x00000001>;
++                assigned-address = <0x51>;
++        };
++        pmic5xxx_3_1: pmic@49,20400000001 {
++                reg = <0x49 0x204 0x00000001>;
++                assigned-address = <0x49>;
++        };
++        rcd_3_1: rcd@59,2C000000001 {
++                reg = <0x59 0x2C0 0x00000001>;
++                assigned-address = <0x59>;
++        };
++        //DIMM I
++        spd5118_3_2: spd@52,3C000000002 {
++                reg = <0x52 0x3C0 0x00000002>;
++                assigned-address = <0x52>;
++        };
++        pmic5xxx_3_2: pmic@4a,20400000002 {
++                reg = <0x4a 0x204 0x00000002>;
++                assigned-address = <0x4a>;
++        };
++        rcd_3_2: rcd@5a,2C000000002 {
++                reg = <0x5a 0x2C0 0x00000002>;
++                assigned-address = <0x5a>;
++        };
++        //DIMM J
++        spd5118_3_3: spd@53,3C000000003 {
++                reg = <0x53 0x3C0 0x00000003>;
++                assigned-address = <0x53>;
++        };
++        pmic5xxx_3_3: pmic@4b,20400000003 {
++                reg = <0x4b 0x204 0x00000003>;
++                assigned-address = <0x4b>;
++        };
++        rcd_3_3: rcd@5b,2C000000003 {
++                reg = <0x5b 0x2C0 0x00000003>;
++                assigned-address = <0x5b>;
++        };
++        //DIMM K
++        spd5118_3_4: spd@54,3C000000004 {
++                reg = <0x54 0x3C0 0x00000004>;
++                assigned-address = <0x54>;
++        };
++        pmic5xxx_3_4: pmic@4c,20400000004 {
++                reg = <0x4c 0x204 0x00000004>;
++                assigned-address = <0x4c>;
++        };
++        rcd_3_4: rcd@5c,2C000000004 {
++                reg = <0x5c 0x2C0 0x00000004>;
++                assigned-address = <0x5c>;
++        };
++        //DIMM L
++        spd5118_3_5: spd@55,3C000000005 {
++                reg = <0x55 0x3C0 0x00000005>;
++                assigned-address = <0x55>;
++        };
++        pmic5xxx_3_5: pmic@4d,20400000005 {
++                reg = <0x4d 0x204 0x00000005>;
++                assigned-address = <0x4d>;
++        };
++        rcd_3_5: rcd@5d,2C000000005 {
++                reg = <0x5d 0x2C0 0x00000005>;
++                assigned-address = <0x5d>;
++        };
++};
++
++&i3c4 {
++	// P0 APML
++	status = "okay";
++
++	jdec-spd;
++	set_dasa;
++	bus_id = <0x04>;
++
++	imx3112_p0: i3cmux@70,4CC00000000 {
++		reg = <0x70 0x4CC 0x00000000>;
++		assigned-address = <0x70>;
++	};
++	sbtsi_p0_0: sbtsi@4c,22400000001 {
++		reg = <0x4c 0x224 0x00000001>;
++		assigned-address = <0x4c>;
++	};
++	sbrmi_p0_1: sbrmi@3c,22400000002 {
++		reg = <0x3c 0x224 0x00000002>;
++		assigned-address = <0x3c>;
++	};
++};
++
++&espi_ctrl {
++	status = "okay";
++
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_espi_default &pinctrl_espialt_default>;
++
++	perif,dma-mode;
++};
++
++&espi_mmbi {
++	status = "okay";
++};
++
++&gpio0 {
++	gpio-line-names =
++	/*A0-A7*/	"","","","","","","","",
++	/*B0-B7*/	"","","","","MON_POST_COMPLETE","","","",
++	/*C0-C7*/	"","","","","","","","",
++	/*D0-D7*/	"","","","","","","","",
++	/*E0-E7*/	"","","","","","","","",
++	/*F0-F7*/	"","","","","","","","",
++	/*G0-G7*/	"","","","","","","","",
++	/*H0-H7*/	"","ASSERT_WARM_RST_BTN_L","ASSERT_SOC_RST_BTN_L","","","","","",
++	/*I0-I7*/	"","","","","","","","P0_I3C_APML_ALERT_L",
++	/*J0-J7*/	"","","","","","","","",
++	/*K0-K7*/	"","","","","","","","",
++	/*L0-L7*/	"","","","","","","","",
++	/*M0-M7*/	"","","","","","","","",
++	/*N0-N7*/	"","","","","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
++	/*O0-O7*/	"","","HDT_SEL","HDT_XTRIG5","HDT_XTRIG6","JTAG_TRST_N","","",
++	/*P0-P7*/	"MON_RST_BTN_L","ASSERT_RST_BTN_L","MON_PWR_BTN_L","ASSERT_PWR_BTN_L","HPM_FPGA_LOCKOUT","ASSERT_NMI_BTN_L","MON_PWR_GOOD","",
++	/*Q0-Q7*/	"","","HDT_DBREQ_L","","BIOS_SPD_MUX_CTRL_RELEASED_L","","","",
++	/*R0-R7*/	"","","","","","","","",
++	/*S0-S7*/	"","","","","","","P0_DIMM_AF_ERROR","P0_DIMM_GL_ERROR",
++	/*T0-T7*/	"","","","","","","","",
++	/*U0-U7*/	"","","","","","","","",
++	/*V0-V7*/	"","","","","","","","",
++	/*W0-W7*/	"","","","","","","","",
++	/*X0-X7*/	"","","","","","","","",
++	/*Y0-Y7*/	"","","","","","","","",
++	/*Z0-Z7*/	"","","","","","","","";
++};
++
++&jtag1 {
++	status = "okay";
++};
++
++&video {
++	status = "okay";
++	memory-region = <&video_engine_memory>;
++};
++
++&vhub {
++	status = "okay";
++};
++
++&lpc_ctrl {
++	status = "okay";
++};
++
++&lpc_pcc {
++	port-addr = <0x80>;
++	dma-mode;
++	memory-region = <&pcc_memory>;
++	rec-mode = <0x1>;
++	port-addr-hbits-select = <0x1>;
++	port-addr-xbits = <0x3>;
++	status = "okay";
++};
++
++&kcs3 {
++	status = "okay";
++	aspeed,lpc-io-reg = <0xCA2>;
++};
++
++&uart_routing {
++	status = "okay";
++};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+index 0ab165172a7e..d88ae4644582 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+@@ -794,8 +794,6 @@ rcd_3_5: rcd@5d,2C000000005 {
+         };
+ };
+
+-#ifdef ENABLE_I2C_APML
+-
+ &i2c2 {
+ 	// P0 APML - i2c10
+ 	status = "okay";
+@@ -812,32 +810,6 @@ sbtsi@4c {
+ 	};
+ };
+
+-#else
+-
+-&i3c4 {
+-	// P0 APML
+-	status = "okay";
+-
+-	jdec-spd;
+-	set_dasa;
+-	bus_id = <0x04>;
+-
+-	imx3112_p0: i3cmux@70,4CC00000000 {
+-		reg = <0x70 0x4CC 0x00000000>;
+-		assigned-address = <0x70>;
+-	};
+-	sbtsi_p0_0: sbtsi@4c,22400000001 {
+-		reg = <0x4c 0x224 0x00000001>;
+-		assigned-address = <0x4c>;
+-	};
+-	sbrmi_p0_1: sbrmi@3c,22400000002 {
+-		reg = <0x3c 0x224 0x00000002>;
+-		assigned-address = <0x3c>;
+-	};
+-};
+-
+-#endif  // OPENBMC_I2C_ENABLE
+-
+ &espi_ctrl {
+ 	status = "okay";
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-titanite-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-titanite-i3c.dts
+new file mode 100644
+index 000000000000..6fbc2dcfcf11
+--- /dev/null
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-titanite-i3c.dts
+@@ -0,0 +1,935 @@
++// SPDX-License-Identifier: GPL-2.0
++// Copyright (c) 2021 - 2022 AMD Inc.
++// Author: Vinu Vaghasia <vvaghasi@amd.com>
++// Author: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
++
++/dts-v1/;
++
++#include "aspeed-g6.dtsi"
++#include "dt-bindings/gpio/aspeed-gpio.h"
++
++/ {
++	model = "AMD Titanite BMC";
++	compatible = "amd,Titanite-bmc", "aspeed,ast2600";
++
++	aliases {
++		serial4 = &uart5;
++		ethernet0 = &mac3;
++		ethernet1 = &mac2;
++	};
++
++	chosen {
++		stdout-path = &uart5;
++		bootargs = "console=ttyS4,115200 earlycon vmalloc=512MB";
++	};
++
++	leds {
++		compatible = "gpio-leds";
++
++		fault {
++			gpios = <&gpio0 ASPEED_GPIO(O, 6) GPIO_ACTIVE_HIGH>;
++		};
++
++		identify {
++			gpios = <&gpio0 ASPEED_GPIO(O, 7) GPIO_ACTIVE_HIGH>;
++		};
++	};
++
++	memory@80000000 {
++		device_type = "memory";
++		reg = <0x80000000 0x80000000>;
++	};
++
++	reserved-memory {
++		#address-cells = <1>;
++		#size-cells = <1>;
++		ranges;
++
++		video_engine_memory: jpegbuffer {
++			size = <0x02000000>;	/* 32M */
++			alignment = <0x01000000>;
++			compatible = "shared-dma-pool";
++			reusable;
++		};
++
++		pcc_memory: pccbuffer {
++			no-map;
++			reg = <0xE0000000 0x00001000>; /* 4K */
++		};
++	};
++
++	iio-hwmon-adc121c {
++		compatible = "iio-hwmon";
++		oemname0 = "FPGA_VDD_CORE";
++		oemname1 = "FPGA_VDD_18";
++		oemname2 = "FPGA_VDD_33";
++		oemname3 = "LOM_VDD_33";
++		oemname4 = "LOM_VDD_12";
++		oemname5 = "VDD_12_DUAL";
++		io-channels = <&adc0 0>, <&adc1 0>, <&adc2 0>, <&adc4 0>, <&adc5 0>;
++	};
++};
++
++&mctp0 {
++	status	= "okay";
++};
++
++&mdio0 {
++	status = "okay";
++
++	ethphy0: ethernet-phy@0 {
++		compatible = "ethernet-phy-ieee802.3-c22";
++		reg = <0>;
++	};
++};
++
++&mac2 {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_rmii3_default>;
++	clock-names = "MACCLK",	"RCLK";
++	use-ncsi;
++};
++
++&mac3 {
++	status = "okay";
++	phy-mode = "rgmii";
++	phy-handle = <&ethphy0>;
++
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_rgmii4_default>;
++};
++
++&fmc {
++	status = "okay";
++	fmc-spi-user-mode;
++	flash@0 {
++		compatible = "jedec,spi-nor";
++		status = "okay";
++		label = "bmc";
++		spi-tx-bus-width = <4>;
++		spi-rx-bus-width = <4>;
++		#include "openbmc-flash-layout-128.dtsi"
++	};
++};
++
++&spi1 {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_spi1_default &pinctrl_qspi1_default>;
++	fmc-spi-user-mode;
++	compatible = "aspeed,ast2600-spi";
++
++	flash@0 {
++		compatible = "jedec,spi-nor";
++		label = "pnor";
++		status = "okay";
++	};
++
++};
++
++&spi2 {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_spi2_default &pinctrl_qspi2_default>;
++	fmc-spi-user-mode;
++	compatible = "aspeed,ast2600-spi";
++
++	flash@0 {
++		compatible = "jedec,spi-nor";
++		label = "pnor";
++		status = "okay";
++	};
++
++};
++
++#ifdef HOST_SERIAL_ESPI_VUART
++// eSPI Virtual UART - 0x3F8
++&vuart1 {
++	status = "okay";
++};
++#else
++// Host Serial console
++&uart1 {
++	compatible = "aspeed,ast2600-uart";
++	/delete-property/ reg-shift;
++	/delete-property/ reg-io-width;
++	dma-mode;
++	dma-channel = <0>;
++	status = "okay";
++};
++#endif
++
++// BMC Serial Console
++&uart5 {
++	status = "okay";
++};
++
++// HPM FPGA
++&i2c0 {
++	//Net name i2c9 - MB FPGA slave
++	status = "okay";
++};
++
++// Post Code LCD
++&i2c1 {
++	//Net name i2c12 - Titanite side
++	status = "okay";
++
++		//<TBD> Define LCD details here
++};
++
++// i3c
++
++&i3c0 {
++	// P0 DIMM (A-F) SPD Access
++	status = "okay";
++
++	jdec-spd;
++	bus_id = <0x00>;
++
++	//DIMM A
++	spd5118_0_0: spd@50,3C000000000 {
++		reg = <0x50 0x3C0 0x00000000>;
++		assigned-address = <0x50>;
++	};
++	pmic5xxx_0_0: pmic@48,20400000000 {
++		reg = <0x48 0x204 0x00000000>;
++		assigned-address = <0x48>;
++	};
++	rcd_0_0: rcd@58,2C000000000 {
++		reg = <0x58 0x2C0 0x00000000>;
++		assigned-address = <0x58>;
++	};
++	//DIMM B
++	spd5118_0_1: spd@51,3C000000001 {
++		reg = <0x51 0x3C0 0x00000001>;
++		assigned-address = <0x51>;
++	};
++	pmic5xxx_0_1: pmic@49,20400000001 {
++		reg = <0x49 0x204 0x00000001>;
++		assigned-address = <0x49>;
++	};
++	rcd_0_1: rcd@59,2C000000001 {
++		reg = <0x59 0x2C0 0x00000001>;
++		assigned-address = <0x59>;
++	};
++	//DIMM C
++	spd5118_0_2: spd@52,3C000000002 {
++		reg = <0x52 0x3C0 0x00000002>;
++		assigned-address = <0x52>;
++	};
++	pmic5xxx_0_2: pmic@4a,20400000002 {
++		reg = <0x4a 0x204 0x00000002>;
++		assigned-address = <0x4a>;
++	};
++	rcd_0_2: rcd@5a,2C000000002 {
++		reg = <0x5a 0x2C0 0x00000002>;
++		assigned-address = <0x5a>;
++	};
++	//DIMM D
++	spd5118_0_3: spd@53,3C000000003 {
++		reg = <0x53 0x3C0 0x00000003>;
++		assigned-address = <0x53>;
++	};
++	pmic5xxx_0_3: pmic@4b,20400000003 {
++		reg = <0x4b 0x204 0x00000003>;
++		assigned-address = <0x4b>;
++	};
++	rcd_0_3: rcd@5b,2C000000003 {
++		reg = <0x5b 0x2C0 0x00000003>;
++		assigned-address = <0x5b>;
++	};
++	//DIMM E
++	spd5118_0_4: spd@54,3C000000004 {
++		reg = <0x54 0x3C0 0x00000004>;
++		assigned-address = <0x54>;
++	};
++	pmic5xxx_0_4: pmic@4c,20400000004 {
++		reg = <0x4c 0x204 0x00000004>;
++		assigned-address = <0x4c>;
++	};
++	rcd_0_4: rcd@5c,2C000000004 {
++		reg = <0x5c 0x2C0 0x00000004>;
++		assigned-address = <0x5c>;
++	};
++	//DIMM F
++	spd5118_0_5: spd@55,3C000000005 {
++		reg = <0x55 0x3C0 0x00000005>;
++		assigned-address = <0x55>;
++	};
++	pmic5xxx_0_5: pmic@4d,20400000005 {
++		reg = <0x4d 0x204 0x00000005>;
++		assigned-address = <0x4d>;
++	};
++	rcd_0_5: rcd@5d,2C000000005 {
++		reg = <0x5d 0x2C0 0x00000005>;
++		assigned-address = <0x5d>;
++	};
++};
++
++&i3c1 {
++	// P0 DIMM (G-L) SPD Access
++	status = "okay";
++
++	jdec-spd;
++	bus_id = <0x01>;
++
++	//DIMM G
++	spd5118_1_0: spd@50,3C000000000 {
++		reg = <0x50 0x3C0 0x00000000>;
++		assigned-address = <0x50>;
++	};
++	pmic5xxx_1_0: pmic@48,20400000000 {
++		reg = <0x48 0x204 0x00000000>;
++		assigned-address = <0x48>;
++	};
++	rcd_1_0: rcd@58,2C000000000 {
++		reg = <0x58 0x2C0 0x00000000>;
++		assigned-address = <0x58>;
++	};
++	//DIMM H
++	spd5118_1_1: spd@51,3C000000001 {
++		reg = <0x51 0x3C0 0x00000001>;
++		assigned-address = <0x51>;
++	};
++	pmic5xxx_1_1: pmic@49,20400000001 {
++		reg = <0x49 0x204 0x00000001>;
++		assigned-address = <0x49>;
++	};
++	rcd_1_1: rcd@59,2C000000001 {
++		reg = <0x59 0x2C0 0x00000001>;
++		assigned-address = <0x59>;
++	};
++	//DIMM I
++	spd5118_1_2: spd@52,3C000000002 {
++		reg = <0x52 0x3C0 0x00000002>;
++		assigned-address = <0x52>;
++	};
++	pmic5xxx_1_2: pmic@4a,20400000002 {
++		reg = <0x4a 0x204 0x00000002>;
++		assigned-address = <0x4a>;
++	};
++	rcd_1_2: rcd@5a,2C000000002 {
++		reg = <0x5a 0x2C0 0x00000002>;
++		assigned-address = <0x5a>;
++	};
++	//DIMM J
++	spd5118_1_3: spd@53,3C000000003 {
++		reg = <0x53 0x3C0 0x00000003>;
++		assigned-address = <0x53>;
++	};
++	pmic5xxx_1_3: pmic@4b,20400000003 {
++		reg = <0x4b 0x204 0x00000003>;
++		assigned-address = <0x4b>;
++	};
++	rcd_1_3: rcd@5b,2C000000003 {
++		reg = <0x5b 0x2C0 0x00000003>;
++		assigned-address = <0x5b>;
++	};
++	//DIMM K
++	spd5118_1_4: spd@54,3C000000004 {
++		reg = <0x54 0x3C0 0x00000004>;
++		assigned-address = <0x54>;
++	};
++	pmic5xxx_1_4: pmic@4c,20400000004 {
++		reg = <0x4c 0x204 0x00000004>;
++		assigned-address = <0x4c>;
++	};
++	rcd_1_4: rcd@5c,2C000000004 {
++		reg = <0x5c 0x2C0 0x00000004>;
++		assigned-address = <0x5c>;
++	};
++	//DIMM L
++	spd5118_1_5: spd@55,3C000000005 {
++		reg = <0x55 0x3C0 0x00000005>;
++		assigned-address = <0x55>;
++	};
++	pmic5xxx_1_5: pmic@4d,20400000005 {
++		reg = <0x4d 0x204 0x00000005>;
++		assigned-address = <0x4d>;
++	};
++	rcd_1_5: rcd@5d,2C000000005 {
++		reg = <0x5d 0x2C0 0x00000005>;
++		assigned-address = <0x5d>;
++	};
++ };
++
++&i3c2 {
++	// P1 DIMM (A-F) SPD Access
++	status = "okay";
++
++	jdec-spd;
++	bus_id = <0x02>;
++
++	//DIMM A
++	spd5118_2_0: spd@50,3C000000000 {
++		reg = <0x50 0x3C0 0x00000000>;
++		assigned-address = <0x50>;
++	};
++	pmic5xxx_2_0: pmic@48,20400000000 {
++		reg = <0x48 0x204 0x00000000>;
++		assigned-address = <0x48>;
++	};
++	rcd_2_0: rcd@58,2C000000000 {
++		reg = <0x58 0x2C0 0x00000000>;
++		assigned-address = <0x58>;
++	};
++	//DIMM B
++	spd5118_2_1: spd@51,3C000000001 {
++		reg = <0x51 0x3C0 0x00000001>;
++		assigned-address = <0x51>;
++	};
++	pmic5xxx_2_1: pmic@49,20400000001 {
++		reg = <0x49 0x204 0x00000001>;
++		assigned-address = <0x49>;
++	};
++	rcd_2_1: rcd@59,2C000000001 {
++		reg = <0x59 0x2C0 0x00000001>;
++		assigned-address = <0x59>;
++	};
++	//DIMM C
++	spd5118_2_2: spd@52,3C000000002 {
++		reg = <0x52 0x3C0 0x00000002>;
++		assigned-address = <0x52>;
++	};
++	pmic5xxx_2_2: pmic@4a,20400000002 {
++		reg = <0x4a 0x204 0x00000002>;
++		assigned-address = <0x4a>;
++	};
++	rcd_2_2: rcd@5a,2C000000002 {
++		reg = <0x5a 0x2C0 0x00000002>;
++		assigned-address = <0x5a>;
++	};
++	//DIMM D
++	spd5118_2_3: spd@53,3C000000003 {
++		reg = <0x53 0x3C0 0x00000003>;
++		assigned-address = <0x53>;
++	};
++	pmic5xxx_2_3: pmic@4b,20400000003 {
++		reg = <0x4b 0x204 0x00000003>;
++		assigned-address = <0x4b>;
++	};
++	rcd_2_3: rcd@5b,2C000000003 {
++		reg = <0x5b 0x2C0 0x00000003>;
++		assigned-address = <0x5b>;
++	};
++	//DIMM E
++	spd5118_2_4: spd@54,3C000000004 {
++		reg = <0x54 0x3C0 0x00000004>;
++		assigned-address = <0x54>;
++	};
++	pmic5xxx_2_4: pmic@4c,20400000004 {
++		reg = <0x4c 0x204 0x00000004>;
++		assigned-address = <0x4c>;
++	};
++	rcd_2_4: rcd@5c,2C000000004 {
++		reg = <0x5c 0x2C0 0x00000004>;
++		assigned-address = <0x5c>;
++	};
++	//DIMM F
++	spd5118_2_5: spd@55,3C000000005 {
++		reg = <0x55 0x3C0 0x00000005>;
++		assigned-address = <0x55>;
++	};
++	pmic5xxx_2_5: pmic@4d,20400000005 {
++		reg = <0x4d 0x204 0x00000005>;
++		assigned-address = <0x4d>;
++	};
++	rcd_2_5: rcd@5d,2C000000005 {
++		reg = <0x5d 0x2C0 0x00000005>;
++		assigned-address = <0x5d>;
++	};
++};
++
++&i3c3 {
++	// P1 DIMM (G-L) SPD Access
++	status = "okay";
++
++	jdec-spd;
++	bus_id = <0x03>;
++
++	//DIMM G
++	spd5118_3_0: spd@50,3C000000000 {
++		reg = <0x50 0x3C0 0x00000000>;
++		assigned-address = <0x50>;
++	};
++	pmic5xxx_3_0: pmic@48,20400000000 {
++		reg = <0x48 0x204 0x00000000>;
++		assigned-address = <0x48>;
++	};
++	rcd_3_0: rcd@58,2C000000000 {
++		reg = <0x58 0x2C0 0x00000000>;
++		assigned-address = <0x58>;
++	};
++	//DIMM H
++	spd5118_3_1: spd@51,3C000000001 {
++		reg = <0x51 0x3C0 0x00000001>;
++		assigned-address = <0x51>;
++	};
++	pmic5xxx_3_1: pmic@49,20400000001 {
++		reg = <0x49 0x204 0x00000001>;
++		assigned-address = <0x49>;
++	};
++	rcd_3_1: rcd@59,2C000000001 {
++		reg = <0x59 0x2C0 0x00000001>;
++		assigned-address = <0x59>;
++	};
++	//DIMM I
++	spd5118_3_2: spd@52,3C000000002 {
++		reg = <0x52 0x3C0 0x00000002>;
++		assigned-address = <0x52>;
++	};
++	pmic5xxx_3_2: pmic@4a,20400000002 {
++		reg = <0x4a 0x204 0x00000002>;
++		assigned-address = <0x4a>;
++	};
++	rcd_3_2: rcd@5a,2C000000002 {
++		reg = <0x5a 0x2C0 0x00000002>;
++		assigned-address = <0x5a>;
++	};
++	//DIMM J
++	spd5118_3_3: spd@53,3C000000003 {
++		reg = <0x53 0x3C0 0x00000003>;
++		assigned-address = <0x53>;
++	};
++	pmic5xxx_3_3: pmic@4b,20400000003 {
++		reg = <0x4b 0x204 0x00000003>;
++		assigned-address = <0x4b>;
++	};
++	rcd_3_3: rcd@5b,2C000000003 {
++		reg = <0x5b 0x2C0 0x00000003>;
++		assigned-address = <0x5b>;
++	};
++	//DIMM K
++	spd5118_3_4: spd@54,3C000000004 {
++		reg = <0x54 0x3C0 0x00000004>;
++		assigned-address = <0x54>;
++	};
++	pmic5xxx_3_4: pmic@4c,20400000004 {
++		reg = <0x4c 0x204 0x00000004>;
++		assigned-address = <0x4c>;
++	};
++	rcd_3_4: rcd@5c,2C000000004 {
++		reg = <0x5c 0x2C0 0x00000004>;
++		assigned-address = <0x5c>;
++	};
++	//DIMM L
++	spd5118_3_5: spd@55,3C000000005 {
++		reg = <0x55 0x3C0 0x00000005>;
++		assigned-address = <0x55>;
++	};
++	pmic5xxx_3_5: pmic@4d,20400000005 {
++		reg = <0x4d 0x204 0x00000005>;
++		assigned-address = <0x4d>;
++	};
++	rcd_3_5: rcd@5d,2C000000005 {
++		reg = <0x5d 0x2C0 0x00000005>;
++		assigned-address = <0x5d>;
++	};
++};
++
++&i3c4 {
++	// P0 APML
++	status = "okay";
++
++	jdec-spd;
++	set_dasa;
++	bus_id = <0x04>;
++
++	imx3112_p0: i3cmux@70,4CC00000000 {
++		reg = <0x70 0x4CC 0x00000000>;
++		assigned-address = <0x70>;
++	};
++	sbtsi_p0_0: sbtsi@4c,22400000001 {
++		reg = <0x4c 0x224 0x00000001>;
++		assigned-address = <0x4c>;
++	};
++	sbrmi_p0_1: sbrmi@3c,22400000002 {
++		reg = <0x3c 0x224 0x00000002>;
++		assigned-address = <0x3c>;
++		dimm-count = <12>;
++		dimm-ids = <0x80 0x81 0x82 0x93 0x84 0x85 0x86 0x87 0x88 0x99 0x8A 0x8B>;
++	};
++};
++
++&i3c5 {
++	// P1 APML
++	status = "okay";
++
++	jdec-spd;
++	set_dasa;
++	bus_id = <0x05>;
++
++	imx3112_P1: i3cmux@70,4CC00000000 {
++		reg = <0x70 0x4CC 0x00000000>;
++		assigned-address = <0x70>;
++	};
++	sbtsi_p1_0: sbtsi@48,22400000001 {
++		reg = <0x48 0x224 0x00000001>;
++		assigned-address = <0x48>;
++	};
++	sbrmi_p1_1: sbrmi@38,22400000002 {
++		reg = <0x38 0x224 0x00000002>;
++		assigned-address = <0x38>;
++		dimm-count = <12>;
++		dimm-ids = <0x80 0x81 0x82 0x93 0x84 0x85 0x86 0x87 0x88 0x99 0x8A 0x8B>;
++	};
++};
++
++// Misc Regulators
++&i2c4 {
++	// Net name i2c1
++	status = "okay";
++};
++
++// Titanite P0 VRs
++&i2c5 {
++	// Net name i2c2 (SCM_I2C2)
++	status = "okay";
++       pvddcr_soc_p0@61 {
++           compatible = "isil,isl68137";
++           reg = <0x61>;
++       };
++       pvdd33_s5_p0@19 {
++           compatible = "isil,isl68137";
++           reg = <0x19>;
++       };
++       pvdd11_s3_p0@63 {
++           compatible = "isil,isl68137";
++           reg = <0x63>;
++       };
++       pvddio_p0@62 {
++           compatible = "isil,isl68137";
++           reg = <0x62>;
++       };
++       pvdd18_s5_p0@17 {
++           compatible = "isil,isl68137";
++           reg = <0x17>;
++       };
++
++};
++
++// Titanite P1 VRs
++&i2c6 {
++	// Net name i2c3 (SCM_I2C3)
++	status = "okay";
++       pvddcr_soc_p1@72 {
++           compatible = "isil,isl68137";
++           reg = <0x72>;
++       };
++       pvddio_p1@75 {
++           compatible = "isil,isl68137";
++           reg = <0x75>;
++       };
++       pvdd11_s3_p1@74 {
++           compatible = "isil,isl68137";
++           reg = <0x74>;
++       };
++       pvdd18_s5_p1@18 {
++           compatible = "isil,isl68137";
++           reg = <0x18>;
++       };
++
++};
++
++// HPM Board ID
++&i2c7 {
++	// Net name i2c4
++	status = "okay";
++
++	mbeeprom@50 {
++		compatible = "microchip,24lc256","atmel,24c256";
++		reg = <0x50>;
++	};
++};
++
++// PSUs
++&i2c8 {
++	// Net name i2c5
++	status = "okay";
++};
++
++// Fan, Temp, ADC sensors
++&i2c9 {
++	// Net name i2c6
++	status = "okay";
++
++	i2cswitch@71 {
++		compatible = "nxp,pca9548";
++		reg = <0x71>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		i2c@0 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <0>;
++
++			// FAN Band
++			i2cswitch@77 {
++				compatible = "nxp,pca9546";
++				#address-cells = <1>;
++				#size-cells = <0>;
++				reg = <0x77>;
++
++				//  port 0 connected to CPLD on FAN BD
++				i2c@0 {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					reg = <0>;
++
++					// 6 dual rotter Fans are controlled by cpld
++					amd_cpld@28 {
++						compatible="amd_cpld,amd_cpld";
++						reg = <0x28>;
++					};
++				};
++
++				i2c@3 {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					reg = <3>;
++
++					lm75a@4b {	// FAN BD
++						compatible = "national,lm75a";
++						reg = <0x4b>;
++					};
++				};
++			};
++		};
++
++		i2c@1 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <1>;
++
++			lm75a@48 {	// SYS OUTLET
++				compatible = "national,lm75a";
++				reg = <0x48>;
++			};
++
++			lm75a@49 {	// OCP INLET
++				compatible = "national,lm75a";
++				reg = <0x49>;
++			};
++			lm75a@4a {	// SCM INLET
++				compatible = "national,lm75a";
++				reg = <0x4a>;
++			};
++
++			lm75a@4b {	// CPU1 INLET
++				compatible = "national,lm75a";
++				reg = <0x4b>;
++			};
++
++			lm75a@4c {	// CPU0 INLET
++				compatible = "national,lm75a";
++				reg = <0x4c>;
++			};
++		};
++
++		i2c@2 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <2>;
++
++			adc0: p1v0_aux@50 {
++				compatible = "ti,adc121c";
++				reg = <0x50>;
++				#io-channel-cells = <1>;
++				label = "p1v0_aux";
++			};
++			adc1: p1v8_aux@51 {
++				compatible = "ti,adc121c";
++				reg = <0x51>;
++				#io-channel-cells = <1>;
++				label = "p1v8_aux";
++			};
++			adc2: p3v3_aux@52 {
++				compatible = "ti,adc121c";
++				reg = <0x52>;
++				#io-channel-cells = <1>;
++				label = "p3v3_aux";
++			};
++			adc4: p1v27_aux@55 {
++				compatible = "ti,adc121c";
++				reg = <0x55>;
++				#io-channel-cells = <1>;
++				label = "p1v27_aux";
++			};
++			adc5: p12v_aux@56 {
++				compatible = "ti,adc121c";
++				reg = <0x56>;
++				#io-channel-cells = <1>;
++				label = "p12v_aux";
++			};
++		};
++
++		i2c@6 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <6>;
++
++			lm75a@4a {	// SYS INLET
++				compatible = "national,lm75a";
++				reg = <0x4a>;
++			};
++		};
++	};
++};
++
++// Titanite brd_id
++&i2c10 {
++	// Net name i2c7
++	status = "okay";
++#ifdef EEPROM_PROG_ENABLE
++	// SCM brd_id, Titanite brd_id, CLK
++	i2cswitch@71 {
++		compatible = "nxp,pca9848";
++		reg = <0x71>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		i2c@0 {
++			reg = <0>;
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			// BRD ID eeprom
++			brdreveeprom@50 {
++				compatible = "microchip,24lc256","atmel,24c256";
++				reg = <0x50>;
++			};
++			// SCM BRD ID eeprom
++			scmbrdeeprom@51 {
++				compatible = "microchip,24lc256","atmel,24c256";
++				reg = <0x51>;
++			};
++
++			// Usually the eeproms are at 0x50 and 0x51 address,
++			// but some systems (Rev A) have eeprom address 0x54
++			// SCM BRD ID eeprom
++			scmbrdeeprom@54 {
++				compatible = "microchip,24lc256","atmel,24c256";
++				reg = <0x54>;
++			};
++		};
++	};
++	// Midpalne, Raiser cards, SATA, etc
++	i2cswitch@75 {
++		compatible = "nxp,pca9848";
++		reg = <0x75>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++	};
++#endif
++};
++
++// 1G ROM
++&i2c11 {
++	// Net name i2c8
++	status = "okay";
++};
++
++// LOCAL MGMT - FPGA slave
++&i2c12 {
++	status = "okay";
++};
++
++// LOCAL MGMT - EEPROM, RTC
++&i2c14 {
++	status = "okay";
++
++	bmceeprom@50 {
++		compatible = "microchip,24lc512","atmel,24c512";
++		reg = <0x50>;
++	};
++};
++
++// ROT
++&i2c15 {
++	status = "okay";
++};
++
++&espi_ctrl {
++	status = "okay";
++
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_espi_default &pinctrl_espialt_default>;
++
++	perif,dma-mode;
++};
++
++&espi_mmbi {
++	status = "okay";
++};
++
++&gpio0 {
++	gpio-line-names =
++	/*A0-A7*/	"","","","","","","","",
++	/*B0-B7*/	"","","","","MON_POST_COMPLETE","","","",
++	/*C0-C7*/	"","","","","","","","",
++	/*D0-D7*/	"","","","","","","","",
++	/*E0-E7*/	"","","","","","","","",
++	/*F0-F7*/	"","","","","","","","",
++	/*G0-G7*/	"","","","","","","","",
++	/*H0-H7*/	"","ASSERT_WARM_RST_BTN_L","ASSERT_SOC_RST_BTN_L","","","","","",
++	/*I0-I7*/	"","","","","","","","P0_I3C_APML_ALERT_L",
++	/*J0-J7*/	"","","","","","","","",
++	/*K0-K7*/	"","","","","","","","",
++	/*L0-L7*/	"","","","","","","","",
++	/*M0-M7*/	"","","","","","","","",
++	/*N0-N7*/	"","","","","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
++	/*O0-O7*/	"","","HDT_SEL","HDT_XTRIG5","HDT_XTRIG6","JTAG_TRST_N","","",
++	/*P0-P7*/	"MON_RST_BTN_L","ASSERT_RST_BTN_L","MON_PWR_BTN_L","ASSERT_PWR_BTN_L","HPM_FPGA_LOCKOUT","ASSERT_NMI_BTN_L","MON_PWR_GOOD","",
++	/*Q0-Q7*/	"","","HDT_DBREQ_L","","BIOS_SPD_MUX_CTRL_RELEASED_L","","","",
++	/*R0-R7*/	"","","","","","","","",
++	/*S0-S7*/	"","","","","P1_DIMM_AF_ERROR","P1_DIMM_GL_ERROR","P0_DIMM_AF_ERROR","P0_DIMM_GL_ERROR",
++	/*T0-T7*/	"","","","","","","","",
++	/*U0-U7*/	"","","","","P1_I3C_APML_ALERT_L","","","",
++	/*V0-V7*/	"","","","","","","","",
++	/*W0-W7*/	"","","","","","","","",
++	/*X0-X7*/	"","","","","","","","",
++	/*Y0-Y7*/	"","","","","","","","",
++	/*Z0-Z7*/	"","","","","","","","",
++	/*AA0-AA7*/	"","","","","","","","",
++	/*AB0-AB7*/	"","","","","","","","",
++	/*AC0-AC7*/	"","","","","","","","";
++};
++
++&jtag1 {
++	status = "okay";
++};
++
++&video {
++	status = "okay";
++	memory-region = <&video_engine_memory>;
++};
++
++&vhub {
++	status = "okay";
++};
++
++&lpc_ctrl {
++	status = "okay";
++};
++
++&lpc_pcc {
++	port-addr = <0x80>;
++	dma-mode;
++	memory-region = <&pcc_memory>;
++	rec-mode = <0x1>;
++	port-addr-hbits-select = <0x1>;
++	port-addr-xbits = <0x3>;
++	status = "okay";
++};
++
++&kcs3 {
++	status = "okay";
++	aspeed,lpc-io-reg = <0xCA2>;
++};
++
++&uart_routing {
++	status = "okay";
++};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts b/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
+index 12ef7f706f37..fc7d8750a588 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
+@@ -529,8 +529,6 @@ rcd_3_5: rcd@5d,2C000000005 {
+ 	};
+ };
+
+-#ifdef ENABLE_I2C_APML
+-
+ &i2c2 {
+ 	// P0 APML - i2c10
+ 	status = "okay";
+@@ -567,58 +565,6 @@ sbtsi@48 {
+ 	};
+ };
+
+-#else
+-
+-&i3c4 {
+-	// P0 APML
+-	status = "okay";
+-
+-	jdec-spd;
+-	set_dasa;
+-	bus_id = <0x04>;
+-
+-	imx3112_p0: i3cmux@70,4CC00000000 {
+-		reg = <0x70 0x4CC 0x00000000>;
+-		assigned-address = <0x70>;
+-	};
+-	sbtsi_p0_0: sbtsi@4c,22400000001 {
+-		reg = <0x4c 0x224 0x00000001>;
+-		assigned-address = <0x4c>;
+-	};
+-	sbrmi_p0_1: sbrmi@3c,22400000002 {
+-		reg = <0x3c 0x224 0x00000002>;
+-		assigned-address = <0x3c>;
+-		dimm-count = <12>;
+-		dimm-ids = <0x80 0x81 0x82 0x93 0x84 0x85 0x86 0x87 0x88 0x99 0x8A 0x8B>;
+-	};
+-};
+-
+-&i3c5 {
+-	// P1 APML
+-	status = "okay";
+-
+-	jdec-spd;
+-	set_dasa;
+-	bus_id = <0x05>;
+-
+-	imx3112_P1: i3cmux@70,4CC00000000 {
+-		reg = <0x70 0x4CC 0x00000000>;
+-		assigned-address = <0x70>;
+-	};
+-	sbtsi_p1_0: sbtsi@48,22400000001 {
+-		reg = <0x48 0x224 0x00000001>;
+-		assigned-address = <0x48>;
+-	};
+-	sbrmi_p1_1: sbrmi@38,22400000002 {
+-		reg = <0x38 0x224 0x00000002>;
+-		assigned-address = <0x38>;
+-		dimm-count = <12>;
+-		dimm-ids = <0x80 0x81 0x82 0x93 0x84 0x85 0x86 0x87 0x88 0x99 0x8A 0x8B>;
+-	};
+-};
+-
+-#endif  // ENABLE_I2C_APML
+-
+ // Misc Regulators
+ &i2c4 {
+ 	// Net name i2c1
+--
+2.25.1
