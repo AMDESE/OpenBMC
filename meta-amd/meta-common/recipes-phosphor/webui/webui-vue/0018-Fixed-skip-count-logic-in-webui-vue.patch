@@ -1,0 +1,27 @@
+From 25bb933f6478a9dbdccb575f4b97dd06b54dfccc Mon Sep 17 00:00:00 2001
+From: Ashok Kumar <ashok2.kumar@amd.com>
+Date: Mon, 13 Mar 2023 09:58:48 -0500
+Subject: [PATCH] Fixed skip count logic in webui-vue
+
+Fixed skip count logic if total Postcodes count is less then 200 then
+skip count should be 0
+Fixes: PLAT-126935
+
+Signed-off-by: Ashok Kumar <ashok2.kumar@amd.com>
+---
+ src/store/modules/Logs/PostCodeLogsStore.js | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/store/modules/Logs/PostCodeLogsStore.js b/src/store/modules/Logs/PostCodeLogsStore.js
+index fd7b0dc..3d0f09a 100644
+--- a/src/store/modules/Logs/PostCodeLogsStore.js
++++ b/src/store/modules/Logs/PostCodeLogsStore.js
+@@ -65,7 +65,7 @@ const PostCodeLogsStore = {
+           if (count > 200) {
+             skipval = count - 200;
+           } else {
+-            skipval = count;
++            skipval = 0;
+           }
+           state.pccount = skipval;
+           commit('setPCCount', skipval);
