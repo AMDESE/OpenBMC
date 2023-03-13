@@ -1,0 +1,86 @@
+From 14903f5ca0043192cfccd0c406491ff05ca3ba4a Mon Sep 17 00:00:00 2001
+Message-Id: <14903f5ca0043192cfccd0c406491ff05ca3ba4a.1678985432.git.vinu.vaghasia@amd.com>
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Wed, 8 Mar 2023 16:37:58 -0600
+Subject: [PATCH] ARM-dts-aspeed: Modify Genoa device trees for i2c slave backend
+ device
+
+i2c slave backend device node added with DTS for all Genoa platforms
+
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts     | 5 +++++
+ arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts   | 5 +++++
+ arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts     | 6 ++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts | 6 ++++++
+ 4 files changed, 22 insertions(+)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+index 88d249e7e931..eed42dcc2273 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+@@ -273,6 +273,11 @@
+ 	// Net name i2c7
+ 	status = "okay";
+
++	i2c_slave_backend@30 {
++		compatible = "i2c-slave-backend";
++		reg = <0x30>;
++	};
++
+ #ifdef EEPROM_PROG_ENABLE
+ 	i2cswitch@70 {
+ 		compatible = "nxp,pca9548";
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+index 978dac23b5c2..c0c864a375f3 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+@@ -601,6 +601,11 @@
+ 	// Net name i2c7 (SCM_I2C7)
+ 	status = "okay";
+
++	i2c_slave_backend@30 {
++		compatible = "i2c-slave-backend";
++		reg = <0x30>;
++	};
++
+ #ifdef EEPROM_PROG_ENABLE
+ 	i2cswitch@70 {
+ 		compatible = "nxp,pca9548";
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+index d88ae4644582..78c760df9bb8 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+@@ -385,6 +385,12 @@
+ &i2c10 {
+ 	// Net name i2c7
+ 	status = "okay";
++
++	i2c_slave_backend@30 {
++		compatible = "i2c-slave-backend";
++		reg = <0x30>;
++	};
++
+ #ifdef EEPROM_PROG_ENABLE
+ 	// UBM
+ 	i2cswitch@70 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts b/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
+index fc7d8750a588..1b5a88843cdc 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
+@@ -771,6 +771,12 @@
+ &i2c10 {
+ 	// Net name i2c7
+ 	status = "okay";
++
++	i2c_slave_backend@30 {
++		compatible = "i2c-slave-backend";
++		reg = <0x30>;
++	};
++
+ #ifdef EEPROM_PROG_ENABLE
+ 	// SCM brd_id, Titanite brd_id, CLK
+ 	i2cswitch@71 {
+--
+2.17.1
+
