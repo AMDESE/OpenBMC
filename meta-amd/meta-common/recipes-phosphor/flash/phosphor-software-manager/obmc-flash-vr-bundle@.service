@@ -1,0 +1,7 @@
+[Unit]
+Description=Flash VR Bundle image %I to VR
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/usr/sbin/vr-update /tmp/images/%i

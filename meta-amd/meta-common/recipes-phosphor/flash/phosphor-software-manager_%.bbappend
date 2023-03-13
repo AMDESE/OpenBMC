@@ -23,7 +23,7 @@ DEPENDS += "amd-lcd-lib"
 
 TARGET_LDFLAGS += " -llcdlib32"
 
-PACKAGECONFIG_append = " flash_bios flash_scm_fpga flash_hpm_fpga flash_vr flash_retimer"
+PACKAGECONFIG_append = " flash_bios flash_scm_fpga flash_hpm_fpga flash_vr_bundle flash_retimer"
 RDEPENDS_${PN} += "bash"
 
 do_install_append() {
