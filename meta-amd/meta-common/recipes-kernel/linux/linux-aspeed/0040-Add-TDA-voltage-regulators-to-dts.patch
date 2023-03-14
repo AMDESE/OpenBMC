@@ -1,0 +1,39 @@
+From 748e40b1ad4e517b4f115bb087fa3899f22e7769 Mon Sep 17 00:00:00 2001
+From: Abinaya <abinaya.dhandapani@amd.com>
+Date: Tue, 14 Mar 2023 00:26:13 -0500
+Subject: [PATCH] Add TDA voltage regulators to dts
+
+Signed-off-by: Abinaya <abinaya.dhandapani@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+index 85cfdffac9bb..88d249e7e931 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+@@ -188,6 +188,21 @@ tca9546a@70 {
+ &i2c4 {
+ 	// Net name i2c1
+ 	status = "okay";
++	vdd33run@13 {
++		//VDD_33_RUN VRM
++		compatible = "infineon,xdpe12284";
++		reg = <0x13>;
++	};
++	vdd33dual@14 {
++		//VDD_33_DUAL VRM
++		compatible = "infineon,xdpe12284";
++		reg = <0x14>;
++	};
++	vdd5dual@15 {
++		//VDD_5_DUAL VRM
++		compatible = "infineon,xdpe12284";
++		reg = <0x15>;
++	};
+ };
+
+ // BMC Onyx VRs
+--
+2.25.1
+
