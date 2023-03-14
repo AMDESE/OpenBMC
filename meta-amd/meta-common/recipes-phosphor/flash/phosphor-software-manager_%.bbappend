@@ -18,6 +18,7 @@ SRC_URI += "file://bios-update.sh \
             file://0013-add-host-factory-reset-to-resetAll-handler.patch \
             file://0014-phosphor-software-manager-Modify-to-call-u-boot-env-script.patch \
             file://0015-phosphor-software-manager-LCD-clean-BMC-version.patch \
+            file://0016-Added-support-for-VR-Bundle-firmware-update.patch \
             "
 DEPENDS += "amd-lcd-lib"
 
