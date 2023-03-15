@@ -90,7 +90,7 @@ index 000000000000..6f0e98f5b1e6
 +#include <linux/sysfs.h>
 +#include <linux/interrupt.h>
 +
-+#define USE_INTERRUPTS
++//#define USE_INTERRUPTS
 +/******************************************************************************/
 +union chassis_ctrl_register {
 +	uint32_t value;
