@@ -10,6 +10,7 @@ SRC_URI_append += " file://shale-stepwise-config.json \
                     file://phosphor-pid-control.path \
                     file://0001-phosphor-pid-control-Add-CPU-Temp-simulation-code.patch \
                     file://0002-phosphor-pid-control-Modify-Sensor-based-Temp-simulation.patch \
+                    file://0003-phosphor-pid-control-Add-chassis-intrusion-sensor.patch \
                   "
 
 FILES_${PN}_append = " ${datadir}/swampd/shale-stepwise-config.json \
