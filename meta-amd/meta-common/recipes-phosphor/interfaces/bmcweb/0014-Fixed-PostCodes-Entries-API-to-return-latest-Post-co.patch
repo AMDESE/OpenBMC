@@ -1,0 +1,34 @@
+From 343de8e3b764d069a5a6364ba39930d5e72d0617 Mon Sep 17 00:00:00 2001
+From: Ashok Kumar <ashok2.kumar@amd.com>
+Date: Fri, 17 Mar 2023 02:23:30 -0500
+Subject: [PATCH] Fixed PostCodes/Entries API to return latest Post codes
+
+API were always return the first boot data, fixed to get the latest Postcodes
+
+Signed-off-by: Ashok Kumar <ashok2.kumar@amd.com>
+---
+ redfish-core/lib/log_services.hpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/redfish-core/lib/log_services.hpp b/redfish-core/lib/log_services.hpp
+index d3605841..365f9655 100644
+--- a/redfish-core/lib/log_services.hpp
++++ b/redfish-core/lib/log_services.hpp
+@@ -3580,7 +3580,7 @@ static void getPostCodeForBoot(const std::shared_ptr<bmcweb::AsyncResp>& aResp,
+                 getPostCodeForBoot(aResp, static_cast<uint16_t>(bootIndex + 1),
+                                    bootCount, endCount, skip, top);
+             }
+-            else
++            else if (skip + top < endCount)
+             {
+                 aResp->res.jsonValue["Members@odata.nextLink"] =
+                     "/redfish/v1/Systems/system/LogServices/PostCodes/"
+@@ -3591,7 +3591,7 @@ static void getPostCodeForBoot(const std::shared_ptr<bmcweb::AsyncResp>& aResp,
+         "xyz.openbmc_project.State.Boot.PostCode0",
+         "/xyz/openbmc_project/State/Boot/PostCode0",
+         "xyz.openbmc_project.State.Boot.PostCode", "GetPostCodesWithTimeStamp",
+-        bootIndex);
++        static_cast<uint16_t>(1)); //get latest post code
+ }
+
+ static void
