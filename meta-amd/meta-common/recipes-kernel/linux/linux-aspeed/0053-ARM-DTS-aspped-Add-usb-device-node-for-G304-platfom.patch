@@ -1,0 +1,72 @@
+From 0e6d83bdaa87a65bd6e0492b8243ef5ecbd5e9b3 Mon Sep 17 00:00:00 2001
+Message-Id: <0e6d83bdaa87a65bd6e0492b8243ef5ecbd5e9b3.1682609014.git.vinu.vaghasia@amd.com>
+In-Reply-To: <2400bf2d006d47d49a991536157997f197fce360.1682609014.git.vinu.vaghasia@amd.com>
+References: <2400bf2d006d47d49a991536157997f197fce360.1682609014.git.vinu.vaghasia@amd.com>
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Thu, 27 Apr 2023 10:22:50 -0500
+Subject: [PATCH 2/2] ARM-DTS-aspped: Add usb device node for G304 platfom
+
+- udc usb device noded added with aspees base dtsi.
+- udc usb device enable with G304 dts for vNIC support as device.
+- vhub device disabled as it conflicts with ZT BMC vhub on G304 platform
+
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-g304.dts |  9 ++++++++-
+ arch/arm/boot/dts/aspeed-g6.dtsi          | 10 ++++++++++
+ 2 files changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-g304.dts b/arch/arm/boot/dts/aspeed-bmc-amd-g304.dts
+index cc8e1d40f80f..37e8bdd53622 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-g304.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-g304.dts
+@@ -129,7 +129,7 @@
+
+     i2c_slave_backend@57 {
+         compatible = "i2c-slave-backend";
+-        reg = <0x30>;
++        reg = <0x57>;
+     };
+ };
+
+@@ -191,9 +191,16 @@
+     status = "okay";
+ };
+
++&udc {
++    status = "okay";
++};
++
++#if 0
+ &vhub {
+     status = "okay";
+ };
++#endif
++
+ &i3c2 {
+     status = "okay";
+     compatible = "";
+diff --git a/arch/arm/boot/dts/aspeed-g6.dtsi b/arch/arm/boot/dts/aspeed-g6.dtsi
+index 739765dedb4e..5a81b54a6d08 100644
+--- a/arch/arm/boot/dts/aspeed-g6.dtsi
++++ b/arch/arm/boot/dts/aspeed-g6.dtsi
+@@ -277,6 +277,16 @@
+ 			status = "disabled";
+ 		};
+
++		udc: usb@1e6a2000 {
++			compatible = "aspeed,ast2600-udc";
++			reg = <0x1e6a2000 0x200>;
++			interrupts = <GIC_SPI 9 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&syscon ASPEED_CLK_GATE_USBPORT2CLK>;
++			pinctrl-names = "default";
++			pinctrl-0 = <&pinctrl_usb2bd_default>;
++			status = "disabled";
++		};
++
+ 		ehci1: usb@1e6a3000 {
+ 			compatible = "aspeed,ast2600-ehci", "generic-ehci";
+ 			reg = <0x1e6a3000 0x100>;
+--
+2.17.1
+
