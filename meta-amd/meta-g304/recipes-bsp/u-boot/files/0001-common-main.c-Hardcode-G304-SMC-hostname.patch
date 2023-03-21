@@ -1,121 +1,36 @@
-From 0e4db38e71519fab4bef38c1344c4f6bc1248f10 Mon Sep 17 00:00:00 2001
-From: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
-Date: Fri, 17 Feb 2023 15:37:27 -0600
-Subject: [PATCH 1/1] common/main.c: Hardcode G304 SMC hostname
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+From c7c77a14c8b58fc6ee0e5ba22e35b794ecb6b84b Mon Sep 17 00:00:00 2001
+Message-Id: <c7c77a14c8b58fc6ee0e5ba22e35b794ecb6b84b.1679413339.git.vinu.vaghasia@amd.com>
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Tue, 21 Mar 2023 10:41:57 -0500
+Subject: [PATCH] common/main.c: Hardcode G304 SMC hostname
 
 1. Hardcoded G304 SMC hostname.
-2. Removed board id parsing during fit image load.
-This is a temporary change.
 
 Signed-off-by: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
 ---
- common/image-fit.c | 85 +---------------------------------------------
- common/main.c      | 10 +++++-
- 2 files changed, 10 insertions(+), 85 deletions(-)
+ common/image-fit.c |  2 +-
+ common/main.c      | 10 +++++++++-
+ 2 files changed, 10 insertions(+), 2 deletions(-)
 
 diff --git a/common/image-fit.c b/common/image-fit.c
-index f4208da863..667b982421 100644
+index fa5f141a81..6fcd314128 100644
 --- a/common/image-fit.c
 +++ b/common/image-fit.c
-@@ -1858,90 +1858,7 @@ int fit_image_load(bootm_headers_t *images, ulong addr,
- 		} else {
- 			fit_uname_config = (char *) malloc(conf_name_size);
-
--			// Reading board_id from ENV
--			platform_id = env_get("board_id");
--			// Convert bd_id string to integer
--			board_id = str2hex(platform_id);
--			// select the  device tree configuration based on board_id
--			switch (board_id)
--			{
--				/* SP5 Platforms  dts selection */
--				case ONYX_SLT:
--				case ONYX_1 ... ONYX_3:
--				case ONYX_FR4:
--					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-onyx.dtb");
--					break;
--				case QUARTZ_DAP:
--				case QUARTZ_1 ... QUARTZ_3:
--				case QUARTZ_FR4:
--					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-quartz.dtb");
--					break;
--				case RUBY_1 ... RUBY_3:
--					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-ruby.dtb");
--					break;
--				case TITANITE_1 ... TITANITE_6:
--					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-titanite.dtb");
--					break;
--
--				/* SH5 Platforms  dts selection */
--				case SH5_SIDLEY:
--					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-sidley.dtb");
--					break;
--				case SH5_PARRY_PEAK:
--					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-parrypeak.dtb");
--					break;
--				case SH5_1P_PWR ... SH5_1P_SLT:
--				case SH5_1P_OEM_P:
--				case SH5_2P_CABLED:
--					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-sh5d807.dtb");
--					break;
--
--				/* SP6 Platforms  dts selection */
--				case SUNSTONE:
--				case SUNSTONE_DAP:
--					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-sunstone.dtb");
--					break;
--				case SHALE_SLT:
--				case SHALE:
--				case SHALE_64:
--					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-shale.dtb");
--					break;
--				case CINNABAR:
--					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-cinnabar.dtb");
--					break;
--
--				/* Turin Platforms dts selection */
--				case CHALUPA:
--				case CHALUPA_1:
--				case CHALUPA_2:
--					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-chalupa.dtb");
--					break;
--				case HUAMBO:
--					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-huambo.dtb");
--					break;
--				case GALENA:
--				case GALENA_1:
--				case GALENA_2:
--					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-galena.dtb");
--					break;
--				case RECLUSE:
--					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-recluse.dtb");
--					break;
--				case PURICO:
--				case PURICO_1:
--				case PURICO_2:
--					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-purico.dtb");
--					break;
--				case VOLCANO:
--				case VOLCANO_1:
--				case VOLCANO_2:
--					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-volcano.dtb");
--					break;
--				default :
--					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-quartz.dtb");
--					break;
--			} // switch
+@@ -1977,7 +1977,7 @@ int fit_image_load(bootm_headers_t *images, ulong addr,
+ 					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-quartz.dtb");
+ 					break;
+ 			} // switch
 -
 +			sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-g304.dtb");
  			cfg_noffset = fit_conf_get_node(fit,
  							fit_uname_config);
  		}
 diff --git a/common/main.c b/common/main.c
-index 665083e8b3..301193e8ab 100644
+index 1a98b3ea21..caf2dacaa1 100644
 --- a/common/main.c
 +++ b/common/main.c
-@@ -173,7 +173,15 @@ void set_hostname()
+@@ -175,7 +175,15 @@ void set_hostname()
  			printf("Hostname set to '%s'\n", hostname);
  		}
  		else
