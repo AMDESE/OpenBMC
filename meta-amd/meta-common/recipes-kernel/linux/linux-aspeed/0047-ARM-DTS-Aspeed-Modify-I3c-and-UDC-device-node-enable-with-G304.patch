@@ -1,0 +1,305 @@
+From 2248432211fbd9569efa4fb43ca5f7db578692bc Mon Sep 17 00:00:00 2001
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Wed, 19 Apr 2023 11:58:37 -0500
+Subject: [PATCH 1/1] ARM-DTS-Aspeed: Modify G304 DTS to enable g304 platform
+ specific devices
+
+Following devices enabled
+ - i2c & i3c
+ - vhub & udc to support vNIC and BMC as usb device
+ - SPI2 as single SPI mode ( disabled SQPI mode)
+ - ubbmeeprom on i2c-14
+ - configured i2c-1 as slave-backend device
+ - Disable uart1 to use pins as GPIOs.
+
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-g304.dts | 209 +++++++++++++---------
+ 1 file changed, 128 insertions(+), 81 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-g304.dts b/arch/arm/boot/dts/aspeed-bmc-amd-g304.dts
+index d1e82c7e7cbc..cc8e1d40f80f 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-g304.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-g304.dts
+@@ -9,150 +9,197 @@
+ #include "dt-bindings/gpio/aspeed-gpio.h"
+
+ / {
+-	model = "AMD G304 BMC";
+-	compatible = "amd,g304-smc ", "aspeed,ast2600";
++    model = "AMD G304 BMC";
++    compatible = "amd,g304-smc ", "aspeed,ast2600";
+
+-	aliases {
+-		serial4 = &uart5;
+-	};
++    aliases {
++        serial4 = &uart5;
++    };
+
+-	chosen {
+-		stdout-path = &uart5;
+-		bootargs = "console=ttyS4,115200 earlycon vmalloc=512MB";
+-	};
++    chosen {
++        stdout-path = &uart5;
++        bootargs = "console=ttyS4,115200 earlycon vmalloc=512MB";
++    };
+
+-	memory@80000000 {
+-		device_type = "memory";
+-		reg = <0x80000000 0x80000000>;
+-	};
++    memory@80000000 {
++        device_type = "memory";
++        reg = <0x80000000 0x80000000>;
++    };
+ };
+
+ &fmc {
+-	status = "okay";
+-	fmc-spi-user-mode;
+-	flash@0 {
+-		compatible = "jedec,spi-nor";
+-		status = "okay";
+-		label = "bmc";
+-		spi-tx-bus-width = <4>;
+-		spi-rx-bus-width = <4>;
+-		#include "openbmc-flash-layout-128.dtsi"
+-	};
+-};
+-
++    status = "okay";
++    fmc-spi-user-mode;
++    flash@0 {
++        compatible = "jedec,spi-nor";
++        status = "okay";
++        label = "bmc";
++        spi-tx-bus-width = <4>;
++        spi-rx-bus-width = <4>;
++        #include "openbmc-flash-layout-128.dtsi"
++    };
++#if 0
++    flash@1 {
++        status = "okay";
++        label = "bmc_backup";
++        spi-tx-bus-width = <4>;
++        spi-rx-bus-width = <4>;
++    };
++
++    flash@2 {
++        status = "okay";
++        label = "rot_control";
++        spi-tx-bus-width = <4>;
++        spi-rx-bus-width = <4>;
++    };
++#endif
++
++};
++
++#if 0  // currently not used
+ &spi1 {
+-	status = "okay";
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&pinctrl_spi1_default &pinctrl_qspi1_default>;
+-	fmc-spi-user-mode;
+-	compatible = "aspeed,ast2600-spi";
+-
+-	flash@0 {
+-		compatible = "jedec,spi-nor";
+-		label = "pnor";
+-		status = "okay";
+-	};
+-
+-	flash@1 {
+-		compatible = "jedec,spi-nor";
+-		label = "pnor";
+-		status = "okay";
+-	};
+-};
++    status = "okay";
++    pinctrl-names = "default";
++    pinctrl-0 = <&pinctrl_spi1_default>;
++    fmc-spi-user-mode;
++    compatible = "aspeed,ast2600-spi";
++
++    flash@0 {
++        compatible = "jedec,spi-nor";
++        label = "pnor";
++        status = "okay";
++        spi-tx-bus-width = <1>;
++        spi-rx-bus-width = <1>;
++    };
++
++    flash@1 {
++        compatible = "jedec,spi-nor";
++        label = "pnor";
++        status = "okay";
++        spi-tx-bus-width = <1>;
++        spi-rx-bus-width = <1>;
++    };
++};
++#endif
+
+ &spi2 {
+-	status = "okay";
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&pinctrl_spi2_default &pinctrl_qspi2_default>;
+-	fmc-spi-user-mode;
+-	compatible = "aspeed,ast2600-spi";
+-
+-	flash@0 {
+-		compatible = "jedec,spi-nor";
+-		label = "pnor";
+-		status = "okay";
+-	};
+-};
+-
++    status = "okay";
++    pinctrl-names = "default";
++    pinctrl-0 = <&pinctrl_spi2_default>;
++    fmc-spi-user-mode;
++    compatible = "aspeed,ast2600-spi";
++
++    flash@0 {
++        compatible = "jedec,spi-nor";
++        label = "pnor";
++        status = "okay";
++        spi-tx-bus-width = <1>;
++        spi-rx-bus-width = <1>;
++    };
++};
++
++#if 0 // Disable uart1 to use pins as GPIOs
+ &uart1 {
+-	//Host console
+-	compatible = "aspeed,ast2600-uart";
+-	/delete-property/ reg-shift;
+-	/delete-property/ reg-io-width;
+-	dma-mode;
+-	dma-channel = <0>;
+-	status = "okay";
++    //Host console
++    compatible = "aspeed,ast2600-uart";
++    /delete-property/ reg-shift;
++    /delete-property/ reg-io-width;
++    dma-mode;
++    dma-channel = <0>;
++    status = "okay";
+ };
++#endif
+
+ //BMC Console - UART
+ &uart5 {
+-	status = "okay";
++    status = "okay";
+ };
+
+ &uart_routing {
+-	status = "okay";
++    status = "okay";
+ };
+
+ // I2C configs
+ &i2c0 {
+-	status = "okay";
++    status = "okay";
+ };
+
+ &i2c1 {
+-	status = "okay";
++    status = "okay";
++
++    i2c_slave_backend@57 {
++        compatible = "i2c-slave-backend";
++        reg = <0x30>;
++    };
+ };
+
+ &i2c2 {
+-	status = "okay";
++    status = "okay";
+ };
+
+ &i2c3 {
+-	status = "okay";
++    status = "okay";
+ };
+
+ &i2c4 {
+-	status = "okay";
++    status = "okay";
+ };
+
+ &i2c5 {
+-	status = "okay";
++    status = "okay";
+ };
+
+ &i2c6 {
+-	status = "okay";
++    status = "okay";
+ };
+
+ &i2c7 {
+-	status = "okay";
++    status = "okay";
+ };
+
+ &i2c8 {
+-	status = "okay";
++    status = "okay";
+ };
+ &i2c9 {
+-	status = "okay";
++    status = "okay";
+ };
+ &i2c10 {
+-	status = "okay";
++    status = "okay";
+ };
+
+ &i2c11 {
+-	status = "okay";
++    status = "okay";
+ };
+
+ &i2c12 {
+-	status = "okay";
++    status = "okay";
+ };
+
+ &i2c13 {
+-	status = "okay";
++    status = "okay";
+ };
+
+ &i2c14 {
+-	status = "okay";
++    status = "okay";
++    ubbeeprom@50 {
++    compatible = "microchip,24lc02","atmel,24c02";
++    reg = <0x50>;
++    };
+ };
+
+ &i2c15 {
+-	status = "okay";
++    status = "okay";
++};
++
++&vhub {
++    status = "okay";
++};
++&i3c2 {
++    status = "okay";
++    compatible = "";
+ };
+
++&i3c3 {
++    status = "okay";
++    compatible = "";
++};
+--
+2.17.1
+
