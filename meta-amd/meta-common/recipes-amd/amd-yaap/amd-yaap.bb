@@ -32,6 +32,7 @@ do_install() {
 inherit systemd
 SYSTEMD_SERVICE_${PN} += "yaapd.service \
                           "
+SYSTEMD_AUTO_ENABLE_${PN} = "disable"
 
 DEPENDS += "libgpiod"
 DEPENDS += "boost"
