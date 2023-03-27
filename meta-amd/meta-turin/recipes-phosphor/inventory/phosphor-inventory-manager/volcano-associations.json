@@ -65,6 +65,9 @@
                "/xyz/openbmc_project/sensors/temperature/CPU1_REAR_Temp",
                "/xyz/openbmc_project/sensors/temperature/CPU0_Temp",
                "/xyz/openbmc_project/sensors/temperature/CPU1_Temp",
+               "/xyz/openbmc_project/sensors/temperature/RISER_1_Temp",
+               "/xyz/openbmc_project/sensors/temperature/RISER_2_Temp",
+               "/xyz/openbmc_project/sensors/temperature/SYS_INLET_Temp",
 
                "/xyz/openbmc_project/sensors/temperature/P0_DIMM_C_Temp",
                "/xyz/openbmc_project/sensors/temperature/P0_DIMM_E_Temp",
@@ -176,6 +179,9 @@
                "/xyz/openbmc_project/sensors/temperature/CPU1_REAR_Temp",
                "/xyz/openbmc_project/sensors/temperature/CPU0_Temp",
                "/xyz/openbmc_project/sensors/temperature/CPU1_Temp",
+               "/xyz/openbmc_project/sensors/temperature/RISER_1_Temp",
+               "/xyz/openbmc_project/sensors/temperature/RISER_2_Temp",
+               "/xyz/openbmc_project/sensors/temperature/SYS_INLET_Temp",
 
                "/xyz/openbmc_project/sensors/temperature/P0_DIMM_C_Temp",
                "/xyz/openbmc_project/sensors/temperature/P0_DIMM_E_Temp",
