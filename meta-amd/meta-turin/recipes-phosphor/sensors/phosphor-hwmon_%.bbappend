@@ -106,6 +106,10 @@ CHIPS_PURICO = " \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@49 \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4a \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4c \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@7/lm75a@48 \
+        bus@1e78a000/i2c-bus@580/i2cswitch@75/i2c@0/i2cswitch@73/i2c@1/lm75a@48 \
+        bus@1e78a000/i2c-bus@580/i2cswitch@75/i2c@1/i2cswitch@73/i2c@1/lm75a@48 \
+        bus@1e78a000/i2c-bus@580/i2cswitch@75/i2c@2/i2cswitch@73/i2c@1/lm75a@48 \
         bus@1e78a000/i2c-bus@300/i2cswitch@70/i2c@0/vddcr_core0_soc@61 \
         bus@1e78a000/i2c-bus@300/i2cswitch@70/i2c@0/vddcr_core1_11@62 \
         bus@1e78a000/i2c-bus@300/i2cswitch@70/i2c@0/vddcr_vddio_33@63 \
@@ -168,7 +172,9 @@ CHIPS_VOLCANO = " \
         bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@1/lm75a@4b \
         bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@1/lm75a@4c \
         bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@1/lm75a@4d \
-        bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@6/lm75a@4a \
+        bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@4/i2cswitch@73/i2c@0/lm75a@48 \
+        bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@5/i2cswitch@73/i2c@0/lm75a@48 \
+        bus@1e78a000/i2c-bus@500/i2cswitch@71/i2c@6/lm75a@48 \
         bus@1e78a000/i2c-bus@300/pvdd11_s3_p0@62 \
         bus@1e78a000/i2c-bus@300/pvddcr_soc_p0@61 \
         bus@1e78a000/i2c-bus@300/pvddio_p0@63 \
