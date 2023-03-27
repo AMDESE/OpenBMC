@@ -62,6 +62,11 @@
                     "/xyz/openbmc_project/sensors/temperature/LM75A_4E",
                     "/xyz/openbmc_project/sensors/temperature/LM75A_4C",
                     "/xyz/openbmc_project/sensors/temperature/LM75A_49",
+                    "/xyz/openbmc_project/sensors/temperature/LM95234_18",
+                    "/xyz/openbmc_project/sensors/temperature/LM95234_P0_CCD2",
+                    "/xyz/openbmc_project/sensors/temperature/LM95234_P0_CCD1",
+                    "/xyz/openbmc_project/sensors/temperature/LM95234_P0_IOD",
+                    "/xyz/openbmc_project/sensors/temperature/LM95234_P0_CCD0",
 
                     "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan1",
                     "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan2",
@@ -92,6 +97,9 @@
                     "/xyz/openbmc_project/sensors/current/VDDIO_IOUT",
                     "/xyz/openbmc_project/sensors/current/VDD_CORE0_IOUT",
                     "/xyz/openbmc_project/sensors/current/SOC_IOUT",
+                    "/xyz/openbmc_project/sensors/current/VDD_33_RUN_IOUT",
+                    "/xyz/openbmc_project/sensors/current/VDD_33_DUAL_IOUT",
+                    "/xyz/openbmc_project/sensors/current/VDD_5_DUAL_IOUT",
 
                     "/xyz/openbmc_project/sensors/power/VDD_CORE1_POUT",
                     "/xyz/openbmc_project/sensors/power/VDD11_SUS_POUT",
@@ -169,6 +177,11 @@
                     "/xyz/openbmc_project/sensors/temperature/LM75A_4E",
                     "/xyz/openbmc_project/sensors/temperature/LM75A_4C",
                     "/xyz/openbmc_project/sensors/temperature/LM75A_49",
+                    "/xyz/openbmc_project/sensors/temperature/LM95234_18",
+                    "/xyz/openbmc_project/sensors/temperature/LM95234_P0_CCD2",
+                    "/xyz/openbmc_project/sensors/temperature/LM95234_P0_CCD1",
+                    "/xyz/openbmc_project/sensors/temperature/LM95234_P0_IOD",
+                    "/xyz/openbmc_project/sensors/temperature/LM95234_P0_CCD0",
 
                     "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan1",
                     "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan2",
@@ -199,6 +212,9 @@
                     "/xyz/openbmc_project/sensors/current/VDDIO_IOUT",
                     "/xyz/openbmc_project/sensors/current/VDD_CORE0_IOUT",
                     "/xyz/openbmc_project/sensors/current/SOC_IOUT",
+                    "/xyz/openbmc_project/sensors/current/VDD_33_RUN_IOUT",
+                    "/xyz/openbmc_project/sensors/current/VDD_33_DUAL_IOUT",
+                    "/xyz/openbmc_project/sensors/current/VDD_5_DUAL_IOUT",
 
                     "/xyz/openbmc_project/sensors/power/VDD_CORE1_POUT",
                     "/xyz/openbmc_project/sensors/power/VDD11_SUS_POUT",

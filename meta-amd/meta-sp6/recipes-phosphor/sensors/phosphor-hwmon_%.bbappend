@@ -63,11 +63,15 @@ CHIPS_SUNSTONE = " \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4d \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4e \
         bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@5/lm75a@4f \
+        bus@1e78a000/i2c-bus@500/i2cswitch@70/i2c@7/lm95234@18 \
         bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/p0_vdd_soc_run@40 \
         bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/p0_vdd_vddio_run@41 \
         bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/p0_vdd_11_sus@42 \
         bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/p0_vdd_18_dual@17 \
         bus@1e78a000/i2c-bus@300/i2cswitch@71/i2c@0/p0_vdd_33_dual@16 \
+        bus@1e78a000/i2c-bus@280/vdd_33_run@13 \
+        bus@1e78a000/i2c-bus@280/vdd_33_dual@14 \
+        bus@1e78a000/i2c-bus@280/vdd_5_dual@15 \
         "
 
 ITEMSFMT = "ahb/apb/{0}.conf"
