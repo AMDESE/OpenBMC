@@ -42,4 +42,5 @@ SRC_URI += "file://amd-bmc-baseline.cfg \
             file://0039-apml_sbrmi-Wait-for-fops-to-complete-cleanly-on-devi.patch \
             file://0040-Add-TDA-voltage-regulators-to-dts.patch \
             file://0041-ARM-dts-aspeed-Modify-Genoa-device-trees-for-i2c-slave.patch \
+            file://0042-Add-LM95234-to-dts-file.patch \
            "

@@ -1,0 +1,49 @@
+From 7eacf6cc730c3fbfd145e17a9a8106d3ea4923d1 Mon Sep 17 00:00:00 2001
+From: Abinaya <abinaya.dhandapani@amd.com>
+Date: Mon, 27 Mar 2023 07:29:07 -0500
+Subject: [PATCH] Add LM95234 to dts file
+
+Signed-off-by: Abinaya <abinaya.dhandapani@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-sunstone.dts | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-sunstone.dts b/arch/arm/boot/dts/aspeed-bmc-amd-sunstone.dts
+index 7402d1700dd3..272cdc4ddcb9 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-sunstone.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-sunstone.dts
+@@ -181,17 +181,17 @@ i2cswitch@70 {
+ &i2c4 {
+ 	// Net name i2c1
+ 	status = "okay";
+-	vdd33run@13 {
++	vdd_33_run@13 {
+ 		//VDD_33_RUN VRM
+ 		compatible = "infineon,xdpe12284";
+ 		reg = <0x13>;
+ 	};
+-	vdd33dual@14 {
++	vdd_33_dual@14 {
+ 		//VDD_33_DUAL VRM
+ 		compatible = "infineon,xdpe12284";
+ 		reg = <0x14>;
+ 	};
+-	vdd5dual@15 {
++	vdd_5_dual@15 {
+ 		//VDD_5_DUAL VRM
+ 		compatible = "infineon,xdpe12284";
+ 		reg = <0x15>;
+@@ -514,6 +514,10 @@ i2c@7 {
+ 			#size-cells = <0>;
+ 			reg = <7>;
+ 			// SOC Thermal Diode
++            lm95234@18 {
++                compatible = "lm95234";
++                reg = <0x18>;
++            };
+ 		};
+ 	};
+ };
+--
+2.25.1
+
