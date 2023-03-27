@@ -366,3 +366,23 @@
   sensorID: 0x4D
   sensorType: 3
   offset: 0xff
+/xyz/openbmc_project/sensors/temperature/RISER_1_Temp:
+  eventReadingType: 1
+  sensorID: 0x4E
+  sensorType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/temperature/RISER_2_Temp:
+  eventReadingType: 1
+  sensorID: 0x4F
+  sensorType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/temperature/RISER_3_Temp:
+  eventReadingType: 1
+  sensorID: 0x50
+  sensorType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/temperature/SYS_INLET_Temp:
+  eventReadingType: 1
+  sensorID: 0x51
+  sensorType: 1
+  offset: 0xff

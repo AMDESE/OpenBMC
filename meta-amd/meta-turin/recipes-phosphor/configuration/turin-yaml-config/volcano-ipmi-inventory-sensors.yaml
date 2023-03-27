@@ -61,6 +61,21 @@
   sensorID: 0x0A
   sensorType: 2
   offset: 0xff
+/xyz/openbmc_project/sensors/temperature/RISER_1_Temp:
+  eventReadingType: 1
+  sensorID: 0x0B
+  sensorType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/temperature/RISER_2_Temp:
+  eventReadingType: 1
+  sensorID: 0x0C
+  sensorType: 1
+  offset: 0xff
+/xyz/openbmc_project/sensors/temperature/SYS_INLET_Temp:
+  eventReadingType: 1
+  sensorID: 0x0D
+  sensorType: 1
+  offset: 0xff
 /xyz/openbmc_project/sensors/temperature/P0_DIMM_C_Temp:
   eventReadingType: 1
   sensorID: 0x1A
