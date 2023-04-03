@@ -43,4 +43,5 @@ SRC_URI += "file://amd-bmc-baseline.cfg \
             file://0040-Add-TDA-voltage-regulators-to-dts.patch \
             file://0041-ARM-dts-aspeed-Modify-Genoa-device-trees-for-i2c-slave.patch \
             file://0042-Add-LM95234-to-dts-file.patch \
+            file://0043-ARM-dts-aspeed-Add-Riser-PSU-FP-sensors-to-Turin-Lenovo.patch \
            "

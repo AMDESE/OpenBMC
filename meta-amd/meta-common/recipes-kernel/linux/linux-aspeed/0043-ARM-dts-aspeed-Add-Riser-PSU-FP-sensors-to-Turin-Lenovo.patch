@@ -1,0 +1,826 @@
+From 9a40f7a86abe835f914c55da615cd64e5e8145da Mon Sep 17 00:00:00 2001
+From: Mohsen Dolaty <mohsen.dolaty@amd.com>
+Date: Mon, 27 Mar 2023 11:20:09 -0500
+Subject: [PATCH 1/1] linux-aspeed: Add Riser-PSU-FP sensors to Turin Lenovo
+
+Add Riser LM75 and FRU for Volcano and Purico
+Add PSU FRU for Volcano and Purico
+Add Front Panel PCT2075 as LM75 for Volcano and Purico
+Add i2c Bus number for Volcano retimer bus
+Clean Purico ADC
+Cleanup i2c Mux addr for Volcano and Purico Board ID
+
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
+---
+ .../boot/dts/aspeed-bmc-amd-purico-i3c.dts    | 163 +++++++++++++-----
+ arch/arm/boot/dts/aspeed-bmc-amd-purico.dts   | 163 +++++++++++++-----
+ .../boot/dts/aspeed-bmc-amd-volcano-i3c.dts   | 110 ++++++++++--
+ arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts  | 110 ++++++++++--
+ 4 files changed, 440 insertions(+), 106 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
+index 40ec0bceeb92..18f2327cf75d 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
+@@ -76,14 +76,9 @@ pcc_memory: pccbuffer {
+
+ 	iio-hwmon-adc121c {
+ 		compatible = "iio-hwmon";
+-		oemname0 = "ADC121C_50";
+-		oemname1 = "ADC121C_51";
+-		oemname2 = "ADC121C_52";
+-		oemname4 = "ADC121C_54";
+-		oemname5 = "ADC121C_55";
+-		oemname6 = "ADC121C_56";
+-		io-channels = <&adc0 0>, <&adc1 0>, <&adc2 0>,
+-					  <&adc4 0>, <&adc5 0>, <&adc6 0>;
++		oemname0 = "ADC121C_55";
++		oemname1 = "ADC121C_56";
++		io-channels = <&adc0 0>, <&adc1 0>;
+ 	};
+ };
+
+@@ -260,6 +255,18 @@ mbeeprom@50 {
+ &i2c8 {
+ 	// Net name i2c5
+ 	status = "okay";
++
++	psu0_eeprom: eeprom@50 {
++		compatible = "atmel,24c32";
++		reg = <0x50>;
++		pagesize = <32>;
++	};
++
++	psu1_eeprom: eeprom@51 {
++		compatible = "atmel,24c32";
++		reg = <0x51>;
++		pagesize = <32>;
++	};
+ };
+
+ // Fan, Temp, ADC sensors
+@@ -327,43 +334,30 @@ i2c@6 {
+ 			#size-cells = <0>;
+ 			reg = <6>;
+
+-			adc0: adc121c_50@50 {
+-				compatible = "ti,adc121c";
+-				reg = <0x50>;
+-				#io-channel-cells = <1>;
+-				label = "adc121c_50";
+-			};
+-			adc1: adc121c_51@51 {
+-				compatible = "ti,adc121c";
+-				reg = <0x51>;
+-				#io-channel-cells = <1>;
+-				label = "adc121c_51";
+-			};
+-			adc2: adc121c_52@52 {
+-				compatible = "ti,adc121c";
+-				reg = <0x52>;
+-				#io-channel-cells = <1>;
+-				label = "adc121c_52";
+-			};
+-			adc4: adc121c_54@54 {
+-				compatible = "ti,adc121c";
+-				reg = <0x54>;
+-				#io-channel-cells = <1>;
+-				label = "adc121c_54";
+-			};
+-			adc5: adc121c_55@55 {
++			adc0: adc121c_55@55 {
+ 				compatible = "ti,adc121c";
+ 				reg = <0x55>;
+ 				#io-channel-cells = <1>;
+ 				label = "adc121c_55";
+ 			};
+-			adc6: adc121c_56@56 {
++			adc1: adc121c_56@56 {
+ 				compatible = "ti,adc121c";
+ 				reg = <0x56>;
+ 				#io-channel-cells = <1>;
+ 				label = "adc121c_56";
+ 			};
+ 		};
++
++		i2c@7 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <7>;
++
++			lm75a@48 {
++				compatible = "national,lm75a";
++				reg = <0x48>;
++			};
++		};
+ 	};
+ };
+
+@@ -372,17 +366,10 @@ &i2c10 {
+ 	// Net name i2c7
+ 	status = "okay";
+ #ifdef EEPROM_PROG_ENABLE
+-	// UBM
+-	i2cswitch@70 {
+-		compatible = "nxp,pca9548";
+-		reg = <0x70>;
+-
+-	};
+-
+ 	// SCM brd_id, Purico brd_id, CLK
+-	i2cswitch@73 {
++	i2cswitch@71 {
+ 		compatible = "nxp,pca9548";
+-		reg = <0x73>;
++		reg = <0x71>;
+ 		#address-cells = <1>;
+ 		#size-cells = <0>;
+
+@@ -414,18 +401,108 @@ channel_10_10: i2c@0 {
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 			reg = <0>;
++
++			i2cswitch@73 {
++				compatible = "nxp,pca9545";
++				#address-cells = <1>;
++				#size-cells = <0>;
++				reg = <0x73>;
++
++				i2c@1 {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					reg = <1>;
++
++					lm75a@48 {      // Riser 1 temp
++						compatible = "national,lm75a";
++						reg = <0x48>;
++					};
++				};
++
++				i2c@2 {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					reg = <2>;
++
++					riser1_eeprom: eeprom@51 {
++						compatible = "atmel,24c32";
++						reg = <0x51>;
++						pagesize = <32>;
++					};
++                                };
++			};
+ 		};
+
+ 		channel_10_11: i2c@1 {
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 			reg = <1>;
++
++			i2cswitch@73 {
++				compatible = "nxp,pca9545";
++				#address-cells = <1>;
++				#size-cells = <0>;
++				reg = <0x73>;
++
++				i2c@1 {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					reg = <1>;
++
++					lm75a@48 {      // Riser 2 temp
++						compatible = "national,lm75a";
++						reg = <0x48>;
++					};
++				};
++
++				i2c@2 {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					reg = <2>;
++
++					riser2_eeprom: eeprom@51 {
++						compatible = "atmel,24c32";
++						reg = <0x51>;
++						pagesize = <32>;
++					};
++				};
++			};
+ 		};
+
+ 		channel_10_12: i2c@2 {
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 			reg = <2>;
++
++			i2cswitch@73 {
++				compatible = "nxp,pca9545";
++				#address-cells = <1>;
++				#size-cells = <0>;
++				reg = <0x73>;
++
++				i2c@1 {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					reg = <1>;
++
++					lm75a@48 {      // Riser 3 temp
++						compatible = "national,lm75a";
++						reg = <0x48>;
++					};
++				};
++
++				i2c@2 {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					reg = <2>;
++
++					riser3_eeprom: eeprom@51 {
++						compatible = "atmel,24c32";
++						reg = <0x51>;
++						pagesize = <32>;
++					};
++				};
++			};
+ 		};
+
+ 		channel_10_13: i2c@3 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+index 2a8a03645e17..7b37ff079f6f 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+@@ -76,14 +76,9 @@ pcc_memory: pccbuffer {
+
+ 	iio-hwmon-adc121c {
+ 		compatible = "iio-hwmon";
+-		oemname0 = "ADC121C_50";
+-		oemname1 = "ADC121C_51";
+-		oemname2 = "ADC121C_52";
+-		oemname4 = "ADC121C_54";
+-		oemname5 = "ADC121C_55";
+-		oemname6 = "ADC121C_56";
+-		io-channels = <&adc0 0>, <&adc1 0>, <&adc2 0>,
+-					  <&adc4 0>, <&adc5 0>, <&adc6 0>;
++		oemname0 = "ADC121C_55";
++		oemname1 = "ADC121C_56";
++		io-channels = <&adc0 0>, <&adc1 0>;
+ 	};
+ };
+
+@@ -260,6 +255,18 @@ mbeeprom@50 {
+ &i2c8 {
+ 	// Net name i2c5
+ 	status = "okay";
++
++	psu0_eeprom: eeprom@50 {
++		compatible = "atmel,24c32";
++		reg = <0x50>;
++		pagesize = <32>;
++	};
++
++	psu1_eeprom: eeprom@51 {
++		compatible = "atmel,24c32";
++		reg = <0x51>;
++		pagesize = <32>;
++	};
+ };
+
+ // Fan, Temp, ADC sensors
+@@ -327,43 +334,30 @@ i2c@6 {
+ 			#size-cells = <0>;
+ 			reg = <6>;
+
+-			adc0: adc121c_50@50 {
+-				compatible = "ti,adc121c";
+-				reg = <0x50>;
+-				#io-channel-cells = <1>;
+-				label = "adc121c_50";
+-			};
+-			adc1: adc121c_51@51 {
+-				compatible = "ti,adc121c";
+-				reg = <0x51>;
+-				#io-channel-cells = <1>;
+-				label = "adc121c_51";
+-			};
+-			adc2: adc121c_52@52 {
+-				compatible = "ti,adc121c";
+-				reg = <0x52>;
+-				#io-channel-cells = <1>;
+-				label = "adc121c_52";
+-			};
+-			adc4: adc121c_54@54 {
+-				compatible = "ti,adc121c";
+-				reg = <0x54>;
+-				#io-channel-cells = <1>;
+-				label = "adc121c_54";
+-			};
+-			adc5: adc121c_55@55 {
++			adc0: adc121c_55@55 {
+ 				compatible = "ti,adc121c";
+ 				reg = <0x55>;
+ 				#io-channel-cells = <1>;
+ 				label = "adc121c_55";
+ 			};
+-			adc6: adc121c_56@56 {
++			adc1: adc121c_56@56 {
+ 				compatible = "ti,adc121c";
+ 				reg = <0x56>;
+ 				#io-channel-cells = <1>;
+ 				label = "adc121c_56";
+ 			};
+ 		};
++
++		i2c@7 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <7>;
++
++			lm75a@48 {
++				compatible = "national,lm75a";
++				reg = <0x48>;
++			};
++		};
+ 	};
+ };
+
+@@ -372,17 +366,10 @@ &i2c10 {
+ 	// Net name i2c7
+ 	status = "okay";
+ #ifdef EEPROM_PROG_ENABLE
+-	// UBM
+-	i2cswitch@70 {
+-		compatible = "nxp,pca9548";
+-		reg = <0x70>;
+-
+-	};
+-
+ 	// SCM brd_id, Purico brd_id, CLK
+-	i2cswitch@73 {
++	i2cswitch@71 {
+ 		compatible = "nxp,pca9548";
+-		reg = <0x73>;
++		reg = <0x71>;
+ 		#address-cells = <1>;
+ 		#size-cells = <0>;
+
+@@ -414,18 +401,108 @@ channel_10_10: i2c@0 {
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 			reg = <0>;
++
++			i2cswitch@73 {
++				compatible = "nxp,pca9545";
++				#address-cells = <1>;
++				#size-cells = <0>;
++				reg = <0x73>;
++
++				i2c@1 {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					reg = <1>;
++
++					lm75a@48 {      // Riser 1 temp
++						compatible = "national,lm75a";
++						reg = <0x48>;
++					};
++				};
++
++				i2c@2 {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					reg = <2>;
++
++					riser1_eeprom: eeprom@51 {
++						compatible = "atmel,24c32";
++						reg = <0x51>;
++						pagesize = <32>;
++					};
++                                };
++			};
+ 		};
+
+ 		channel_10_11: i2c@1 {
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 			reg = <1>;
++
++			i2cswitch@73 {
++				compatible = "nxp,pca9545";
++				#address-cells = <1>;
++				#size-cells = <0>;
++				reg = <0x73>;
++
++				i2c@1 {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					reg = <1>;
++
++					lm75a@48 {      // Riser 2 temp
++						compatible = "national,lm75a";
++						reg = <0x48>;
++					};
++				};
++
++				i2c@2 {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					reg = <2>;
++
++					riser2_eeprom: eeprom@51 {
++						compatible = "atmel,24c32";
++						reg = <0x51>;
++						pagesize = <32>;
++					};
++				};
++			};
+ 		};
+
+ 		channel_10_12: i2c@2 {
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 			reg = <2>;
++
++			i2cswitch@73 {
++				compatible = "nxp,pca9545";
++				#address-cells = <1>;
++				#size-cells = <0>;
++				reg = <0x73>;
++
++				i2c@1 {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					reg = <1>;
++
++					lm75a@48 {      // Riser 3 temp
++						compatible = "national,lm75a";
++						reg = <0x48>;
++					};
++				};
++
++				i2c@2 {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					reg = <2>;
++
++					riser3_eeprom: eeprom@51 {
++						compatible = "atmel,24c32";
++						reg = <0x51>;
++						pagesize = <32>;
++					};
++				};
++			};
+ 		};
+
+ 		channel_10_13: i2c@3 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts
+index a458b46cf344..1b27b7bd9bf0 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts
+@@ -16,6 +16,16 @@ aliases {
+ 		serial4 = &uart5;
+ 		ethernet0 = &mac3;
+ 		ethernet1 = &mac2;
++		i2c200 = &channel_9_0;
++		i2c201 = &channel_9_1;
++		i2c202 = &channel_9_2;
++		i2c203 = &channel_9_3;
++		i2c204 = &channel_9_4;
++		i2c205 = &channel_9_5;
++		i2c206 = &channel_9_6;
++		i2c207 = &channel_9_7;
++		i2c208 = &channel_9_40;
++		i2c209 = &channel_9_50;
+ 		i2c240 = &channel_10_10; //U63
+ 		i2c241 = &channel_10_11;
+ 		i2c242 = &channel_10_12;
+@@ -685,6 +695,18 @@ mbeeprom@50 {
+ &i2c8 {
+ 	// Net name i2c5
+ 	status = "okay";
++
++	psu0_eeprom: eeprom@50 {
++		compatible = "atmel,24c32";
++		reg = <0x50>;
++		pagesize = <32>;
++	};
++
++	psu1_eeprom: eeprom@51 {
++		compatible = "atmel,24c32";
++		reg = <0x51>;
++		pagesize = <32>;
++	};
+ };
+
+ // Fan, Temp, ADC sensors
+@@ -698,7 +720,7 @@ i2cswitch@71 {
+ 		#address-cells = <1>;
+ 		#size-cells = <0>;
+
+-		i2c@0 {
++		channel_9_0: i2c@0 {
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 			reg = <0>;
+@@ -708,7 +730,7 @@ nct7362@20 {
+ 			};
+ 		};
+
+-		i2c@7 { //Liquid Cooling Fan
++		channel_9_7: i2c@7 { //Liquid Cooling Fan
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 			reg = <7>;
+@@ -718,7 +740,7 @@ nct7362@20 {
+ 			};
+ 		};
+
+-		i2c@1 {
++		channel_9_1: i2c@1 {
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 			reg = <1>;
+@@ -749,7 +771,7 @@ lm75a@4d {  // CPU1 R-VR
+ 			};
+ 		};
+
+-		i2c@2 {
++		channel_9_2: i2c@2 {
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 			reg = <2>;
+@@ -768,14 +790,82 @@ adc1: p12v_aux@56 {
+ 			};
+ 		};
+
+-		i2c@6 {
++		channel_9_3: i2c@3 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <3>;
++		};
++
++		channel_9_4: i2c@4 {  //Riser 1
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <4>;
++
++			i2cswitch@73 {
++				compatible = "nxp,pca9545";
++				#address-cells = <1>;
++				#size-cells = <0>;
++				reg = <0x73>;
++
++				//  channel 0 connected to FRU, LM75, and Retimer
++				channel_9_40: i2c@0 {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					reg = <0>;
++
++					riser1_eeprom: eeprom@51 {
++						compatible = "atmel,24c32";
++						reg = <0x51>;
++						pagesize = <32>;
++					};
++
++					lm75a@48 {      // Riser 1 temp
++						compatible = "national,lm75a";
++						reg = <0x48>;
++					};
++				};
++			};
++		};
++
++		channel_9_5: i2c@5 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <5>;
++
++			i2cswitch@73 {
++				compatible = "nxp,pca9545";
++				#address-cells = <1>;
++				#size-cells = <0>;
++				reg = <0x73>;
++
++				//  channel 0 connected to FRU, LM75, and Retimer
++				channel_9_50: i2c@0 {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					reg = <0>;
++
++					riser2_eeprom: eeprom@51 {
++						compatible = "atmel,24c32";
++						reg = <0x51>;
++						pagesize = <32>;
++					};
++
++					lm75a@48 {      // Riser 2 temp
++						compatible = "national,lm75a";
++						reg = <0x48>;
++					};
++				};
++			};
++		};
++
++		channel_9_6: i2c@6 {
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 			reg = <6>;
+
+-			lm75a@4a {	// SYS INLET
++			lm75a@48 {	// SYS INLET
+ 				compatible = "national,lm75a";
+-				reg = <0x4a>;
++				reg = <0x48>;
+ 			};
+ 		};
+ 	};
+@@ -787,9 +877,9 @@ &i2c10 {
+ 	status = "okay";
+ #ifdef EEPROM_PROG_ENABLE
+ 	// SCM brd_id, Volcano brd_id, CLK
+-	i2cswitch@73 {
+-		compatible = "nxp,pca9848";
+-		reg = <0x73>;
++	i2cswitch@71 {
++		compatible = "nxp,pca9548";
++		reg = <0x71>;
+ 		#address-cells = <1>;
+ 		#size-cells = <0>;
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts b/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
+index 9f8a5050a878..2e27bf10ba4e 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
+@@ -16,6 +16,16 @@ aliases {
+ 		serial4 = &uart5;
+ 		ethernet0 = &mac3;
+ 		ethernet1 = &mac2;
++		i2c200 = &channel_9_0;
++		i2c201 = &channel_9_1;
++		i2c202 = &channel_9_2;
++		i2c203 = &channel_9_3;
++		i2c204 = &channel_9_4;
++		i2c205 = &channel_9_5;
++		i2c206 = &channel_9_6;
++		i2c207 = &channel_9_7;
++		i2c208 = &channel_9_40;
++		i2c209 = &channel_9_50;
+ 		i2c240 = &channel_10_10; //U63
+ 		i2c241 = &channel_10_11;
+ 		i2c242 = &channel_10_12;
+@@ -673,6 +683,18 @@ mbeeprom@50 {
+ &i2c8 {
+ 	// Net name i2c5
+ 	status = "okay";
++
++	psu0_eeprom: eeprom@50 {
++		compatible = "atmel,24c32";
++		reg = <0x50>;
++		pagesize = <32>;
++	};
++
++	psu1_eeprom: eeprom@51 {
++		compatible = "atmel,24c32";
++		reg = <0x51>;
++		pagesize = <32>;
++	};
+ };
+
+ // Fan, Temp, ADC sensors
+@@ -686,7 +708,7 @@ i2cswitch@71 {
+ 		#address-cells = <1>;
+ 		#size-cells = <0>;
+
+-		i2c@0 {
++		channel_9_0: i2c@0 {
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 			reg = <0>;
+@@ -696,7 +718,7 @@ nct7362@20 {
+ 			};
+ 		};
+
+-		i2c@7 { //Liquid Cooling Fan
++		channel_9_7: i2c@7 { //Liquid Cooling Fan
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 			reg = <7>;
+@@ -706,7 +728,7 @@ nct7362@20 {
+ 			};
+ 		};
+
+-		i2c@1 {
++		channel_9_1: i2c@1 {
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 			reg = <1>;
+@@ -737,7 +759,7 @@ lm75a@4d {  // CPU1 R-VR
+ 			};
+ 		};
+
+-		i2c@2 {
++		channel_9_2: i2c@2 {
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 			reg = <2>;
+@@ -756,14 +778,82 @@ adc1: p12v_aux@56 {
+ 			};
+ 		};
+
+-		i2c@6 {
++		channel_9_3: i2c@3 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <3>;
++		};
++
++		channel_9_4: i2c@4 {  //Riser 1
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <4>;
++
++			i2cswitch@73 {
++				compatible = "nxp,pca9545";
++				#address-cells = <1>;
++				#size-cells = <0>;
++				reg = <0x73>;
++
++				//  channel 0 connected to FRU, LM75, and Retimer
++				channel_9_40: i2c@0 {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					reg = <0>;
++
++					riser1_eeprom: eeprom@51 {
++						compatible = "atmel,24c32";
++						reg = <0x51>;
++						pagesize = <32>;
++					};
++
++					lm75a@48 {      // Riser 1 temp
++						compatible = "national,lm75a";
++						reg = <0x48>;
++					};
++				};
++			};
++		};
++
++		channel_9_5: i2c@5 {
++			#address-cells = <1>;
++			#size-cells = <0>;
++			reg = <5>;
++
++			i2cswitch@73 {
++				compatible = "nxp,pca9545";
++				#address-cells = <1>;
++				#size-cells = <0>;
++				reg = <0x73>;
++
++				//  channel 0 connected to FRU, LM75, and Retimer
++				channel_9_50: i2c@0 {
++					#address-cells = <1>;
++					#size-cells = <0>;
++					reg = <0>;
++
++					riser2_eeprom: eeprom@51 {
++						compatible = "atmel,24c32";
++						reg = <0x51>;
++						pagesize = <32>;
++					};
++
++					lm75a@48 {      // Riser 2 temp
++						compatible = "national,lm75a";
++						reg = <0x48>;
++					};
++				};
++			};
++		};
++
++		channel_9_6: i2c@6 {
+ 			#address-cells = <1>;
+ 			#size-cells = <0>;
+ 			reg = <6>;
+
+-			lm75a@4a {	// SYS INLET
++			lm75a@48 {	// SYS INLET
+ 				compatible = "national,lm75a";
+-				reg = <0x4a>;
++				reg = <0x48>;
+ 			};
+ 		};
+ 	};
+@@ -775,9 +865,9 @@ &i2c10 {
+ 	status = "okay";
+ #ifdef EEPROM_PROG_ENABLE
+ 	// SCM brd_id, Volcano brd_id, CLK
+-	i2cswitch@73 {
+-		compatible = "nxp,pca9848";
+-		reg = <0x73>;
++	i2cswitch@71 {
++		compatible = "nxp,pca9548";
++		reg = <0x71>;
+ 		#address-cells = <1>;
+ 		#size-cells = <0>;
+
+--
+2.25.1
