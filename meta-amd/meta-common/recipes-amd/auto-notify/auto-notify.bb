@@ -5,7 +5,7 @@ LICENSE = "CLOSED"
 
 inherit systemd
 
-SRC_URI = "git://git@github.com:/AMDESE/notify-automation.git;branch=main;protocol=ssh;tag=v0.0.1"
+SRC_URI = "git://git@github.com:/AMDESE/notify-automation.git;branch=main;protocol=ssh;tag=prod"
 
 RDEPENDS_${PN} += " bash curl"
 S="${WORKDIR}/git"
