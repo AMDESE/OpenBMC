@@ -9,6 +9,9 @@ slot_flag=0
 port=0
 i2cbus=9
 mux=0
+Volcano=false
+volcano_riser1_bus=208
+volcano_riser2_bus=209
 
 # Read Board ID from u-boot env
 boardID=`fw_printenv board_id | sed -n "s/^board_id=//p"`
@@ -29,6 +32,10 @@ case $boardID in
    "49" | "4A" | "4a" | "4B" | "4b" | "4C" |"4c" | "4D" | "4d" | "4E" | "4e")  # Titanite board_ids
         echo "Titnanite Platform Rev $revID"
         mux=71
+   ;;
+   "6B"| "74" | "75")  # volcano board_ids
+        Volcano=true
+        echo "Turin Volcano platform Rev $revID"
    ;;
    *)  # Default
         echo "Unknown Platform. Aborting"
@@ -81,8 +88,10 @@ function onboard_probe() {
 }
 
 function onboard_cleanup() {
-    if [ $onboard_flag == 1 ]; then
-    echo $fmux > /sys/bus/i2c/devices/i2c-10/delete_device || true
+    if [ $Volcano != "true" ]; then
+        if [ $onboard_flag == 1 ]; then
+            echo $fmux > /sys/bus/i2c/devices/i2c-10/delete_device || true
+        fi
     fi
 }
 
@@ -123,17 +132,29 @@ else
     exit -1
 fi
 
-if [ $Riser == "Riser1" ]; then
-    port=0x10
-    set_bus_for_slot
-elif [ $Riser == "Riser2" ]; then
-    port=0x20
-    set_bus_for_slot
-elif [ $Riser == "RiserOB" ]; then
-    onboard_probe
+if [ $Volcano == "true" ]; then
+    if [ $Riser == "Riser1" ]; then
+        BUSADDR=$volcano_riser1_bus
+    elif [ $Riser == "Riser2" ]; then
+        BUSADDR=$volcano_riser2_bus
+    else
+        echo "Unknown Riser in MANIFEST"
+        exit
+    fi
+    echo "Volcano: " $Manufacturer $Riser $BUSADDR
 else
-    echo "Unknown Riser in MANIFEST"
-    exit
+    if [ $Riser == "Riser1" ]; then
+        port=0x10
+        set_bus_for_slot
+    elif [ $Riser == "Riser2" ]; then
+        port=0x20
+        set_bus_for_slot
+    elif [ $Riser == "RiserOB" ]; then
+        onboard_probe
+    else
+        echo "Unknown Riser in MANIFEST"
+        exit
+    fi
 fi
 
 IMAGE_FILE=$(find -type f -name '*.ihx')
