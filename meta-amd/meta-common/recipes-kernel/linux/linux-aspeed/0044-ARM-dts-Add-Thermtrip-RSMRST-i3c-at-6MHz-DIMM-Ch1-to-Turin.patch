@@ -1,0 +1,371 @@
+From d98b886cb575f40d55d53b33038155e5c3cb6ab9 Mon Sep 17 00:00:00 2001
+From: Mohsen Dolaty <mohsen.dolaty@amd.com>
+Date: Fri, 7 Apr 2023 12:23:42 -0500
+Subject: [PATCH 1/1] dts: Add Thermtrip RSMRST i3c at 6MHz DIMM on Ch1 to Turin
+
+Add Termtrip and RSMRST GPIOS for P0 and P1 to Turin Platforms
+Add capability to change DIMM i3c bus to 6 MHz frequency
+Change DIMM Temp monitoring in Purico from Ch 0 to Ch 1
+
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
+---
+ .../boot/dts/aspeed-bmc-amd-chalupa-i3c.dts    |  4 ++--
+ arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts   |  4 ++--
+ .../arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts |  4 ++--
+ arch/arm/boot/dts/aspeed-bmc-amd-galena.dts    |  4 ++--
+ .../arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts |  4 ++--
+ arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts    |  4 ++--
+ .../arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts |  6 ++++--
+ arch/arm/boot/dts/aspeed-bmc-amd-purico.dts    |  6 ++++--
+ .../boot/dts/aspeed-bmc-amd-recluse-i3c.dts    |  4 ++--
+ arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts   |  4 ++--
+ .../boot/dts/aspeed-bmc-amd-volcano-i3c.dts    |  4 ++--
+ arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts   |  4 ++--
+ arch/arm/boot/dts/aspeed-g6.dtsi               | 18 ++++++++++++++++++
+ 13 files changed, 46 insertions(+), 24 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
+index 0cf5a52e6f54..5180623a8c5a 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
+@@ -1104,7 +1104,7 @@ &gpio0 {
+ 	/*K0-K7*/	"","","","","","","","",
+ 	/*L0-L7*/	"","","","","","","","",
+ 	/*M0-M7*/	"","","","","","","","",
+-	/*N0-N7*/	"","","","","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
++	/*N0-N7*/	"","","P0_THERMTRIP_L","P1_THERMTRIP_L","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
+ 	/*O0-O7*/	"","","HDT_SEL","HDT_XTRIG5","HDT_XTRIG6","JTAG_TRST_N","","",
+ 	/*P0-P7*/	"MON_RST_BTN_L","ASSERT_RST_BTN_L","MON_PWR_BTN_L","ASSERT_PWR_BTN_L","","ASSERT_NMI_BTN_L","MON_PWR_GOOD","",
+ 	/*Q0-Q7*/	"","","HDT_DBREQ_L","","BIOS_SPD_MUX_CTRL_RELEASED_L","","","",
+@@ -1112,7 +1112,7 @@ &gpio0 {
+ 	/*S0-S7*/	"","","","","P1_DIMM_AF_ERROR","P1_DIMM_GL_ERROR","P0_DIMM_AF_ERROR","P0_DIMM_GL_ERROR",
+ 	/*T0-T7*/	"","","","","","","","",
+ 	/*U0-U7*/	"","","","","P1_I3C_APML_ALERT_L","","","",
+-	/*V0-V7*/	"","","","","","","","",
++	/*V0-V7*/	"","","","RSMRST","","","","",
+ 	/*W0-W7*/	"","","","","","","","",
+ 	/*X0-X7*/	"","","","","","","","",
+ 	/*Y0-Y7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
+index 346da02c9b73..de76563d7b9b 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
+@@ -1092,7 +1092,7 @@ &gpio0 {
+ 	/*K0-K7*/	"","","","","","","","",
+ 	/*L0-L7*/	"","","","","","","","",
+ 	/*M0-M7*/	"","","","","","","","",
+-	/*N0-N7*/	"","","","","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
++	/*N0-N7*/	"","","P0_THERMTRIP_L","P1_THERMTRIP_L","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
+ 	/*O0-O7*/	"","","HDT_SEL","HDT_XTRIG5","HDT_XTRIG6","JTAG_TRST_N","","",
+ 	/*P0-P7*/	"MON_RST_BTN_L","ASSERT_RST_BTN_L","MON_PWR_BTN_L","ASSERT_PWR_BTN_L","","ASSERT_NMI_BTN_L","MON_PWR_GOOD","",
+ 	/*Q0-Q7*/	"","","HDT_DBREQ_L","","BIOS_SPD_MUX_CTRL_RELEASED_L","","","",
+@@ -1100,7 +1100,7 @@ &gpio0 {
+ 	/*S0-S7*/	"","","","","P1_DIMM_AF_ERROR","P1_DIMM_GL_ERROR","P0_DIMM_AF_ERROR","P0_DIMM_GL_ERROR",
+ 	/*T0-T7*/	"","","","","","","","",
+ 	/*U0-U7*/	"","","","","P1_I3C_APML_ALERT_L","","","",
+-	/*V0-V7*/	"","","","","","","","",
++	/*V0-V7*/	"","","","RSMRST","","","","",
+ 	/*W0-W7*/	"","","","","","","","",
+ 	/*X0-X7*/	"","","","","","","","",
+ 	/*Y0-Y7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts
+index 69da0423da72..9293c7ff47ab 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts
+@@ -785,7 +785,7 @@ &gpio0 {
+ 	/*K0-K7*/	"","","","","","","","",
+ 	/*L0-L7*/	"","","","","","","","",
+ 	/*M0-M7*/	"","","","","","","","",
+-	/*N0-N7*/	"","","","","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
++	/*N0-N7*/	"","","P0_THERMTRIP_L","","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
+ 	/*O0-O7*/	"","","HDT_SEL","HDT_XTRIG5","HDT_XTRIG6","JTAG_TRST_N","","",
+ 	/*P0-P7*/	"MON_RST_BTN_L","ASSERT_RST_BTN_L","MON_PWR_BTN_L","ASSERT_PWR_BTN_L","","ASSERT_NMI_BTN_L","MON_PWR_GOOD","",
+ 	/*Q0-Q7*/	"","","HDT_DBREQ_L","","BIOS_SPD_MUX_CTRL_RELEASED_L","","","",
+@@ -793,7 +793,7 @@ &gpio0 {
+ 	/*S0-S7*/	"","","","","","","P0_DIMM_AF_ERROR","P0_DIMM_GL_ERROR",
+ 	/*T0-T7*/	"","","","","","","","",
+ 	/*U0-U7*/	"","","","","","","","",
+-	/*V0-V7*/	"","","","","","","","",
++	/*V0-V7*/	"","","","RSMRST","","","","",
+ 	/*W0-W7*/	"","","","","","","","",
+ 	/*X0-X7*/	"","","","","","","","",
+ 	/*Y0-Y7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts b/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
+index f9f54f340f9e..088fa13a24a4 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
+@@ -779,7 +779,7 @@ &gpio0 {
+ 	/*K0-K7*/	"","","","","","","","",
+ 	/*L0-L7*/	"","","","","","","","",
+ 	/*M0-M7*/	"","","","","","","","",
+-	/*N0-N7*/	"","","","","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
++	/*N0-N7*/	"","","P0_THERMTRIP_L","","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
+ 	/*O0-O7*/	"","","HDT_SEL","HDT_XTRIG5","HDT_XTRIG6","JTAG_TRST_N","","",
+ 	/*P0-P7*/	"MON_RST_BTN_L","ASSERT_RST_BTN_L","MON_PWR_BTN_L","ASSERT_PWR_BTN_L","","ASSERT_NMI_BTN_L","MON_PWR_GOOD","",
+ 	/*Q0-Q7*/	"","","HDT_DBREQ_L","","BIOS_SPD_MUX_CTRL_RELEASED_L","","","",
+@@ -787,7 +787,7 @@ &gpio0 {
+ 	/*S0-S7*/	"","","","","","","P0_DIMM_AF_ERROR","P0_DIMM_GL_ERROR",
+ 	/*T0-T7*/	"","","","","","","","",
+ 	/*U0-U7*/	"","","","","","","","",
+-	/*V0-V7*/	"","","","","","","","",
++	/*V0-V7*/	"","","","RSMRST","","","","",
+ 	/*W0-W7*/	"","","","","","","","",
+ 	/*X0-X7*/	"","","","","","","","",
+ 	/*Y0-Y7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts
+index 69b55a9a66fb..de1d09cd4203 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts
+@@ -1104,7 +1104,7 @@ &gpio0 {
+ 	/*K0-K7*/	"","","","","","","","",
+ 	/*L0-L7*/	"","","","","","","","",
+ 	/*M0-M7*/	"","","","","","","","",
+-	/*N0-N7*/	"","","","","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
++	/*N0-N7*/	"","","P0_THERMTRIP_L","P1_THERMTRIP_L","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
+ 	/*O0-O7*/	"","","HDT_SEL","HDT_XTRIG5","HDT_XTRIG6","JTAG_TRST_N","","",
+ 	/*P0-P7*/	"MON_RST_BTN_L","ASSERT_RST_BTN_L","MON_PWR_BTN_L","ASSERT_PWR_BTN_L","","ASSERT_NMI_BTN_L","MON_PWR_GOOD","",
+ 	/*Q0-Q7*/	"","","HDT_DBREQ_L","","BIOS_SPD_MUX_CTRL_RELEASED_L","","","",
+@@ -1112,7 +1112,7 @@ &gpio0 {
+ 	/*S0-S7*/	"","","","","P1_DIMM_AF_ERROR","P1_DIMM_GL_ERROR","P0_DIMM_AF_ERROR","P0_DIMM_GL_ERROR",
+ 	/*T0-T7*/	"","","","","","","","",
+ 	/*U0-U7*/	"","","","","P1_I3C_APML_ALERT_L","","","",
+-	/*V0-V7*/	"","","","","","","","",
++	/*V0-V7*/	"","","","RSMRST","","","","",
+ 	/*W0-W7*/	"","","","","","","","",
+ 	/*X0-X7*/	"","","","","","","","",
+ 	/*Y0-Y7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts b/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
+index 47169bb35681..d030a149fead 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
+@@ -1092,7 +1092,7 @@ &gpio0 {
+ 	/*K0-K7*/	"","","","","","","","",
+ 	/*L0-L7*/	"","","","","","","","",
+ 	/*M0-M7*/	"","","","","","","","",
+-	/*N0-N7*/	"","","","","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
++	/*N0-N7*/	"","","P0_THERMTRIP_L","P1_THERMTRIP_L","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
+ 	/*O0-O7*/	"","","HDT_SEL","HDT_XTRIG5","HDT_XTRIG6","JTAG_TRST_N","","",
+ 	/*P0-P7*/	"MON_RST_BTN_L","ASSERT_RST_BTN_L","MON_PWR_BTN_L","ASSERT_PWR_BTN_L","","ASSERT_NMI_BTN_L","MON_PWR_GOOD","",
+ 	/*Q0-Q7*/	"","","HDT_DBREQ_L","","BIOS_SPD_MUX_CTRL_RELEASED_L","","","",
+@@ -1100,7 +1100,7 @@ &gpio0 {
+ 	/*S0-S7*/	"","","","","P1_DIMM_AF_ERROR","P1_DIMM_GL_ERROR","P0_DIMM_AF_ERROR","P0_DIMM_GL_ERROR",
+ 	/*T0-T7*/	"","","","","","","","",
+ 	/*U0-U7*/	"","","","","P1_I3C_APML_ALERT_L","","","",
+-	/*V0-V7*/	"","","","","","","","",
++	/*V0-V7*/	"","","","RSMRST","","","","",
+ 	/*W0-W7*/	"","","","","","","","",
+ 	/*X0-X7*/	"","","","","","","","",
+ 	/*Y0-Y7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
+index 18f2327cf75d..0f697d6d56fb 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
+@@ -1035,6 +1035,8 @@ sbtsi_p0_0: sbtsi@4c,22400000001 {
+ 	sbrmi_p0_1: sbrmi@3c,22400000002 {
+ 		reg = <0x3c 0x224 0x00000002>;
+ 		assigned-address = <0x3c>;
++		dimm-count = <12>;
++		dimm-ids = <0x90 0x91 0x92 0x93 0x94 0x95 0x96 0x97 0x98 0x99 0x9A 0x9B>;
+ 	};
+ };
+
+@@ -1066,7 +1068,7 @@ &gpio0 {
+ 	/*K0-K7*/	"","","","","","","","",
+ 	/*L0-L7*/	"","","","","","","","",
+ 	/*M0-M7*/	"","","","","","","","",
+-	/*N0-N7*/	"","","","","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
++	/*N0-N7*/	"","","P0_THERMTRIP_L","","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
+ 	/*O0-O7*/	"","","HDT_SEL","HDT_XTRIG5","HDT_XTRIG6","JTAG_TRST_N","","",
+ 	/*P0-P7*/	"MON_RST_BTN_L","ASSERT_RST_BTN_L","MON_PWR_BTN_L","ASSERT_PWR_BTN_L","","ASSERT_NMI_BTN_L","MON_PWR_GOOD","",
+ 	/*Q0-Q7*/	"","","HDT_DBREQ_L","","BIOS_SPD_MUX_CTRL_RELEASED_L","","","",
+@@ -1074,7 +1076,7 @@ &gpio0 {
+ 	/*S0-S7*/	"","","","","","","P0_DIMM_AF_ERROR","P0_DIMM_GL_ERROR",
+ 	/*T0-T7*/	"","","","","","","","",
+ 	/*U0-U7*/	"","","","","","","","",
+-	/*V0-V7*/	"","","","","","","","",
++	/*V0-V7*/	"","","","RSMRST","","","","",
+ 	/*W0-W7*/	"","","","","","","","",
+ 	/*X0-X7*/	"","","","","","","","",
+ 	/*Y0-Y7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+index 7b37ff079f6f..0260f0157208 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+@@ -1024,6 +1024,8 @@ &i2c2 {
+ 	sbrmi@3c {
+ 		compatible = "amd,sbrmi";
+ 		reg = <0x3c>;
++		dimm-count = <12>;
++		dimm-ids = <0x90 0x91 0x92 0x93 0x94 0x95 0x96 0x97 0x98 0x99 0x9A 0x9B>;
+ 	};
+
+ 	sbtsi@4c {
+@@ -1060,7 +1062,7 @@ &gpio0 {
+ 	/*K0-K7*/	"","","","","","","","",
+ 	/*L0-L7*/	"","","","","","","","",
+ 	/*M0-M7*/	"","","","","","","","",
+-	/*N0-N7*/	"","","","","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
++	/*N0-N7*/	"","","P0_THERMTRIP_L","","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
+ 	/*O0-O7*/	"","","HDT_SEL","HDT_XTRIG5","HDT_XTRIG6","JTAG_TRST_N","","",
+ 	/*P0-P7*/	"MON_RST_BTN_L","ASSERT_RST_BTN_L","MON_PWR_BTN_L","ASSERT_PWR_BTN_L","","ASSERT_NMI_BTN_L","MON_PWR_GOOD","",
+ 	/*Q0-Q7*/	"","","HDT_DBREQ_L","","BIOS_SPD_MUX_CTRL_RELEASED_L","","","",
+@@ -1068,7 +1070,7 @@ &gpio0 {
+ 	/*S0-S7*/	"","","","","","","P0_DIMM_AF_ERROR","P0_DIMM_GL_ERROR",
+ 	/*T0-T7*/	"","","","","","","","",
+ 	/*U0-U7*/	"","","","","","","","",
+-	/*V0-V7*/	"","","","","","","","",
++	/*V0-V7*/	"","","","RSMRST","","","","",
+ 	/*W0-W7*/	"","","","","","","","",
+ 	/*X0-X7*/	"","","","","","","","",
+ 	/*Y0-Y7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts
+index 43f87078ccd9..aaa42437128b 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts
+@@ -785,7 +785,7 @@ &gpio0 {
+ 	/*K0-K7*/	"","","","","","","","",
+ 	/*L0-L7*/	"","","","","","","","",
+ 	/*M0-M7*/	"","","","","","","","",
+-	/*N0-N7*/	"","","","","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
++	/*N0-N7*/	"","","P0_THERMTRIP_L","","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
+ 	/*O0-O7*/	"","","HDT_SEL","HDT_XTRIG5","HDT_XTRIG6","JTAG_TRST_N","","",
+ 	/*P0-P7*/	"MON_RST_BTN_L","ASSERT_RST_BTN_L","MON_PWR_BTN_L","ASSERT_PWR_BTN_L","","ASSERT_NMI_BTN_L","MON_PWR_GOOD","",
+ 	/*Q0-Q7*/	"","","HDT_DBREQ_L","","BIOS_SPD_MUX_CTRL_RELEASED_L","","","",
+@@ -793,7 +793,7 @@ &gpio0 {
+ 	/*S0-S7*/	"","","","","","","P0_DIMM_AF_ERROR","P0_DIMM_GL_ERROR",
+ 	/*T0-T7*/	"","","","","","","","",
+ 	/*U0-U7*/	"","","","","","","","",
+-	/*V0-V7*/	"","","","","","","","",
++	/*V0-V7*/	"","","","RSMRST","","","","",
+ 	/*W0-W7*/	"","","","","","","","",
+ 	/*X0-X7*/	"","","","","","","","",
+ 	/*Y0-Y7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts b/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
+index 1dec5ea00fb4..b7fd005dfae8 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
+@@ -779,7 +779,7 @@ &gpio0 {
+ 	/*K0-K7*/	"","","","","","","","",
+ 	/*L0-L7*/	"","","","","","","","",
+ 	/*M0-M7*/	"","","","","","","","",
+-	/*N0-N7*/	"","","","","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
++	/*N0-N7*/	"","","P0_THERMTRIP_L","","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
+ 	/*O0-O7*/	"","","HDT_SEL","HDT_XTRIG5","HDT_XTRIG6","JTAG_TRST_N","","",
+ 	/*P0-P7*/	"MON_RST_BTN_L","ASSERT_RST_BTN_L","MON_PWR_BTN_L","ASSERT_PWR_BTN_L","","ASSERT_NMI_BTN_L","MON_PWR_GOOD","",
+ 	/*Q0-Q7*/	"","","HDT_DBREQ_L","","BIOS_SPD_MUX_CTRL_RELEASED_L","","","",
+@@ -787,7 +787,7 @@ &gpio0 {
+ 	/*S0-S7*/	"","","","","","","P0_DIMM_AF_ERROR","P0_DIMM_GL_ERROR",
+ 	/*T0-T7*/	"","","","","","","","",
+ 	/*U0-U7*/	"","","","","","","","",
+-	/*V0-V7*/	"","","","","","","","",
++	/*V0-V7*/	"","","","RSMRST","","","","",
+ 	/*W0-W7*/	"","","","","","","","",
+ 	/*X0-X7*/	"","","","","","","","",
+ 	/*Y0-Y7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts
+index 1b27b7bd9bf0..d725ba287c27 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts
+@@ -1117,7 +1117,7 @@ &gpio0 {
+ 	/*K0-K7*/	"","","","","","","","",
+ 	/*L0-L7*/	"","","","","","","","",
+ 	/*M0-M7*/	"","","","","","","","",
+-	/*N0-N7*/	"","","","","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
++	/*N0-N7*/	"","","P0_THERMTRIP_L","P1_THERMTRIP_L","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
+ 	/*O0-O7*/	"","","HDT_SEL","HDT_XTRIG5","HDT_XTRIG6","JTAG_TRST_N","","",
+ 	/*P0-P7*/	"MON_RST_BTN_L","ASSERT_RST_BTN_L","MON_PWR_BTN_L","ASSERT_PWR_BTN_L","","ASSERT_NMI_BTN_L","MON_PWR_GOOD","",
+ 	/*Q0-Q7*/	"","","HDT_DBREQ_L","","BIOS_SPD_MUX_CTRL_RELEASED_L","","","",
+@@ -1125,7 +1125,7 @@ &gpio0 {
+ 	/*S0-S7*/	"","","","","P1_DIMM_AF_ERROR","P1_DIMM_GL_ERROR","P0_DIMM_AF_ERROR","P0_DIMM_GL_ERROR",
+ 	/*T0-T7*/	"","","","","","","","",
+ 	/*U0-U7*/	"","","","","P1_I3C_APML_ALERT_L","","","",
+-	/*V0-V7*/	"","","","","","","","",
++	/*V0-V7*/	"","","","RSMRST","","","","",
+ 	/*W0-W7*/	"","","","","","","","",
+ 	/*X0-X7*/	"","","","","","","","",
+ 	/*Y0-Y7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts b/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
+index 2e27bf10ba4e..17053d221a78 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
+@@ -1105,7 +1105,7 @@ &gpio0 {
+ 	/*K0-K7*/	"","","","","","","","",
+ 	/*L0-L7*/	"","","","","","","","",
+ 	/*M0-M7*/	"","","","","","","","",
+-	/*N0-N7*/	"","","","","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
++	/*N0-N7*/	"","","P0_THERMTRIP_L","P1_THERMTRIP_L","","","PSP_SOFT_FUSE_NOTIFY","ASSERT_BMC_READY",
+ 	/*O0-O7*/	"","","HDT_SEL","HDT_XTRIG5","HDT_XTRIG6","JTAG_TRST_N","","",
+ 	/*P0-P7*/	"MON_RST_BTN_L","ASSERT_RST_BTN_L","MON_PWR_BTN_L","ASSERT_PWR_BTN_L","","ASSERT_NMI_BTN_L","MON_PWR_GOOD","",
+ 	/*Q0-Q7*/	"","","HDT_DBREQ_L","","BIOS_SPD_MUX_CTRL_RELEASED_L","","","",
+@@ -1113,7 +1113,7 @@ &gpio0 {
+ 	/*S0-S7*/	"","","","","P1_DIMM_AF_ERROR","P1_DIMM_GL_ERROR","P0_DIMM_AF_ERROR","P0_DIMM_GL_ERROR",
+ 	/*T0-T7*/	"","","","","","","","",
+ 	/*U0-U7*/	"","","","","P1_I3C_APML_ALERT_L","","","",
+-	/*V0-V7*/	"","","","","","","","",
++	/*V0-V7*/	"","","","RSMRST","","","","",
+ 	/*W0-W7*/	"","","","","","","","",
+ 	/*X0-X7*/	"","","","","","","","",
+ 	/*Y0-Y7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-g6.dtsi b/arch/arm/boot/dts/aspeed-g6.dtsi
+index 24ca19a06881..739765dedb4e 100644
+--- a/arch/arm/boot/dts/aspeed-g6.dtsi
++++ b/arch/arm/boot/dts/aspeed-g6.dtsi
+@@ -6,6 +6,8 @@
+ #include <dt-bindings/interrupt-controller/aspeed-scu-irq.h>
+ #include <dt-bindings/clock/ast2600-clock.h>
+
++//#define DIMM_I3C_6_MHZ
++
+ / {
+ 	model = "Aspeed BMC";
+ 	compatible = "aspeed,ast2600";
+@@ -1101,7 +1103,11 @@ i3c0: i3c0@2000 {
+ 		clocks = <&syscon ASPEED_CLK_GATE_I3C0CLK>;
+ 		resets = <&syscon ASPEED_RESET_I3C0>;
+ 		i2c-scl-hz = <400000>;
++#ifdef DIMM_I3C_6_MHZ
++		i3c-scl-hz = <6000000>;
++#else
+ 		i3c-scl-hz = <12500000>;
++#endif
+ 		interrupts = <GIC_SPI 102 IRQ_TYPE_LEVEL_HIGH>;
+ 		pinctrl-names = "default";
+ 		pinctrl-0 = <&pinctrl_i3c1_default>;
+@@ -1119,7 +1125,11 @@ i3c1: i3c1@3000 {
+ 		clocks = <&syscon ASPEED_CLK_GATE_I3C1CLK>;
+ 		resets = <&syscon ASPEED_RESET_I3C1>;
+ 		i2c-scl-hz = <400000>;
++#ifdef DIMM_I3C_6_MHZ
++                i3c-scl-hz = <6000000>;
++#else
+ 		i3c-scl-hz = <12500000>;
++#endif
+ 		interrupts = <GIC_SPI 103 IRQ_TYPE_LEVEL_HIGH>;
+ 		pinctrl-names = "default";
+ 		pinctrl-0 = <&pinctrl_i3c2_default>;
+@@ -1137,7 +1147,11 @@ i3c2: i3c2@4000 {
+ 		clocks = <&syscon ASPEED_CLK_GATE_I3C2CLK>;
+ 		resets = <&syscon ASPEED_RESET_I3C2>;
+ 		i2c-scl-hz = <400000>;
++#ifdef DIMM_I3C_6_MHZ
++                i3c-scl-hz = <6000000>;
++#else
+ 		i3c-scl-hz = <12500000>;
++#endif
+ 		interrupts = <GIC_SPI 104 IRQ_TYPE_LEVEL_HIGH>;
+ 		pinctrl-names = "default";
+ 		pinctrl-0 = <&pinctrl_i3c3_default>;
+@@ -1155,7 +1169,11 @@ i3c3: i3c3@5000 {
+ 		clocks = <&syscon ASPEED_CLK_GATE_I3C3CLK>;
+ 		resets = <&syscon ASPEED_RESET_I3C3>;
+ 		i2c-scl-hz = <400000>;
++#ifdef DIMM_I3C_6_MHZ
++                i3c-scl-hz = <6000000>;
++#else
+ 		i3c-scl-hz = <12500000>;
++#endif
+ 		interrupts = <GIC_SPI 105 IRQ_TYPE_LEVEL_HIGH>;
+ 		pinctrl-names = "default";
+ 		pinctrl-0 = <&pinctrl_i3c4_default>;
+--
+2.25.1
