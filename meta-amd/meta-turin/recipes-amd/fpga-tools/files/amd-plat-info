@@ -59,7 +59,7 @@ function get_hpm_fpga_ver()
     REV_X=$(read_reg 5)
     REV_Y=$(read_reg 4)
     REV_Z=$(read_reg 3)
-    echo "$REV_W.$REV_X.$REV_Y.$REV_Z"
+    echo -ne "$REV_W.$REV_X.$REV_Y.$REV_Z"
 }
 # all arguments are function names. invoke directly
 if [ ! -z "$1" ] ; then
