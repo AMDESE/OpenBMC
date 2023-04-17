@@ -19,5 +19,6 @@ SRC_URI += "file://0001-Reset-server-settings-only-changes-to-invoke-CMOS.patch 
             file://0012-Redfish-Interface-for-crashdump-signature-ID.patch \
             file://0013-bmcweb-changes-to-support-vrbundle-update.patch \
             file://0014-Fixed-PostCodes-Entries-API-to-return-latest-Post-co.patch \
+            file://0015-Add-socket-id-for-multi-host-support.patch \
             "
 

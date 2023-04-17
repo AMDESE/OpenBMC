@@ -1,0 +1,27 @@
+From 5baad3c39c95ec501fc0ac42c8b41cd35635ca52 Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Mon, 17 Apr 2023 06:49:02 -0500
+Subject: [PATCH] Add socket-id for multi host support
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+---
+ include/obmc_console.hpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/include/obmc_console.hpp b/include/obmc_console.hpp
+index cdb19901..d8677cec 100644
+--- a/include/obmc_console.hpp
++++ b/include/obmc_console.hpp
+@@ -126,7 +126,8 @@ inline void requestRoutes(App& app)
+             sessions.insert(&conn);
+             if (hostSocket == nullptr)
+             {
+-                const std::string consoleName("\0obmc-console", 13);
++                // append socket-id for UI when using multiple servers (.host0)
++                const std::string consoleName("\0obmc-console.host0", 19);
+                 boost::asio::local::stream_protocol::endpoint ep(consoleName);
+
+                 hostSocket = std::make_unique<
+--
+2.17.1
+
