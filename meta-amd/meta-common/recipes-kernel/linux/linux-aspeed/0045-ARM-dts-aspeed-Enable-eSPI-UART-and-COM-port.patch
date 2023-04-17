@@ -1,0 +1,118 @@
+From f9ef666da6d5a7fc9af3c972986f8feb7a15c02d Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Mon, 17 Apr 2023 11:00:35 -0500
+Subject: [PATCH] ARM:dts:aspeed: Enable eSPI UART and COM port
+
+Enable both UARTs for all Genoa platforms
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts     | 3 ---
+ arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts   | 3 ---
+ arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts     | 3 ---
+ arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts | 3 ---
+ 4 files changed, 12 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+index eed42dcc2273..bc79f122a598 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+@@ -144,12 +144,10 @@
+
+ };
+
+-#ifdef HOST_SERIAL_ESPI_VUART
+ // eSPI Virtual UART - 0x3F8
+ &vuart1 {
+ 	status = "okay";
+ };
+-#else
+ &uart1 {
+ 	//Host console
+ 	compatible = "aspeed,ast2600-uart";
+@@ -159,7 +157,6 @@
+ 	dma-channel = <0>;
+ 	status = "okay";
+ };
+-#endif
+
+ //BMC Console
+ &uart5 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+index c0c864a375f3..f2da960913c6 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+@@ -144,12 +144,10 @@
+
+ };
+
+-#ifdef HOST_SERIAL_ESPI_VUART
+ // eSPI Virtual UART - 0x3F8
+ &vuart1 {
+ 	status = "okay";
+ };
+-#else
+ &uart1 {
+ 	//Host console
+ 	compatible = "aspeed,ast2600-uart";
+@@ -159,7 +157,6 @@
+ 	dma-channel = <0>;
+ 	status = "okay";
+ };
+-#endif
+
+ //BMC Console
+ &uart5 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+index 78c760df9bb8..a60da5f780f7 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+@@ -144,12 +144,10 @@
+
+ };
+
+-#ifdef HOST_SERIAL_ESPI_VUART
+ // eSPI Virtual UART - 0x3F8
+ &vuart1 {
+ 	status = "okay";
+ };
+-#else
+ // Host Serial console
+ &uart1 {
+ 	compatible = "aspeed,ast2600-uart";
+@@ -159,7 +157,6 @@
+ 	dma-channel = <0>;
+ 	status = "okay";
+ };
+-#endif
+
+ // BMC Serial Console
+ &uart5 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts b/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
+index 1b5a88843cdc..479274138306 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
+@@ -143,12 +143,10 @@
+
+ };
+
+-#ifdef HOST_SERIAL_ESPI_VUART
+ // eSPI Virtual UART - 0x3F8
+ &vuart1 {
+ 	status = "okay";
+ };
+-#else
+ // Host Serial console
+ &uart1 {
+ 	compatible = "aspeed,ast2600-uart";
+@@ -158,7 +156,6 @@
+ 	dma-channel = <0>;
+ 	status = "okay";
+ };
+-#endif
+
+ // BMC Serial Console
+ &uart5 {
+--
+2.17.1
+
