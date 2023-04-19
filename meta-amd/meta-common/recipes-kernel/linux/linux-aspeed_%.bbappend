@@ -46,4 +46,5 @@ SRC_URI += "file://amd-bmc-baseline.cfg \
             file://0043-ARM-dts-aspeed-Add-Riser-PSU-FP-sensors-to-Turin-Lenovo.patch \
             file://0044-ARM-dts-Add-Thermtrip-RSMRST-i3c-at-6MHz-DIMM-Ch1-to-Turin.patch \
             file://0045-ARM-dts-aspeed-Enable-eSPI-UART-and-COM-port.patch \
+            file://0046-ARM-dts-aspeed-Enable-eSPI-UART-and-COM-port-for-Tur.patch \
            "

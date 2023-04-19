@@ -1,0 +1,457 @@
+From 9760e31a66fba6759c27271196250bec6d6e41c7 Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Wed, 19 Apr 2023 05:20:45 -0500
+Subject: [PATCH] ARM:dts:aspeed: Enable eSPI UART and COM port for Turin and
+ MI300 platforms
+
+Enable both UARTs for all AMD platforms
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts  | 3 ---
+ arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts      | 3 ---
+ arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts   | 3 ---
+ arch/arm/boot/dts/aspeed-bmc-amd-galena.dts       | 3 ---
+ arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts   | 3 ---
+ arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts       | 3 ---
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts     | 3 ---
+ arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts   | 3 ---
+ arch/arm/boot/dts/aspeed-bmc-amd-purico.dts       | 3 ---
+ arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts   | 3 ---
+ arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts  | 3 ---
+ arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts      | 3 ---
+ arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts     | 3 ---
+ arch/arm/boot/dts/aspeed-bmc-amd-sh5d807.dts      | 3 ---
+ arch/arm/boot/dts/aspeed-bmc-amd-titanite-i3c.dts | 3 ---
+ arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts  | 3 ---
+ arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts      | 3 ---
+ 17 files changed, 51 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
+index 5180623a8c5a..e10c04e1f236 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
+@@ -144,12 +144,10 @@
+
+ };
+
+-#ifdef HOST_SERIAL_ESPI_VUART
+ // eSPI Virtual UART - 0x3F8
+ &vuart1 {
+ 	status = "okay";
+ };
+-#else
+ &uart1 {
+ 	//Host console
+ 	compatible = "aspeed,ast2600-uart";
+@@ -159,7 +157,6 @@
+ 	dma-channel = <0>;
+ 	status = "okay";
+ };
+-#endif
+
+ //BMC Console
+ &uart5 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
+index de76563d7b9b..f5e1c2d02b18 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
+@@ -144,12 +144,10 @@
+
+ };
+
+-#ifdef HOST_SERIAL_ESPI_VUART
+ // eSPI Virtual UART - 0x3F8
+ &vuart1 {
+ 	status = "okay";
+ };
+-#else
+ &uart1 {
+ 	//Host console
+ 	compatible = "aspeed,ast2600-uart";
+@@ -159,7 +157,6 @@
+ 	dma-channel = <0>;
+ 	status = "okay";
+ };
+-#endif
+
+ //BMC Console
+ &uart5 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts
+index 9293c7ff47ab..ca5e93a3922c 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts
+@@ -144,12 +144,10 @@
+
+ };
+
+-#ifdef HOST_SERIAL_ESPI_VUART
+ // eSPI Virtual UART - 0x3F8
+ &vuart1 {
+ 	status = "okay";
+ };
+-#else
+ &uart1 {
+ 	//Host console
+ 	compatible = "aspeed,ast2600-uart";
+@@ -159,7 +157,6 @@
+ 	dma-channel = <0>;
+ 	status = "okay";
+ };
+-#endif
+
+ //BMC Console
+ &uart5 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts b/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
+index 088fa13a24a4..0c73e6fb08ec 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
+@@ -144,12 +144,10 @@
+
+ };
+
+-#ifdef HOST_SERIAL_ESPI_VUART
+ // eSPI Virtual UART - 0x3F8
+ &vuart1 {
+ 	status = "okay";
+ };
+-#else
+ &uart1 {
+ 	//Host console
+ 	compatible = "aspeed,ast2600-uart";
+@@ -159,7 +157,6 @@
+ 	dma-channel = <0>;
+ 	status = "okay";
+ };
+-#endif
+
+ //BMC Console
+ &uart5 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts
+index de1d09cd4203..7280e11dd9af 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts
+@@ -144,12 +144,10 @@
+
+ };
+
+-#ifdef HOST_SERIAL_ESPI_VUART
+ // eSPI Virtual UART - 0x3F8
+ &vuart1 {
+ 	status = "okay";
+ };
+-#else
+ &uart1 {
+ 	//Host console
+ 	compatible = "aspeed,ast2600-uart";
+@@ -159,7 +157,6 @@
+ 	dma-channel = <0>;
+ 	status = "okay";
+ };
+-#endif
+
+ //BMC Console
+ &uart5 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts b/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
+index d030a149fead..91af95761c6a 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
+@@ -144,12 +144,10 @@
+
+ };
+
+-#ifdef HOST_SERIAL_ESPI_VUART
+ // eSPI Virtual UART - 0x3F8
+ &vuart1 {
+ 	status = "okay";
+ };
+-#else
+ &uart1 {
+ 	//Host console
+ 	compatible = "aspeed,ast2600-uart";
+@@ -159,7 +157,6 @@
+ 	dma-channel = <0>;
+ 	status = "okay";
+ };
+-#endif
+
+ //BMC Console
+ &uart5 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts
+index 48a7731b90ab..df6a0bc2f1c7 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts
+@@ -144,12 +144,10 @@
+
+ };
+
+-#ifdef HOST_SERIAL_ESPI_VUART
+ // eSPI Virtual UART - 0x3F8
+ &vuart1 {
+ 	status = "okay";
+ };
+-#else
+ &uart1 {
+ 	//Host console
+ 	compatible = "aspeed,ast2600-uart";
+@@ -159,7 +157,6 @@
+ 	dma-channel = <0>;
+ 	status = "okay";
+ };
+-#endif
+
+ //BMC Console
+ &uart5 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
+index 0f697d6d56fb..d57fece94d07 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
+@@ -155,12 +155,10 @@
+
+ };
+
+-#ifdef HOST_SERIAL_ESPI_VUART
+ // eSPI Virtual UART - 0x3F8
+ &vuart1 {
+ 	status = "okay";
+ };
+-#else
+ // Host Serial console
+ &uart1 {
+ 	compatible = "aspeed,ast2600-uart";
+@@ -170,7 +168,6 @@
+ 	dma-channel = <0>;
+ 	status = "okay";
+ };
+-#endif
+
+ // BMC Serial Console
+ &uart5 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+index 0260f0157208..b4477aca3061 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+@@ -155,12 +155,10 @@
+
+ };
+
+-#ifdef HOST_SERIAL_ESPI_VUART
+ // eSPI Virtual UART - 0x3F8
+ &vuart1 {
+ 	status = "okay";
+ };
+-#else
+ // Host Serial console
+ &uart1 {
+ 	compatible = "aspeed,ast2600-uart";
+@@ -170,7 +168,6 @@
+ 	dma-channel = <0>;
+ 	status = "okay";
+ };
+-#endif
+
+ // BMC Serial Console
+ &uart5 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts
+index a12ab44bddde..9ed0c37c296f 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts
+@@ -144,12 +144,10 @@
+
+ };
+
+-#ifdef HOST_SERIAL_ESPI_VUART
+ // eSPI Virtual UART - 0x3F8
+ &vuart1 {
+ 	status = "okay";
+ };
+-#else
+ &uart1 {
+ 	//Host console
+ 	compatible = "aspeed,ast2600-uart";
+@@ -159,7 +157,6 @@
+ 	dma-channel = <0>;
+ 	status = "okay";
+ };
+-#endif
+
+ //BMC Console
+ &uart5 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts
+index aaa42437128b..d266889295ce 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts
+@@ -144,12 +144,10 @@
+
+ };
+
+-#ifdef HOST_SERIAL_ESPI_VUART
+ // eSPI Virtual UART - 0x3F8
+ &vuart1 {
+ 	status = "okay";
+ };
+-#else
+ &uart1 {
+ 	//Host console
+ 	compatible = "aspeed,ast2600-uart";
+@@ -159,7 +157,6 @@
+ 	dma-channel = <0>;
+ 	status = "okay";
+ };
+-#endif
+
+ //BMC Console
+ &uart5 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts b/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
+index b7fd005dfae8..367d05249e6c 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
+@@ -144,12 +144,10 @@
+
+ };
+
+-#ifdef HOST_SERIAL_ESPI_VUART
+ // eSPI Virtual UART - 0x3F8
+ &vuart1 {
+ 	status = "okay";
+ };
+-#else
+ &uart1 {
+ 	//Host console
+ 	compatible = "aspeed,ast2600-uart";
+@@ -159,7 +157,6 @@
+ 	dma-channel = <0>;
+ 	status = "okay";
+ };
+-#endif
+
+ //BMC Console
+ &uart5 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts
+index 2505124d0a2d..332ba1c82031 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts
+@@ -144,12 +144,10 @@
+
+ };
+
+-#ifdef HOST_SERIAL_ESPI_VUART
+ // eSPI Virtual UART - 0x3F8
+ &vuart1 {
+ 	status = "okay";
+ };
+-#else
+ // Host Serial console
+ &uart1 {
+ 	compatible = "aspeed,ast2600-uart";
+@@ -159,7 +157,6 @@
+ 	dma-channel = <0>;
+ 	status = "okay";
+ };
+-#endif
+
+ // BMC Serial Console
+ &uart5 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-sh5d807.dts b/arch/arm/boot/dts/aspeed-bmc-amd-sh5d807.dts
+index 9ad797635e3f..05c5aa31bab1 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-sh5d807.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-sh5d807.dts
+@@ -144,12 +144,10 @@
+
+ };
+
+-#ifdef HOST_SERIAL_ESPI_VUART
+ // eSPI Virtual UART - 0x3F8
+ &vuart1 {
+ 	status = "okay";
+ };
+-#else
+ &uart1 {
+ 	//Host console
+ 	compatible = "aspeed,ast2600-uart";
+@@ -159,7 +157,6 @@
+ 	dma-channel = <0>;
+ 	status = "okay";
+ };
+-#endif
+
+ //BMC Console
+ &uart5 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-titanite-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-titanite-i3c.dts
+index 6fbc2dcfcf11..4fc2f2401122 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-titanite-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-titanite-i3c.dts
+@@ -143,12 +143,10 @@
+
+ };
+
+-#ifdef HOST_SERIAL_ESPI_VUART
+ // eSPI Virtual UART - 0x3F8
+ &vuart1 {
+ 	status = "okay";
+ };
+-#else
+ // Host Serial console
+ &uart1 {
+ 	compatible = "aspeed,ast2600-uart";
+@@ -158,7 +156,6 @@
+ 	dma-channel = <0>;
+ 	status = "okay";
+ };
+-#endif
+
+ // BMC Serial Console
+ &uart5 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts
+index d725ba287c27..9eaf6cb04247 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts
+@@ -165,12 +165,10 @@
+
+ };
+
+-#ifdef HOST_SERIAL_ESPI_VUART
+ // eSPI Virtual UART - 0x3F8
+ &vuart1 {
+ 	status = "okay";
+ };
+-#else
+ // Host Serial console
+ &uart1 {
+ 	compatible = "aspeed,ast2600-uart";
+@@ -180,7 +178,6 @@
+ 	dma-channel = <0>;
+ 	status = "okay";
+ };
+-#endif
+
+ // BMC Serial Console
+ &uart5 {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts b/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
+index 17053d221a78..1005e0659cfd 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
+@@ -165,12 +165,10 @@
+
+ };
+
+-#ifdef HOST_SERIAL_ESPI_VUART
+ // eSPI Virtual UART - 0x3F8
+ &vuart1 {
+ 	status = "okay";
+ };
+-#else
+ // Host Serial console
+ &uart1 {
+ 	compatible = "aspeed,ast2600-uart";
+@@ -180,7 +178,6 @@
+ 	dma-channel = <0>;
+ 	status = "okay";
+ };
+-#endif
+
+ // BMC Serial Console
+ &uart5 {
+--
+2.17.1
+
