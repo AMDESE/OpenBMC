@@ -65,4 +65,6 @@ RDEPENDS_${PN}-system = " \
         set-associations-path \
         vr-update \
         webui-vue \
+        phosphor-misc-usb-ctrl \
+        usb-network \
         "
