@@ -1,0 +1,7 @@
+[Unit]
+Description=Flash Backplane FW image %I
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/usr/sbin/amd-bmc-bp-update -d /tmp/images/%i

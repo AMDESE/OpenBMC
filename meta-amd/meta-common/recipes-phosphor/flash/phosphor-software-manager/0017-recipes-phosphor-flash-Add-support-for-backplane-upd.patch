@@ -1,0 +1,327 @@
+From c5c611121291c0b889c87503038f6686ef5b3ed8 Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Thu, 20 Apr 2023 02:43:58 -0500
+Subject: [PATCH] recipes-phosphor/flash: Add support for backplane update
+
+Adds support for backplane firmware updates
+Adds new version object for managing backplane firmware
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+---
+ activation.cpp    | 109 ++++++++++++++++++++++++++++++++++++++++++++++
+ activation.hpp    |   8 ++++
+ item_updater.cpp  |  39 +++++++++++++++++
+ item_updater.hpp  |  23 +++++++++-
+ meson.build       |   5 +++
+ meson_options.txt |   9 ++++
+ 6 files changed, 192 insertions(+), 1 deletion(-)
+
+diff --git a/activation.cpp b/activation.cpp
+index 41fb6f1..0553287 100644
+--- a/activation.cpp
++++ b/activation.cpp
+@@ -236,6 +236,29 @@ auto Activation::activation(Activations value) -> Activations
+             return softwareServer::Activation::activation(value);
+         }
+ #endif
++
++#ifdef BP_FW_UPGRADE
++        if (purpose == VersionPurpose::BP_FW)
++        {
++            if (!activationProgress)
++            {
++                activationProgress =
++                    std::make_unique<ActivationProgress>(bus, path);
++            }
++
++            // Enable systemd signals
++            subscribeToSystemdSignals();
++
++            // Set initial progress
++            activationProgress->progress(20);
++
++            // Initiate image writing to flash
++            flashWriteBPFW();
++
++            return softwareServer::Activation::activation(value);
++        }
++#endif
++
+         auto versionStr = parent.versions.find(versionId)->second->version();
+
+         if (!minimum_ship_level::verify(versionStr))
+@@ -459,6 +482,14 @@ void Activation::unitStateChange(sdbusplus::message::message& msg)
+     }
+ #endif
+
++#ifdef BP_FW_UPGRADE
++    if (purpose == VersionPurpose::BP_FW)
++    {
++        onStateChangesBPFW(msg);
++        return;
++    }
++#endif
++
+     onStateChanges(msg);
+
+     return;
+@@ -1033,6 +1064,84 @@ void Activation::onStateChangesRetimer(sdbusplus::message::message& msg)
+
+ #endif
+
++#ifdef BP_FW_UPGRADE
++void Activation::flashWriteBPFW()
++{
++    auto method = bus.new_method_call(SYSTEMD_BUSNAME, SYSTEMD_PATH,
++                                      SYSTEMD_INTERFACE, "StartUnit");
++    auto bpfwServiceFile = "obmc-flash-bp-fw@" + versionId + ".service";
++    method.append(bpfwServiceFile, "replace");
++    try
++    {
++        auto reply = bus.call(method);
++    }
++    catch (const SdBusError& e)
++    {
++        log<level::ERR>("Error in trying to upgrade BP FW.");
++        report<InternalFailure>();
++    }
++}
++
++void Activation::onStateChangesBPFW(sdbusplus::message::message& msg)
++{
++    uint32_t newStateID{};
++    sdbusplus::message::object_path newStateObjPath;
++    std::string newStateUnit{};
++    std::string newStateResult{};
++
++    // Read the msg and populate each variable
++    msg.read(newStateID, newStateObjPath, newStateUnit, newStateResult);
++
++    auto bpfwServiceFile = "obmc-flash-bp-fw@" + versionId + ".service";
++
++    if (newStateUnit == bpfwServiceFile)
++    {
++        // unsubscribe to systemd signals
++        unsubscribeFromSystemdSignals();
++
++        if (newStateResult == "done")
++        {
++            // Remove version object from image manager
++            deleteImageManagerObject();
++
++            // Set activation progress to 100
++            activationProgress->progress(100);
++
++            // Set Activation value to active
++            activation(softwareServer::Activation::Activations::Active);
++
++            log<level::INFO>("BP FW upgrade completed successfully.");
++            parent.bpfwVersion->version(
++                parent.versions.find(versionId)->second->version());
++            SET_VER(BP_FW_VER_FILE);
++            parent.versions.find(versionId)->second->version("--");
++
++            // Delete the uploaded activation
++            boost::asio::post(getIOContext(), [this]() {
++                this->parent.erase(this->versionId);
++            });
++
++        }
++        else if (newStateResult == "failed")
++        {
++            // Remove version object from image manager
++            deleteImageManagerObject();
++            // Delete the uploaded activation
++            boost::asio::post(getIOContext(), [this]() {
++                this->parent.erase(this->versionId);
++            });
++
++            // Set Activation value to Failed
++            activation(softwareServer::Activation::Activations::Failed);
++
++            log<level::ERR>("BP FW upgrade failed.");
++        }
++    }
++
++    return;
++}
++
++#endif
+ void Activation::rebootBmc()
+ {
+     auto method = bus.new_method_call(SYSTEMD_BUSNAME, SYSTEMD_PATH,
+diff --git a/activation.hpp b/activation.hpp
+index ac57da1..dd96e65 100644
+--- a/activation.hpp
++++ b/activation.hpp
+@@ -319,6 +319,14 @@ class Activation : public ActivationInherit, public Flash
+     void onStateChangesRetimer(sdbusplus::message::message&);
+ #endif
+
++#ifdef BP_FW_UPGRADE
++    /* @brief write to BP FW flash function */
++    void flashWriteBPFW();
++
++    /** @brief Function that acts on BP FW upgrade service file state changes */
++    void onStateChangesBPFW(sdbusplus::message::message&);
++#endif
++
+     /** @brief Overloaded function that acts on service file state changes */
+     void onStateChanges(sdbusplus::message::message&) override;
+
+diff --git a/item_updater.cpp b/item_updater.cpp
+index 25bbfa1..f19e130 100644
+--- a/item_updater.cpp
++++ b/item_updater.cpp
+@@ -100,6 +100,9 @@ void ItemUpdater::createActivation(sdbusplus::message::message& msg)
+ #ifdef RETIMER_UPGRADE
+                         value == VersionPurpose::RETIMER ||
+ #endif
++#ifdef BP_FW_UPGRADE
++                        value == VersionPurpose::BP_FW ||
++#endif
+
+                         value == VersionPurpose::System)
+                     {
+@@ -1004,6 +1007,42 @@ void ItemUpdater::createRetimerObject()
+ }
+ #endif
+
++#ifdef BP_FW_UPGRADE
++void ItemUpdater::createBPFWObject()
++{
++    std::string path = BP_FW_OBJPATH;
++    // Get version id from last item in the path
++    auto pos = path.rfind("/");
++    if (pos == std::string::npos)
++    {
++        log<level::ERR>("No version id found in object path",
++                        entry("BP_FW_OBJPATH=%s", path.c_str()));
++        return;
++    }
++
++    createActiveAssociation(path);
++    createFunctionalAssociation(path);
++
++    auto versionId = path.substr(pos + 1);
++    std::string version = "Unknown";
++    GET_VER(BP_FW_VER_FILE);
++
++    AssociationList assocs = {};
++    bpfwActivation = std::make_unique<Activation>(
++        bus, path, *this, versionId, server::Activation::Activations::Active,
++        assocs);
++    auto dummyErase = [](std::string /*entryId*/) {
++        // Do nothing;
++    };
++    bpfwVersion = std::make_unique<VersionClass>(
++        bus, path, version, VersionPurpose::BP_FW, "", "",
++        std::bind(dummyErase, std::placeholders::_1));
++    bpfwVersion->deleteObject =
++        std::make_unique<phosphor::software::manager::Delete>(bus, path,
++                                                              *bpfwVersion);
++}
++#endif
++
+ } // namespace updater
+ } // namespace software
+ } // namespace phosphor
+diff --git a/item_updater.hpp b/item_updater.hpp
+index 394742e..21c2d06 100644
+--- a/item_updater.hpp
++++ b/item_updater.hpp
+@@ -29,6 +29,9 @@
+ #ifdef RETIMER_UPGRADE
+ #define RETIMER_VER_FILE    "retimer_ver"
+ #endif
++#ifdef BP_FW_UPGRADE
++#define BP_FW_VER_FILE	"bp_fw_ver"
++#endif
+ #define ACTIVE_VER_KEY	"active"
+
+ namespace phosphor
+@@ -96,6 +99,9 @@ class ItemUpdater : public ItemUpdaterInherit
+ #endif
+ #ifdef RETIMER_UPGRADE
+         createRetimerObject();
++#endif
++#ifdef BP_FW_UPGRADE
++        createBPFWObject();
+ #endif
+         emit_object_added();
+     };
+@@ -373,8 +379,23 @@ class ItemUpdater : public ItemUpdaterInherit
+     /** @brief Persistent Version D-Bus object for HPM FPGA */
+     std::unique_ptr<VersionClass> retimerVersion;
+ #endif
+-};
+
++#ifdef BP_FW_UPGRADE
++    /** @brief Create the BP FW object without knowing the version.
++     *
++     *  The object is created only to provide the DBus access so that an
++     *  external service could set the correct BP FW version.
++     *  On BP FW code update, the version is updated accordingly.
++     */
++    void createBPFWObject();
++
++    /** @brief Persistent Activation D-Bus object for BP FW */
++    std::unique_ptr<Activation> bpfwActivation;
++  public:
++    /** @brief Persistent Version D-Bus object for BP FW */
++    std::unique_ptr<VersionClass> bpfwVersion;
++#endif
++};
+ } // namespace updater
+ } // namespace software
+ } // namespace phosphor
+diff --git a/meson.build b/meson.build
+index 4f7d301..1a6728d 100644
+--- a/meson.build
++++ b/meson.build
+@@ -75,6 +75,7 @@ conf.set('SCM_FPGA_UPGRADE', get_option('scm-fpga-upgrade').enabled())
+ conf.set('HPM_FPGA_UPGRADE', get_option('hpm-fpga-upgrade').enabled())
+ conf.set('VR_BUNDLE_UPGRADE', get_option('vr-bundle-upgrade').enabled())
+ conf.set('RETIMER_UPGRADE', get_option('retimer-upgrade').enabled())
++conf.set('BP_FW_UPGRADE', get_option('bp-fw-upgrade').enabled())
+
+ # Configurable variables
+ conf.set('ACTIVE_BMC_MAX_ALLOWED', get_option('active-bmc-max-allowed'))
+@@ -116,6 +117,10 @@ if get_option('retimer-upgrade').enabled()
+     conf.set_quoted('RETIMER_OBJPATH', get_option('retimer-object-path'))
+ endif
+
++if get_option('bp-fw-upgrade').enabled()
++    conf.set_quoted('BP_FW_OBJPATH', get_option('bp-fw-object-path'))
++endif
++
+ configure_file(output: 'config.h', configuration: conf)
+
+ deps = [
+diff --git a/meson_options.txt b/meson_options.txt
+index bd73c7e..1f52ea4 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -24,6 +24,9 @@ option('vr-bundle-upgrade', type: 'feature',
+ option('retimer-upgrade', type: 'feature',
+     description: 'Enable retimer upgrade support.')
+
++option('bp-fw-upgrade', type: 'feature',
++    description: 'Enable backplane upgrade support.')
++
+ option('sync-bmc-files', type: 'feature',
+     description: 'Enable sync of filesystem files.')
+
+@@ -146,3 +149,9 @@ option(
+     value: '/xyz/openbmc_project/software/retimer_active',
+     description: 'The Retimer DBus object path.',
+ )
++
++option(
++    'bp-fw-object-path', type: 'string',
++    value: '/xyz/openbmc_project/software/bp_fw_active',
++    description: 'The Backplane DBus object path.',
++)
+--
+2.17.1
+
