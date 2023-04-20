@@ -35,6 +35,7 @@ PACKAGECONFIG[flash_scm_fpga] = "-Dscm-fpga-upgrade=enabled, -Dscm-fpga-upgrade=
 PACKAGECONFIG[flash_hpm_fpga] = "-Dhpm-fpga-upgrade=enabled, -Dhpm-fpga-upgrade=disabled"
 PACKAGECONFIG[flash_retimer] = "-Dretimer-upgrade=enabled, -Dretimer-upgrade=disabled"
 PACKAGECONFIG[flash_vr_bundle] = "-Dvr-bundle-upgrade=enabled, -Dvr-bundle-upgrade=disabled"
+PACKAGECONFIG[flash_bp_fw] = "-Dbp-fw-upgrade=enabled, -Dbp-fw-upgrade=disabled"
 
 inherit meson pkgconfig
 inherit obmc-phosphor-dbus-service
@@ -89,6 +90,7 @@ SYSTEMD_SERVICE_${PN}-updater += "${@bb.utils.contains('PACKAGECONFIG', 'flash_s
 SYSTEMD_SERVICE_${PN}-updater += "${@bb.utils.contains('PACKAGECONFIG', 'flash_hpm_fpga', 'obmc-flash-hpm-fpga@.service', '', d)}"
 SYSTEMD_SERVICE_${PN}-updater += "${@bb.utils.contains('PACKAGECONFIG', 'flash_retimer', 'obmc-flash-retimer@.service', '', d)}"
 SYSTEMD_SERVICE_${PN}-updater += "${@bb.utils.contains('PACKAGECONFIG', 'flash_vr_bundle', 'obmc-flash-vr-bundle@.service', '', d)}"
+SYSTEMD_SERVICE_${PN}-updater += "${@bb.utils.contains('PACKAGECONFIG', 'flash_bp_fw', 'obmc-flash-bp-fw@.service', '', d)}"
 
 S = "${WORKDIR}/git"
 

@@ -1,0 +1,14 @@
+[Unit]
+Description=Phosphor BP FW Code Update
+Wants=mapper-wait@-org-openbmc-managers-Download.service
+After=mapper-wait@-org-openbmc-managers-Download.service
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/env flash_bp_fw.exe
+SyslogIdentifier=flash_bp_fw.exe
+Type=dbus
+BusName={BUSNAME}
+
+[Install]
+WantedBy=multi-user.target

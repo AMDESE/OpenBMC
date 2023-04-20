@@ -1,0 +1,12 @@
+[Unit]
+Description=Initialize BP FW update
+Wants=mapper-wait@-org-openbmc-control-flash-bp-fw.service
+After=mapper-wait@-org-openbmc-control-flash-bp-fw.service
+
+[Service]
+Restart=no
+ExecStart=/bin/sh -c "busctl call `mapper get-service /org/openbmc/control/flash/bp_fw` /org/openbmc/control/flash/bp_fw org.openbmc.Flash init"
+SyslogIdentifier=obmc-flash-bp-fw-init
+
+[Install]
+WantedBy=multi-user.target
