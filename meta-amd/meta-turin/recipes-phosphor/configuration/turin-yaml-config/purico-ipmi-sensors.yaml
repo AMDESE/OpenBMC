@@ -788,7 +788,7 @@
 
 0x2E:
   sensorType: 0x02
-  path: /xyz/openbmc_project/sensors/voltage/ADC121C_55
+  path: /xyz/openbmc_project/sensors/voltage/ADC_1V27_NIC
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
   scale: 0
@@ -807,7 +807,7 @@
 
 0x2F:
   sensorType: 0x02
-  path: /xyz/openbmc_project/sensors/voltage/ADC121C_56
+  path: /xyz/openbmc_project/sensors/voltage/ADC_12V_AUX
   sensorReadingType: 0x01
   unit: xyz.openbmc_project.Sensor.Value.Unit.Volts
   scale: 0
