@@ -23,8 +23,8 @@
                     "/xyz/openbmc_project/sensors/voltage/VDD18_DUAL_VOUT",
                     "/xyz/openbmc_project/sensors/voltage/VDD33_DUAL_VOUT",
 
-                    "/xyz/openbmc_project/sensors/voltage/ADC121C_55",
-                    "/xyz/openbmc_project/sensors/voltage/ADC121C_56",
+                    "/xyz/openbmc_project/sensors/voltage/ADC_1V27_NIC",
+                    "/xyz/openbmc_project/sensors/voltage/ADC_12V_AUX",
 
                     "/xyz/openbmc_project/sensors/current/VDDCR_SOC_IIN",
                     "/xyz/openbmc_project/sensors/current/VDDCR_SOC_IOUT1",
@@ -118,8 +118,8 @@
                     "/xyz/openbmc_project/sensors/voltage/VDD18_DUAL_VOUT",
                     "/xyz/openbmc_project/sensors/voltage/VDD33_DUAL_VOUT",
 
-                    "/xyz/openbmc_project/sensors/voltage/ADC121C_55",
-                    "/xyz/openbmc_project/sensors/voltage/ADC121C_56",
+                    "/xyz/openbmc_project/sensors/voltage/ADC_1V27_NIC",
+                    "/xyz/openbmc_project/sensors/voltage/ADC_12V_AUX",
 
                     "/xyz/openbmc_project/sensors/current/VDDCR_SOC_IIN",
                     "/xyz/openbmc_project/sensors/current/VDDCR_SOC_IOUT1",
