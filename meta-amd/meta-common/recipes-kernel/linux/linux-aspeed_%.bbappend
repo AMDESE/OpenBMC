@@ -48,4 +48,6 @@ SRC_URI += "file://amd-bmc-baseline.cfg \
             file://0045-ARM-dts-aspeed-Enable-eSPI-UART-and-COM-port.patch \
             file://0046-ARM-dts-aspeed-Enable-eSPI-UART-and-COM-port-for-Tur.patch \
             file://0047-ARM-DTS-Aspeed-Modify-I3c-and-UDC-device-node-enable-with-G304.patch \
+            file://0048-Added-Aspeed-BMC-device-drivers-from-Aspeed-Tech-ups.patch \
+            file://0049-Enabled-BMC-device-and-configuration-for-SP5-and-SP6.patch \
            "
