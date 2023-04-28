@@ -1,0 +1,81 @@
+From 943426588fc38eda971b2da8f9b84162fbfa22a9 Mon Sep 17 00:00:00 2001
+From: Ashok Kumar <ashok2.kumar@amd.com>
+Date: Thu, 27 Apr 2023 20:10:04 -0500
+Subject: [PATCH] Redfish support for PCIe Device
+
+Added Redfish support for PCIe Devices new property added
+as per requirment
+
+Signed-off-by: Ashok Kumar <ashok2.kumar@amd.com>
+---
+ redfish-core/lib/pcie.hpp | 43 ++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 42 insertions(+), 1 deletion(-)
+
+diff --git a/redfish-core/lib/pcie.hpp b/redfish-core/lib/pcie.hpp
+index 35d20a57..7f30a31a 100644
+--- a/redfish-core/lib/pcie.hpp
++++ b/redfish-core/lib/pcie.hpp
+@@ -135,7 +135,7 @@ class SystemPCIeDevice : public Node
+             [asyncResp,
+              device](const boost::system::error_code ec,
+                      boost::container::flat_map<std::string,
+-                                                std::variant<std::string>>&
++                                                std::variant<uint8_t, std::string>>&
+                          pcieDevProperties) {
+                 if (ec)
+                 {
+@@ -162,6 +162,34 @@ class SystemPCIeDevice : public Node
+                     {"Name", "PCIe Device"},
+                     {"Id", device}};
+
++                if (std::string* property = std::get_if<std::string>(
++                        &pcieDevProperties["Model"]);
++                    property)
++                {
++                    asyncResp->res.jsonValue["Model"] = *property;
++                }
++
++                if (std::string* property = std::get_if<std::string>(
++                        &pcieDevProperties["MaxPCIeType"]);
++                    property)
++                {
++                    asyncResp->res.jsonValue["MaxPCIeType"] = *property;
++                }
++
++                if (std::string* property = std::get_if<std::string>(
++                        &pcieDevProperties["PCIeType"]);
++                    property)
++                {
++                    asyncResp->res.jsonValue["PCIeType"] = *property;
++                }
++
++                if (std::string* property = std::get_if<std::string>(
++                        &pcieDevProperties["State"]);
++                    property)
++                {
++                    asyncResp->res.jsonValue["State"] = *property;
++                }
++
+                 if (std::string* property = std::get_if<std::string>(
+                         &pcieDevProperties["Manufacturer"]);
+                     property)
+@@ -176,6 +204,19 @@ class SystemPCIeDevice : public Node
+                     asyncResp->res.jsonValue["DeviceType"] = *property;
+                 }
+
++                if (uint8_t* property = std::get_if<uint8_t>(
++                        &pcieDevProperties["LanesInUse"]);
++                    property)
++                {
++                    asyncResp->res.jsonValue["LanesInUse"] = *property;
++                }
++                if (uint8_t* property = std::get_if<uint8_t>(
++                        &pcieDevProperties["MaxLanes"]);
++                    property)
++                {
++                    asyncResp->res.jsonValue["MaxLanes"] = *property;
++                }
++
+                 asyncResp->res.jsonValue["PCIeFunctions"] = {
+                     {"@odata.id", "/redfish/v1/Systems/system/PCIeDevices/" +
+                                       device + "/PCIeFunctions"}};
