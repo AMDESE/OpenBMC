@@ -55,16 +55,17 @@ RDEPENDS_${PN}-system = " \
         fpga-tools \
         i3c-tools \
         ipmitool \
+        iodevices-inventory \
         phosphor-hostlogger \
         phosphor-pid-control \
         phosphor-host-postd \
         phosphor-post-code-manager \
         power-capping \
+        phosphor-misc-usb-ctrl \
         retimer-update \
         set-fan-speed \
         set-associations-path \
+        usb-network \
         vr-update \
         webui-vue \
-        phosphor-misc-usb-ctrl \
-        usb-network \
         "
