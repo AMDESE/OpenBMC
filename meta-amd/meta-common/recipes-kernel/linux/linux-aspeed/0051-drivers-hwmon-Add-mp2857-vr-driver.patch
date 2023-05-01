@@ -1,0 +1,227 @@
+From 09d7940f60e462291b93960a147df8ce11e3b7d3 Mon Sep 17 00:00:00 2001
+From: Alisha Kulkarni <ALISHA.KULKARNI@amd.com>
+Date: Thu, 27 Apr 2023 12:11:53 -0500
+Subject: [PATCH 1/1] drivers-hwmon-Add-mp2857-vr-driver
+
+Signed-off-by: Alisha Kulkarni <ALISHA.KULKARNI@amd.com>
+---
+ drivers/hwmon/pmbus/Kconfig  |   9 ++
+ drivers/hwmon/pmbus/Makefile |   1 +
+ drivers/hwmon/pmbus/mp2857.c | 172 +++++++++++++++++++++++++++++++++++
+ 3 files changed, 182 insertions(+)
+ create mode 100644 drivers/hwmon/pmbus/mp2857.c
+
+diff --git a/drivers/hwmon/pmbus/Kconfig b/drivers/hwmon/pmbus/Kconfig
+index a25faf69fce3..435dae59527f 100644
+--- a/drivers/hwmon/pmbus/Kconfig
++++ b/drivers/hwmon/pmbus/Kconfig
+@@ -111,6 +111,15 @@ config SENSORS_ISL68137
+ 	  This driver can also be built as a module. If so, the module will
+ 	  be called isl68137.
+
++config SENSORS_MP2857
++        tristate "MPS MP2857"
++        help
++          If you say yes here you get hardware monitoring support for MPS
++          MP2857 Dual Loop Digital Multi-Phase Controller.
++
++          This driver can also be built as a module. If so, the module will
++          be called mp2857.
++
+ config SENSORS_LM25066
+ 	tristate "National Semiconductor LM25066 and compatibles"
+ 	help
+diff --git a/drivers/hwmon/pmbus/Makefile b/drivers/hwmon/pmbus/Makefile
+index 4c97ad0bd791..c957d51ef630 100644
+--- a/drivers/hwmon/pmbus/Makefile
++++ b/drivers/hwmon/pmbus/Makefile
+@@ -25,6 +25,7 @@ obj-$(CONFIG_SENSORS_MAX31785)	+= max31785.o
+ obj-$(CONFIG_SENSORS_MAX34440)	+= max34440.o
+ obj-$(CONFIG_SENSORS_MAX8688)	+= max8688.o
+ obj-$(CONFIG_SENSORS_MP2975)	+= mp2975.o
++obj-$(CONFIG_SENSORS_MP2857)	+= mp2857.o
+ obj-$(CONFIG_SENSORS_PXE1610)	+= pxe1610.o
+ obj-$(CONFIG_SENSORS_TPS40422)	+= tps40422.o
+ obj-$(CONFIG_SENSORS_TPS53679)	+= tps53679.o
+diff --git a/drivers/hwmon/pmbus/mp2857.c b/drivers/hwmon/pmbus/mp2857.c
+new file mode 100644
+index 000000000000..b3f9226d83cb
+--- /dev/null
++++ b/drivers/hwmon/pmbus/mp2857.c
+@@ -0,0 +1,172 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Hardware monitoring driver for MPS Multi-phase Digital VR Controllers(MP2857)
++ *
++ * Copyright (C) 2023 MPS
++ */
++
++#include <linux/err.h>
++#include <linux/i2c.h>
++#include <linux/init.h>
++#include <linux/kernel.h>
++#include <linux/delay.h>
++#include <linux/module.h>
++#include "pmbus.h"
++
++#define MFR_VR_CONFIG2          0x5E
++
++#define MP2857_PAGE_NUM			2
++
++#define MP2857_RAIL1_FUNC		(PMBUS_HAVE_VIN | PMBUS_HAVE_VOUT | \
++								PMBUS_HAVE_TEMP | PMBUS_HAVE_POUT)
++
++#define MP2857_RAIL2_FUNC		(PMBUS_HAVE_VOUT | PMBUS_HAVE_TEMP | \
++                                PMBUS_HAVE_POUT)
++
++struct mp2857_data {
++	struct pmbus_driver_info *info;
++	struct i2c_client client;
++	int	   vid_step[MP2857_PAGE_NUM];
++};
++
++struct mp2857_data data;
++
++static int read_word_data(struct i2c_client *client, int page, int reg)
++{
++	int ret;
++	ret = i2c_smbus_write_byte_data(&data.client, PMBUS_PAGE, page);
++	if (ret < 0)
++		return ret;
++	ret = i2c_smbus_read_word_data(&data.client, reg);
++
++	return ret;
++}
++
++static int
++mp2857_read_vin(struct i2c_client *client, int page, int reg)
++{
++	int ret;
++	ret = read_word_data(client, page, reg);
++	printk(KERN_ALERT "Obtained data from MP2857, Vin-%d: %hx\n", page, ret);
++	printk(KERN_ALERT "Converted data:\n");
++
++	return ret;
++}
++
++static int
++mp2857_read_vout(struct i2c_client *client, int page, int reg)
++{
++	int ret;
++	ret = read_word_data(client, 0, MFR_VR_CONFIG2);
++	printk(KERN_ALERT "Obtained data from MP2857, MFR_VR_CONFIG2-%d: %hx\n", page, ret);
++    if ((ret & 0x0800) == 0) {
++        ret = read_word_data(client, page, reg);
++		printk(KERN_ALERT "Obtained data from MP2857, Vout-%d: %hx\n", page, ret);
++        ret = ((ret & 0x3FF) * 5);
++    } else {
++        ret = read_word_data(client, page, reg);
++		printk(KERN_ALERT "Obtained data from MP2857, Vout-%d: %hx\n", page, ret);
++        ret = ((ret & 0x3FF) * 390625) / 100000;
++    }
++	printk(KERN_ALERT "Converted data:\n");
++
++	return ret;
++}
++
++static int
++mp2857_read_temperature(struct i2c_client *client, int page, int reg)
++{
++	int ret;
++	ret = read_word_data(client, page, reg);
++	printk(KERN_ALERT "Obtained data from MP2857, Temp-%d: %hx\n", page, ret);
++	printk(KERN_ALERT "Converted data:\n");
++
++	return ret;
++}
++
++static int
++mp2857_read_pout(struct i2c_client *client, int page, int reg)
++{
++	int ret;
++	ret = read_word_data(client, page, reg);
++	printk(KERN_ALERT "Obtained data from MP2857, Pout-%d: %hx\n", page, ret);
++	printk(KERN_ALERT "Converted data:\n");
++
++	return ret;
++}
++
++static int mp2857_read_word_data(struct i2c_client *client, int page, int phase,
++			      int reg)
++{
++	int ret;
++	switch (reg) {
++		case PMBUS_READ_VIN:
++			ret = mp2857_read_vin(client, page, reg);
++			break;
++		case PMBUS_READ_VOUT:
++			ret = mp2857_read_vout(client, page, reg);
++			break;
++		case PMBUS_READ_TEMPERATURE_1:
++			ret = mp2857_read_temperature(client, page, reg);
++			break;
++		case PMBUS_READ_POUT:
++			ret = mp2857_read_pout(client, page, reg);
++			break;
++		default:
++			ret = -ENODATA;
++			break;
++	}
++
++	return ret;
++}
++
++static struct pmbus_driver_info mp2857_info = {
++	.pages = MP2857_PAGE_NUM,
++
++	.format[PSC_VOLTAGE_IN] = linear,
++	.format[PSC_VOLTAGE_OUT] = linear,
++	.format[PSC_TEMPERATURE] = linear,
++	.format[PSC_POWER] = linear,
++	.m[PSC_VOLTAGE_OUT] = 1,
++	.R[PSC_VOLTAGE_OUT] = 3,
++	.b[PSC_VOLTAGE_OUT] = 0,
++
++	.func[0] = MP2857_RAIL1_FUNC,
++	.func[1] = MP2857_RAIL2_FUNC,
++	.read_word_data = mp2857_read_word_data,
++};
++
++static int mp2857_probe(struct i2c_client *client, const struct i2c_device_id *id)
++{
++	data.info = &mp2857_info;
++	data.client = *client;
++
++	return pmbus_do_probe(client, &mp2857_info);
++}
++
++static const struct i2c_device_id mp2857_id[] = {
++	{"mp2857", 0},
++	{}
++};
++MODULE_DEVICE_TABLE(i2c, mp2857_id);
++
++static const struct of_device_id mp2857_of_match[] = {
++	{.compatible = "mps,mp2857"},
++	{}
++};
++MODULE_DEVICE_TABLE(of, mp2857_of_match);
++
++static struct i2c_driver mp2857_driver = {
++	.driver = {
++		.name = "mp2857",
++		.of_match_table = mp2857_of_match,
++	},
++	.probe = mp2857_probe,
++	.id_table = mp2857_id,
++};
++
++module_i2c_driver(mp2857_driver);
++
++MODULE_AUTHOR("Noah Wang <Noah.Wang@monolithicpower.com>");
++MODULE_DESCRIPTION("PMBus driver for MPS MP2857 device");
++MODULE_LICENSE("GPL");
++
+--
+2.17.1
+

@@ -1,0 +1,54 @@
+From c19922c10895295715739cc45c29d37e5ce4ba34 Mon Sep 17 00:00:00 2001
+From: Alisha Kulkarni <ALISHA.KULKARNI@amd.com>
+Date: Thu, 27 Apr 2023 12:00:55 -0500
+Subject: [PATCH 1/1] ARM-dts-aspeed-MP2857-VR-Purico-dts-file-for-AMD-Turin
+
+Signed-off-by: Alisha Kulkarni <ALISHA.KULKARNI@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts | 4 ++--
+ arch/arm/boot/dts/aspeed-bmc-amd-purico.dts     | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
+index 40ec0bceeb92..f2cf811be9dc 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
+@@ -225,13 +225,13 @@
+
+ 			vddcr_core0_soc@61 {
+ 				//VDD core0 soc
+-				compatible = "isil,isl68137";
++				compatible = "mps,mp2857";
+ 				reg = <0x61>;
+ 			};
+
+ 			vddcr_core1_11@62 {
+ 				//VDD 11
+-				compatible = "isil,isl68137";
++				compatible = "mps,mp2857";
+ 				reg = <0x62>;
+ 			};
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+index 2a8a03645e17..a2e1201cb1df 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+@@ -225,13 +225,13 @@
+
+ 			vddcr_core0_soc@61 {
+ 				//VDD core0 soc
+-				compatible = "isil,isl68137";
++				compatible = "mps,mp2857";
+ 				reg = <0x61>;
+ 			};
+
+ 			vddcr_core1_11@62 {
+ 				//VDD 11
+-				compatible = "isil,isl68137";
++				compatible = "mps,mp2857";
+ 				reg = <0x62>;
+ 			};
+
+--
+2.17.1
+

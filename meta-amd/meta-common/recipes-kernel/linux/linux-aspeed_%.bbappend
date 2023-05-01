@@ -50,4 +50,6 @@ SRC_URI += "file://amd-bmc-baseline.cfg \
             file://0047-ARM-DTS-Aspeed-Modify-I3c-and-UDC-device-node-enable-with-G304.patch \
             file://0048-Added-Aspeed-BMC-device-drivers-from-Aspeed-Tech-ups.patch \
             file://0049-Enabled-BMC-device-and-configuration-for-SP5-and-SP6.patch \
+            file://0050-ARM-dts-aspeed-MP2857-VR-Purico-dts-file-for-AMD-Turin.patch \
+            file://0051-drivers-hwmon-Add-mp2857-vr-driver.patch \
            "
