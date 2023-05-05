@@ -1,0 +1,57 @@
+From 6c89cfceb797a38f3e6d8813c39c4e788c53d37c Mon Sep 17 00:00:00 2001
+Message-Id: <6c89cfceb797a38f3e6d8813c39c4e788c53d37c.1683323591.git.vinu.vaghasia@amd.com>
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Fri, 5 May 2023 16:26:13 -0500
+Subject: [PATCH] ARM-DTS-aspeed: Modify g304 dts for SPI2 Single mode support
+
+G304 device tree modified to support Single SPI mode at 1MHz frequency
+
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-g304.dts | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-g304.dts b/arch/arm/boot/dts/aspeed-bmc-amd-g304.dts
+index 37e8bdd53622..3a33f0c4c99b 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-g304.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-g304.dts
+@@ -56,7 +56,6 @@
+
+ };
+
+-#if 0  // currently not used
+ &spi1 {
+     status = "okay";
+     pinctrl-names = "default";
+@@ -68,6 +67,7 @@
+         compatible = "jedec,spi-nor";
+         label = "pnor";
+         status = "okay";
++        spi-max-frequency = <1000000>;
+         spi-tx-bus-width = <1>;
+         spi-rx-bus-width = <1>;
+     };
+@@ -76,11 +76,11 @@
+         compatible = "jedec,spi-nor";
+         label = "pnor";
+         status = "okay";
++        spi-max-frequency = <1000000>;
+         spi-tx-bus-width = <1>;
+         spi-rx-bus-width = <1>;
+     };
+ };
+-#endif
+
+ &spi2 {
+     status = "okay";
+@@ -93,6 +93,7 @@
+         compatible = "jedec,spi-nor";
+         label = "pnor";
+         status = "okay";
++        spi-max-frequency = <1000000>;
+         spi-tx-bus-width = <1>;
+         spi-rx-bus-width = <1>;
+     };
+--
+2.17.1
+
