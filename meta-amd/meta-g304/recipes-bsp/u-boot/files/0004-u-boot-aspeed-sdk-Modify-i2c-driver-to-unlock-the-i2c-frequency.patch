@@ -1,0 +1,33 @@
+From 8753bd8a5470739cbccc60528578b132f6026ae0 Mon Sep 17 00:00:00 2001
+Message-Id: <8753bd8a5470739cbccc60528578b132f6026ae0.1683661446.git.vinu.vaghasia@amd.com>
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Tue, 9 May 2023 14:41:15 -0500
+Subject: [PATCH] u-boot-aspeed-sdk: Modify i2c driver to unlock the i2c
+ frequency settings
+
+- I2CD_M_SCL_DRIVE_EN removed to unlock the i2c frequency settings.
+- This allows to changed the i2c frequency from u-boot by setting the
+REGs.
+- This change needed for G304 I2C testing at various speeds.
+
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ drivers/i2c/ast_i2c.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/i2c/ast_i2c.c b/drivers/i2c/ast_i2c.c
+index bbc32d6cdb..13420ade84 100644
+--- a/drivers/i2c/ast_i2c.c
++++ b/drivers/i2c/ast_i2c.c
+@@ -73,7 +73,7 @@ static void ast_i2c_init_bus(struct udevice *dev)
+ 	/* Enable Master Mode. Assuming single-master */
+ 	writel(I2CD_MASTER_EN
+ 	       | I2CD_M_SDA_LOCK_EN
+-	       | I2CD_MULTI_MASTER_DIS | I2CD_M_SCL_DRIVE_EN,
++	       | I2CD_MULTI_MASTER_DIS,
+ 	       &priv->regs->fcr);
+ 	/* Enable Interrupts */
+ 	writel(I2CD_INTR_TX_ACK
+--
+2.17.1
+
