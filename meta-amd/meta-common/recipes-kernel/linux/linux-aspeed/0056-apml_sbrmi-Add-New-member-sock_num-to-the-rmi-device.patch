@@ -1,0 +1,102 @@
+From cdb117e8df8f59e57f399c09b8bdfc06adc445f1 Mon Sep 17 00:00:00 2001
+From: Akshay Gupta <Akshay.Gupta@amd.com>
+Date: Mon, 10 Apr 2023 01:30:39 -0400
+Subject: [PATCH 2/3] apml_sbrmi: Add New member sock_num to the rmi device
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+- This patch add new member to rmi_dev structure, "sock_num"
+  this will hold the socket number in the rmi device information
+
+Signed-of-by: Akshay Gupta <Akshay.Gupta@amd.com>
+---
+ drivers/misc/amd-apml/sbrmi-common.h |  1 +
+ drivers/misc/amd-apml/sbrmi.c        | 20 +++++++++-----------
+ 2 files changed, 10 insertions(+), 11 deletions(-)
+
+diff --git a/drivers/misc/amd-apml/sbrmi-common.h b/drivers/misc/amd-apml/sbrmi-common.h
+index e352489dd8bc..0275c271a541 100644
+--- a/drivers/misc/amd-apml/sbrmi-common.h
++++ b/drivers/misc/amd-apml/sbrmi-common.h
+@@ -23,6 +23,7 @@ struct apml_sbrmi_device {
+ 	atomic_t in_progress;
+ 	atomic_t no_new_trans;
+ 	u8 rev;
++	u8 sock_num;
+ } __packed;
+
+ int rmi_mca_msr_read(struct apml_sbrmi_device *rmi_dev,
+diff --git a/drivers/misc/amd-apml/sbrmi.c b/drivers/misc/amd-apml/sbrmi.c
+index d4b6cf6a6c2c..12f8976d9fcb 100644
+--- a/drivers/misc/amd-apml/sbrmi.c
++++ b/drivers/misc/amd-apml/sbrmi.c
+@@ -299,15 +299,15 @@ static const struct file_operations sbrmi_fops = {
+ };
+
+ static int create_misc_rmi_device(struct apml_sbrmi_device *rmi_dev,
+-				  struct device *dev, int id)
++				  struct device *dev)
+ {
+ 	int ret;
+
+-	rmi_dev->sbrmi_misc_dev.name		= devm_kasprintf(dev, GFP_KERNEL, "apml_rmi%d", id);
++	rmi_dev->sbrmi_misc_dev.name		= devm_kasprintf(dev, GFP_KERNEL, "apml_rmi%d", rmi_dev->sock_num);
+ 	rmi_dev->sbrmi_misc_dev.minor		= MISC_DYNAMIC_MINOR;
+ 	rmi_dev->sbrmi_misc_dev.fops		= &sbrmi_fops;
+ 	rmi_dev->sbrmi_misc_dev.parent		= dev;
+-	rmi_dev->sbrmi_misc_dev.nodename	= devm_kasprintf(dev, GFP_KERNEL, "sbrmi%d", id);
++	rmi_dev->sbrmi_misc_dev.nodename	= devm_kasprintf(dev, GFP_KERNEL, "sbrmi%d", rmi_dev->sock_num);
+ 	rmi_dev->sbrmi_misc_dev.mode		= 0600;
+
+ 	ret = misc_register(&rmi_dev->sbrmi_misc_dev);
+@@ -328,7 +328,6 @@ static int sbrmi_i2c_probe(struct i2c_client *client,
+ 		.reg_bits = 8,
+ 		.val_bits = 8,
+ 	};
+-	int id;
+ 	int ret;
+ 	int i;
+ 	u32 dimm_cnt;
+@@ -380,12 +379,12 @@ static int sbrmi_i2c_probe(struct i2c_client *client,
+ 		return PTR_ERR_OR_ZERO(hwmon_dev);
+
+ 	if (client->addr == SOCK_0_ADDR)
+-		id = 0;
++		rmi_dev->sock_num = 0;
+ 	if (client->addr == SOCK_1_ADDR)
+-		id = 1;
++		rmi_dev->sock_num = 1;
+
+ 	init_completion(&rmi_dev->misc_fops_done);
+-	return create_misc_rmi_device(rmi_dev, dev, id);
++	return create_misc_rmi_device(rmi_dev, dev);
+ }
+
+ static int sbrmi_i3c_probe(struct i3c_device *i3cdev)
+@@ -398,7 +397,6 @@ static int sbrmi_i3c_probe(struct i3c_device *i3cdev)
+ 		.val_bits = 8,
+ 	};
+ 	struct regmap *regmap;
+-	int id;
+ 	int ret;
+ 	int i;
+ 	u32 dimm_cnt;
+@@ -451,12 +449,12 @@ static int sbrmi_i3c_probe(struct i3c_device *i3cdev)
+ 		return PTR_ERR_OR_ZERO(hwmon_dev);
+
+ 	if (i3cdev->desc->info.static_addr == SOCK_0_ADDR)
+-		id = 0;
++		rmi_dev->sock_num = 0;
+ 	if (i3cdev->desc->info.static_addr == SOCK_1_ADDR)
+-		id = 1;
++		rmi_dev->sock_num = 1;
+
+ 	init_completion(&rmi_dev->misc_fops_done);
+-	return create_misc_rmi_device(rmi_dev, dev, id);
++	return create_misc_rmi_device(rmi_dev, dev);
+ }
+
+ static int sbrmi_i2c_remove(struct i2c_client *client)
+--
+2.17.1
+

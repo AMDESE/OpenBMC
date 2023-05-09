@@ -55,4 +55,7 @@ SRC_URI += "file://amd-bmc-baseline.cfg \
             file://0052-linux-aspeed-driver-Add-aspeed_udc-driver-for-BMC-USB-Device.patch \
             file://0053-ARM-DTS-aspped-Add-usb-device-node-for-G304-platfom.patch \
             file://0054-ARM-DTS-aspeed-Modify-g304-dts-for-SPI2-Single-mode.patch \
+            file://0055-apml_sbrmi-Use-API-provided-by-linux-to-set-and-clea.patch \
+            file://0056-apml_sbrmi-Add-New-member-sock_num-to-the-rmi-device.patch \
+            file://0057-apml_sbrmi-Add-support-to-identify-register-address-.patch \
            "
