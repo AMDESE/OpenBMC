@@ -15,6 +15,7 @@ SRCREV = "${AUTOREV}"
 
 SRC_URI += "file://0001-amd-apml-Enable-apml-library-with-i3c.patch \
             file://0002-amd-apml-select-APML-over-i2c-i3c.patch  \
+            file://0003-amd-apml-Add-i2c-bind-unbind.patch \
            "
 
 S="${WORKDIR}/git"
