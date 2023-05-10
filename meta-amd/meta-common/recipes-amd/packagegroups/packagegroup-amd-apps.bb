@@ -45,8 +45,6 @@ RDEPENDS_${PN}-system = " \
         amd-lcd-lib \
         amd-mctp-tool \
         amd-ras \
-        amd-spdm \
-        amd-yaap \
         auto-notify \
         bmcweb \
         cpu-info \
