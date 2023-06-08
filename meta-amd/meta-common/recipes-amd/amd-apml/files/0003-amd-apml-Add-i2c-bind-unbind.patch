@@ -1,19 +1,22 @@
-From 7ad0efbb0e95bc15e0457ca76c6aef1cc55fabf8 Mon Sep 17 00:00:00 2001
+From 876063bd648bce66214d0f948233d6b3b4fec3a0 Mon Sep 17 00:00:00 2001
 From: Mohsen Dolaty <mohsen.dolaty@amd.com>
 Date: Tue, 9 May 2023 07:14:34 -0500
 Subject: [PATCH 1/1] amd-apml: Add i2c bind unbind
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 
 Add i2c Bind/Unbind for SBTSI and SBRMI Drivers
 Bind when system state change from S5 to S0
 Unbind when system state change from S0 to S5
 
 Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
+Signed-off-by: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
 ---
- scripts/set-apml.sh | 24 ++++++++++++++++++++++--
- 1 file changed, 22 insertions(+), 2 deletions(-)
+ scripts/set-apml.sh | 97 +++++++++++++++++++--------------------------
+ 1 file changed, 40 insertions(+), 57 deletions(-)
 
 diff --git a/scripts/set-apml.sh b/scripts/set-apml.sh
-index f45c345..438816c 100644
+index f45c345..520d624 100644
 --- a/scripts/set-apml.sh
 +++ b/scripts/set-apml.sh
 @@ -9,7 +9,11 @@ I2C_BUS=2
@@ -76,7 +79,105 @@ index f45c345..438816c 100644
          i2cset -f -y $I2C_BUS $I2C_MUX 0x40 0x00 || retval=$?
          if [[ "$retval" -ne 0 ]]; then
              echo "Error: Setting I2C Mux Reg 0x40"
-@@ -219,6 +238,7 @@ elif [[ $1 == "bind" ]];then
+@@ -96,33 +115,12 @@ unbind_i2c_drivers()
+ set_i3c_apml()
+ {
+     echo "Setting I3C Mux for CPU 0 APML "
+-    if [ -a "$I3C_MUX_0" ]
+-    then
+-        $I3C_TOOL -d $I3C_MUX_0 -w 0x46 -r 1 > /dev/null 2>&1
+-        if [[ $? -ne 0 ]]
+-        then
+-            echo "I3C Mux 0 not present"
+-            i3c_mux_present=0
+-        else
+-            echo "I3C Mux 0 present"
+-            i3c_mux_present=0
+-        fi
+-    else
+-        i3c_mux_present=0
+-    fi
+-    if [[ $i3c_mux_present == 0 ]]
+-    then
+-        # Unbind sbtsi driver
+-        echo  $DEV_I3C_SBTSI_4 > $DEV_I3C_SBTSI_PATH/unbind
+-        echo  $DEV_I3C_SBRMI_4 > $DEV_I3C_SBRMI_PATH/unbind
+-        sleep 1
+-        # Unbind platform i3c driver
+-        echo  $DEV_I3C_4 > $DEV_I3C_PATH/unbind
+-        sleep 1
+-        # Bind platform i3c driver
+-        echo  $DEV_I3C_4 > $DEV_I3C_PATH/bind
+-        sleep 1
+-    fi
++
++    sleep 1
++    # Bind platform i3c driver
++    echo  $DEV_I3C_4 > $DEV_I3C_PATH/bind
++    sleep 1
++
+     $I3C_TOOL -d $I3C_MUX_0 -w 0x46,0x00,0x01
+     $I3C_TOOL -d $I3C_MUX_0 -w 0x0E,0x00,0x24
+     $I3C_TOOL -d $I3C_MUX_0 -w 0x40,0x00,0x40
+@@ -140,34 +138,11 @@ set_i3c_apml()
+
+     if [[ $num_of_cpu == 2 ]]
+     then
+-        echo "Setting I3C Mux for CPU 1 APML "
+-        if [ -a "$I3C_MUX_1" ]
+-        then
+-            $I3C_TOOL -d $I3C_MUX_1 -w 0x46 -r 1 > /dev/null 2>&1
+-            if [[ $? -ne 0 ]]
+-            then
+-                echo "I3C Mux 1 not present"
+-                i3c_mux_present=0
+-            else
+-                echo "I3C Mux 1 present"
+-                i3c_mux_present=0
+-            fi
+-        else
+-            i3c_mux_present=0
+-        fi
+-        if [[ $i3c_mux_present == 0 ]]
+-        then
+-            # Unbind sbtsi driver
+-            echo  $DEV_I3C_SBTSI_5 > $DEV_I3C_SBTSI_PATH/unbind
+-            echo  $DEV_I3C_SBRMI_5 > $DEV_I3C_SBRMI_PATH/unbind
+-            sleep 1
+-            # Unbind platform i3c driver
+-            echo  $DEV_I3C_5 > $DEV_I3C_PATH/unbind
+-            sleep 1
+-            # Bind platform i3c driver
+-            echo  $DEV_I3C_5 > $DEV_I3C_PATH/bind
+-            sleep 1
+-        fi
++        sleep 1
++        # Bind platform i3c driver
++        echo  $DEV_I3C_5 > $DEV_I3C_PATH/bind
++        sleep 1
++
+         $I3C_TOOL -d $I3C_MUX_1 -w 0x46,0x00,0x01
+         $I3C_TOOL -d $I3C_MUX_1 -w 0x0E,0x00,0x24
+         $I3C_TOOL -d $I3C_MUX_1 -w 0x40,0x00,0x40
+@@ -190,10 +165,17 @@ unbind_i3c_drivers()
+     # Unbind sbtsi and sbrmi drivers
+     echo  $DEV_I3C_SBTSI_4 > $DEV_I3C_SBTSI_PATH/unbind
+     echo  $DEV_I3C_SBRMI_4 > $DEV_I3C_SBRMI_PATH/unbind
++    # Unbind platform i3c driver
++    sleep 1
++    echo  $DEV_I3C_4 > $DEV_I3C_PATH/unbind
++
+     if [[ $num_of_cpu == 2 ]]
+     then
+         echo  $DEV_I3C_SBTSI_5 > $DEV_I3C_SBTSI_PATH/unbind
+         echo  $DEV_I3C_SBRMI_5 > $DEV_I3C_SBRMI_PATH/unbind
++        # Unbind platform i3c driver
++        sleep 1
++        echo  $DEV_I3C_5 > $DEV_I3C_PATH/unbind
+     fi
+ }
+
+@@ -219,6 +201,7 @@ elif [[ $1 == "bind" ]];then
      fi
  elif [[ $1 == "unbind" ]];then
      if [[ -a "$DEV_I2C_2" ]];then
@@ -85,4 +186,5 @@ index f45c345..438816c 100644
      else
          echo "UnBind I3C Drivers"
 --
-2.25.1
+2.17.1
+
