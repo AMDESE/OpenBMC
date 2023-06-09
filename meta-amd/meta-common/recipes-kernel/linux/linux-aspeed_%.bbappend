@@ -58,4 +58,5 @@ SRC_URI += "file://amd-bmc-baseline.cfg \
             file://0055-apml_sbrmi-Use-API-provided-by-linux-to-set-and-clea.patch \
             file://0056-apml_sbrmi-Add-New-member-sock_num-to-the-rmi-device.patch \
             file://0057-apml_sbrmi-Add-support-to-identify-register-address-.patch \
+            file://0058-sbrmi-Implement-CPUID-and-MCAMSR-protocol-for-rev-0x.patch \
            "
