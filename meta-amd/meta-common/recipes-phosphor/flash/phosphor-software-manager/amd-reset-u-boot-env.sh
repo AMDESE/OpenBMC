@@ -14,3 +14,4 @@ rm -f /etc/hostname
 /sbin/fw_setenv eth1addr
 /sbin/fw_setenv bootargs console=ttyS4,115200n8 vmalloc=1024MB root=/dev/ram rw
 /sbin/fw_setenv board_id
+/sbin/fw_setenv apml_i3c true
