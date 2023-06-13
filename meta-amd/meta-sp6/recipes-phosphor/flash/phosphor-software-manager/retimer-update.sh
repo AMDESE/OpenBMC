@@ -15,15 +15,12 @@ boardID=`fw_printenv board_id | sed -n "s/^board_id=//p"`
 revID=`hexdump -c /sys/bus/i2c/devices/7-0050/eeprom -s 24 -n 1 | head -n 1 | awk '{ print $2}'`
 case $boardID in
    "61"|"64")  # Sunstone board_ids
-        echo "Retimer update not supported for Sunstone"
         mux=70
    ;;
    "63")  # Cinnabar board_ids
-        echo "Retimer update not supported for Cinnabar"
-        mux=70
+        mux=72
    ;;
    "59"|"62"|"65")  # Shale board_ids
-        echo "Retimer update not supported for Shale64"
         mux=70
    ;;
    *)  # Default
@@ -49,36 +46,26 @@ function probe_bus() {
         fi
 }
 
-function onboard_probe() {
-    probe_bus 0x70
-    abus_num=$?
-    if [ $abus_num -eq 0 ]; then
-            probe_bus 0x71
-            abus_num=$?
-            if [ $abus_num -eq 0 ]; then
-                    probe_bus 0x75
-                    abus_num=$?
-                    if [ $abus_num -eq 0 ] ; then
-                            echo "Retimer not found on any mux behind i2c-10"
-                            exit -1
-                    else
-                            echo "Retimers found on $abus_num"
-                            BUSADDR=$abus_num
-                    fi
-            else
-                    echo "Retimers found on $abus_num"
-                    BUSADDR=$abus_num
-            fi
-    else
-            echo "Retimers found on $abus_num"
-            BUSADDR=$abus_num
-    fi
+function cinnabar_probe() {
+    echo pca9546 0x72 > /sys/bus/i2c/devices/i2c-10/new_device
+    ch=$(i2cdetect -l | grep i2c-10 | sort | grep -E "chan_id 2" | awk '{print $1}') ##mux1 address
+    pat='i2c-(.*)'
+    [[ "$ch" =~ $pat ]]
+
+    echo pca9546 0x70 > /sys/bus/i2c/devices/$ch/new_device
+
+    retimer_chan_det=`i2cdetect -l | grep $ch | grep -E "chan_id 1" | awk '{print $1}'` ##mux2 address
+    echo "retimer channel = $retimer_chan_det"
+
+    retimer_bus=`echo $retimer_chan_det | cut -c 5-`
+    BUSADDR=$retimer_bus
     onboard_flag=1
 }
 
-function onboard_cleanup() {
+function cinnabar_cleanup() {
     if [ $onboard_flag == 1 ]; then
-    echo $fmux > /sys/bus/i2c/devices/i2c-10/delete_device || true
+    echo 0x70 > /sys/bus/i2c/devices/$ch/delete_device || true
+    echo 0x72 > /sys/bus/i2c/devices/i2c-10/delete_device || true
     fi
 }
 
@@ -114,7 +101,7 @@ if [ -e "$MANIFEST_FILE" ]; then
     Riser=$(sed '4!d' $MANIFEST_FILE | awk -F= '{print $NF}')
 else
     echo "MANIFEST file not available. Update failed"
-    onboard_cleanup
+    cinnabar_cleanup
     slot_cleanup
     exit -1
 fi
@@ -125,8 +112,8 @@ if [ $Riser == "Riser1" ]; then
 elif [ $Riser == "Riser2" ]; then
     port=0x20
     set_bus_for_slot
-elif [ $Riser == "RiserOB" ]; then
-    onboard_probe
+elif [ $Riser == "RiserCB" ]; then
+    cinnabar_probe
 else
     echo "Unknown Riser in MANIFEST"
     exit
@@ -140,7 +127,7 @@ if [ ! -e "$IMAGE_FILE" ]; then
         IMAGE_FILE=$(find -type f -name '*.txt')
         if [ ! -e "$IMAGE_FILE" ]; then
             echo "image file does not exist"
-            onboard_cleanup
+            cinnabar_cleanup
             slot_cleanup
             exit -1
         fi
@@ -154,18 +141,18 @@ if [ "$Manufacturer" == "Aries" ]; then
     /usr/bin/retimer_update $BUSADDR $SLAVEADDR $IMAGE_FILE
     if [ $? -eq 0 ]; then
         echo "update Successful"
-        onboard_cleanup
+        cinnabar_cleanup
         slot_cleanup
     else
         echo "update failed"
-        onboard_cleanup
+        cinnabar_cleanup
         slot_cleanup
         exit -1
     fi
 
 else
     echo "Not a valid Manufacturer Name. Aborting the update"
-    onboard_cleanup
+    cinnabar_cleanup
     slot_cleanup
     exit -1
 fi
