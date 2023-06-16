@@ -1,0 +1,75 @@
+From aab6ed0f0c8ccaf007cf30d43b0706f63dd7cc3d Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Fri, 16 Jun 2023 00:10:04 -0500
+Subject: [PATCH] u-boot: Add enable-gpios to mount Lanai flash
+
+Added gpio configurations to select Lanai SPI ROM.
+This will be accessed by kernel for eSPI boot.
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+---
+ common/main.c           | 30 ++++++++++++++++++++++++++++++
+ include/amd-platforms.h |  4 ++++
+ 2 files changed, 34 insertions(+)
+
+diff --git a/common/main.c b/common/main.c
+index 1a98b3ea21..180b2f320d 100644
+--- a/common/main.c
++++ b/common/main.c
+@@ -220,6 +220,35 @@ void set_board_id()
+ 	return;
+ }
+
++/*
++ * Set Lanai mux gpios
++ */
++void init_rot_flash ()
++{
++	printf("eSPI Boot init\n");
++	run_command_list("mw 1e6e20d8 00000000", -1, 0);
++	run_command_list("mw 1e6ee080 00000007", -1, 0);
++	printf("Enabling RoT flash\n");
++	run_command_list("gpio set " LANAI_GPIO_V0, -1, 0);
++	run_command_list("gpio set " LANAI_GPIO_V1, -1, 0);
++	printf("Enabling SAFS boot\n");
++	run_command_list("mw 1e6e2510 00000082", -1, 0);
++#ifdef PERIPHERAL_CHANNEL
++       //run_command_list("mw 1e6ee084 03000000", -1, 0);
++       //run_command_list("mw 1e6ee088 30000000", -1, 0);
++       //run_command_list("mw 1e6ee08c ff000000", -1, 0);
++#endif
++	/* enable to read back registers (debug prints)
++	run_command_list("md.l 1e6e20d8 1", -1, 0);
++	run_command_list("md.l 1e6ee080 1", -1, 0);
++	run_command_list("md.l 1e6ee084 1", -1, 0);
++	run_command_list("md.l 1e6ee088 1", -1, 0);
++	run_command_list("md.l 1e6ee08c 1", -1, 0);
++	run_command_list("md.l 1e6e2510 1", -1, 0);
++        */
++	return;
++}
++
+ static void run_preboot_environment_command(void)
+ {
+ #ifdef CONFIG_PREBOOT
+@@ -269,6 +298,7 @@ void main_loop(void)
+ 	/* Read board id from eerpom and set env */
+ 	set_board_id();
+ 	set_hostname();
++	init_rot_flash();
+ 	s = bootdelay_process();
+ 	if (cli_process_fdt(&s))
+ 		cli_secure_boot_cmd(s);
+diff --git a/include/amd-platforms.h b/include/amd-platforms.h
+index 2f398d9a6f..1f2e1bafbc 100644
+--- a/include/amd-platforms.h
++++ b/include/amd-platforms.h
+@@ -100,4 +100,8 @@
+ // APML
+ #define APML_I3C_CHAR_CNT       (4)
+
++// Lanai flash mux gpios
++#define LANAI_GPIO_V0	"168"
++#define LANAI_GPIO_V1	"169"
++
+ #endif /* _AMD_PLATFOMS_H */
