@@ -61,4 +61,5 @@ SRC_URI += "file://amd-bmc-baseline.cfg \
             file://0058-sbrmi-Implement-CPUID-and-MCAMSR-protocol-for-rev-0x.patch \
             file://0059-drivers-jtag-Add-support-for-hardware-mode-2.patch \
             file://0060-linux-aspeed-change-DIMM-i3c-freq-to-2-MHz.patch \
+            file://0061-ARM-dts-aspeed-Add-eSPI-peripheral-and-flash-channel.patch \
            "

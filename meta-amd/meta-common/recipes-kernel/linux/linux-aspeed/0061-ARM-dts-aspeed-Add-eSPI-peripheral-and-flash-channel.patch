@@ -1,0 +1,231 @@
+From 4c442d542758784591e6cc26100e183fe0bdf8b1 Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Fri, 16 Jun 2023 23:08:26 -0500
+Subject: [PATCH] ARM:dts:aspeed: Add eSPI peripheral and flash channels
+
+Adds eSPI peripheral channel and flash channel for SAFS
+in all Turin platforms
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts | 6 ++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts     | 6 ++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts  | 6 ++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-galena.dts      | 6 ++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts  | 6 ++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts      | 6 ++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts  | 6 ++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-purico.dts      | 6 ++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts | 6 ++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts     | 6 ++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts | 6 ++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts     | 6 ++++++
+ 12 files changed, 72 insertions(+)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
+index e10c04e1f236..c24dc0c51585 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
+@@ -1080,6 +1080,12 @@
+ 	pinctrl-0 = <&pinctrl_espi_default &pinctrl_espialt_default>;
+
+ 	perif,dma-mode;
++	perif,memcyc-src-addr = <0x30000000>;
++	perif,memcyc-size = <0x4000000>;
++
++	/* SAFS - Hw mode */
++	flash,dma-mode;
++	flash,safs-mode = <0x2>;
+ };
+
+ &espi_mmbi {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
+index 7ac8201dd307..3112f072f094 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
+@@ -1075,6 +1075,12 @@
+ 	pinctrl-0 = <&pinctrl_espi_default &pinctrl_espialt_default>;
+
+ 	perif,dma-mode;
++	perif,memcyc-src-addr = <0x30000000>;
++	perif,memcyc-size = <0x4000000>;
++
++	/* SAFS - Hw mode */
++	flash,dma-mode;
++	flash,safs-mode = <0x2>;
+ };
+
+ &espi_mmbi {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts
+index ca5e93a3922c..c4ad8853f5d5 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts
+@@ -761,6 +761,12 @@
+ 	pinctrl-0 = <&pinctrl_espi_default &pinctrl_espialt_default>;
+
+ 	perif,dma-mode;
++	perif,memcyc-src-addr = <0x30000000>;
++	perif,memcyc-size = <0x4000000>;
++
++	/* SAFS - Hw mode */
++	flash,dma-mode;
++	flash,safs-mode = <0x2>;
+ };
+
+ &espi_mmbi {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts b/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
+index 4f593beae7e2..54cc6ad70453 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
+@@ -762,6 +762,12 @@
+ 	pinctrl-0 = <&pinctrl_espi_default &pinctrl_espialt_default>;
+
+ 	perif,dma-mode;
++	perif,memcyc-src-addr = <0x30000000>;
++	perif,memcyc-size = <0x4000000>;
++
++	/* SAFS - Hw mode */
++	flash,dma-mode;
++	flash,safs-mode = <0x2>;
+ };
+
+ &espi_mmbi {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts
+index 7280e11dd9af..2a2d86f9d0bf 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts
+@@ -1080,6 +1080,12 @@
+ 	pinctrl-0 = <&pinctrl_espi_default &pinctrl_espialt_default>;
+
+ 	perif,dma-mode;
++	perif,memcyc-src-addr = <0x30000000>;
++	perif,memcyc-size = <0x4000000>;
++
++	/* SAFS - Hw mode */
++	flash,dma-mode;
++	flash,safs-mode = <0x2>;
+ };
+
+ &espi_mmbi {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts b/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
+index 83fed3c80f71..02fc0da0f3cb 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
+@@ -1075,6 +1075,12 @@
+ 	pinctrl-0 = <&pinctrl_espi_default &pinctrl_espialt_default>;
+
+ 	perif,dma-mode;
++	perif,memcyc-src-addr = <0x30000000>;
++	perif,memcyc-size = <0x4000000>;
++
++	/* SAFS - Hw mode */
++	flash,dma-mode;
++	flash,safs-mode = <0x2>;
+ };
+
+ &espi_mmbi {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
+index c82d245eabde..1b303c58e7e1 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
+@@ -1044,6 +1044,12 @@
+ 	pinctrl-0 = <&pinctrl_espi_default &pinctrl_espialt_default>;
+
+ 	perif,dma-mode;
++	perif,memcyc-src-addr = <0x30000000>;
++	perif,memcyc-size = <0x4000000>;
++
++	/* SAFS - Hw mode */
++	flash,dma-mode;
++	flash,safs-mode = <0x2>;
+ };
+
+ &espi_mmbi {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+index 4aeed0e7fb08..b9fc68e2e0a5 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+@@ -1045,6 +1045,12 @@
+ 	pinctrl-0 = <&pinctrl_espi_default &pinctrl_espialt_default>;
+
+ 	perif,dma-mode;
++	perif,memcyc-src-addr = <0x30000000>;
++	perif,memcyc-size = <0x4000000>;
++
++	/* SAFS - Hw mode */
++	flash,dma-mode;
++	flash,safs-mode = <0x2>;
+ };
+
+ &espi_mmbi {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts
+index d266889295ce..d04bdb91c81b 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts
+@@ -761,6 +761,12 @@
+ 	pinctrl-0 = <&pinctrl_espi_default &pinctrl_espialt_default>;
+
+ 	perif,dma-mode;
++	perif,memcyc-src-addr = <0x30000000>;
++	perif,memcyc-size = <0x4000000>;
++
++	/* SAFS - Hw mode */
++	flash,dma-mode;
++	flash,safs-mode = <0x2>;
+ };
+
+ &espi_mmbi {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts b/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
+index 9d83cb47033a..b36c7942d872 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
+@@ -762,6 +762,12 @@
+ 	pinctrl-0 = <&pinctrl_espi_default &pinctrl_espialt_default>;
+
+ 	perif,dma-mode;
++	perif,memcyc-src-addr = <0x30000000>;
++	perif,memcyc-size = <0x4000000>;
++
++	/* SAFS - Hw mode */
++	flash,dma-mode;
++	flash,safs-mode = <0x2>;
+ };
+
+ &espi_mmbi {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts
+index 9eaf6cb04247..0a5393f8417a 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts
+@@ -1093,6 +1093,12 @@
+ 	pinctrl-0 = <&pinctrl_espi_default &pinctrl_espialt_default>;
+
+ 	perif,dma-mode;
++	perif,memcyc-src-addr = <0x30000000>;
++	perif,memcyc-size = <0x4000000>;
++
++	/* SAFS - Hw mode */
++	flash,dma-mode;
++	flash,safs-mode = <0x2>;
+ };
+
+ &espi_mmbi {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts b/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
+index 66cc6f10b4fa..5568d357f614 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
+@@ -1088,6 +1088,12 @@
+ 	pinctrl-0 = <&pinctrl_espi_default &pinctrl_espialt_default>;
+
+ 	perif,dma-mode;
++	perif,memcyc-src-addr = <0x30000000>;
++	perif,memcyc-size = <0x4000000>;
++
++	/* SAFS - Hw mode */
++	flash,dma-mode;
++	flash,safs-mode = <0x2>;
+ };
+
+ &espi_mmbi {
+--
+2.17.1
+
