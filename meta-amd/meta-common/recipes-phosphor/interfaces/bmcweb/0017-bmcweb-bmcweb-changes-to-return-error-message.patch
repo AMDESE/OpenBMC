@@ -1,0 +1,299 @@
+From f2354b336659481c0d59810c04dd029004f85a7a Mon Sep 17 00:00:00 2001
+From: Ashok Kumar <ashok2.kumar@amd.com>
+Date: Mon, 19 Jun 2023 08:46:44 -0500
+Subject: [PATCH] bmcweb: bmcweb changes to return error message when APML
+ failed
+
+Redfish should return error message when APML failed to populate
+processor information e.g. SerialNumber, PPIN and PartNumber
+
+Fixes: FWDEV-43511
+
+Signed-off-by: Ashok Kumar <ashok2.kumar@amd.com>
+
+---
+ redfish-core/include/error_messages.hpp       | 10 +++++
+ .../registries/base_message_registry.hpp      | 17 ++++++-
+ redfish-core/lib/processor.hpp                | 45 +++++++++++++------
+ redfish-core/lib/storage.hpp                  | 13 +++++-
+ redfish-core/src/error_messages.cpp           | 26 +++++++++++
+ 5 files changed, 96 insertions(+), 15 deletions(-)
+
+diff --git a/redfish-core/include/error_messages.hpp b/redfish-core/include/error_messages.hpp
+index 7dfdc800..f6381d14 100644
+--- a/redfish-core/include/error_messages.hpp
++++ b/redfish-core/include/error_messages.hpp
+@@ -959,6 +959,16 @@ nlohmann::json mutualExclusiveProperties(const std::string& arg1,
+ void mutualExclusiveProperties(crow::Response& res, const std::string& arg1,
+                                const std::string& arg2);
+
++/**
++ * @brief Formats CpuPropertyNotFound message into JSON
++ * Message body: "The properties with Id '<arg1>' is not available to perform this request."
++ *
++ * @param[in] arg1 Parameter of message that will replace %1 in its body.
++ *
++ * @returns Message CpuPropertyNotFound formatted to JSON */
++nlohmann::json cpuPropertyNotFound(const std::string& arg1);
++
++void cpuPropertyNotFound(crow::Response& res, const std::string& arg1);
+ } // namespace messages
+
+ } // namespace redfish
+diff --git a/redfish-core/include/registries/base_message_registry.hpp b/redfish-core/include/registries/base_message_registry.hpp
+index 7c385a00..cff9759b 100644
+--- a/redfish-core/include/registries/base_message_registry.hpp
++++ b/redfish-core/include/registries/base_message_registry.hpp
+@@ -36,7 +36,7 @@ const Header header = {
+ constexpr const char* url =
+     "https://redfish.dmtf.org/registries/Base.1.8.1.json";
+
+-constexpr std::array<MessageEntry, 74> registry = {
++constexpr std::array<MessageEntry, 75> registry = {
+     MessageEntry{
+         "AccessDenied",
+         {
+@@ -1139,5 +1139,20 @@ constexpr std::array<MessageEntry, 74> registry = {
+             {},
+             "Correct the request body and resubmit the request if it failed.",
+         }},
++   MessageEntry{
++        "cpuPropertyNotFound",
++        {
++            "Indicates that the request requires a Apml to be configured",
++            "The CPU property '%1' not found in Dbus to perform"
++            "this request.",
++            "Warning",
++            "Warning",
++            1,
++            {
++                "string",
++            },
++            "Apml library may not be configured properly, check apml configuration"
++            "and resubmit",
++        }},
+ };
+ } // namespace redfish::message_registries::base
+diff --git a/redfish-core/lib/processor.hpp b/redfish-core/lib/processor.hpp
+index 00a5ceb9..e518b787 100644
+--- a/redfish-core/lib/processor.hpp
++++ b/redfish-core/lib/processor.hpp
+@@ -54,6 +54,7 @@ inline void
+     aResp->res.jsonValue["Status"]["State"] = "Enabled";
+     aResp->res.jsonValue["Status"]["Health"] = "OK";
+
++    // first check CPU Presense and status
+     for (const auto& interface : cpuInterfacesProperties)
+     {
+         for (const auto& property : interface.second)
+@@ -71,6 +72,7 @@ inline void
+                 {
+                     // Slot is not populated
+                     aResp->res.jsonValue["Status"]["State"] = "Absent";
++                    return;
+                 }
+             }
+             else if (property.first == "Functional")
+@@ -86,7 +88,14 @@ inline void
+                     aResp->res.jsonValue["Status"]["Health"] = "Critical";
+                 }
+             }
+-            else if (property.first == "CoreCount")
++        }
++    }
++
++    for (const auto& interface : cpuInterfacesProperties)
++    {
++        for (const auto& property : interface.second)
++        {
++            if (property.first == "CoreCount")
+             {
+                 const uint16_t* coresCount =
+                     std::get_if<uint16_t>(&property.second);
+@@ -109,7 +118,7 @@ inline void
+             {
+                 const std::string* value =
+                     std::get_if<std::string>(&property.second);
+-                if (value != nullptr)
++                if (value != nullptr && !value->empty())
+                 {
+                     aResp->res.jsonValue["Socket"] = *value;
+                 }
+@@ -126,7 +135,7 @@ inline void
+             {
+                 const std::string* value =
+                     std::get_if<std::string>(&property.second);
+-                if (value != nullptr)
++                if (value != nullptr && !value->empty())
+                 {
+                     aResp->res.jsonValue["ProcessorId"]["EffectiveFamily"] =
+                         "0x" + *value;
+@@ -136,7 +145,7 @@ inline void
+             {
+                 const std::string* value =
+                     std::get_if<std::string>(&property.second);
+-                if (value != nullptr)
++                if (value != nullptr && !value->empty())
+                 {
+                     aResp->res.jsonValue["ProcessorId"]["EffectiveModel"] =
+                         "0x" + *value;
+@@ -156,7 +165,7 @@ inline void
+             {
+                 const std::string* value =
+                     std::get_if<std::string>(&property.second);
+-                if (value != nullptr)
++                if (value != nullptr && !value->empty())
+                 {
+                     aResp->res.jsonValue["ProcessorId"]["MicrocodeInfo"] =
+                         *value;
+@@ -166,7 +175,7 @@ inline void
+             {
+                 const std::string* value =
+                     std::get_if<std::string>(&property.second);
+-                if (value != nullptr)
++                if (value != nullptr && !value->empty())
+                 {
+                     aResp->res.jsonValue["ProcessorId"]["Step"] =
+                        "0x" + *value;
+@@ -176,7 +185,7 @@ inline void
+             {
+                 const std::string* value =
+                     std::get_if<std::string>(&property.second);
+-                if (value != nullptr)
++                if (value != nullptr && !value->empty())
+                 {
+                     aResp->res.jsonValue["VendorId"] =
+                        *value;
+@@ -186,7 +195,7 @@ inline void
+             {
+                 const std::string* value =
+                     std::get_if<std::string>(&property.second);
+-                if (value != nullptr)
++                if (value != nullptr && !value->empty())
+                 {
+                     aResp->res.jsonValue["ProcessorId"]["Family"] =
+                        "0x" + *value;
+@@ -196,7 +205,7 @@ inline void
+             {
+                 const std::string* value =
+                     std::get_if<std::string>(&property.second);
+-                if (value != nullptr)
++                if (value != nullptr && !value->empty())
+                 {
+                     aResp->res.jsonValue["ProcessorId"]["Model"] =
+                        "0x" + *value;
+@@ -206,7 +215,12 @@ inline void
+             {
+                 const std::string* value =
+                     std::get_if<std::string>(&property.second);
+-                if (value != nullptr)
++                if (value == nullptr || value->empty())
++                {
++                    messages::cpuPropertyNotFound(aResp->res, "PPIN");
++                    return;
++                }
++                else
+                 {
+                     aResp->res.jsonValue["ProcessorId"]["ProtectedIdentificationNumber"] =
+                        *value;
+@@ -322,6 +336,11 @@ inline void getCpuAssetData(std::shared_ptr<bmcweb::AsyncResp> aResp,
+                     {
+                         aResp->res.jsonValue["SerialNumber"] = *sn;
+                     }
++                    else
++                    {
++                       messages::cpuPropertyNotFound(aResp->res, "SerialNumber");
++                       return;
++                    }
+                 }
+                 else if (property.first == "Model")
+                 {
+@@ -337,7 +356,7 @@ inline void getCpuAssetData(std::shared_ptr<bmcweb::AsyncResp> aResp,
+
+                     const std::string* mfg =
+                         std::get_if<std::string>(&property.second);
+-                    if (mfg != nullptr)
++                    if (mfg != nullptr  && !mfg->empty())
+                     {
+                         aResp->res.jsonValue["Manufacturer"] = *mfg;
+
+@@ -361,9 +380,9 @@ inline void getCpuAssetData(std::shared_ptr<bmcweb::AsyncResp> aResp,
+                     const std::string* partNumber =
+                         std::get_if<std::string>(&property.second);
+
+-                    if (partNumber == nullptr)
++                    if (partNumber == nullptr || partNumber->empty())
+                     {
+-                        messages::internalError(aResp->res);
++                        messages::cpuPropertyNotFound(aResp->res, "PartNumber");
+                         return;
+                     }
+                     aResp->res.jsonValue["PartNumber"] = *partNumber;
+diff --git a/redfish-core/lib/storage.hpp b/redfish-core/lib/storage.hpp
+index 34ef39a2..87735f59 100644
+--- a/redfish-core/lib/storage.hpp
++++ b/redfish-core/lib/storage.hpp
+@@ -377,7 +377,9 @@ class Drive : public Node
+                             if ((propertyName == "PartNumber") ||
+                                 (propertyName == "SerialNumber") ||
+                                 (propertyName == "Manufacturer") ||
+-                                (propertyName == "Model"))
++                                (propertyName == "Model")
++                                (propertyName == "FirmwareVersion") ||
++                                (propertyName == "MediaType"))
+                             {
+                                 const std::string* value =
+                                     std::get_if<std::string>(&property.second);
+@@ -389,6 +391,15 @@ class Drive : public Node
+                                 }
+                                 asyncResp->res.jsonValue[propertyName] = *value;
+                             }
++                            if (propertyName == "CapacityBytes")
++                            {
++                               const uint64_t* capacity =
++                               std::get_if<uint64_t>(&property.second);
++                               if (*capacity != 0)
++                               {
++                                  asyncResp->res.jsonValue["CapacityBytes"] = *capacity;
++                               }
++                           }
+                         }
+                     },
+                     connectionName, path, "org.freedesktop.DBus.Properties",
+diff --git a/redfish-core/src/error_messages.cpp b/redfish-core/src/error_messages.cpp
+index ad5f819b..31d55a66 100644
+--- a/redfish-core/src/error_messages.cpp
++++ b/redfish-core/src/error_messages.cpp
+@@ -2147,6 +2147,32 @@ void mutualExclusiveProperties(crow::Response& res, const std::string& arg1,
+     addMessageToErrorJson(res.jsonValue, mutualExclusiveProperties(arg1, arg2));
+ }
+
++/**
++ * @internal
++ * @brief Formats cpuPropertyNotFound message into JSON
++ *
++ * See header file for more information
++ * @endinternal
++ */
++nlohmann::json cpuPropertyNotFound(const std::string& arg1)
++{
++    return nlohmann::json{
++        {"@odata.type", "#Message.v1_1_1.Message"},
++        {"MessageId", "Base.1.8.1.cpuPropertyNotFound"},
++        {"Message", "The CPU property '" + arg1 +
++                        "' not found in Dbus to perform this request."},
++        {"MessageArgs", {arg1}},
++        {"MessageSeverity", "Warning"},
++        {"Resolution",
++         "Apml library may not be configured properly, check Apml "
++         "configuration or reboot Host and BMC, and resubmit the request."}};
++}
++
++void cpuPropertyNotFound(crow::Response& res, const std::string& arg1)
++{
++    res.result(boost::beast::http::status::bad_request);
++    addMessageToErrorJson(res.jsonValue, cpuPropertyNotFound(arg1));
++}
+ } // namespace messages
+
+ } // namespace redfish

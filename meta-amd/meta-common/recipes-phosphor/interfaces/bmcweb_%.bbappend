@@ -21,5 +21,6 @@ SRC_URI += "file://0001-Reset-server-settings-only-changes-to-invoke-CMOS.patch 
             file://0014-Fixed-PostCodes-Entries-API-to-return-latest-Post-co.patch \
             file://0015-Add-socket-id-for-multi-host-support.patch \
             file://0016-Redfish-support-for-PCIe-Device.patch \
+            file://0017-bmcweb-bmcweb-changes-to-return-error-message.patch \
             "
 
