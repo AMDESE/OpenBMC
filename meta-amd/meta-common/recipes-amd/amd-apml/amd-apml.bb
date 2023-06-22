@@ -11,7 +11,7 @@ RDEPENDS_${PN} += "bash"
 
 SRC_URI += "git://git@github.com/amd/apml_library.git;protocol=ssh"
 #SRC_URI += "git://git@github.com/amd/esmi_oob_library.git;protocol=ssh"
-SRCREV = "apml-2.8.2"
+SRCREV = "apml-3.0.0"
 
 SRC_URI += "file://0001-amd-apml-Enable-apml-library-with-i3c.patch \
             file://0002-amd-apml-select-APML-over-i2c-i3c.patch  \
