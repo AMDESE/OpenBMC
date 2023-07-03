@@ -1,0 +1,337 @@
+From 9671023492b85ace57ae3269084abb3e4f1b4585 Mon Sep 17 00:00:00 2001
+From: Ashok Kumar <ashok2.kumar@amd.com>
+Date: Mon, 3 Jul 2023 11:51:49 -0500
+Subject: [PATCH] DTS changes to map GPIO line P0_PRESENT_L and P1_PRESENT_L
+
+DTS changes to map GPIO line P0_PRESENT_L and P1_PRESENT_L
+Fixes: FWDEV-43511
+
+Signed-off-by: Ashok Kumar <ashok2.kumar@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts  | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts      | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-cinnabar.dts     | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts   | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-galena.dts       | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts   | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts       | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts     | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts         | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts   | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-purico.dts       | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts   | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts       | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts  | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts      | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts     | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts         | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-shale.dts        | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-sunstone.dts     | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-titanite-i3c.dts | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts     | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts  | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts      | 2 +-
+ 23 files changed, 23 insertions(+), 23 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
+index c24dc0c51585..f78fd17200a3 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
+@@ -1095,7 +1095,7 @@ &espi_mmbi {
+ &gpio0 {
+ 	gpio-line-names =
+ 	/*A0-A7*/	"","","","","","","","",
+-	/*B0-B7*/	"","","","","MON_POST_COMPLETE","","","",
++	/*B0-B7*/	"","","","","MON_POST_COMPLETE","P0_PRESENT_L","","P1_PRESENT_L",
+ 	/*C0-C7*/	"","","","","","","","",
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
+index 3112f072f094..7c546b37fc44 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
+@@ -1090,7 +1090,7 @@ &espi_mmbi {
+ &gpio0 {
+ 	gpio-line-names =
+ 	/*A0-A7*/	"","","","","","","","",
+-	/*B0-B7*/	"","","","","MON_POST_COMPLETE","","","",
++	/*B0-B7*/	"","","","","MON_POST_COMPLETE","P0_PRESENT_L","","P1_PRESENT_L",
+ 	/*C0-C7*/	"","","","","","","","",
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-cinnabar.dts b/arch/arm/boot/dts/aspeed-bmc-amd-cinnabar.dts
+index 66c9356813a0..7c3f14fae0af 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-cinnabar.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-cinnabar.dts
+@@ -766,7 +766,7 @@ &espi_mmbi {
+ &gpio0 {
+ 	gpio-line-names =
+ 	/*A0-A7*/	"","","","","","","","",
+-	/*B0-B7*/	"","","","","MON_POST_COMPLETE","","","",
++	/*B0-B7*/	"","","","","MON_POST_COMPLETE","P0_PRESENT_L","","",
+ 	/*C0-C7*/	"","","","","","","","",
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts
+index c4ad8853f5d5..6dc7c1c3923f 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts
+@@ -776,7 +776,7 @@ &espi_mmbi {
+ &gpio0 {
+ 	gpio-line-names =
+ 	/*A0-A7*/	"","","","","","","","",
+-	/*B0-B7*/	"","","","","MON_POST_COMPLETE","","","",
++	/*B0-B7*/	"","","","","MON_POST_COMPLETE","P0_PRESENT_L","","",
+ 	/*C0-C7*/	"","","","","","","","",
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts b/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
+index 54cc6ad70453..097db6bbd5e5 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
+@@ -777,7 +777,7 @@ &espi_mmbi {
+ &gpio0 {
+ 	gpio-line-names =
+ 	/*A0-A7*/	"","","","","","","","",
+-	/*B0-B7*/	"","","","","MON_POST_COMPLETE","","","",
++	/*B0-B7*/	"","","","","MON_POST_COMPLETE","P0_PRESENT_L","","",
+ 	/*C0-C7*/	"","","","","","","","",
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts
+index 2a2d86f9d0bf..e6b4b39a7225 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts
+@@ -1095,7 +1095,7 @@ &espi_mmbi {
+ &gpio0 {
+ 	gpio-line-names =
+ 	/*A0-A7*/	"","","","","","","","",
+-	/*B0-B7*/	"","","","","MON_POST_COMPLETE","","","",
++	/*B0-B7*/	"","","","","MON_POST_COMPLETE","P0_PRESENT_L","","P1_PRESENT_L",
+ 	/*C0-C7*/	"","","","","","","","",
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts b/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
+index 02fc0da0f3cb..a247d238bb89 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
+@@ -1090,7 +1090,7 @@ &espi_mmbi {
+ &gpio0 {
+ 	gpio-line-names =
+ 	/*A0-A7*/	"","","","","","","","",
+-	/*B0-B7*/	"","","","","MON_POST_COMPLETE","","","",
++	/*B0-B7*/	"","","","","MON_POST_COMPLETE","P0_PRESENT_L","","P1_PRESENT_L",
+ 	/*C0-C7*/	"","","","","","","","",
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts
+index df6a0bc2f1c7..81c48f5242a2 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts
+@@ -775,7 +775,7 @@ &espi_mmbi {
+ &gpio0 {
+ 	gpio-line-names =
+ 	/*A0-A7*/	"","","","","","","","",
+-	/*B0-B7*/	"","","","","MON_POST_COMPLETE","","","",
++	/*B0-B7*/	"","","","","MON_POST_COMPLETE","P0_PRESENT_L","","",
+ 	/*C0-C7*/	"","","","","","","","",
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+index 10a1bf328d4f..7c26bd216c08 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+@@ -796,7 +796,7 @@ &espi_mmbi {
+ &gpio0 {
+ 	gpio-line-names =
+ 	/*A0-A7*/	"","","","","","","","",
+-	/*B0-B7*/	"","","","","MON_POST_COMPLETE","","","",
++	/*B0-B7*/	"","","","","MON_POST_COMPLETE","P0_PRESENT_L","","",
+ 	/*C0-C7*/	"","","","","","","","",
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
+index 1b303c58e7e1..e7b21f823ff6 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
+@@ -1059,7 +1059,7 @@ &espi_mmbi {
+ &gpio0 {
+ 	gpio-line-names =
+ 	/*A0-A7*/	"","","","","","","","",
+-	/*B0-B7*/	"","","","","MON_POST_COMPLETE","","","",
++	/*B0-B7*/	"","","","","MON_POST_COMPLETE","P0_PRESENT_L","","",
+ 	/*C0-C7*/	"","","","","","","","",
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+index b9fc68e2e0a5..2ac25801e980 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+@@ -1060,7 +1060,7 @@ &espi_mmbi {
+ &gpio0 {
+ 	gpio-line-names =
+ 	/*A0-A7*/	"","","","","","","","",
+-	/*B0-B7*/	"","","","","MON_POST_COMPLETE","","","",
++	/*B0-B7*/	"","","","","MON_POST_COMPLETE","P0_PRESENT_L","","",
+ 	/*C0-C7*/	"","","","","","","","",
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts
+index 9ed0c37c296f..4e54b343ab66 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts
+@@ -1089,7 +1089,7 @@ &espi_mmbi {
+ &gpio0 {
+ 	gpio-line-names =
+ 	/*A0-A7*/	"","","","","","","","",
+-	/*B0-B7*/	"","","","","MON_POST_COMPLETE","","","",
++	/*B0-B7*/	"","","","","MON_POST_COMPLETE","P0_PRESENT_L","","P1_PRESENT_L",
+ 	/*C0-C7*/	"","","","","","","","",
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+index 5596abdc1831..6bf3e6d70222 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+@@ -1090,7 +1090,7 @@ &espi_mmbi {
+ &gpio0 {
+ 	gpio-line-names =
+ 	/*A0-A7*/	"","","","","","","","",
+-	/*B0-B7*/	"","","","","MON_POST_COMPLETE","","","",
++	/*B0-B7*/	"","","","","MON_POST_COMPLETE","P0_PRESENT_L","","P1_PRESENT_L",
+ 	/*C0-C7*/	"","","","","","","","",
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts
+index d04bdb91c81b..caa7ab847028 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts
+@@ -776,7 +776,7 @@ &espi_mmbi {
+ &gpio0 {
+ 	gpio-line-names =
+ 	/*A0-A7*/	"","","","","","","","",
+-	/*B0-B7*/	"","","","","MON_POST_COMPLETE","","","",
++	/*B0-B7*/	"","","","","MON_POST_COMPLETE","P0_PRESENT_L","","",
+ 	/*C0-C7*/	"","","","","","","","",
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts b/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
+index b36c7942d872..c249458fb68e 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
+@@ -777,7 +777,7 @@ &espi_mmbi {
+ &gpio0 {
+ 	gpio-line-names =
+ 	/*A0-A7*/	"","","","","","","","",
+-	/*B0-B7*/	"","","","","MON_POST_COMPLETE","","","",
++	/*B0-B7*/	"","","","","MON_POST_COMPLETE","P0_PRESENT_L","","",
+ 	/*C0-C7*/	"","","","","","","","",
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts
+index 332ba1c82031..c98a87ac8f02 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts
+@@ -829,7 +829,7 @@ &espi_mmbi {
+ &gpio0 {
+ 	gpio-line-names =
+ 	/*A0-A7*/	"","","","","","","","",
+-	/*B0-B7*/	"","","","","MON_POST_COMPLETE","","","",
++	/*B0-B7*/	"","","","","MON_POST_COMPLETE","P0_PRESENT_L","","",
+ 	/*C0-C7*/	"","","","","","","","",
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+index ae994a80c1aa..21ded2743f6a 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+@@ -836,7 +836,7 @@ &espi_mmbi {
+ &gpio0 {
+ 	gpio-line-names =
+ 	/*A0-A7*/	"","","","","","","","",
+-	/*B0-B7*/	"","","","","MON_POST_COMPLETE","","","",
++	/*B0-B7*/	"","","","","MON_POST_COMPLETE","P0_PRESENT_L","","",
+ 	/*C0-C7*/	"","","","","","","","",
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-shale.dts b/arch/arm/boot/dts/aspeed-bmc-amd-shale.dts
+index 03a4a689d6b3..d34e228aa170 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-shale.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-shale.dts
+@@ -753,7 +753,7 @@ &espi_mmbi {
+ &gpio0 {
+ 	gpio-line-names =
+ 	/*A0-A7*/	"","","","","","","","",
+-	/*B0-B7*/	"","","","","MON_POST_COMPLETE","","","",
++	/*B0-B7*/	"","","","","MON_POST_COMPLETE","P0_PRESENT_L","","",
+ 	/*C0-C7*/	"","","","","","","","",
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-sunstone.dts b/arch/arm/boot/dts/aspeed-bmc-amd-sunstone.dts
+index 51090025c55e..76836af261a6 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-sunstone.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-sunstone.dts
+@@ -866,7 +866,7 @@ &espi_mmbi {
+ &gpio0 {
+ 	gpio-line-names =
+ 	/*A0-A7*/	"","","","","","","","",
+-	/*B0-B7*/	"","","","","MON_POST_COMPLETE","","","",
++	/*B0-B7*/	"","","","","MON_POST_COMPLETE","P0_PRESENT_L","","",
+ 	/*C0-C7*/	"","","","","","","","",
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-titanite-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-titanite-i3c.dts
+index 4fc2f2401122..3f35cce37ec1 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-titanite-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-titanite-i3c.dts
+@@ -865,7 +865,7 @@ &espi_mmbi {
+ &gpio0 {
+ 	gpio-line-names =
+ 	/*A0-A7*/	"","","","","","","","",
+-	/*B0-B7*/	"","","","","MON_POST_COMPLETE","","","",
++	/*B0-B7*/	"","","","","MON_POST_COMPLETE","P0_PRESENT_L","","P1_PRESENT_L",
+ 	/*C0-C7*/	"","","","","","","","",
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts b/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
+index 7c086e0b5ee3..a0896daec6eb 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
+@@ -866,7 +866,7 @@ &espi_mmbi {
+ &gpio0 {
+ 	gpio-line-names =
+ 	/*A0-A7*/	"","","","","","","","",
+-	/*B0-B7*/	"","","","","MON_POST_COMPLETE","","","",
++	/*B0-B7*/	"","","","","MON_POST_COMPLETE","P0_PRESENT_L","","P1_PRESENT_L",
+ 	/*C0-C7*/	"","","","","","","","",
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts
+index 0a5393f8417a..8ce37a79e0ed 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts
+@@ -1108,7 +1108,7 @@ &espi_mmbi {
+ &gpio0 {
+ 	gpio-line-names =
+ 	/*A0-A7*/	"","","","","","","","",
+-	/*B0-B7*/	"","","","","MON_POST_COMPLETE","","","",
++	/*B0-B7*/	"","","","","MON_POST_COMPLETE","P0_PRESENT_L","","P1_PRESENT_L",
+ 	/*C0-C7*/	"","","","","","","","",
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts b/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
+index 5568d357f614..d042294f4dc3 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
+@@ -1103,7 +1103,7 @@ &espi_mmbi {
+ &gpio0 {
+ 	gpio-line-names =
+ 	/*A0-A7*/	"","","","","","","","",
+-	/*B0-B7*/	"","","","","MON_POST_COMPLETE","","","",
++	/*B0-B7*/	"","","","","MON_POST_COMPLETE","P0_PRESENT_L","","P1_PRESENT_L",
+ 	/*C0-C7*/	"","","","","","","","",
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+--
+2.25.1
+
