@@ -1,0 +1,295 @@
+From eaaacd0661c78b60258bb5045ce4af16a675881a Mon Sep 17 00:00:00 2001
+From: Ashok Kumar <ashok2.kumar@amd.com>
+Date: Wed, 5 Jul 2023 12:53:16 -0500
+Subject: [PATCH] ARM:dts:aspeed: Enabled BMC device for I3c DTS file
+
+Enabled bmc-device for i3c DTS file to get the data
+from BIOS
+
+Signed-off-by: Ashok Kumar <ashok2.kumar@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts  | 12 ++++++++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts   | 12 ++++++++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts   | 12 ++++++++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts     | 12 ++++++++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts   | 12 ++++++++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts   | 12 ++++++++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts  | 12 ++++++++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts     | 12 ++++++++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-titanite-i3c.dts | 12 ++++++++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts  | 12 ++++++++++++
+ 10 files changed, 120 insertions(+)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
+index f78fd17200a3..b562033bf550 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
+@@ -52,6 +52,13 @@ video_engine_memory: jpegbuffer {
+ 			reusable;
+ 		};
+
++                bmc_dev_memory: bmc_dev_memory {
++                       size = <0x00100000>;
++                       alignment = <0x00100000>;
++                       compatible = "shared-dma-pool";
++                       no-map;
++                };
++
+ 		pcc_memory: pccbuffer {
+ 			no-map;
+ 			reg = <0xE0000000 0x00001000>; /* 4K */
+@@ -1157,3 +1164,8 @@ &kcs3 {
+ &uart_routing {
+ 	status = "okay";
+ };
++
++&bmc_dev {
++        status = "okay";
++        memory-region = <&bmc_dev_memory>;
++};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts
+index 6dc7c1c3923f..c4832f8a3aae 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts
+@@ -52,6 +52,13 @@ video_engine_memory: jpegbuffer {
+ 			reusable;
+ 		};
+
++                bmc_dev_memory: bmc_dev_memory {
++                       size = <0x00100000>;
++                       alignment = <0x00100000>;
++                       compatible = "shared-dma-pool";
++                       no-map;
++                };
++
+ 		pcc_memory: pccbuffer {
+ 			no-map;
+ 			reg = <0xE0000000 0x00001000>; /* 4K */
+@@ -839,3 +846,8 @@ &kcs3 {
+ &uart_routing {
+ 	status = "okay";
+ };
++
++&bmc_dev {
++        status = "okay";
++        memory-region = <&bmc_dev_memory>;
++};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts
+index e6b4b39a7225..154fff9aff5c 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts
+@@ -52,6 +52,13 @@ video_engine_memory: jpegbuffer {
+ 			reusable;
+ 		};
+
++                bmc_dev_memory: bmc_dev_memory {
++                       size = <0x00100000>;
++                       alignment = <0x00100000>;
++                       compatible = "shared-dma-pool";
++                       no-map;
++                };
++
+ 		pcc_memory: pccbuffer {
+ 			no-map;
+ 			reg = <0xE0000000 0x00001000>; /* 4K */
+@@ -1157,3 +1164,8 @@ &kcs3 {
+ &uart_routing {
+ 	status = "okay";
+ };
++
++&bmc_dev {
++        status = "okay";
++        memory-region = <&bmc_dev_memory>;
++};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts
+index 81c48f5242a2..054e9b8b5750 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts
+@@ -52,6 +52,13 @@ video_engine_memory: jpegbuffer {
+ 			reusable;
+ 		};
+
++                bmc_dev_memory: bmc_dev_memory {
++                       size = <0x00100000>;
++                       alignment = <0x00100000>;
++                       compatible = "shared-dma-pool";
++                       no-map;
++                };
++
+ 		pcc_memory: pccbuffer {
+ 			no-map;
+ 			reg = <0xE0000000 0x00001000>; /* 4K */
+@@ -838,3 +845,8 @@ &kcs3 {
+ &uart_routing {
+ 	status = "okay";
+ };
++
++&bmc_dev {
++        status = "okay";
++        memory-region = <&bmc_dev_memory>;
++};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
+index e7b21f823ff6..09564cd8c7ae 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
+@@ -68,6 +68,13 @@ video_engine_memory: jpegbuffer {
+ 			reusable;
+ 		};
+
++                bmc_dev_memory: bmc_dev_memory {
++                       size = <0x00100000>;
++                       alignment = <0x00100000>;
++                       compatible = "shared-dma-pool";
++                       no-map;
++                };
++
+ 		pcc_memory: pccbuffer {
+ 			no-map;
+ 			reg = <0xE0000000 0x00001000>; /* 4K */
+@@ -1121,3 +1128,8 @@ &kcs3 {
+ &uart_routing {
+ 	status = "okay";
+ };
++
++&bmc_dev {
++        status = "okay";
++        memory-region = <&bmc_dev_memory>;
++};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts
+index 4e54b343ab66..d67c1095f1df 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts
+@@ -52,6 +52,13 @@ video_engine_memory: jpegbuffer {
+ 			reusable;
+ 		};
+
++                bmc_dev_memory: bmc_dev_memory {
++                       size = <0x00100000>;
++                       alignment = <0x00100000>;
++                       compatible = "shared-dma-pool";
++                       no-map;
++                };
++
+ 		pcc_memory: pccbuffer {
+ 			no-map;
+ 			reg = <0xE0000000 0x00001000>; /* 4K */
+@@ -1151,3 +1158,8 @@ &kcs3 {
+ &uart_routing {
+ 	status = "okay";
+ };
++
++&bmc_dev {
++        status = "okay";
++        memory-region = <&bmc_dev_memory>;
++};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts
+index caa7ab847028..4cb5aba065b0 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts
+@@ -52,6 +52,13 @@ video_engine_memory: jpegbuffer {
+ 			reusable;
+ 		};
+
++                bmc_dev_memory: bmc_dev_memory {
++                       size = <0x00100000>;
++                       alignment = <0x00100000>;
++                       compatible = "shared-dma-pool";
++                       no-map;
++                };
++
+ 		pcc_memory: pccbuffer {
+ 			no-map;
+ 			reg = <0xE0000000 0x00001000>; /* 4K */
+@@ -839,3 +846,8 @@ &kcs3 {
+ &uart_routing {
+ 	status = "okay";
+ };
++
++&bmc_dev {
++        status = "okay";
++        memory-region = <&bmc_dev_memory>;
++};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts
+index c98a87ac8f02..06a859ea5cb6 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts
+@@ -52,6 +52,13 @@ video_engine_memory: jpegbuffer {
+ 			reusable;
+ 		};
+
++                bmc_dev_memory: bmc_dev_memory {
++                       size = <0x00100000>;
++                       alignment = <0x00100000>;
++                       compatible = "shared-dma-pool";
++                       no-map;
++                };
++
+ 		pcc_memory: pccbuffer {
+ 			no-map;
+ 			reg = <0xE0000000 0x00001000>; /* 4K */
+@@ -891,3 +898,8 @@ &kcs3 {
+ &uart_routing {
+ 	status = "okay";
+ };
++
++&bmc_dev {
++        status = "okay";
++        memory-region = <&bmc_dev_memory>;
++};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-titanite-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-titanite-i3c.dts
+index 3f35cce37ec1..3712a473a1f9 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-titanite-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-titanite-i3c.dts
+@@ -52,6 +52,13 @@ video_engine_memory: jpegbuffer {
+ 			reusable;
+ 		};
+
++                bmc_dev_memory: bmc_dev_memory {
++                       size = <0x00100000>;
++                       alignment = <0x00100000>;
++                       compatible = "shared-dma-pool";
++                       no-map;
++                };
++
+ 		pcc_memory: pccbuffer {
+ 			no-map;
+ 			reg = <0xE0000000 0x00001000>; /* 4K */
+@@ -930,3 +937,8 @@ &kcs3 {
+ &uart_routing {
+ 	status = "okay";
+ };
++
++&bmc_dev {
++        status = "okay";
++        memory-region = <&bmc_dev_memory>;
++};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts
+index 8ce37a79e0ed..e480548e3051 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts
+@@ -78,6 +78,13 @@ video_engine_memory: jpegbuffer {
+ 			reusable;
+ 		};
+
++                bmc_dev_memory: bmc_dev_memory {
++                       size = <0x00100000>;
++                       alignment = <0x00100000>;
++                       compatible = "shared-dma-pool";
++                       no-map;
++                };
++
+ 		pcc_memory: pccbuffer {
+ 			no-map;
+ 			reg = <0xE0000000 0x00001000>; /* 4K */
+@@ -1173,3 +1180,8 @@ &kcs3 {
+ &uart_routing {
+ 	status = "okay";
+ };
++
++&bmc_dev {
++        status = "okay";
++        memory-region = <&bmc_dev_memory>;
++};
+--
+2.25.1
+
