@@ -1,0 +1,23 @@
+From 7049312036b3b78e85674e524648266260fe21e2 Mon Sep 17 00:00:00 2001
+From: Ashok Kumar <ashok2.kumar@amd.com>
+Date: Thu, 6 Jul 2023 16:35:04 -0500
+Subject: [PATCH] bmcweb: Fixed bmcweb build issue
+
+Signed-off-by: Ashok Kumar <ashok2.kumar@amd.com>
+---
+ redfish-core/lib/storage.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/redfish-core/lib/storage.hpp b/redfish-core/lib/storage.hpp
+index 87735f59..d2a6f17c 100644
+--- a/redfish-core/lib/storage.hpp
++++ b/redfish-core/lib/storage.hpp
+@@ -377,7 +377,7 @@ class Drive : public Node
+                             if ((propertyName == "PartNumber") ||
+                                 (propertyName == "SerialNumber") ||
+                                 (propertyName == "Manufacturer") ||
+-                                (propertyName == "Model")
++                                (propertyName == "Model") ||
+                                 (propertyName == "FirmwareVersion") ||
+                                 (propertyName == "MediaType"))
+                             {
