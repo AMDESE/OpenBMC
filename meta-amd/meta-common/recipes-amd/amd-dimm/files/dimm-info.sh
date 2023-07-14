@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# Read board_id from u-boot env
-board_id=`/sbin/fw_printenv -n board_id`
 num_of_cpu=`/sbin/fw_printenv -n num_of_cpu`
 dimm_per_ch=`/sbin/fw_printenv -n dimm_per_ch`
 dimm_per_bus=`/sbin/fw_printenv -n dimm_per_bus`
@@ -13,6 +11,17 @@ dimm_sh="${LOG_DIR}/dimm.sh"
 dimm_info="${LOG_DIR}/dimm_info.txt"
 SET_PROP="busctl set-property xyz.openbmc_project.Inventory.Manager /xyz/openbmc_project/inventory/system/chassis/motherboard/"
 ITEM_DIMM="xyz.openbmc_project.Inventory.Item.Dimm"
+
+# check for Volcano and Purico system and exit
+board_id=`fw_printenv board_id | sed -n "s/^board_id=//p"`
+
+case $board_id in
+       "6A" | "72" | "73" | "6B"| "74" | "75")  # Purico or Volcano
+            echo "Lenovo Turin system " $board_id " do not run dimm-info "
+            exit
+       ;;
+esac
+
 power_status() {
         st=$(busctl get-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis CurrentPowerState | cut -d"." -f6)
         if [ "$st" == "On\"" ]; then
