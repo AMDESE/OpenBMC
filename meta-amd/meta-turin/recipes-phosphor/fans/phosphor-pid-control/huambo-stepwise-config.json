@@ -425,7 +425,7 @@
                     "pid": {
                         "samplePeriod": 1.0,
                         "positiveHysteresis": 0.0,
-                        "negativeHysteresis": 0.0,
+                        "negativeHysteresis": 5.0,
                         "isCeiling": false,
                         "reading": {
                             "0": 10,
@@ -505,7 +505,7 @@
                     "pid": {
                         "samplePeriod": 1.0,
                         "positiveHysteresis": 0.0,
-                        "negativeHysteresis": 0.0,
+                        "negativeHysteresis": 5.0,
                         "isCeiling": false,
                         "reading": {
                             "0": 10,
