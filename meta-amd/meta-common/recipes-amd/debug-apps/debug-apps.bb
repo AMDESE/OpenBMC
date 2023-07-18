@@ -19,6 +19,7 @@ SRC_URI = "file://aspeed-espi.h  \
 	file://ubm_fru_update \
 	file://AMI_MG9100_001_ALL_PCIE.sh \
         file://get-Lenovo-bp-config.sh \
+        file://set-Lenovo-fp-led.sh \
 	"
 
 S = "${WORKDIR}"
@@ -46,4 +47,5 @@ do_install() {
 	install -m 0755 ubm_fru_update ${D}${bindir}
 	install -m 0755 AMI_MG9100_001_ALL_PCIE.sh ${D}${bindir}
         install -m 0755 get-Lenovo-bp-config.sh ${D}${bindir}
+        install -m 0755 set-Lenovo-fp-led.sh ${D}${bindir}
 }
