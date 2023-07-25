@@ -1,0 +1,349 @@
+From 28c600a673448388360b18220d23316b7e083c43 Mon Sep 17 00:00:00 2001
+From: Andrew Peng <pengms1@lenovo.com>
+Date: Tue, 25 Jul 2023 16:25:25 +0800
+Subject: [PATCH] ARM:dts:aspeed: Add MP 2857 PMBus VR driver   - Add MP 2857
+ PMBus VR driver   - Update purico dts file
+
+Signed-off-by: Andrew Peng <pengms1@lenovo.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-purico.dts |   2 +-
+ drivers/hwmon/pmbus/mp2857.c                | 224 +++++++++++++++++---
+ 2 files changed, 195 insertions(+), 31 deletions(-)
+ mode change 100644 => 100755 arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+ mode change 100644 => 100755 drivers/hwmon/pmbus/mp2857.c
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+old mode 100644
+new mode 100755
+index 2ac25801e980..cd2080a6ea72
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+@@ -236,7 +236,7 @@
+ 
+ 			vddcr_vddio_33@63 {
+ 				//VDD 11 sus
+-				compatible = "isil,isl68137";
++				compatible = "mps,mp2857";
+ 				reg = <0x63>;
+ 			};
+ 		};
+diff --git a/drivers/hwmon/pmbus/mp2857.c b/drivers/hwmon/pmbus/mp2857.c
+old mode 100644
+new mode 100755
+index 8a573f0953d8..e6bee7e6c17c
+--- a/drivers/hwmon/pmbus/mp2857.c
++++ b/drivers/hwmon/pmbus/mp2857.c
+@@ -13,15 +13,27 @@
+ #include <linux/module.h>
+ #include "pmbus.h"
+ 
+-#define MFR_VR_CONFIG2          0x5E
++#define IIN_EXP_POS	3
++#define IIN_EXP_MSK	(0x7 << IIN_EXP_POS)
++
++#define IOUT_EXP_POS	0
++#define IOUT_EXP_MSK	(0x7 << IOUT_EXP_POS)
++
++#define POUT_EXP_POS	6
++#define POUT_EXP_MSK	(0x1F << POUT_EXP_POS)
++
++#define MFR_VR_CONFIG2			0x5E
+ 
+ #define MP2857_PAGE_NUM			2
+ 
+ #define MP2857_RAIL1_FUNC		(PMBUS_HAVE_VIN | PMBUS_HAVE_VOUT | \
+-								PMBUS_HAVE_TEMP | PMBUS_HAVE_POUT)
++								PMBUS_HAVE_IOUT | PMBUS_HAVE_IIN | \
++								PMBUS_HAVE_TEMP | PMBUS_HAVE_POUT | \
++								PMBUS_PHASE_VIRTUAL)
+ 
+-#define MP2857_RAIL2_FUNC		(PMBUS_HAVE_VOUT | PMBUS_HAVE_TEMP | \
+-                                PMBUS_HAVE_POUT)
++#define MP2857_RAIL2_FUNC		(PMBUS_HAVE_VIN | PMBUS_HAVE_VOUT | PMBUS_HAVE_TEMP | \
++								PMBUS_HAVE_IOUT | PMBUS_HAVE_IIN | \
++								PMBUS_HAVE_POUT | PMBUS_PHASE_VIRTUAL)
+ 
+ struct mp2857_data {
+ 	struct pmbus_driver_info *info;
+@@ -34,6 +46,7 @@ struct mp2857_data data;
+ static int read_word_data(struct i2c_client *client, int page, int reg)
+ {
+ 	int ret;
++	data.client.addr = client->addr;
+ 	ret = i2c_smbus_write_byte_data(&data.client, PMBUS_PAGE, page);
+ 	if (ret < 0)
+ 		return ret;
+@@ -42,34 +55,72 @@ static int read_word_data(struct i2c_client *client, int page, int reg)
+ 	return ret;
+ }
+ 
++static int write_word_data(struct i2c_client *client, int page, int reg, u16 data)
++{
++	int ret;
++	ret = i2c_smbus_write_byte_data(client, PMBUS_PAGE, page);
++	if (ret < 0)
++		return ret;
++
++	ret = i2c_smbus_write_word_data(client, reg, data);
++	if (ret < 0)
++		return ret;
++
++	return ret;
++}
++
++static int mp2857_config_exp(struct i2c_client *client, int page, int reg, u16 exp, u16 pos, u16 msk)
++{
++	int ret;
++
++	ret = read_word_data(client, page, reg);
++	if (ret < 0)
++		return ret;
++
++	ret = (ret & ~msk) | (exp << pos);
++	ret = write_word_data(client, page, reg, ret);
++	if (ret < 0)
++		return ret;
++
++	return 0;
++}
++
+ static int
+ mp2857_read_vin(struct i2c_client *client, int page, int reg)
+ {
+ 	int ret;
+ 	ret = read_word_data(client, page, reg);
+-	printk(KERN_ALERT "Obtained data from MP2857, Vin-%d: %hx\n", page, ret);
+-	printk(KERN_ALERT "Converted data:\n");
++	/*
++	* READ_VIN requires fixup to scale it to linear11 format. Register data format
++	* provides 10 bits for sensed Vin and 1 reserved bit and 5 bits for exponent.
++	* EXP fixed value 11100b 1/16=0.0625.
++	*/
++	//printk(KERN_ALERT "Obtained data from MP2857, Vin-%d: %hx  %hx\n", page, ret, ret & GENMASK(9, 0));
++	ret = ((ret & GENMASK(9, 0)) * 625) / 100;
+ 
++	//printk(KERN_ALERT "Converted data:%x\n",ret);
+ 	return ret;
+ }
+ 
+ static int
+ mp2857_read_vout(struct i2c_client *client, int page, int reg)
+ {
+-	int ret;
+-	ret = read_word_data(client, 0, MFR_VR_CONFIG2);
+-	printk(KERN_ALERT "Obtained data from MP2857, MFR_VR_CONFIG2-%d: %hx\n", page, ret);
+-    if ((ret & 0x0800) == 0) {
+-        ret = read_word_data(client, page, reg);
+-		printk(KERN_ALERT "Obtained data from MP2857, Vout-%d: %hx\n", page, ret);
+-        ret = ((ret & 0x3FF) * 5);
+-    } else {
+-        ret = read_word_data(client, page, reg);
+-		printk(KERN_ALERT "Obtained data from MP2857, Vout-%d: %hx\n", page, ret);
+-        ret = ((ret & 0x3FF) * 390625) / 100000;
+-    }
+-	printk(KERN_ALERT "Converted data:\n");
++	/*
++	* The voltage report format is
++	* determined by 5Eh (on Page 0), bit[11].
++	* If 5Eh, bit[11] = 0: VID mode. 5mV/LSB
++	* If 5Eh, bit[11] = 1: Linear mode. 3.90625mV/LSB
++	*/
+ 
++	int ret;
++	ret = read_word_data(client, page, MFR_VR_CONFIG2);
++	if ((ret & 0x0800) == 0) {
++		ret = read_word_data(client, page, reg);
++		ret = ((ret & GENMASK(9, 0)) * 5);
++	} else {
++		ret = read_word_data(client, page, reg);
++		ret = ((ret & GENMASK(9, 0)) * 390625) / 100000;
++	}
+ 	return ret;
+ }
+ 
+@@ -78,9 +129,12 @@ mp2857_read_temperature(struct i2c_client *client, int page, int reg)
+ {
+ 	int ret;
+ 	ret = read_word_data(client, page, reg);
+-	printk(KERN_ALERT "Obtained data from MP2857, Temp-%d: %hx\n", page, ret);
+-	printk(KERN_ALERT "Converted data:\n");
+-
++	/*
++	* temperature requires fixup to scale it to linear11 format. Register data format
++	* provides 8 bits for temperature sensed and 3 bit SIGN and 5 bits for exponent.
++	* EXP value 00000b.
++	*/
++	ret &= GENMASK(7, 0);
+ 	return ret;
+ }
+ 
+@@ -89,14 +143,68 @@ mp2857_read_pout(struct i2c_client *client, int page, int reg)
+ {
+ 	int ret;
+ 	ret = read_word_data(client, page, reg);
+-	printk(KERN_ALERT "Obtained data from MP2857, Pout-%d: %hx\n", page, ret);
+-	printk(KERN_ALERT "Converted data:\n");
++	/*
++	* POUT Register data format
++	* provides 11 bits for sensed IOUT and 5 bits for exponent.
++	* probe function set PWR_EXPONENT_BIT[10:6] 5b11100: (1/16)
++	* EXP value 1/16=0.0625.
++	*/
++	ret = ((ret & GENMASK(10, 0)) * 625) / 100;
++	return ret;
++}
++
++static int
++mp2857_read_iout(struct i2c_client *client, int page, int reg)
++{
++	int ret;
++	ret = read_word_data(client, page, reg);
++	/*
++	* IOUT Register data format
++	* provides 11 bits for sensed IOUT and 5 bits for exponent.
++	* probe function set IIN_SCALE_SEL[5:3] 3b101: (1/16) A/LSB
++	* EXP value 1/16=0.0625.
++	*/
++	ret = ((ret & GENMASK(10, 0)) * 625) / 100;
++	return ret;
++}
++
++static int
++mp2857_read_iin(struct i2c_client *client, int page, int reg)
++{
++	int ret;
++	if (page == 0) {
++		ret = read_word_data(client, page, 0x8E);
++	} else {
++		ret = read_word_data(client, page, reg);
++	}
++	/*
++	* IIN Register data format
++	* provides 11 bits for sensed IIN and 5 bits for exponent.
++	* probe function set IOUT_SCALE_SEL[2:0] 3b010: (1/16) A/LSB
++	* EXP value 1/16=0.0625.
++	*/
++	ret = ((ret & GENMASK(10, 0)) * 625) / 100;
++	return ret;
++}
++
++static int mp2857_read_byte_data(struct i2c_client *client, int page, int reg)
++{
++	int ret;
++
++	switch (reg) {
++	case PMBUS_VOUT_MODE:
++		ret = PB_VOUT_MODE_DIRECT;
++		break;
++	default:
++		ret = -EINVAL;
++		break;
++	}
+ 
+ 	return ret;
+ }
+ 
+ static int mp2857_read_word_data(struct i2c_client *client, int page, int phase,
+-			      int reg)
++				  int reg)
+ {
+ 	int ret;
+ 	switch (reg) {
+@@ -112,8 +220,14 @@ static int mp2857_read_word_data(struct i2c_client *client, int page, int phase,
+ 		case PMBUS_READ_POUT:
+ 			ret = mp2857_read_pout(client, page, reg);
+ 			break;
++		case PMBUS_READ_IIN:
++			ret = mp2857_read_iin(client, page, reg);
++			break;
++		case PMBUS_READ_IOUT:
++			ret = mp2857_read_iout(client, page, reg);
++			break;
+ 		default:
+-			ret = -ENODATA;
++			ret = -EINVAL;
+ 			break;
+ 	}
+ 
+@@ -123,24 +237,74 @@ static int mp2857_read_word_data(struct i2c_client *client, int page, int phase,
+ static struct pmbus_driver_info mp2857_info = {
+ 	.pages = MP2857_PAGE_NUM,
+ 
+-	.format[PSC_VOLTAGE_IN] = linear,
+-	.format[PSC_VOLTAGE_OUT] = linear,
+-	.format[PSC_TEMPERATURE] = linear,
+-	.format[PSC_POWER] = linear,
++	.format[PSC_VOLTAGE_IN] = direct,
++	.format[PSC_VOLTAGE_OUT] = direct,
++	.format[PSC_TEMPERATURE] = direct,
++	.format[PSC_POWER] = direct,
++	.format[PSC_CURRENT_IN] = direct,
++	.format[PSC_CURRENT_OUT] = direct,
+ 	.m[PSC_VOLTAGE_OUT] = 1,
+ 	.R[PSC_VOLTAGE_OUT] = 3,
+ 	.b[PSC_VOLTAGE_OUT] = 0,
++	.m[PSC_TEMPERATURE] = 1,
++	.R[PSC_TEMPERATURE] = 3,
++	.b[PSC_TEMPERATURE] = 0,
++	.m[PSC_VOLTAGE_IN] = 1,
++	.R[PSC_VOLTAGE_IN] = 2,
++	.b[PSC_VOLTAGE_IN] = 0,
++	.m[PSC_POWER] = 1,
++	.R[PSC_POWER] = 2,
++	.b[PSC_POWER] = 0,
++	.m[PSC_CURRENT_IN] = 1,
++	.R[PSC_CURRENT_IN] = 2,
++	.b[PSC_CURRENT_IN] = 0,
++	.m[PSC_CURRENT_OUT] = 1,
++	.R[PSC_CURRENT_OUT] = 2,
++	.b[PSC_CURRENT_OUT] = 0,
++
+ 
+ 	.func[0] = MP2857_RAIL1_FUNC,
+ 	.func[1] = MP2857_RAIL2_FUNC,
+ 	.read_word_data = mp2857_read_word_data,
++	.read_byte_data = mp2857_read_byte_data,
+ };
+ 
+ static int mp2857_probe(struct i2c_client *client, const struct i2c_device_id *id)
+ {
++	int ret;
+ 	data.info = &mp2857_info;
+ 	data.client = *client;
+ 
++	// config rail1 iin exp
++	ret = mp2857_config_exp(client, 2, 0x0B, 0x5, IIN_EXP_POS, IIN_EXP_MSK);
++	if (ret < 0)
++		return ret;
++
++	// config rail2 iin exp
++	ret = mp2857_config_exp(client, 2, 0x1B, 0x5, IIN_EXP_POS, IIN_EXP_MSK);
++	if (ret < 0)
++		return ret;
++
++	// config rail1 iout exp
++	ret = mp2857_config_exp(client, 2, 0x0B, 0x2, IOUT_EXP_POS, IOUT_EXP_MSK);
++	if (ret < 0)
++		return ret;
++
++	// config rail2 iout exp
++	ret = mp2857_config_exp(client, 2, 0x1B, 0x2, IOUT_EXP_POS, IOUT_EXP_MSK);
++	if (ret < 0)
++		return ret;
++
++	// config rail1 pout exp
++	ret = mp2857_config_exp(client, 2, 0x0B, 0x1C, POUT_EXP_POS, POUT_EXP_MSK);
++	if (ret < 0)
++		return ret;
++
++	// config rail2 pou exp
++	ret = mp2857_config_exp(client, 2, 0x1B, 0x1C, POUT_EXP_POS, POUT_EXP_MSK);
++	if (ret < 0)
++		return ret;
++
+ 	return pmbus_do_probe(client, &mp2857_info);
+ }
+ 
+-- 
+2.17.1
+
