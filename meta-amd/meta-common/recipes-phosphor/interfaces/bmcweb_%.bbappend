@@ -23,5 +23,6 @@ SRC_URI += "file://0001-Reset-server-settings-only-changes-to-invoke-CMOS.patch 
             file://0016-Redfish-support-for-PCIe-Device.patch \
             file://0017-bmcweb-bmcweb-changes-to-return-error-message.patch \
             file://0018-bmcweb-Fixed-bmcweb-build-issue.patch \
+            file://0019-redfish-ras-runtime-error-configuration.patch \
             "
 

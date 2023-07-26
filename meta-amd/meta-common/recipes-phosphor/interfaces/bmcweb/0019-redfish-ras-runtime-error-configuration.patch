@@ -1,0 +1,535 @@
+From 4a62f5a5d255b1fb1de3952c9f3a0f4e6135ce12 Mon Sep 17 00:00:00 2001
+From: Abinaya <abinaya.dhandapani@amd.com>
+Date: Wed, 26 Jul 2023 02:12:24 -0500
+Subject: [PATCH] redfish ras runtime error configuration
+
+Signed-off-by: Abinaya <abinaya.dhandapani@amd.com>
+---
+ redfish-core/lib/log_services.hpp | 467 +++++++++++++++++++++++++++++-
+ 1 file changed, 465 insertions(+), 2 deletions(-)
+
+diff --git a/redfish-core/lib/log_services.hpp b/redfish-core/lib/log_services.hpp
+index 365f9655..72ca55ac 100644
+--- a/redfish-core/lib/log_services.hpp
++++ b/redfish-core/lib/log_services.hpp
+@@ -36,6 +36,7 @@
+ #include <optional>
+ #include <string_view>
+ #include <variant>
++#include <string>
+
+ namespace redfish
+ {
+@@ -2677,6 +2678,18 @@ static void
+             std::string crashdumpURI =
+                 "/redfish/v1/Systems/system/LogServices/Crashdump/Entries/" +
+                 logID + "/" + filename;
++
++            std::string DiagnosticDataTypeString;
++
++            if(filename.find("mca-runtime") != std::string::npos)
++                DiagnosticDataTypeString = "Mca_RuntimeError_APMLCrashdump";
++            else if(filename.find("dram-cecc-runtime") != std::string::npos)
++                DiagnosticDataTypeString = "DramCecc_RuntimeError_APMLCrashdump";
++            else if(filename.find("pcie-runtime") != std::string::npos)
++                DiagnosticDataTypeString = "Pcie_RuntimeError_APMLCrashdump";
++            else
++                DiagnosticDataTypeString = "APMLCrashdump";
++
+             logEntryJson = {{"@odata.type", "#LogEntry.v1_7_0.LogEntry"},
+                             {"@odata.id", "/redfish/v1/Systems/system/"
+                                           "LogServices/Crashdump/Entries/" +
+@@ -2686,7 +2699,7 @@ static void
+                             {"EntryType", "Oem"},
+                             {"AdditionalDataURI", std::move(crashdumpURI)},
+                             {"DiagnosticDataType", "OEM"},
+-                            {"OEMDiagnosticDataType", "APMLCrashdump"},
++                            {"OEMDiagnosticDataType", DiagnosticDataTypeString},
+                             {"Created", std::move(timestamp)}};
+         };
+     crow::connections::systemBus->async_method_call(
+@@ -2901,6 +2914,126 @@ class CrashdumpConfiguration : public Node
+                                 .jsonValue["harvestPpin"] = *value;
+                         }
+                     }
++                    if (property.first == "McaPollingEn")
++                    {
++                        const bool* value =
++                            std::get_if<bool>(&property.second);
++                        if (value != nullptr)
++                        {
++                            asyncResp->res
++                                .jsonValue["McaPollingEn"] = *value;
++                        }
++                    }
++                    if (property.first == "DramCeccPollingEn")
++                    {
++                        const bool* value =
++                            std::get_if<bool>(&property.second);
++                        if (value != nullptr)
++                        {
++                            asyncResp->res
++                                .jsonValue["DramCeccPollingEn"] = *value;
++                        }
++                    }
++                    if (property.first == "PcieAerPollingEn")
++                    {
++                        const bool* value =
++                            std::get_if<bool>(&property.second);
++                        if (value != nullptr)
++                        {
++                            asyncResp->res
++                                .jsonValue["PcieAerPollingEn"] = *value;
++                        }
++                    }
++                    if (property.first == "McaThresholdEn")
++                    {
++                        const bool* value =
++                            std::get_if<bool>(&property.second);
++                        if (value != nullptr)
++                        {
++                            asyncResp->res
++                                .jsonValue["McaThresholdEn"] = *value;
++                        }
++                    }
++                    if (property.first == "DramCeccThresholdEn")
++                    {
++                        const bool* value =
++                            std::get_if<bool>(&property.second);
++                        if (value != nullptr)
++                        {
++                            asyncResp->res
++                                .jsonValue["DramCeccThresholdEn"] = *value;
++                        }
++                    }
++                    if (property.first == "PcieAerThresholdEn")
++                    {
++                        const bool* value =
++                            std::get_if<bool>(&property.second);
++                        if (value != nullptr)
++                        {
++                            asyncResp->res
++                                .jsonValue["PcieAerThresholdEn"] = *value;
++                        }
++                    }
++                    if (property.first == "McaPollingPeriod")
++                    {
++                        const uint16_t* value =
++                            std::get_if<uint16_t>(&property.second);
++                        if (value != nullptr)
++                        {
++                            asyncResp->res.jsonValue["McaPollingPeriod"] =
++                                *value;
++                        }
++                    }
++                    if (property.first == "DramCeccPollingPeriod")
++                    {
++                        const uint16_t* value =
++                            std::get_if<uint16_t>(&property.second);
++                        if (value != nullptr)
++                        {
++                            asyncResp->res.jsonValue["DramCeccPollingPeriod"] =
++                                *value;
++                        }
++                    }
++                    if (property.first == "PcieAerPollingPeriod")
++                    {
++                        const uint16_t* value =
++                            std::get_if<uint16_t>(&property.second);
++                        if (value != nullptr)
++                        {
++                            asyncResp->res.jsonValue["PcieAerPollingPeriod"] =
++                                *value;
++                        }
++                    }
++                    if (property.first == "McaErrCounter")
++                    {
++                        const uint16_t* value =
++                            std::get_if<uint16_t>(&property.second);
++                        if (value != nullptr)
++                        {
++                            asyncResp->res.jsonValue["McaErrCounter"] =
++                                *value;
++                        }
++                    }
++                    if (property.first == "DramCeccErrCounter")
++                    {
++                        const uint16_t* value =
++                            std::get_if<uint16_t>(&property.second);
++                        if (value != nullptr)
++                        {
++                            asyncResp->res.jsonValue["DramCeccErrCounter"] =
++                                *value;
++                        }
++                    }
++                    if (property.first == "PcieAerErrCounter")
++                    {
++                        const uint16_t* value =
++                            std::get_if<uint16_t>(&property.second);
++                        if (value != nullptr)
++                        {
++                            asyncResp->res.jsonValue["PcieAerErrCounter"] =
++                                *value;
++                        }
++                    }
+                     if (property.first == "sigIDOffset")
+                     {
+                         const std::vector<std::string>* value =
+@@ -2911,6 +3044,26 @@ class CrashdumpConfiguration : public Node
+                                 .jsonValue["sigIDOffset"] = *value;
+                         }
+                     }
++                    if (property.first == "P0_DimmLabels")
++                    {
++                        const std::vector<std::string>* value =
++                            std::get_if<std::vector<std::string>>(&property.second);
++                        if (value != nullptr)
++                        {
++                            asyncResp->res
++                                .jsonValue["P0_DimmLabels"] = *value;
++                        }
++                    }
++                    if (property.first == "P1_DimmLabels")
++                    {
++                        const std::vector<std::string>* value =
++                            std::get_if<std::vector<std::string>>(&property.second);
++                        if (value != nullptr)
++                        {
++                            asyncResp->res
++                                .jsonValue["P1_DimmLabels"] = *value;
++                        }
++                    }
+                 }
+             },
+             crashdumpObject, crashdumpPath,
+@@ -2927,12 +3080,40 @@ class CrashdumpConfiguration : public Node
+         std::optional<bool> harvestuCodeVersion;
+         std::optional<bool> harvestPpin;
+         std::optional<std::vector<std::string>> sigIDOffset;
++        std::optional<std::vector<std::string>> P0_DimmLabels;
++        std::optional<std::vector<std::string>> P1_DimmLabels;
++        std::optional<uint16_t> McaPollingPeriod;
++        std::optional<uint16_t> DramCeccPollingPeriod;
++        std::optional<uint16_t> PcieAerPollingPeriod;
++        std::optional<uint16_t> McaErrCounter;
++        std::optional<uint16_t> DramCeccErrCounter;
++        std::optional<uint16_t> PcieAerErrCounter;
++        std::optional<bool> McaPollingEn;
++        std::optional<bool> DramCeccPollingEn;
++        std::optional<bool> PcieAerPollingEn;
++        std::optional<bool> McaThresholdEn;
++        std::optional<bool> DramCeccThresholdEn;
++        std::optional<bool> PcieAerThresholdEn;
+
+         if (!json_util::readJson(req, asyncResp->res, "apmlRetries", apmlRetries,
+                                 "systemRecovery", systemRecovery,
+                                 "harvestPpin", harvestPpin,
+                                 "harvestuCodeVersion", harvestuCodeVersion,
+-                                "sigIDOffset",sigIDOffset))
++                                "sigIDOffset",sigIDOffset,
++                                "McaPollingEn",McaPollingEn,
++                                "DramCeccPollingEn",DramCeccPollingEn,
++                                "PcieAerPollingEn",PcieAerPollingEn,
++                                "McaThresholdEn",McaThresholdEn,
++                                "DramCeccThresholdEn",DramCeccThresholdEn,
++                                "PcieAerThresholdEn",PcieAerThresholdEn,
++                                "McaPollingPeriod",McaPollingPeriod,
++                                "DramCeccPollingPeriod",DramCeccPollingPeriod,
++                                "PcieAerPollingPeriod",PcieAerPollingPeriod,
++                                "McaErrCounter",McaErrCounter,
++                                "DramCeccErrCounter",DramCeccErrCounter,
++                                "PcieAerErrCounter",PcieAerErrCounter,
++                                "P0_DimmLabels",P0_DimmLabels,
++                                "P1_DimmLabels",P1_DimmLabels))
+         {
+             return;
+         }
+@@ -3031,6 +3212,288 @@ class CrashdumpConfiguration : public Node
+             crashdumpConfigurationInterface, "sigIDOffset",
+             std::variant<std::vector<std::string>>(*sigIDOffset));
+         }
++
++        if(P0_DimmLabels)
++        {
++            crow::connections::systemBus->async_method_call(
++            [asyncResp](const boost::system::error_code ec) {
++                if (ec)
++                {
++                    BMCWEB_LOG_ERROR << "D-Bus responses error: " << ec;
++                    messages::internalError(asyncResp->res);
++                    return;
++                }
++                messages::success(asyncResp->res);
++                return;
++            },
++            crashdumpObject,crashdumpPath,
++            "org.freedesktop.DBus.Properties", "Set",
++            crashdumpConfigurationInterface, "P0_DimmLabels",
++            std::variant<std::vector<std::string>>(*P0_DimmLabels));
++        }
++
++        if(P1_DimmLabels)
++        {
++            crow::connections::systemBus->async_method_call(
++            [asyncResp](const boost::system::error_code ec) {
++                if (ec)
++                {
++                    BMCWEB_LOG_ERROR << "D-Bus responses error: " << ec;
++                    messages::internalError(asyncResp->res);
++                    return;
++                }
++                messages::success(asyncResp->res);
++                return;
++            },
++            crashdumpObject,crashdumpPath,
++            "org.freedesktop.DBus.Properties", "Set",
++            crashdumpConfigurationInterface, "P1_DimmLabels",
++            std::variant<std::vector<std::string>>(*P1_DimmLabels));
++        }
++
++        if(McaPollingEn)
++        {
++            crow::connections::systemBus->async_method_call(
++            [asyncResp](const boost::system::error_code ec) {
++                if (ec)
++                {
++                    BMCWEB_LOG_ERROR << "D-Bus responses error: " << ec;
++                    messages::internalError(asyncResp->res);
++                    return;
++                }
++                messages::success(asyncResp->res);
++                return;
++            },
++            crashdumpObject, crashdumpPath,
++            "org.freedesktop.DBus.Properties", "Set",
++            crashdumpConfigurationInterface, "McaPollingEn",
++            std::variant<bool>(*McaPollingEn));
++        }
++
++        if(DramCeccPollingEn)
++        {
++            crow::connections::systemBus->async_method_call(
++            [asyncResp](const boost::system::error_code ec) {
++                if (ec)
++                {
++                    BMCWEB_LOG_ERROR << "D-Bus responses error: " << ec;
++                    messages::internalError(asyncResp->res);
++                    return;
++                }
++                messages::success(asyncResp->res);
++                return;
++            },
++            crashdumpObject, crashdumpPath,
++            "org.freedesktop.DBus.Properties", "Set",
++            crashdumpConfigurationInterface, "DramCeccPollingEn",
++            std::variant<bool>(*DramCeccPollingEn));
++        }
++
++        if(PcieAerPollingEn)
++        {
++            crow::connections::systemBus->async_method_call(
++            [asyncResp](const boost::system::error_code ec) {
++                if (ec)
++                {
++                    BMCWEB_LOG_ERROR << "D-Bus responses error: " << ec;
++                    messages::internalError(asyncResp->res);
++                    return;
++                }
++                messages::success(asyncResp->res);
++                return;
++            },
++            crashdumpObject, crashdumpPath,
++            "org.freedesktop.DBus.Properties", "Set",
++            crashdumpConfigurationInterface, "PcieAerPollingEn",
++            std::variant<bool>(*PcieAerPollingEn));
++        }
++
++        if(McaThresholdEn)
++        {
++            crow::connections::systemBus->async_method_call(
++            [asyncResp](const boost::system::error_code ec) {
++                if (ec)
++                {
++                    BMCWEB_LOG_ERROR << "D-Bus responses error: " << ec;
++                    messages::internalError(asyncResp->res);
++                    return;
++                }
++                messages::success(asyncResp->res);
++                return;
++            },
++            crashdumpObject, crashdumpPath,
++            "org.freedesktop.DBus.Properties", "Set",
++            crashdumpConfigurationInterface, "McaThresholdEn",
++            std::variant<bool>(*McaThresholdEn));
++        }
++
++        if(DramCeccThresholdEn)
++        {
++            crow::connections::systemBus->async_method_call(
++            [asyncResp](const boost::system::error_code ec) {
++                if (ec)
++                {
++                    BMCWEB_LOG_ERROR << "D-Bus responses error: " << ec;
++                    messages::internalError(asyncResp->res);
++                    return;
++                }
++                messages::success(asyncResp->res);
++                return;
++            },
++            crashdumpObject, crashdumpPath,
++            "org.freedesktop.DBus.Properties", "Set",
++            crashdumpConfigurationInterface, "DramCeccThresholdEn",
++            std::variant<bool>(*DramCeccThresholdEn));
++        }
++
++        if(PcieAerThresholdEn)
++        {
++            crow::connections::systemBus->async_method_call(
++            [asyncResp](const boost::system::error_code ec) {
++                if (ec)
++                {
++                    BMCWEB_LOG_ERROR << "D-Bus responses error: " << ec;
++                    messages::internalError(asyncResp->res);
++                    return;
++                }
++                messages::success(asyncResp->res);
++                return;
++            },
++            crashdumpObject, crashdumpPath,
++            "org.freedesktop.DBus.Properties", "Set",
++            crashdumpConfigurationInterface, "PcieAerThresholdEn",
++            std::variant<bool>(*PcieAerThresholdEn));
++        }
++
++        if(McaPollingPeriod)
++        {
++            crow::connections::systemBus->async_method_call(
++            [asyncResp](const boost::system::error_code ec) {
++                if (ec)
++                {
++                    BMCWEB_LOG_ERROR << "D-Bus responses error: " << ec;
++                    messages::internalError(asyncResp->res);
++                    return;
++                }
++                messages::success(asyncResp->res);
++                return;
++            },
++            crashdumpObject, crashdumpPath,
++            "org.freedesktop.DBus.Properties", "Set",
++            crashdumpConfigurationInterface, "McaPollingPeriod",
++            std::variant<uint16_t>(*McaPollingPeriod));
++        }
++        if(DramCeccPollingPeriod)
++        {
++            crow::connections::systemBus->async_method_call(
++            [asyncResp](const boost::system::error_code ec) {
++                if (ec)
++                {
++                    BMCWEB_LOG_ERROR << "D-Bus responses error: " << ec;
++                    messages::internalError(asyncResp->res);
++                    return;
++                }
++                messages::success(asyncResp->res);
++                return;
++            },
++            crashdumpObject, crashdumpPath,
++            "org.freedesktop.DBus.Properties", "Set",
++            crashdumpConfigurationInterface, "DramCeccPollingPeriod",
++            std::variant<uint16_t>(*DramCeccPollingPeriod));
++        }
++
++        if(PcieAerPollingPeriod)
++        {
++            crow::connections::systemBus->async_method_call(
++            [asyncResp](const boost::system::error_code ec) {
++                if (ec)
++                {
++                    BMCWEB_LOG_ERROR << "D-Bus responses error: " << ec;
++                    messages::internalError(asyncResp->res);
++                    return;
++                }
++                messages::success(asyncResp->res);
++                return;
++            },
++            crashdumpObject, crashdumpPath,
++            "org.freedesktop.DBus.Properties", "Set",
++            crashdumpConfigurationInterface, "PcieAerPollingPeriod",
++            std::variant<uint16_t>(*PcieAerPollingPeriod));
++        }
++
++        if(McaErrCounter)
++        {
++            if ((McaErrCounter < 0x1) || (McaErrCounter > 0xFFF))
++            {
++                messages::propertyValueNotInList(asyncResp->res, std::to_string(McaErrCounter.value()),
++                                                 "McaErrCounter");
++                BMCWEB_LOG_DEBUG << "The accepted MCA error threshold range is between 1 and 4095";
++                return;
++            }
++
++            crow::connections::systemBus->async_method_call(
++            [asyncResp](const boost::system::error_code ec) {
++                if (ec)
++                {
++                    BMCWEB_LOG_ERROR << "D-Bus responses error: " << ec;
++                    messages::internalError(asyncResp->res);
++                    return;
++                }
++                messages::success(asyncResp->res);
++                return;
++            },
++            crashdumpObject, crashdumpPath,
++            "org.freedesktop.DBus.Properties", "Set",
++            crashdumpConfigurationInterface, "McaErrCounter",
++            std::variant<uint16_t>(*McaErrCounter));
++        }
++
++        if(DramCeccErrCounter)
++        {
++
++            if ((DramCeccErrCounter < 0x1) || (DramCeccErrCounter > 0xFFFF))
++            {
++                messages::propertyValueNotInList(asyncResp->res, std::to_string(DramCeccErrCounter.value()),
++                                                 "DramCeccErrCounter");
++                BMCWEB_LOG_DEBUG << "The accepted DRAM Cecc error threshold range is between 1 and 65,535";
++                return;
++            }
++
++            crow::connections::systemBus->async_method_call(
++            [asyncResp](const boost::system::error_code ec) {
++                if (ec)
++                {
++                    BMCWEB_LOG_ERROR << "D-Bus responses error: " << ec;
++                    messages::internalError(asyncResp->res);
++                    return;
++                }
++                messages::success(asyncResp->res);
++                return;
++            },
++            crashdumpObject, crashdumpPath,
++            "org.freedesktop.DBus.Properties", "Set",
++            crashdumpConfigurationInterface, "DramCeccErrCounter",
++            std::variant<uint16_t>(*DramCeccErrCounter));
++        }
++
++        if(PcieAerErrCounter)
++        {
++            crow::connections::systemBus->async_method_call(
++            [asyncResp](const boost::system::error_code ec) {
++                if (ec)
++                {
++                    BMCWEB_LOG_ERROR << "D-Bus responses error: " << ec;
++                    messages::internalError(asyncResp->res);
++                    return;
++                }
++                messages::success(asyncResp->res);
++                return;
++            },
++            crashdumpObject, crashdumpPath,
++            "org.freedesktop.DBus.Properties", "Set",
++            crashdumpConfigurationInterface, "PcieAerErrCounter",
++            std::variant<uint16_t>(*PcieAerErrCounter));
++        }
+     }
+ };
+
