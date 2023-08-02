@@ -1,0 +1,29 @@
+From 0e19c6c4b719f15b2ae987fec65eba986eb90c35 Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Wed, 2 Aug 2023 02:00:49 -0500
+Subject: [PATCH] webui-vue: Add FPGA image update notification
+
+Add notification to inform user about AC cycle
+after FPGA image updates
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+---
+ src/locales/en-US.json | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/locales/en-US.json b/src/locales/en-US.json
+index 58705dd..f774b54 100644
+--- a/src/locales/en-US.json
++++ b/src/locales/en-US.json
+@@ -359,7 +359,7 @@
+       "updateFirmwareInfo": "The BMC will reboot during the update process. The server cannot be powered on until the update is finished.",
+       "updateFirmwareInfo2": "The running image (%{running}) will be copied to backup. The backup image will be deleted.",
+       "updateFirmwareInfo3": "Are you sure you want to proceed with the update?",
+-      "updateFirmwareInfoDefault": "The new image will be uploaded and activated. After that, the BMC or host will reboot automatically to run from the new image."
++      "updateFirmwareInfoDefault": "The new image will be uploaded and activated. After that, the BMC or host will reboot automatically to run from the new image. FPGA image requires AC cycle after update."
+     },
+     "toast": {
+       "errorSwitchImages": "Error switching running and backup images.",
+--
+2.17.1
+

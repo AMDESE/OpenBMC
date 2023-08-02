@@ -20,4 +20,5 @@ SRC_URI += "file://0001-webvue-ui-Support-HPM-and-SCM-FPGA-firmware-updates.patc
             file://0016-Added-Processor-info-in-Hardware-Inventory-page.patch \
             file://0017-webui-changes-to-support-vrbundle-update.patch \
             file://0018-Fixed-skip-count-logic-in-webui-vue.patch \
+            file://0019-webui-vue-Add-FPGA-image-update-notification.patch \
             "
