@@ -1,0 +1,92 @@
+From b06b42953fc89380e8f3a3a10b280543c7c64dfb Mon Sep 17 00:00:00 2001
+From: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
+Date: Thu, 3 Aug 2023 22:06:01 -0500
+Subject: [PATCH 1/1] Add a new Post Package Repair Interface
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+Adds a new Post Package Repair Interface to accept post package repair
+data coming in from user and return the status of the post package
+repair.
+
+Signed-off-by: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
+---
+ .../PostPackageRepair/PprData.interface.yaml  | 66 +++++++++++++++++++
+ 1 file changed, 66 insertions(+)
+ create mode 100644 xyz/openbmc_project/PostPackageRepair/PprData.interface.yaml
+
+diff --git a/xyz/openbmc_project/PostPackageRepair/PprData.interface.yaml b/xyz/openbmc_project/PostPackageRepair/PprData.interface.yaml
+new file mode 100644
+index 0000000..901e868
+--- /dev/null
++++ b/xyz/openbmc_project/PostPackageRepair/PprData.interface.yaml
+@@ -0,0 +1,66 @@
++description: >
++    Accept post package repair data coming in from user and return the status of the post package repair.
++
++properties:
++    - name: CurrentRepairEntry
++      type: uint16
++      description: >
++          It is used to indicate the current repair entry. It starts from 0
++          and is limited to Maximum 64.
++    - name: RecordAdd
++      type: boolean
++      description: >
++          The post package repair record added.
++
++methods:
++    - name: setPostPackageRepairData
++      description: >
++          Method to set the post package repair data.
++      parameters:
++        - name: RepairEntryNum
++          type: uint16
++          description: >
++            The post package repair entry number data.
++        - name: RepairType
++          type: uint16
++          description: >
++            The post package repair type data.
++        - name: SocNum
++          type: uint16
++          description: >
++            The Soc Number.
++        - name: Payload
++          type: array[uint16]
++          description: >
++            The post package repair data payload.
++      returns:
++        - name: recordAdded
++          type: boolean
++          description: >
++            A boolean value to indicate whether record added or not.
++    - name: getPostPackageRepairStatus
++      description: >
++          Method to get the cached post package repair status.
++      parameters:
++        - name: Index
++          type: uint16
++          description: >
++              Index indicates which repair entry post package repair status is requested.
++      returns:
++        - name: pprDataOut
++          type: struct[uint16,uint16,uint16,uint16,array[uint16]]
++          description: >
++            An array of post package repair entries and its status.
++    - name: startRuntimeRepair
++      description: >
++          Method to get the cached post package repair status.
++      parameters:
++        - name: Index
++          type: uint16
++          description: >
++              Index indicates which repair entry post package repair is requested.
++      returns:
++        - name: Status
++          type: uint32
++          description: >
++            APML command status of the repair entry.
+--
+2.17.1
+

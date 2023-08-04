@@ -14,5 +14,9 @@ SRC_URI += "file://0001-recipes-phosphor-dbus-Add-enumeration-SCM_FPGA-for-v.pat
             file://0010-Added-configuration-for-VR-Bundle-Update.patch \
             file://0011-add-support-for-bp-fw-update.patch \
             file://0012-Added-Present-property-to-check-processor-present.patch \
+            file://0013-Add-a-new-Post-Package-Repair-Interface.patch \
             "
 
+do_configure_append() {
+  cd ${S}/gen && ./regenerate-meson
+}
