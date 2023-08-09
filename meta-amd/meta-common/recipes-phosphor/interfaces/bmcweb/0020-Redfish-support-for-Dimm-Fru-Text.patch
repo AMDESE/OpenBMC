@@ -1,0 +1,257 @@
+From 95a01ed04d04f8bced2238c9dbb820f2d8fa9b7f Mon Sep 17 00:00:00 2001
+From: Abinaya <abinaya.dhandapani@amd.com>
+Date: Wed, 9 Aug 2023 06:24:34 -0500
+Subject: [PATCH] Redfish support for Dimm Fru Text
+
+Signed-off-by: Abinaya <abinaya.dhandapani@amd.com>
+---
+ redfish-core/include/utils/json_utils.hpp | 35 +++++++++
+ redfish-core/lib/log_services.hpp         | 93 ++++++++++++++++++-----
+ 2 files changed, 108 insertions(+), 20 deletions(-)
+
+diff --git a/redfish-core/include/utils/json_utils.hpp b/redfish-core/include/utils/json_utils.hpp
+index 1eeb65ad..040df478 100644
+--- a/redfish-core/include/utils/json_utils.hpp
++++ b/redfish-core/include/utils/json_utils.hpp
+@@ -68,6 +68,14 @@ template <typename Type, std::size_t size>
+ struct IsStdArray<std::array<Type, size>> : std::true_type
+ {};
+
++template <typename Type>
++struct IsPairVector : std::false_type
++{};
++
++template <>
++struct IsPairVector<std::vector<std::pair<std::string, std::string>>> : std::true_type
++{};
++
+ enum class UnpackErrorCode
+ {
+     success,
+@@ -231,6 +239,32 @@ bool unpackValue(nlohmann::json& jsonValue, const std::string& key,
+                   ret;
+         }
+     }
++    else if constexpr (IsPairVector<Type>::value)
++    {
++        if (!jsonValue.is_array())
++        {
++            return false;
++        }
++
++        for (const auto& val : jsonValue.items())
++        {
++            std::pair<std::string, std::string> pair;
++
++            nlohmann::json& pairValue = val.value();
++
++            if (!pairValue.is_object())
++            {
++                return false;
++            }
++
++            auto it = pairValue.begin();
++
++            pair.first = it.key();
++            pair.second = it.value();
++
++            value.push_back(pair);
++        }
++    }
+     else if constexpr (IsVector<Type>::value)
+     {
+         if (!jsonValue.is_array())
+@@ -309,6 +343,7 @@ bool unpackValue(nlohmann::json& jsonValue, const std::string& key, Type& value)
+     }
+     else if constexpr (IsVector<Type>::value)
+     {
++
+         if (!jsonValue.is_array())
+         {
+             return false;
+diff --git a/redfish-core/lib/log_services.hpp b/redfish-core/lib/log_services.hpp
+index 72ca55ac..038b4bbd 100644
+--- a/redfish-core/lib/log_services.hpp
++++ b/redfish-core/lib/log_services.hpp
+@@ -2683,7 +2683,7 @@ static void
+
+             if(filename.find("mca-runtime") != std::string::npos)
+                 DiagnosticDataTypeString = "Mca_RuntimeError_APMLCrashdump";
+-            else if(filename.find("dram-cecc-runtime") != std::string::npos)
++            else if(filename.find("dram-runtime") != std::string::npos)
+                 DiagnosticDataTypeString = "DramCecc_RuntimeError_APMLCrashdump";
+             else if(filename.find("pcie-runtime") != std::string::npos)
+                 DiagnosticDataTypeString = "Pcie_RuntimeError_APMLCrashdump";
+@@ -2861,7 +2861,9 @@ class CrashdumpConfiguration : public Node
+             [asyncResp](
+                 const boost::system::error_code ec,
+                 const std::vector<std::pair<
+-                    std::string, std::variant<uint16_t, bool, std::vector<std::string>>>>&
++                    std::string, std::variant<uint16_t, bool,
++                                     std::vector<std::pair<std::string, std::string>>,
++                                     std::vector<std::string>>>>&
+                     propertiesList) {
+                 if (ec)
+                 {
+@@ -2871,7 +2873,9 @@ class CrashdumpConfiguration : public Node
+                 BMCWEB_LOG_DEBUG << "Got " << propertiesList.size()
+                                  << "properties for Crashdump configuration";
+                 for (const std::pair<std::string,
+-                                     std::variant<uint16_t, bool, std::vector<std::string>>>&
++                                     std::variant<uint16_t, bool,
++                                     std::vector<std::pair<std::string, std::string>>,
++                                     std::vector<std::string>>>&
+                          property : propertiesList)
+                 {
+                     if (property.first == "apmlRetries")
+@@ -3044,24 +3048,24 @@ class CrashdumpConfiguration : public Node
+                                 .jsonValue["sigIDOffset"] = *value;
+                         }
+                     }
+-                    if (property.first == "P0_DimmLabels")
++                    if (property.first == "P0_DIMM_LABELS")
+                     {
+-                        const std::vector<std::string>* value =
+-                            std::get_if<std::vector<std::string>>(&property.second);
++                        const std::vector<std::pair<std::string, std::string>>* value =
++                            std::get_if<std::vector<std::pair<std::string, std::string>>>(&property.second);
+                         if (value != nullptr)
+                         {
+                             asyncResp->res
+-                                .jsonValue["P0_DimmLabels"] = *value;
++                                .jsonValue["P0_DIMM_LABELS"] = *value;
+                         }
+                     }
+-                    if (property.first == "P1_DimmLabels")
++                    if (property.first == "P1_DIMM_LABELS")
+                     {
+-                        const std::vector<std::string>* value =
+-                            std::get_if<std::vector<std::string>>(&property.second);
++                        const std::vector<std::pair<std::string, std::string>>* value =
++                            std::get_if<std::vector<std::pair<std::string, std::string>>>(&property.second);
+                         if (value != nullptr)
+                         {
+                             asyncResp->res
+-                                .jsonValue["P1_DimmLabels"] = *value;
++                                .jsonValue["P1_DIMM_LABELS"] = *value;
+                         }
+                     }
+                 }
+@@ -3080,8 +3084,8 @@ class CrashdumpConfiguration : public Node
+         std::optional<bool> harvestuCodeVersion;
+         std::optional<bool> harvestPpin;
+         std::optional<std::vector<std::string>> sigIDOffset;
+-        std::optional<std::vector<std::string>> P0_DimmLabels;
+-        std::optional<std::vector<std::string>> P1_DimmLabels;
++        std::optional<std::vector<std::pair<std::string, std::string>>> P0_DimmLabels;
++        std::optional<std::vector<std::pair<std::string, std::string>>> P1_DimmLabels;
+         std::optional<uint16_t> McaPollingPeriod;
+         std::optional<uint16_t> DramCeccPollingPeriod;
+         std::optional<uint16_t> PcieAerPollingPeriod;
+@@ -3095,11 +3099,14 @@ class CrashdumpConfiguration : public Node
+         std::optional<bool> DramCeccThresholdEn;
+         std::optional<bool> PcieAerThresholdEn;
+
++        std::cout << "Doing patch command " << std::endl;
+         if (!json_util::readJson(req, asyncResp->res, "apmlRetries", apmlRetries,
+                                 "systemRecovery", systemRecovery,
+                                 "harvestPpin", harvestPpin,
+                                 "harvestuCodeVersion", harvestuCodeVersion,
+                                 "sigIDOffset",sigIDOffset,
++                                "P0_DIMM_LABELS",P0_DimmLabels,
++                                "P1_DIMM_LABELS",P1_DimmLabels,
+                                 "McaPollingEn",McaPollingEn,
+                                 "DramCeccPollingEn",DramCeccPollingEn,
+                                 "PcieAerPollingEn",PcieAerPollingEn,
+@@ -3111,9 +3118,7 @@ class CrashdumpConfiguration : public Node
+                                 "PcieAerPollingPeriod",PcieAerPollingPeriod,
+                                 "McaErrCounter",McaErrCounter,
+                                 "DramCeccErrCounter",DramCeccErrCounter,
+-                                "PcieAerErrCounter",PcieAerErrCounter,
+-                                "P0_DimmLabels",P0_DimmLabels,
+-                                "P1_DimmLabels",P1_DimmLabels))
++                                "PcieAerErrCounter",PcieAerErrCounter))
+         {
+             return;
+         }
+@@ -3215,6 +3220,31 @@ class CrashdumpConfiguration : public Node
+
+         if(P0_DimmLabels)
+         {
++
++            std::vector<std::string> supportedP0_DimmLabels =
++                     {"P0_DIMM_A","P0_DIMM_A1","P0_DIMM_B","P0_DIMM_B1",
++                      "P0_DIMM_C","P0_DIMM_C1","P0_DIMM_D","P0_DIMM_D1",
++                      "P0_DIMM_E","P0_DIMM_E1","P0_DIMM_F","P0_DIMM_F1",
++                      "P0_DIMM_G","P0_DIMM_G1","P0_DIMM_H","P0_DIMM_H1",
++                      "P0_DIMM_I","P0_DIMM_I1","P0_DIMM_J","P0_DIMM_J1",
++                      "P0_DIMM_K","P0_DIMM_K1","P0_DIMM_L","P0_DIMM_L1"};
++
++            for (const auto& pair : *P0_DimmLabels)
++            {
++                const std::string& key = pair.first;
++
++                if (std::find(supportedP0_DimmLabels.begin(), supportedP0_DimmLabels.end(), key)
++                                         == supportedP0_DimmLabels.end())
++                {
++                    messages::propertyValueNotInList(asyncResp->res, key,
++                                                 "P0_DIMM_LABELS");
++                    BMCWEB_LOG_DEBUG << "The supplied key " << key <<
++                           " does not match with any of the keys in P0_DimmLabels";
++                    return;
++
++                }
++            }
++
+             crow::connections::systemBus->async_method_call(
+             [asyncResp](const boost::system::error_code ec) {
+                 if (ec)
+@@ -3228,12 +3258,35 @@ class CrashdumpConfiguration : public Node
+             },
+             crashdumpObject,crashdumpPath,
+             "org.freedesktop.DBus.Properties", "Set",
+-            crashdumpConfigurationInterface, "P0_DimmLabels",
+-            std::variant<std::vector<std::string>>(*P0_DimmLabels));
++            crashdumpConfigurationInterface, "P0_DIMM_LABELS",
++            std::variant<std::vector<std::pair<std::string, std::string>>>(*P0_DimmLabels));
+         }
+
+         if(P1_DimmLabels)
+         {
++            std::vector<std::string> supportedP1_DimmLabels =
++                     {"P1_DIMM_A","P1_DIMM_A1","P1_DIMM_B","P1_DIMM_B1",
++                      "P1_DIMM_C","P1_DIMM_C1","P1_DIMM_D","P1_DIMM_D1",
++                      "P1_DIMM_E","P1_DIMM_E1","P1_DIMM_F","P1_DIMM_F1",
++                      "P1_DIMM_G","P1_DIMM_G1","P1_DIMM_H","P1_DIMM_H1",
++                      "P1_DIMM_I","P1_DIMM_I1","P1_DIMM_J","P1_DIMM_J1",
++                      "P1_DIMM_K","P1_DIMM_K1","P1_DIMM_L","P1_DIMM_L1"};
++
++            for (const auto& pair : *P1_DimmLabels)
++            {
++                const std::string& key = pair.first;
++
++                if (std::find(supportedP1_DimmLabels.begin(), supportedP1_DimmLabels.end(), key)
++                                         == supportedP1_DimmLabels.end())
++                {
++                    messages::propertyValueNotInList(asyncResp->res, key,
++                                                 "P1_DIMM_LABELS");
++                    BMCWEB_LOG_DEBUG << "The supplied key " << key <<
++                           " does not match with any of the keys in P1_DimmLabels";
++                    return;
++                }
++            }
++
+             crow::connections::systemBus->async_method_call(
+             [asyncResp](const boost::system::error_code ec) {
+                 if (ec)
+@@ -3247,8 +3300,8 @@ class CrashdumpConfiguration : public Node
+             },
+             crashdumpObject,crashdumpPath,
+             "org.freedesktop.DBus.Properties", "Set",
+-            crashdumpConfigurationInterface, "P1_DimmLabels",
+-            std::variant<std::vector<std::string>>(*P1_DimmLabels));
++            crashdumpConfigurationInterface, "P1_DIMM_LABELS",
++            std::variant<std::vector<std::pair<std::string, std::string>>>(*P1_DimmLabels));
+         }
+
+         if(McaPollingEn)
