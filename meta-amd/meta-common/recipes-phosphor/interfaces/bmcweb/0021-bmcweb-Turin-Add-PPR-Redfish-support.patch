@@ -1,0 +1,293 @@
+From 4a6a3a67da6f91ec6577e1ab79c9a94604a53344 Mon Sep 17 00:00:00 2001
+From: Ashok Kumar <ashok2.kumar@amd.com>
+Date: Fri, 11 Aug 2023 13:14:13 -0500
+Subject: [PATCH 1/1] bmcweb: Turin Add PPR Redfish support
+
+Add Post Package Repair for Runtime DIMM CECC Error
+These Refish requests will be processed by amd-bmc-ppr app
+
+Signed-off-by: Ashok Kumar <ashok2.kumar@amd.com>
+---
+ redfish-core/include/redfish.hpp  |   3 +
+ redfish-core/lib/log_services.hpp | 244 ++++++++++++++++++++++++++++++
+ 2 files changed, 247 insertions(+)
+
+diff --git a/redfish-core/include/redfish.hpp b/redfish-core/include/redfish.hpp
+index 167d42b5..cb9f5b29 100644
+--- a/redfish-core/include/redfish.hpp
++++ b/redfish-core/include/redfish.hpp
+@@ -143,6 +143,9 @@ class RedfishService
+         nodes.emplace_back(std::make_unique<CrashdumpClear>(app));
+         nodes.emplace_back(std::make_unique<CrashdumpCollect>(app));
+         nodes.emplace_back(std::make_unique<CrashdumpConfiguration>(app));
++        nodes.emplace_back(std::make_unique<pprService>(app));
++        nodes.emplace_back(std::make_unique<pprStatus>(app));
++        nodes.emplace_back(std::make_unique<pprFile>(app));
+ #endif // BMCWEB_ENABLE_REDFISH_CPU_LOG
+
+         nodes.emplace_back(std::make_unique<ProcessorCollection>(app));
+diff --git a/redfish-core/lib/log_services.hpp b/redfish-core/lib/log_services.hpp
+index 038b4bbd..5482e0f1 100644
+--- a/redfish-core/lib/log_services.hpp
++++ b/redfish-core/lib/log_services.hpp
+@@ -53,6 +53,10 @@ constexpr char const* crashdumpTelemetryInterface =
+ constexpr char const* crashdumpConfigurationInterface =
+     "com.amd.crashdump.Configuration";
+
++constexpr char const* pprStatusInterface = "xyz.openbmc_project.PostPackageRepair.PprData";
++constexpr char const* pprFileObject      = "xyz.openbmc_project.PostPackageRepair";
++constexpr char const* pprFilePath        = "/xyz/openbmc_project/PostPackageRepair";
++constexpr char const* pprFileInterface   = "xyz.openbmc_project.PostPackageRepair.PprData";
+ namespace message_registries
+ {
+ static const Message* getMessageFromRegistry(
+@@ -3765,6 +3769,246 @@ class CrashdumpCollect : public Node
+     }
+ };
+
++// Post Package Repair
++// PPR
++class pprService : public Node
++{
++  public:
++    pprService(App& app) :
++        Node(app, "/redfish/v1/Systems/system/LogServices/PostPackageRepair/")
++    {
++        // Note: Deviated from redfish privilege registry for GET & HEAD
++        // method for security reasons.
++        entityPrivileges = {
++            {boost::beast::http::verb::get, {{"ConfigureComponents"}}},
++            {boost::beast::http::verb::head, {{"ConfigureComponents"}}},
++            {boost::beast::http::verb::patch, {{"ConfigureManager"}}},
++            {boost::beast::http::verb::put, {{"ConfigureManager"}}},
++            {boost::beast::http::verb::delete_, {{"ConfigureManager"}}},
++            {boost::beast::http::verb::post, {{"ConfigureManager"}}}};
++    }
++
++  private:
++    /**
++     * Functions triggers appropriate requests on DBus
++     */
++    void doGet(const std::shared_ptr<bmcweb::AsyncResp>& asyncResp,
++               const crow::Request&, const std::vector<std::string>&) override
++    {
++
++        // Copy over the static data to include the entries added by SubRoute
++        asyncResp->res.jsonValue["@odata.id"] =
++            "/redfish/v1/Systems/system/LogServices/PostPackageRepair";
++        asyncResp->res.jsonValue["@odata.type"] =
++            "#LogService.v1_2_0.LogService";
++        asyncResp->res.jsonValue["Name"] = "Open BMC Oem PPR Service";
++        asyncResp->res.jsonValue["Description"] = "Oem Post Package Repair Service";
++        asyncResp->res.jsonValue["Id"] = "Oem ppr";
++        asyncResp->res.jsonValue["OverWritePolicy"] = "WrapsWhenFull";
++        asyncResp->res.jsonValue["Actions"] = {
++            {"#LogService.pprStatus",
++             {{"target", "/redfish/v1/Systems/system/LogServices/PostPackageRepair/"
++                         "Status"}}},
++            {"#LogService.pprFile",
++             {{"target", "/redfish/v1/Systems/system/LogServices/PostPackageRepair/"
++                         "RepairData"}}}};
++    }
++};
++
++static void getPostPackageRepairStatus(
++        const std::shared_ptr<bmcweb::AsyncResp> &aResp)
++{
++
++      crow::connections::systemBus->async_method_call(
++      [aResp](
++      const boost::system::error_code ec,
++      const std::vector<
++      std::tuple<uint16_t, uint16_t, uint16_t, uint16_t,
++         std::vector<uint16_t>>>& postpackagerepairstatus) {
++      if (ec) {
++         BMCWEB_LOG_ERROR
++         << "DBUS response error in getPostPackageRepairStatus" << ec.message();
++         messages::internalError(aResp->res);
++        return;
++      }
++
++      BMCWEB_LOG_DEBUG << "D-Bus getPostPackageRepairStatus success size : " << postpackagerepairstatus.size();
++
++      nlohmann::json pprDataOut = nlohmann::json::array();
++      int count = 0;
++      for (auto resolveList : postpackagerepairstatus)
++      {
++         BMCWEB_LOG_INFO << "Testing : "<< std::get<0>(resolveList);
++         uint16_t repairEntryNum = std::get<0>(resolveList);
++         uint16_t repairType = std::get<1>(resolveList);
++         uint16_t socNum = std::get<2>(resolveList);
++         uint16_t repairResult = std::get<3>(resolveList);
++         std::vector<uint16_t> payload = std::get<4>(resolveList);
++
++         nlohmann::json jsonPpr = {
++         { "repairEntryNum" , repairEntryNum },
++         { "repairType" ,     repairType },
++         { "socNum" ,         socNum },
++         { "repairResult" ,   repairResult },
++         { "payload" ,        payload }
++      };
++      pprDataOut.push_back(jsonPpr);
++      count++;
++    }
++
++    aResp->res.jsonValue["Members"] = pprDataOut;
++    aResp->res.jsonValue["Members@odata.count"] = count;
++  },
++  pprFileObject, pprFilePath, pprFileInterface,
++  "getPostPackageRepairStatus");
++
++  messages::success(aResp->res);
++  return;
++}
++
++class pprStatus: public Node {
++public:
++
++    pprStatus(App &app) :
++            Node(app,
++                    "/redfish/v1/Systems/system/LogServices/PostPackageRepair/Status") {
++        // Note: Deviated from redfish privilege registry for GET & HEAD
++        // method for security reasons.
++        entityPrivileges = {
++            {boost::beast::http::verb::get, {{"ConfigureComponents"}}},
++            {boost::beast::http::verb::head, {{"ConfigureComponents"}}},
++            {boost::beast::http::verb::patch, {{"ConfigureManager"}}},
++            {boost::beast::http::verb::put, {{"ConfigureManager"}}},
++            {boost::beast::http::verb::delete_, {{"ConfigureManager"}}},
++            {boost::beast::http::verb::post, {{"ConfigureManager"}}}};
++    }
++
++private:
++    void doGet(const std::shared_ptr<bmcweb::AsyncResp> &asyncResp,
++            const crow::Request&, const std::vector<std::string>&)
++                    override
++    {
++      asyncResp->res.jsonValue["@odata.type"] = "#LogEntry.v1_4_0.LogEntry";
++      asyncResp->res.jsonValue["@odata.id"] =
++          "/redfish/v1/Systems/system/LogServices/PostPackageRepair/"
++          "Status";
++      asyncResp->res.jsonValue["Name"] = "Post Package Repair Entries";
++      asyncResp->res.jsonValue["Description"] =
++          "Collection of Post Package Repair Entries";
++      asyncResp->res.jsonValue["Members"] = nlohmann::json::array();
++      asyncResp->res.jsonValue["Members@odata.count"] = 0;
++
++      getPostPackageRepairStatus(asyncResp);
++      return;
++    }
++
++};
++
++static void setPostPackageRepairData(
++    const std::shared_ptr<bmcweb::AsyncResp> &asyncResp,
++    uint16_t Index, uint16_t repairEntryNum, uint16_t repairType,
++    uint16_t socNum, std::vector<uint16_t> payload) {
++
++  std::optional<bool> RecordAdd = true;
++  crow::connections::systemBus->async_method_call(
++      [asyncResp, Index, RecordAdd, repairEntryNum, repairType, socNum, payload](
++          const boost::system::error_code ec, bool &recordAdd) {
++    if (ec) {
++      BMCWEB_LOG_ERROR
++      << "DBUS POST Package Repair Record Add error";
++      messages::internalError(asyncResp->res);
++      return;
++    }
++    BMCWEB_LOG_DEBUG
++    << "DBUS POST Package Repair Record Added : " << int(recordAdd);
++
++    crow::connections::systemBus->async_method_call(
++        [asyncResp, RecordAdd, Index](const boost::system::error_code ec) {
++      if (ec) {
++        BMCWEB_LOG_ERROR << "D-Bus responses error: " << ec;
++        messages::internalError(asyncResp->res);
++        return;
++      }
++      BMCWEB_LOG_INFO << "D-Bus Record Add success";
++      crow::connections::systemBus->async_method_call(
++          [asyncResp, Index](
++              const boost::system::error_code ec,
++              const uint32_t &startRuntimeRepair) {
++        if (ec) {
++          BMCWEB_LOG_ERROR  << "DBUS start Runtime Repair error";
++          messages::internalError(asyncResp->res);
++          return;
++        }
++        BMCWEB_LOG_INFO << "DBUS success start Runtime Repair : " << startRuntimeRepair;
++      },
++      pprFileObject, pprFilePath, pprFileInterface,
++      "startRuntimeRepair", Index);
++    },
++    pprFileObject, pprFilePath,
++    "org.freedesktop.DBus.Properties", "Set", pprFileInterface,
++    "RecordAdd", std::variant<bool>(*RecordAdd));
++  },
++  pprFileObject, pprFilePath, pprFileInterface,
++  "setPostPackageRepairData", repairEntryNum, repairType, socNum,
++  payload);
++
++}
++
++class pprFile: public Node {
++public:
++
++    pprFile(App &app) :
++            Node(app,
++                    "/redfish/v1/Systems/system/LogServices/PostPackageRepair/"
++                            "RepairData") {
++        // Note: Deviated from redfish privilege registry for GET & HEAD
++        // method for security reasons.
++        entityPrivileges = {
++            {boost::beast::http::verb::get, {{"ConfigureComponents"}}},
++            {boost::beast::http::verb::head, {{"ConfigureComponents"}}},
++            {boost::beast::http::verb::patch, {{"ConfigureManager"}}},
++            {boost::beast::http::verb::put, {{"ConfigureManager"}}},
++            {boost::beast::http::verb::delete_, {{"ConfigureManager"}}},
++            {boost::beast::http::verb::post, {{"ConfigureManager"}}}};
++    }
++
++private:
++    void doPatch(const std::shared_ptr<bmcweb::AsyncResp> &asyncResp,
++            const crow::Request &req, const std::vector<std::string>&) override
++    {
++      uint16_t RepairType;
++      uint16_t RepairEntryNum;
++      uint16_t SocNum;
++      uint16_t Index = 0;
++      std::vector<uint16_t> Payload;
++      nlohmann::json jsonRequest;
++
++      if (!json_util::processJsonFromRequest(asyncResp->res, req,
++          jsonRequest)) {
++        BMCWEB_LOG_DEBUG << "Json value not readable";
++        return;
++      }
++
++      for (auto &el : jsonRequest["pprDataIn"].items()) {
++        BMCWEB_LOG_INFO << "Key " << el.key();
++        BMCWEB_LOG_INFO << "value " << el.value();
++
++        if (!json_util::readJson(el.value(), asyncResp->res, "RepairType",
++            RepairType, "RepairEntryNum", RepairEntryNum, "SocNum",
++          SocNum, "Payload", Payload)) {
++          return;
++        }
++
++        setPostPackageRepairData(asyncResp, Index, RepairEntryNum, RepairType,
++            SocNum, Payload);
++        Index++;
++      }//end of for loop
++
++      messages::success(asyncResp->res);
++      return;
++    } // doPatch()
++};
++// end of class pprFile
+ /**
+  * DBusLogServiceActionsClear class supports POST method for ClearLog action.
+  */
+--
+2.25.1
+
