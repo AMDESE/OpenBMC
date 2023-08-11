@@ -1,0 +1,35 @@
+From 345e0be5bb624e9d4b5d3bc5f10898672f85061e Mon Sep 17 00:00:00 2001
+From: Ashok Kumar <ashok2.kumar@amd.com>
+Date: Fri, 11 Aug 2023 09:20:01 -0500
+Subject: [PATCH 1/1] phosphor-dbus-interfaces: Made PprData to return Array
+
+Made changes to return PprData in Array in getStatus
+
+Signed-off-by: Ashok Kumar <ashok2.kumar@amd.com>
+---
+ .../PostPackageRepair/PprData.interface.yaml               | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+diff --git a/xyz/openbmc_project/PostPackageRepair/PprData.interface.yaml b/xyz/openbmc_project/PostPackageRepair/PprData.interface.yaml
+index 901e868..72419c7 100644
+--- a/xyz/openbmc_project/PostPackageRepair/PprData.interface.yaml
++++ b/xyz/openbmc_project/PostPackageRepair/PprData.interface.yaml
+@@ -41,14 +41,9 @@ methods:
+     - name: getPostPackageRepairStatus
+       description: >
+           Method to get the cached post package repair status.
+-      parameters:
+-        - name: Index
+-          type: uint16
+-          description: >
+-              Index indicates which repair entry post package repair status is requested.
+       returns:
+         - name: pprDataOut
+-          type: struct[uint16,uint16,uint16,uint16,array[uint16]]
++          type: array[struct[uint16,uint16,uint16,uint16,array[uint16]]]
+           description: >
+             An array of post package repair entries and its status.
+     - name: startRuntimeRepair
+--
+2.25.1
+

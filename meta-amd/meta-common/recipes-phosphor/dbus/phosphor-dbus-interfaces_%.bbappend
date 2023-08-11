@@ -15,6 +15,7 @@ SRC_URI += "file://0001-recipes-phosphor-dbus-Add-enumeration-SCM_FPGA-for-v.pat
             file://0011-add-support-for-bp-fw-update.patch \
             file://0012-Added-Present-property-to-check-processor-present.patch \
             file://0013-Add-a-new-Post-Package-Repair-Interface.patch \
+            file://0014-phosphor-dbus-interfaces-Made-PprData-to-return-Arra.patch \
             "
 
 do_configure_append() {
