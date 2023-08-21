@@ -5,7 +5,10 @@ FILESEXTRAPATHS_prepend := "${THISDIR}:"
 
 LICENSE = "CLOSED"
 
-RDEPENDS_${PN} += "bash"
+DEPENDS += "systemd"
+RDEPENDS_${PN} += "bash libsystemd"
+
+inherit systemd
 
 SRC_URI = "file://aspeed-espi.h  \
 	file://perif-test.c \
@@ -18,9 +21,12 @@ SRC_URI = "file://aspeed-espi.h  \
 	file://mg9100test_RL20220323_1709 \
 	file://ubm_fru_update \
 	file://AMI_MG9100_001_ALL_PCIE.sh \
-        file://get-Lenovo-bp-config.sh \
-        file://set-Lenovo-fp-led.sh \
+	file://get-Lenovo-bp-config.sh \
+	file://set-Lenovo-fp-led.sh \
+	file://safs-addr-translator.service \
 	"
+
+SYSTEMD_SERVICE_${PN} = "safs-addr-translator.service"
 
 S = "${WORKDIR}"
 INSANE_SKIP_${PN} += "ldflags already-stripped"
@@ -46,6 +52,8 @@ do_install() {
 	install -m 0755 mg9100test_RL20220323_1709 ${D}${bindir}
 	install -m 0755 ubm_fru_update ${D}${bindir}
 	install -m 0755 AMI_MG9100_001_ALL_PCIE.sh ${D}${bindir}
-        install -m 0755 get-Lenovo-bp-config.sh ${D}${bindir}
-        install -m 0755 set-Lenovo-fp-led.sh ${D}${bindir}
+	install -m 0755 get-Lenovo-bp-config.sh ${D}${bindir}
+	install -m 0755 set-Lenovo-fp-led.sh ${D}${bindir}
+	install -d ${D}${systemd_unitdir}/system
+	install -m 0644 ${WORKDIR}/safs-addr-translator.service ${D}${systemd_unitdir}/system
 }

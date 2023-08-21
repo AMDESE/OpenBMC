@@ -1,0 +1,10 @@
+[Unit]
+Description=Enable SAFS address translation
+After=local-fs.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/safs-test -d /dev/aspeed-espi-flash -m /dev/mtd6
+
+[Install]
+WantedBy=multi-user.target

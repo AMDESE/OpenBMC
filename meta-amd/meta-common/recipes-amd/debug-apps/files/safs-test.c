@@ -16,21 +16,28 @@
 
 #include "aspeed-espi.h"
 
+#define RETRY_MAX	(5)
+#define DELAY_MS	(800 * 1000)
+
 struct safs_context {
 	int dev_fd;
 	int mtd_fd;
 	char dev_path[256];
 	char mtd_path[256];
 	mtd_info_t mtd_info;
+	int remap_mask;
 };
 static struct safs_context safs_ctx[1];
+static int verbose = 0;
 
-static const char opt_short[] = "hd:m:";
+static const char opt_short[] = "vhd:m:b:";
 
 static const struct option opt_long [] = {
 	{ "help",	no_argument,		NULL,       'h' },
 	{ "dev",	required_argument,	NULL,       'd' },
 	{ "mtd",	required_argument,	NULL,       'm' },
+	{ "bitmask",	required_argument,	NULL,       'b' },
+	{ "verbose",	no_argument,		NULL,       'v' },
 	{ 0, 0, 0, 0 }
 };
 
@@ -43,6 +50,8 @@ static void print_usage(int argc, char **argv)
 			" -h | --help       Print this message\n"
 			" -d | --dev        eSPI flash device node\n"
 			" -m | --mtd        MTD device node\n"
+			" -b | --bitmask    Bitmask to remap address\n"
+			" -v | --verbose    Enable all debug prints\n"
 			"",
 			argv[0]);
 }
@@ -61,7 +70,11 @@ static void print_hexdump(uint8_t *buf, uint32_t len)
 
 static ssize_t flash_read(uint32_t addr, uint32_t len, uint8_t *buf)
 {
-	lseek(safs_ctx->mtd_fd, addr, SEEK_SET);
+	off_t ret = lseek(safs_ctx->mtd_fd, addr, SEEK_SET);
+	if ( ret == (addr - 1))
+	{
+		printf("%s-%d:%s\n",__FUNCTION__,__LINE__,strerror(errno));
+	}
 	return read(safs_ctx->mtd_fd, buf, len);
 }
 
@@ -81,10 +94,15 @@ static int flash_erase(uint32_t addr, uint32_t len)
 		ei.start = addr + i;
 		ei.length = safs_ctx->mtd_info.erasesize;
 
-		ioctl(safs_ctx->mtd_fd, MEMUNLOCK, &ei);
+		rc = ioctl(safs_ctx->mtd_fd, MEMUNLOCK, &ei);
+		if (rc) {
+			printf("%s-%d:%s\n",__FUNCTION__, __LINE__, strerror(errno));
+			printf("MEMUNLOCK ioctl with addr 0x%08x, rc=%d\n", ei.start, rc);
+		}
 
 		rc = ioctl(safs_ctx->mtd_fd, MEMERASE, &ei);
 		if (rc) {
+			printf("%s-%d:%s\n",__FUNCTION__, __LINE__, strerror(errno));
 			printf("MEMERASE ioctl with addr=0x%08x, rc=%d\n", ei.start, rc);
 			return -1;
 		}
@@ -112,6 +130,7 @@ static int espi_safs_read(uint8_t tag, uint32_t addr, uint32_t len)
 
 	rc = (int)len;
 	if (rc < 0) {
+		printf("%s-%d:%s\n",__FUNCTION__,__LINE__,strerror(errno));
 		printf("cannot read flash, rc=%d\n", rc);
 
 		cmplt_pkt->cyc = ESPI_FLASH_UNSUC_CMPLT;
@@ -124,7 +143,10 @@ static int espi_safs_read(uint8_t tag, uint32_t addr, uint32_t len)
 
 		rc = ioctl(safs_ctx->dev_fd, ASPEED_ESPI_FLASH_PUT_TX, &ioc);
 		if (rc)
+		{
+			printf("%s-%d:%s\n",__FUNCTION__,__LINE__,strerror(errno));
 			printf("ASPEED_ESPI_FLASH_PUT_TX ioctl failed with rc=%d\n", rc);
+		}
 
 		goto free_n_out;
 	}
@@ -141,6 +163,7 @@ static int espi_safs_read(uint8_t tag, uint32_t addr, uint32_t len)
 
 		rc = ioctl(safs_ctx->dev_fd, ASPEED_ESPI_FLASH_PUT_TX, &ioc);
 		if (rc) {
+			printf("%s-%d:%s\n",__FUNCTION__,__LINE__,strerror(errno));
 			printf("ASPEED_ESPI_FLASH_PUT_TX ioctl failed with rc=%d\n", rc);
 			goto free_n_out;
 		}
@@ -158,6 +181,7 @@ static int espi_safs_read(uint8_t tag, uint32_t addr, uint32_t len)
 
 		rc = ioctl(safs_ctx->dev_fd, ASPEED_ESPI_FLASH_PUT_TX, &ioc);
 		if (rc) {
+			printf("%s-%d:%s\n",__FUNCTION__,__LINE__,strerror(errno));
 			printf("ASPEED_ESPI_FLASH_PUT_TX ioctl failed with rc=%d\n", rc);
 			goto free_n_out;
 		}
@@ -178,6 +202,7 @@ static int espi_safs_read(uint8_t tag, uint32_t addr, uint32_t len)
 
 			rc = ioctl(safs_ctx->dev_fd, ASPEED_ESPI_FLASH_PUT_TX, &ioc);
 			if (rc) {
+				printf("%s-%d:%s\n",__FUNCTION__,__LINE__,strerror(errno));
 				printf("ASPEED_ESPI_FLASH_PUT_TX ioctl failed with rc=%d\n", rc);
 				goto free_n_out;
 			}
@@ -198,6 +223,7 @@ static int espi_safs_read(uint8_t tag, uint32_t addr, uint32_t len)
 
 		rc = ioctl(safs_ctx->dev_fd, ASPEED_ESPI_FLASH_PUT_TX, &ioc);
 		if (rc) {
+			printf("%s-%d:%s\n",__FUNCTION__,__LINE__,strerror(errno));
 			printf("ASPEED_ESPI_FLASH_PUT_TX ioctl failed with rc=%d\n", rc);
 			goto free_n_out;
 		}
@@ -212,12 +238,16 @@ free_n_out:
 static int espi_safs_write(uint8_t tag, uint32_t addr, uint32_t len, uint8_t *buf)
 {
 	int rc = 0;
+	int i =0;
 	struct aspeed_espi_ioc ioc;
 	struct espi_flash_cmplt cmplt_pkt;
 
 	rc = flash_write(addr, (len)? len : ESPI_PLD_LEN_MAX, buf);
 	if (rc < 0)
+	{
+		printf("%s-%d:%s\n",__FUNCTION__,__LINE__,strerror(errno));
 		printf("cannot write flash, rc=%d\n", rc);
+	}
 
 	cmplt_pkt.cyc = (rc < 0)? ESPI_FLASH_UNSUC_CMPLT : ESPI_FLASH_SUC_CMPLT;
 	cmplt_pkt.tag = tag;
@@ -227,12 +257,21 @@ static int espi_safs_write(uint8_t tag, uint32_t addr, uint32_t len, uint8_t *bu
 	ioc.pkt_len = sizeof(cmplt_pkt);
 	ioc.pkt = (uint8_t *)&cmplt_pkt;
 
-	rc = ioctl(safs_ctx->dev_fd, ASPEED_ESPI_FLASH_PUT_TX, &ioc);
-	if (rc) {
-		printf("ASPEED_ESPI_FLASH_PUT_TX ioctl failed, rc=%d\n", rc);
-		return rc;
+	for(i =0 ; i< RETRY_MAX; i++)
+	{
+		rc = ioctl(safs_ctx->dev_fd, ASPEED_ESPI_FLASH_PUT_TX, &ioc);
+		if (rc) {
+			printf("%s-%d:%s\n",__FUNCTION__,__LINE__,strerror(errno));
+			printf("ASPEED_ESPI_FLASH_PUT_TX ioctl failed, rc=%d\n", rc);
+			usleep(DELAY_MS);
+		}
+		else
+			return rc;
 	}
-
+	if (rc) {
+		printf("%s-%d:%s\n",__FUNCTION__,__LINE__,strerror(errno));
+		printf("Retries exhausted for 0x%x. ASPEED_ESPI_FLASH_PUT_TX ioctl failed, rc=%d\n", addr, rc);
+	}
 	return rc;
 }
 
@@ -254,6 +293,7 @@ static int espi_safs_erase(uint8_t tag, uint32_t addr, uint32_t len)
 
 	rc = ioctl(safs_ctx->dev_fd, ASPEED_ESPI_FLASH_PUT_TX, &ioc);
 	if (rc) {
+		printf("%s-%d:%s\n",__FUNCTION__,__LINE__,strerror(errno));
 		printf("ASPEED_ESPI_FLASH_PUT_TX ioctl failed, rc=%d\n", rc);
 		return rc;
 	}
@@ -268,6 +308,7 @@ int main(int argc, char *argv[])
 	uint32_t cyc, tag, len, addr;
 	struct aspeed_espi_ioc ioc;
 	struct espi_flash_rwe *rwe_pkt;
+	safs_ctx->remap_mask = 0x00FFFFFF;
 
 	while ((opt=getopt_long(argc, argv, opt_short, opt_long, NULL)) != (char)-1) {
 		switch(opt) {
@@ -280,10 +321,21 @@ int main(int argc, char *argv[])
 		case 'm':
 			strcpy(safs_ctx->mtd_path, optarg);
 			break;
+		case 'b':
+			safs_ctx->remap_mask = (int)strtol(optarg, NULL, 16);
+			break;
+		case 'v':
+			verbose = 1;
+			break;
 		default:
 			print_usage(argc, argv);
 			return -1;
 		}
+	}
+
+	if (safs_ctx->remap_mask == 0) {
+		printf("invalid bitmask for remap address\n");
+		return -1;
 	}
 
 	rwe_pkt = (struct espi_flash_rwe *)malloc(ESPI_PKT_LEN_MAX);
@@ -314,6 +366,8 @@ int main(int argc, char *argv[])
 			safs_ctx->mtd_info.type,
 			safs_ctx->mtd_info.size,
 			safs_ctx->mtd_info.erasesize);
+	if (verbose)
+		printf("Remap Address Bitmask 0x%08X\n", safs_ctx->remap_mask);
 
 	ioc.pkt_len = ESPI_PKT_LEN_MAX;
 	ioc.pkt = (uint8_t *)rwe_pkt;
@@ -330,25 +384,36 @@ int main(int argc, char *argv[])
 		len = (rwe_pkt->len_h << 8) | (rwe_pkt->len_l & 0xff);
 		addr = bswap_32(rwe_pkt->addr_be);
 
-		printf("==== Receive RX Packet ====\n");
-		printf("cyc=0x%02x, tag=0x%02x, len=0x%04x, addr=0x%08x\n",
+		if (verbose) {
+			printf("==== Receive RX Packet ====\n");
+			printf("cyc=0x%02x, tag=0x%02x, len=0x%04x, addr=0x%08x\n",
 				cyc, tag, len, addr);
-		if (cyc == ESPI_FLASH_WRITE)
+		}
+		addr = addr & safs_ctx->remap_mask;
+		if (verbose) {
+			printf("==== Translated RX Packet ====\n");
+			printf("cyc=0x%02x, tag=0x%02x, len=0x%04x, addr=0x%08x\n",
+				cyc, tag, len, addr);
+		}
+		if (verbose && (cyc == ESPI_FLASH_WRITE))
 			print_hexdump(rwe_pkt->data, len);
 
 		switch (cyc) {
 		case ESPI_FLASH_READ:
 			rc = espi_safs_read(tag, addr, len);
+			if (rc || verbose)
 			printf("[%s] eSPI SAFS read addr=0x%08x, len=0x%04x, rc=%d\n",
 					(rc)? "FAIL" : "SUCC", addr, len, rc);
 			break;
 		case ESPI_FLASH_WRITE:
 			rc = espi_safs_write(tag, addr, len, rwe_pkt->data);
+			if (rc || verbose)
 			printf("[%s] eSPI SAFS write addr=0x%08x, len=0x%04x, rc=%d\n",
 					(rc)? "FAIL" : "SUCC", addr, len, rc);
 			break;
 		case ESPI_FLASH_ERASE:
 			rc = espi_safs_erase(tag, addr, len);
+			if (rc || verbose)
 			printf("[%s] eSPI SAFS erase addr=0x%08x, len=0x%04x, rc=%d\n",
 					(rc)? "FAIL" : "SUCC", addr, len, rc);
 			break;
