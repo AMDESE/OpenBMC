@@ -1,0 +1,56 @@
+From 0de26c4ddf916e78f1ed2db30ecc9a94f95adc5a Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Mon, 21 Aug 2023 01:49:24 -0500
+Subject: [PATCH 12/12] drivers:soc:aspeed: Increased DMA buffer size
+
+eSPI host uses 64KB blocks on flash erase requests.
+Increased DMA buffer size to 64K to handle block erase requests.
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+---
+ drivers/soc/aspeed/aspeed-espi-flash.h | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/soc/aspeed/aspeed-espi-flash.h b/drivers/soc/aspeed/aspeed-espi-flash.h
+index 1acb9877cb2c..88be5a648985 100644
+--- a/drivers/soc/aspeed/aspeed-espi-flash.h
++++ b/drivers/soc/aspeed/aspeed-espi-flash.h
+@@ -10,6 +10,7 @@
+ #define _ASPEED_ESPI_FLASH_H_
+
+ #define FLASH_MDEV_NAME	"aspeed-espi-flash"
++#define LEN_64K_BLOCK   (16 * PAGE_SIZE)
+
+ enum aspeed_espi_flash_safs_mode {
+ 	SAFS_MODE_MIX,
+@@ -332,14 +333,14 @@ static void *aspeed_espi_flash_alloc(struct device *dev, struct aspeed_espi_ctrl
+ 	if (espi_flash->dma_mode) {
+ 		dma = &espi_flash->dma;
+
+-		dma->tx_virt = dma_alloc_coherent(dev, PAGE_SIZE,
++		dma->tx_virt = dma_alloc_coherent(dev, LEN_64K_BLOCK,
+ 						  &dma->tx_addr, GFP_KERNEL);
+ 		if (!dma->tx_virt) {
+ 			dev_err(dev, "cannot allocate DMA TX buffer\n");
+ 			return ERR_PTR(-ENOMEM);
+ 		}
+
+-		dma->rx_virt = dma_alloc_coherent(dev, PAGE_SIZE,
++		dma->rx_virt = dma_alloc_coherent(dev, LEN_64K_BLOCK,
+ 						  &dma->rx_addr, GFP_KERNEL);
+ 		if (!dma->rx_virt) {
+ 			dev_err(dev, "cannot allocate DMA RX buffer\n");
+@@ -367,8 +368,8 @@ static void aspeed_espi_flash_free(struct device *dev, struct aspeed_espi_flash
+ 	struct aspeed_espi_flash_dma *dma = &espi_flash->dma;
+
+ 	if (espi_flash->dma_mode) {
+-		dma_free_coherent(dev, PAGE_SIZE, dma->tx_virt, dma->tx_addr);
+-		dma_free_coherent(dev, PAGE_SIZE, dma->rx_virt, dma->rx_addr);
++		dma_free_coherent(dev, LEN_64K_BLOCK, dma->tx_virt, dma->tx_addr);
++		dma_free_coherent(dev, LEN_64K_BLOCK, dma->rx_virt, dma->rx_addr);
+ 	}
+
+ 	mutex_destroy(&espi_flash->put_tx_mtx);
+--
+2.17.1
+
