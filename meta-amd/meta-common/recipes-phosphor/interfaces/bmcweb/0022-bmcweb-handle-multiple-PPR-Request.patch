@@ -1,0 +1,36 @@
+From 5db9281affc84aaa36947341cf59ef44e04dc591 Mon Sep 17 00:00:00 2001
+From: Mohsen Dolaty <mohsen.dolaty@amd.com>
+Date: Tue, 22 Aug 2023 20:31:48 -0500
+Subject: [PATCH 1/1] bmcweb: handle multiple PPR Request
+
+Will handle multiple PPR Requests for DIMM CECC error
+Repair processing via Redfish
+
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
+---
+ redfish-core/lib/log_services.hpp | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/redfish-core/lib/log_services.hpp b/redfish-core/lib/log_services.hpp
+index 5482e0f1..3e7e504b 100644
+--- a/redfish-core/lib/log_services.hpp
++++ b/redfish-core/lib/log_services.hpp
+@@ -3980,7 +3980,6 @@ private:
+       uint16_t RepairEntryNum;
+       uint16_t SocNum;
+       uint16_t Index = 0;
+-      std::vector<uint16_t> Payload;
+       nlohmann::json jsonRequest;
+
+       if (!json_util::processJsonFromRequest(asyncResp->res, req,
+@@ -3990,6 +3989,8 @@ private:
+       }
+
+       for (auto &el : jsonRequest["pprDataIn"].items()) {
++        std::vector<uint16_t> Payload;
++
+         BMCWEB_LOG_INFO << "Key " << el.key();
+         BMCWEB_LOG_INFO << "value " << el.value();
+
+--
+2.25.1
