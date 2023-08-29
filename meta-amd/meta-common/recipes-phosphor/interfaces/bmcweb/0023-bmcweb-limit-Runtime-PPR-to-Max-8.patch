@@ -1,0 +1,72 @@
+From c4ae9f362e2b6540b507f529d3f7313d862667ad Mon Sep 17 00:00:00 2001
+From: Mohsen Dolaty <mohsen.dolaty@amd.com>
+Date: Tue, 29 Aug 2023 18:22:54 -0500
+Subject: [PATCH 1/1] BMCWEB: limit Runtime PPR to Max 8
+
+Limit the number of Runtime PPR entries for a single JSON file to
+Maximum of 8 entries
+
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
+---
+ redfish-core/lib/log_services.hpp | 23 +++++++++++++++++++----
+ 1 file changed, 19 insertions(+), 4 deletions(-)
+
+diff --git a/redfish-core/lib/log_services.hpp b/redfish-core/lib/log_services.hpp
+index 3e7e504b..fac01c2c 100644
+--- a/redfish-core/lib/log_services.hpp
++++ b/redfish-core/lib/log_services.hpp
+@@ -38,6 +38,9 @@
+ #include <variant>
+ #include <string>
+
++#define MAX_RUNTIME_PPR_CNT      (8)
++#define PPR_TYPE_BOOTTIME_MASK   (0x8000)
++
+ namespace redfish
+ {
+
+@@ -3980,26 +3983,38 @@ private:
+       uint16_t RepairEntryNum;
+       uint16_t SocNum;
+       uint16_t Index = 0;
++      uint16_t RuntimeIndex = 0;
+       nlohmann::json jsonRequest;
+
+       if (!json_util::processJsonFromRequest(asyncResp->res, req,
+           jsonRequest)) {
+-        BMCWEB_LOG_DEBUG << "Json value not readable";
++        BMCWEB_LOG_ERROR << "Error: Json value not readable";
++        messages::malformedJSON(asyncResp->res);
+         return;
+       }
+
+       for (auto &el : jsonRequest["pprDataIn"].items()) {
+         std::vector<uint16_t> Payload;
+
+-        BMCWEB_LOG_INFO << "Key " << el.key();
+-        BMCWEB_LOG_INFO << "value " << el.value();
++        BMCWEB_LOG_DEBUG << "Key " << el.key();
++        BMCWEB_LOG_DEBUG << "value " << el.value();
+
+         if (!json_util::readJson(el.value(), asyncResp->res, "RepairType",
+             RepairType, "RepairEntryNum", RepairEntryNum, "SocNum",
+-          SocNum, "Payload", Payload)) {
++            SocNum, "Payload", Payload)) {
++          BMCWEB_LOG_ERROR << "Error: Issue with Json value read";
++          messages::malformedJSON(asyncResp->res);
+           return;
+         }
+
++        if ((RepairType & PPR_TYPE_BOOTTIME_MASK) == 0) {
++          RuntimeIndex++;
++          if(RuntimeIndex > MAX_RUNTIME_PPR_CNT) {
++            BMCWEB_LOG_ERROR << "Error: Exceed Runtime PPR Max Entry of 8";
++            messages::invalidObject(asyncResp->res, "Runtime PPR entries exceed PPR Max Entry of 8");
++            return;
++	  }
++	}
+         setPostPackageRepairData(asyncResp, Index, RepairEntryNum, RepairType,
+             SocNum, Payload);
+         Index++;
+--
+2.25.1

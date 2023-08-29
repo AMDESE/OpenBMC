@@ -27,5 +27,6 @@ SRC_URI += "file://0001-Reset-server-settings-only-changes-to-invoke-CMOS.patch 
             file://0020-Redfish-support-for-Dimm-Fru-Text.patch \
             file://0021-bmcweb-Turin-Add-PPR-Redfish-support.patch \
             file://0022-bmcweb-handle-multiple-PPR-Request.patch \
+            file://0023-bmcweb-limit-Runtime-PPR-to-Max-8.patch \
             "
 
