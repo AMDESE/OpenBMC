@@ -65,4 +65,5 @@ SRC_URI += "file://amd-bmc-baseline.cfg \
             file://0062-DTS-changes-to-map-GPIO-line-P0_PRESENT_L-and-P1_PRE.patch \
             file://0063-ARM-dts-aspeed-Enabled-BMC-device-for-I3c-DTS-file.patch \
             file://0064-drivers-soc-aspeed-Increased-DMA-buffer-size.patch \
+            file://0065-ARM-dts-aspeed-Add-Turin-U3-i2c-buses.patch \
            "
