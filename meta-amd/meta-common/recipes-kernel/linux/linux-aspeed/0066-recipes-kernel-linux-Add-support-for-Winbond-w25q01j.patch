@@ -1,0 +1,30 @@
+From 85d5f33f6f32cfe49decb9227030c78b303fe171 Mon Sep 17 00:00:00 2001
+From: Ashok Kumar <ashok2.kumar@amd.com>
+Date: Wed, 6 Sep 2023 14:11:19 -0500
+Subject: [PATCH 1/1] recipes-kernel/linux: Add support for Winbond w25q01jv-iq
+ flash chip
+
+Adds support for Winbond w25q01jv-iq flash chip.
+Jamaica uses Winbond w25q01jv-iq flash for BMC image.
+
+Signed-off-by: Ashok Kumar <ashok2.kumar@amd.com>
+---
+ drivers/mtd/spi-nor/winbond.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/mtd/spi-nor/winbond.c b/drivers/mtd/spi-nor/winbond.c
+index e4cfa78c9f0f..28082725ffe0 100644
+--- a/drivers/mtd/spi-nor/winbond.c
++++ b/drivers/mtd/spi-nor/winbond.c
+@@ -99,6 +99,8 @@ static const struct flash_info winbond_parts[] = {
+ 			SPI_NOR_HAS_LOCK | SPI_NOR_HAS_TB) },
+ 	{ "w25m512jv", INFO(0xef7119, 0, 64 * 1024, 1024,
+ 			    SECT_4K | SPI_NOR_QUAD_READ | SPI_NOR_DUAL_READ) },
++	{ "w25q01jv-iq", INFO(0xef4021, 0, 64 * 1024, 2048,
++			    SECT_4K | SPI_NOR_QUAD_READ | SPI_NOR_DUAL_READ) },
+ };
+
+ /**
+--
+2.25.1
+
