@@ -67,4 +67,5 @@ SRC_URI += "file://amd-bmc-baseline.cfg \
             file://0064-drivers-soc-aspeed-Increased-DMA-buffer-size.patch \
             file://0065-ARM-dts-aspeed-Add-Turin-U3-i2c-buses.patch \
             file://0066-recipes-kernel-linux-Add-support-for-Winbond-w25q01j.patch \
+            file://0067-Add-MPS-driver-for-Purico-VR-in-dts.patch \
            "

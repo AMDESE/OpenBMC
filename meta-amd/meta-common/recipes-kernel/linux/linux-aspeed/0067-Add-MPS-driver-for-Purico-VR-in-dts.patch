@@ -1,0 +1,40 @@
+From 58886d9f609dc5a704d90ca306068b7a71ba9813 Mon Sep 17 00:00:00 2001
+From: Abinaya Dhandapani <Abinaya.Dhandapani@amd.com>
+Date: Thu, 14 Sep 2023 01:19:25 -0500
+Subject: [PATCH] Add MPS driver for Purico VR's in dts
+
+Signed-off-by: Abinaya Dhandapani <Abinaya.Dhandapani@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-purico.dts     | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
+index 09564cd8c7ae..c8829d613c46 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
+@@ -236,7 +236,7 @@ vddcr_core1_11@62 {
+
+ 			vddcr_vddio_33@63 {
+ 				//VDD 11 sus
+-				compatible = "isil,isl68137";
++				compatible = "mps,mp2857";
+ 				reg = <0x63>;
+ 			};
+ 		};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+index 2ac25801e980..cd2080a6ea72 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+@@ -236,7 +236,7 @@ vddcr_core1_11@62 {
+
+ 			vddcr_vddio_33@63 {
+ 				//VDD 11 sus
+-				compatible = "isil,isl68137";
++				compatible = "mps,mp2857";
+ 				reg = <0x63>;
+ 			};
+ 		};
+--
+2.25.1
+
