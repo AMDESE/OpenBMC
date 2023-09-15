@@ -5,8 +5,10 @@ LICENSE = "CLOSED"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}:"
 
+inherit meson
+inherit pkgconfig
+inherit systemd
 inherit phosphor-mapper
-inherit cmake pkgconfig systemd
 
 def get_service(d):
     return "com.amd.crashdump.service"
