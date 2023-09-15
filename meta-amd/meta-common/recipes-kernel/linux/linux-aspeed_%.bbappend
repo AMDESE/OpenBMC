@@ -34,7 +34,6 @@ SRC_URI += "file://amd-bmc-baseline.cfg \
             file://0031-ARM-dts-aspeed-Initial-device-tree-for-AMD-G304-Plat.patch \
             file://0032-ARM-dts-aspeed-Add-Volcano-sensors.patch \
             file://0033-ARM-dts-aspeed-APML-over-I2C.patch \
-            file://0034-drivers-usb-gadget-aspeed-virtual-hub-updates.patch \
             file://0035-ARM-dts-aspeed-Add-Turin-Lenovo-UBM.patch \
             file://0036-ARM-dts-aspeed-Turin-APML-over-i2c-i3c-DTS-changes.patch \
             file://0037-ARM-dts-aspeed-SP5-APML-over-i2c-i3c.patch \
