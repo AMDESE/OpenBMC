@@ -68,4 +68,5 @@ SRC_URI += "file://amd-bmc-baseline.cfg \
             file://0066-recipes-kernel-linux-Add-support-for-Winbond-w25q01j.patch \
             file://0067-Add-MPS-driver-for-Purico-VR-in-dts.patch \
             file://0068-Add-MP2857-VR-driver.patch \
+            file://0069-linux-speed-Remove-debug-prints-from-i3c-driver.patch \
            "
