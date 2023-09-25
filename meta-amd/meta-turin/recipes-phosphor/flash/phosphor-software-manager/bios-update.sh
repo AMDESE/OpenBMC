@@ -26,6 +26,14 @@ LANAI_SPI_DEV="1e630000.spi"
 SPI_DEV="1e631000.spi"
 SPI_PATH="/sys/bus/platform/drivers/aspeed-smc"
 
+get_mtd_info() {
+	mtd_num=1000    #/if spi is not detected, default to mtd1000 and fail
+	spi_part=$(basename `find $SPI_PATH/$1/mtd/ -type d -maxdepth 1 | grep "mtd[6-9]$"`)
+	mbsize=$(expr `cat $SPI_PATH/$1/mtd/*/size` / 1048576) # convert to MB (divide by 1024*1024)
+	echo "SPI size: $mbsize MB"
+	mtd_num=$spi_part
+}
+
 power_status() {
 	st=$(busctl get-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis CurrentPowerState | cut -d"." -f6)
 	if [ "$st" == "On\"" ]; then
@@ -197,7 +205,7 @@ flash_image_to_mtd() {
 		echo "Bios image is $IMAGE_FILE"
 		# mtd7 - motherboard local spi (after bind)
 		# mtd6 - already bound lanai spi (refer line no 281)
-		for d in mtd7 mtd6 ; do
+		for d in $mtd_num ; do
 			if [ -e "/dev/$d" ]; then
 				mtd=`cat /sys/class/mtd/$d/name`
 				if [ $mtd == "pnor" ]; then
@@ -261,6 +269,7 @@ fi
 sleep 1
 
 #Flashcp image to device.
+get_mtd_info $SPI_DEV
 flash_image_to_mtd
 
 #Unbind spi driver
@@ -277,6 +286,7 @@ sleep 1
 # Lanai flash start--------------------------
 # (ignore errors but capture return status)
 lanai_ret=0
+get_mtd_info $LANAI_SPI_DEV
 flash_image_to_mtd || lanai_ret=$?
 echo "Lanai flashcp status: $lanai_ret"
 sleep 1
