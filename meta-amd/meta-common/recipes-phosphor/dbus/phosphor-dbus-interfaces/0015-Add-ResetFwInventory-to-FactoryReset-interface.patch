@@ -1,0 +1,23 @@
+From 91e1b6afe787c22714aa6aed43a01707a2905ef4 Mon Sep 17 00:00:00 2001
+From: Abinaya Dhandapani <Abinaya.Dhandapani@amd.com>
+Date: Tue, 3 Oct 2023 07:10:23 -0500
+Subject: [PATCH] Add ResetFwInventory property to FactoryReset interface
+
+Signed-off-by: Abinaya Dhandapani <Abinaya.Dhandapani@amd.com>
+---
+ xyz/openbmc_project/Common/FactoryReset.interface.yaml | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/xyz/openbmc_project/Common/FactoryReset.interface.yaml b/xyz/openbmc_project/Common/FactoryReset.interface.yaml
+index 93943f9..50df750 100644
+--- a/xyz/openbmc_project/Common/FactoryReset.interface.yaml
++++ b/xyz/openbmc_project/Common/FactoryReset.interface.yaml
+@@ -6,3 +6,8 @@ methods:
+           Generic method to start factory reset. Implemented by each service.
+       errors:
+         - xyz.openbmc_project.Common.Error.InternalFailure
++properties:
++    - name: ResetFwInventory
++      type: boolean
++      description: >
++          If this field is true, all the firmware versions will be reset after factory reset
