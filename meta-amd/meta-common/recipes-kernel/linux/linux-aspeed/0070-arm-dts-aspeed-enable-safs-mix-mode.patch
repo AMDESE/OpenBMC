@@ -1,0 +1,182 @@
+From fcb0371b263e5cc5c5304bcf1e1b8ca576241278 Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Fri, 29 Sep 2023 05:53:21 -0500
+Subject: [PATCH] arm:dts:aspeed: enable safs mix mode
+
+Changed SAFS mode from hardware to mixed mode for Turin platforms
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts     | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts  | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-galena.dts      | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts  | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts      | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts  | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-purico.dts      | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts     | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts     | 2 +-
+ 12 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
+index b562033bf550..41d84e2852a9 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
+@@ -1092,7 +1092,7 @@
+
+ 	/* SAFS - Hw mode */
+ 	flash,dma-mode;
+-	flash,safs-mode = <0x2>;
++	flash,safs-mode = <0x00>;
+ };
+
+ &espi_mmbi {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
+index 7c546b37fc44..47b9cef218af 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
+@@ -1080,7 +1080,7 @@
+
+ 	/* SAFS - Hw mode */
+ 	flash,dma-mode;
+-	flash,safs-mode = <0x2>;
++	flash,safs-mode = <0x00>;
+ };
+
+ &espi_mmbi {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts
+index c4832f8a3aae..e1231c69b611 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts
+@@ -773,7 +773,7 @@
+
+ 	/* SAFS - Hw mode */
+ 	flash,dma-mode;
+-	flash,safs-mode = <0x2>;
++	flash,safs-mode = <0x00>;
+ };
+
+ &espi_mmbi {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts b/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
+index 097db6bbd5e5..dc728a50ef4b 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
+@@ -767,7 +767,7 @@
+
+ 	/* SAFS - Hw mode */
+ 	flash,dma-mode;
+-	flash,safs-mode = <0x2>;
++	flash,safs-mode = <0x00>;
+ };
+
+ &espi_mmbi {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts
+index 154fff9aff5c..440152894139 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts
+@@ -1092,7 +1092,7 @@
+
+ 	/* SAFS - Hw mode */
+ 	flash,dma-mode;
+-	flash,safs-mode = <0x2>;
++	flash,safs-mode = <0x00>;
+ };
+
+ &espi_mmbi {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts b/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
+index a247d238bb89..df879037d116 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
+@@ -1080,7 +1080,7 @@
+
+ 	/* SAFS - Hw mode */
+ 	flash,dma-mode;
+-	flash,safs-mode = <0x2>;
++	flash,safs-mode = <0x00>;
+ };
+
+ &espi_mmbi {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
+index c8829d613c46..36bbd832f6e2 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
+@@ -1056,7 +1056,7 @@
+
+ 	/* SAFS - Hw mode */
+ 	flash,dma-mode;
+-	flash,safs-mode = <0x2>;
++	flash,safs-mode = <0x00>;
+ };
+
+ &espi_mmbi {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+index cd2080a6ea72..413fcdba8597 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+@@ -1050,7 +1050,7 @@
+
+ 	/* SAFS - Hw mode */
+ 	flash,dma-mode;
+-	flash,safs-mode = <0x2>;
++	flash,safs-mode = <0x00>;
+ };
+
+ &espi_mmbi {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts
+index 4cb5aba065b0..d6777f54bf17 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts
+@@ -773,7 +773,7 @@
+
+ 	/* SAFS - Hw mode */
+ 	flash,dma-mode;
+-	flash,safs-mode = <0x2>;
++	flash,safs-mode = <0x00>;
+ };
+
+ &espi_mmbi {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts b/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
+index c249458fb68e..1d2c8ec841ff 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
+@@ -767,7 +767,7 @@
+
+ 	/* SAFS - Hw mode */
+ 	flash,dma-mode;
+-	flash,safs-mode = <0x2>;
++	flash,safs-mode = <0x00>;
+ };
+
+ &espi_mmbi {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts
+index be97eaaf2f97..3a3e5b5b83c9 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts
+@@ -1192,7 +1192,7 @@
+
+ 	/* SAFS - Hw mode */
+ 	flash,dma-mode;
+-	flash,safs-mode = <0x2>;
++	flash,safs-mode = <0x00>;
+ };
+
+ &espi_mmbi {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts b/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
+index 809483957cfe..49ff1d8aa618 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
+@@ -1180,7 +1180,7 @@
+
+ 	/* SAFS - Hw mode */
+ 	flash,dma-mode;
+-	flash,safs-mode = <0x2>;
++	flash,safs-mode = <0x00>;
+ };
+
+ &espi_mmbi {
+--
+2.17.1
+
