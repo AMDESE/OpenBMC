@@ -1,0 +1,68 @@
+From b30fd384d22309ed002317168a38a83e796b00d9 Mon Sep 17 00:00:00 2001
+From: Abinaya Dhandapani <Abinaya.Dhandapani@amd.com>
+Date: Tue, 3 Oct 2023 06:56:22 -0500
+Subject: [PATCH] Preserve firmware inventory on factory reset
+
+Signed-off-by: Abinaya Dhandapani <Abinaya.Dhandapani@amd.com>
+---
+ item_updater.cpp               | 5 ++++-
+ item_updater_helper.hpp        | 2 +-
+ static/item_updater_helper.cpp | 8 +++++++-
+ 3 files changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/item_updater.cpp b/item_updater.cpp
+index f19e130..ccee882 100644
+--- a/item_updater.cpp
++++ b/item_updater.cpp
+@@ -536,7 +536,10 @@ void ItemUpdater::freePriority(uint8_t value, const std::string& versionId)
+
+ void ItemUpdater::reset()
+ {
+-    helper.factoryReset();
++
++    bool FwVersionReset = resetFwInventory();
++
++    helper.factoryReset(FwVersionReset);
+
+     log<level::INFO>("BMC factory reset will take effect upon reboot.");
+ }
+diff --git a/item_updater_helper.hpp b/item_updater_helper.hpp
+index 2aeeb23..452ac19 100644
+--- a/item_updater_helper.hpp
++++ b/item_updater_helper.hpp
+@@ -46,7 +46,7 @@ class Helper
+     void cleanup();
+
+     /** @brief Do factory reset */
+-    void factoryReset();
++    void factoryReset(bool);
+
+     /** @brief Remove the image with the version id
+      *
+diff --git a/static/item_updater_helper.cpp b/static/item_updater_helper.cpp
+index e837d7d..45194af 100644
+--- a/static/item_updater_helper.cpp
++++ b/static/item_updater_helper.cpp
+@@ -25,8 +25,9 @@ void Helper::cleanup()
+     // Empty
+ }
+
+-void Helper::factoryReset()
++void Helper::factoryReset(bool ResetFwVersions)
+ {
++
+     // Redfish Managers.ResetAll is expected to handle reset
+     // of both Host and BMC settings
+     utils::execute("/usr/sbin/amd-clear-cmos.sh","Y");
+@@ -37,6 +38,11 @@ void Helper::factoryReset()
+     // Set openbmconce=factory-reset env in U-Boot.
+     // The init will cleanup rwfs during boot.
+     utils::execute("/sbin/fw_setenv", "openbmconce", "factory-reset");
++
++    if(ResetFwVersions == false)
++    {
++        utils::execute("/sbin/fw_setenv", "fw_version", "preserve");
++    }
+ }
+
+ void Helper::removeVersion(const std::string& /* versionId */)

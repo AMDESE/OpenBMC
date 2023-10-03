@@ -20,6 +20,7 @@ SRC_URI += "file://bios-update.sh \
             file://0015-phosphor-software-manager-LCD-clean-BMC-version.patch \
             file://0016-Added-support-for-VR-Bundle-firmware-update.patch \
             file://0017-recipes-phosphor-flash-Add-support-for-backplane-upd.patch \
+            file://0018-Preserve-firmware-inventory-on-factory-reset.patch \
             "
 
 DEPENDS += "amd-lcd-lib"
