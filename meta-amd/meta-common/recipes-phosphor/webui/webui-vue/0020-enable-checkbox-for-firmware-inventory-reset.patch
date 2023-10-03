@@ -1,0 +1,127 @@
+From 4b5532043bd9945e8be70be34a0a309da508e099 Mon Sep 17 00:00:00 2001
+From: Abinaya Dhandapani <Abinaya.Dhandapani@amd.com>
+Date: Tue, 3 Oct 2023 07:28:26 -0500
+Subject: [PATCH] Enable checkbox for firmware inventory reset
+
+Signed-off-by: Abinaya Dhandapani <Abinaya.Dhandapani@amd.com>
+---
+ src/locales/en-US.json                        |  8 +++--
+ .../modules/Operations/FactoryResetStore.js   | 13 ++++++++
+ .../Operations/FactoryReset/FactoryReset.vue  | 33 +++++++++++++++++++
+ 3 files changed, 52 insertions(+), 2 deletions(-)
+
+diff --git a/src/locales/en-US.json b/src/locales/en-US.json
+index f774b54..580e4e3 100644
+--- a/src/locales/en-US.json
++++ b/src/locales/en-US.json
+@@ -289,7 +289,9 @@
+       "resetBiosOptionLabel": "Reset server settings only",
+       "resetBiosOptionHelperText": "Resets firmware settings including: Platform keystore, partition NVRAM, and partition configurations.",
+       "resetToDefaultsOptionLabel": "Reset BMC and server settings",
+-      "resetToDefaultsOptionHelperText": "In addition to server settings, this option resets BMC settings, including: all BMC account data, all changed passwords, all policies, LDAP configurations, network addresses, and time of day."
++      "resetToDefaultsOptionHelperText": "In addition to server settings, this option resets BMC settings, including: all BMC account data, all changed passwords, all policies, LDAP configurations, network addresses, and time of day.",
++      "resetFwInventoryLabel":"Firmware inventory setting",
++      "resetFwInventoryData": "Reset Firmware Inventory"
+     },
+     "modal": {
+       "resetBiosTitle": "Reset server settings",
+@@ -316,7 +318,9 @@
+       "resetBiosSuccess": "Factory reset of server settings successful.",
+       "resetBiosError": "Factory reset of server settings failed.",
+       "resetToDefaultsSuccess": "Factory reset of BMC and server settings successful.",
+-      "resetToDefaultsError": "Factory reset of BMC and server settings failed."
++      "resetToDefaultsError": "Factory reset of BMC and server settings failed.",
++      "resetFwInventorySuccess": "Reset of Firmware Inventory successful",
++      "resetFwInventoryError": "Reset of Firmware Inventory failed"
+     }
+   },
+   "pageFirmware": {
+diff --git a/src/store/modules/Operations/FactoryResetStore.js b/src/store/modules/Operations/FactoryResetStore.js
+index 8118cf7..9e07f6c 100644
+--- a/src/store/modules/Operations/FactoryResetStore.js
++++ b/src/store/modules/Operations/FactoryResetStore.js
+@@ -26,6 +26,19 @@ const FactoryResetStore = {
+           throw new Error(i18n.t('pageFactoryReset.toast.resetBiosError'));
+         });
+     },
++    async resetFwInventory() {
++      return await api
++        .post('/redfish/v1/Managers/bmc/Actions/Manager.ResetFwInventory', {
++          ResetFwInventory: true,
++        })
++        .then(() => i18n.t('pageFactoryReset.toast.resetFwInventorySuccess'))
++        .catch((error) => {
++          console.log('Factory Reset: ', error);
++          throw new Error(
++            i18n.t('pageFactoryReset.toast.resetFwInventoryError')
++          );
++        });
++    },
+   },
+ };
+
+diff --git a/src/views/Operations/FactoryReset/FactoryReset.vue b/src/views/Operations/FactoryReset/FactoryReset.vue
+index 897348f..73168b6 100644
+--- a/src/views/Operations/FactoryReset/FactoryReset.vue
++++ b/src/views/Operations/FactoryReset/FactoryReset.vue
+@@ -26,6 +26,7 @@
+
+               <b-form-radio
+                 class="mb-1"
++                v-model="resetToDefaultsSelected"
+                 value="resetToDefaults"
+                 aria-describedby="reset-to-defaults"
+                 data-test-id="factoryReset-radio-resetToDefaults"
+@@ -37,6 +38,21 @@
+                   $t('pageFactoryReset.form.resetToDefaultsOptionHelperText')
+                 }}
+               </b-form-text>
++
++              <div v-if="resetOption === 'resetToDefaults'">
++                <b-form-checkbox
++                  v-model="ResetFwInventoryChecked"
++                  class="mb-2"
++                  value="resetFwInventory"
++                  aria-describedby="reset-fw-inventory"
++                  data-test-id="factoryReset-radio-resetFwInventory"
++                >
++                  {{ $t('pageFactoryReset.form.resetFwInventoryData') }}
++                </b-form-checkbox>
++                <b-form-text id="reset-fw-inventory" class="ml-4 mb-3">
++                  {{ $t('pageFactoryReset.form.resetFwInventoryLabel') }}
++                </b-form-text>
++              </div>
+             </b-form-radio-group>
+           </b-form-group>
+           <b-button
+@@ -81,6 +97,9 @@ export default {
+       if (this.resetOption == 'resetBios') {
+         this.onResetBiosConfirm();
+       } else {
++        if (this.ResetFwInventoryChecked == 'resetFwInventory') {
++          this.onResetFwInventoryConfirm();
++        }
+         this.onResetToDefaultsConfirm();
+       }
+     },
+@@ -112,6 +131,20 @@ export default {
+           });
+         });
+     },
++    onResetFwInventoryConfirm() {
++      this.$store
++        .dispatch('factoryReset/resetFwInventory')
++        .then((title) => {
++          this.successToast('', {
++            title,
++          });
++        })
++        .catch(({ message }) => {
++          this.errorToast('', {
++            title: message,
++          });
++        });
++    },
+   },
+ };
+ </script>

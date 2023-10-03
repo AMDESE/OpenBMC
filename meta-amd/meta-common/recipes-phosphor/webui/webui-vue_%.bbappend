@@ -21,4 +21,5 @@ SRC_URI += "file://0001-webvue-ui-Support-HPM-and-SCM-FPGA-firmware-updates.patc
             file://0017-webui-changes-to-support-vrbundle-update.patch \
             file://0018-Fixed-skip-count-logic-in-webui-vue.patch \
             file://0019-webui-vue-Add-FPGA-image-update-notification.patch \
+            file://0020-enable-checkbox-for-firmware-inventory-reset.patch \
             "
