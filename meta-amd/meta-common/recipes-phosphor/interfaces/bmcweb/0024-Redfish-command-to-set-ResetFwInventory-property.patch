@@ -1,0 +1,85 @@
+From f33ff63eacd50180bd77fac5d904703e45d6bd84 Mon Sep 17 00:00:00 2001
+From: Abinaya Dhandapani <Abinaya.Dhandapani@amd.com>
+Date: Tue, 3 Oct 2023 07:18:01 -0500
+Subject: [PATCH] Redfish command to set ResetFwInventory property
+
+Signed-off-by: Abinaya Dhandapani <Abinaya.Dhandapani@amd.com>
+---
+ redfish-core/include/redfish.hpp |  1 +
+ redfish-core/lib/managers.hpp    | 51 ++++++++++++++++++++++++++++++++
+ 2 files changed, 52 insertions(+)
+
+diff --git a/redfish-core/include/redfish.hpp b/redfish-core/include/redfish.hpp
+index cb9f5b29..33e3ed81 100644
+--- a/redfish-core/include/redfish.hpp
++++ b/redfish-core/include/redfish.hpp
+@@ -80,6 +80,7 @@ class RedfishService
+         nodes.emplace_back(std::make_unique<ManagerResetAction>(app));
+         nodes.emplace_back(std::make_unique<ManagerResetActionInfo>(app));
+         nodes.emplace_back(std::make_unique<ManagerResetToDefaultsAction>(app));
++        nodes.emplace_back(std::make_unique<ManagerResetFwInventoryAction>(app));
+         nodes.emplace_back(std::make_unique<Power>(app));
+         nodes.emplace_back(std::make_unique<ChassisCollection>(app));
+         nodes.emplace_back(std::make_unique<Chassis>(app));
+diff --git a/redfish-core/lib/managers.hpp b/redfish-core/lib/managers.hpp
+index 67f8d990..f551def1 100644
+--- a/redfish-core/lib/managers.hpp
++++ b/redfish-core/lib/managers.hpp
+@@ -222,6 +222,57 @@ class ManagerResetToDefaultsAction : public Node
+     }
+ };
+
++/**
++ * ManagerResetFwInventoryAction class supports POST method for reset Firmware Inventory
++ * action.
++ */
++
++class ManagerResetFwInventoryAction : public Node
++{
++  public:
++    ManagerResetFwInventoryAction(App& app) :
++        Node(app, "/redfish/v1/Managers/bmc/Actions/Manager.ResetFwInventory/")
++    {
++        entityPrivileges = {
++            {boost::beast::http::verb::post, {{"ConfigureManager"}}}};
++    }
++
++  private:
++    void doPost(const std::shared_ptr<bmcweb::AsyncResp>& asyncResp,
++                const crow::Request& req,
++                const std::vector<std::string>&) override
++    {
++
++        bool ResetFwInventory;
++
++        if (!json_util::readJson(req, asyncResp->res, "ResetFwInventory",
++                                 ResetFwInventory))
++        {
++            BMCWEB_LOG_DEBUG << "Missing property ResetFwInventory";
++
++            messages::actionParameterMissing(asyncResp->res, "ResetFwInventory",
++                                             "ResetFwInventoryType");
++            return;
++        }
++
++        crow::connections::systemBus->async_method_call(
++            [asyncResp](const boost::system::error_code ec) {
++                if (ec)
++                {
++                    BMCWEB_LOG_DEBUG << "Failed to ResetFwInventory: " << ec;
++                    messages::internalError(asyncResp->res);
++                    return;
++                }
++                messages::success(asyncResp->res);
++            },
++            "xyz.openbmc_project.Software.BMC.Updater",
++            "/xyz/openbmc_project/software",
++            "org.freedesktop.DBus.Properties", "Set",
++            "xyz.openbmc_project.Common.FactoryReset", "ResetFwInventory",
++             std::variant<bool>(ResetFwInventory));
++    }
++};
++
+ /**
+  * ManagerResetActionInfo derived class for delivering Manager
+  * ResetType AllowableValues using ResetInfo schema.
