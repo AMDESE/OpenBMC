@@ -1,22 +1,23 @@
-From aab6ed0f0c8ccaf007cf30d43b0706f63dd7cc3d Mon Sep 17 00:00:00 2001
+From 2a8a1b3de566bbfcf852be875b2f3c59a414e8fb Mon Sep 17 00:00:00 2001
 From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
 Date: Fri, 16 Jun 2023 00:10:04 -0500
 Subject: [PATCH] u-boot: Add enable-gpios to mount Lanai flash
 
 Added gpio configurations to select Lanai SPI ROM.
+Configured Erase block size for target as 64K.
 This will be accessed by kernel for eSPI boot.
 
 Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
 ---
- common/main.c           | 30 ++++++++++++++++++++++++++++++
+ common/main.c           | 32 ++++++++++++++++++++++++++++++++
  include/amd-platforms.h |  4 ++++
- 2 files changed, 34 insertions(+)
+ 2 files changed, 36 insertions(+)
 
 diff --git a/common/main.c b/common/main.c
-index 1a98b3ea21..180b2f320d 100644
+index 1a98b3ea21..5e52358939 100644
 --- a/common/main.c
 +++ b/common/main.c
-@@ -220,6 +220,35 @@ void set_board_id()
+@@ -220,6 +220,37 @@ void set_board_id()
  	return;
  }
 
@@ -33,6 +34,8 @@ index 1a98b3ea21..180b2f320d 100644
 +	run_command_list("gpio set " LANAI_GPIO_V1, -1, 0);
 +	printf("Enabling SAFS boot\n");
 +	run_command_list("mw 1e6e2510 00000082", -1, 0);
++	printf("Setting EBS to 64K\n");
++	run_command_list("mw 1e6ee0f0 00004000", -1, 0);
 +#ifdef PERIPHERAL_CHANNEL
 +       //run_command_list("mw 1e6ee084 03000000", -1, 0);
 +       //run_command_list("mw 1e6ee088 30000000", -1, 0);
@@ -52,7 +55,7 @@ index 1a98b3ea21..180b2f320d 100644
  static void run_preboot_environment_command(void)
  {
  #ifdef CONFIG_PREBOOT
-@@ -269,6 +298,7 @@ void main_loop(void)
+@@ -269,6 +300,7 @@ void main_loop(void)
  	/* Read board id from eerpom and set env */
  	set_board_id();
  	set_hostname();
@@ -73,3 +76,6 @@ index 2f398d9a6f..1f2e1bafbc 100644
 +#define LANAI_GPIO_V1	"169"
 +
  #endif /* _AMD_PLATFOMS_H */
+--
+2.17.1
+
