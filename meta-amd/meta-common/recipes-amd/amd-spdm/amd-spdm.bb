@@ -1,15 +1,24 @@
+#set-spdm-config.service
 SUMMARY = "libspdm"
 DESCRIPTION = "Implementation of SPDM(DMTF DSP0274)"
 LICENSE = "CLOSED"
 FILESEXTRAPATHS_prepend := "${THISDIR}:"
 
+inherit systemd
+SYSTEMD_AUTO_ENABLE = "enable"
+SYSTEMD_SERVICE_${PN} = "set-spdm-config.service"
+
 BB_STRICT_CHECKSUM = "0"
-SRC_URI = "git://git@er.github.amd.com/RoT/proto-apps.git;branch=openbmc_release-0.8;protocol=ssh"
+SRC_URI += " \
+        git://git@er.github.amd.com/RoT/proto-apps.git;branch=openbmc_release-0.8;protocol=ssh \
+        file://set-spdm-config.service \
+        "
 SRCREV = "${AUTOREV}"
 
 S="${WORKDIR}/git"
 
 DEPENDS = "openssl"
+RDEPENDS_${PN} += "bash"
 
 # Export the arm-openssl path
 export OPENSSL_ARM_DIR = "${WORKDIR}/recipe-sysroot/usr/lib"
@@ -38,6 +47,9 @@ cmake_do_compile() {
 cmake_do_install() {
     install -d ${D}${bindir}
     install -m 0755 ${S}/release/spdm_requester.elf ${D}${bindir}/
+    install -d ${D}${systemd_unitdir}/system
+    install -c -m 0644 ${WORKDIR}/set-spdm-config.service ${D}/${systemd_unitdir}/system
 }
 
 INSANE_SKIP_${PN} += "ldflags"
+FILES_${PN} += "${systemd_unitdir}/system/set-spdm-config.service"
