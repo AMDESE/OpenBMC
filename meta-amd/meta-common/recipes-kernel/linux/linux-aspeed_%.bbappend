@@ -70,4 +70,5 @@ SRC_URI += "file://amd-bmc-baseline.cfg \
             file://0068-Add-MP2857-VR-driver.patch \
             file://0069-linux-speed-Remove-debug-prints-from-i3c-driver.patch \
             file://0070-arm-dts-aspeed-enable-safs-mix-mode.patch \
+            file://0071-recipes-kernel-Enable-i2c-slave-backend-device.patch \
            "
