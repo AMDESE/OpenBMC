@@ -17,6 +17,7 @@ SRC_URI = "file://aspeed-espi.h  \
 	file://oob-pch-test.c \
 	file://safs-test.c \
 	file://mafs-test.c \
+	file://sm-test.c \
 	file://AMI_MG9100_001_Update_CFRU_S16_23_SATA.sh \
 	file://mg9100test_RL20220323_1709 \
 	file://ubm_fru_update \
@@ -38,6 +39,7 @@ do_compile() {
 	${CC} oob-pch-test.c -o oob-pch-test
 	${CC} safs-test.c -o safs-test
 	${CC} mafs-test.c -o mafs-test
+	${CC} sm-test.c -o sm-test
 }
 
 do_install() {
@@ -48,6 +50,7 @@ do_install() {
 	install -m 0755 oob-pch-test ${D}${bindir}
 	install -m 0755 safs-test ${D}${bindir}
 	install -m 0755 mafs-test ${D}${bindir}
+	install -m 0755 sm-test ${D}${bindir}
 	install -m 0755 AMI_MG9100_001_Update_CFRU_S16_23_SATA.sh ${D}${bindir}
 	install -m 0755 mg9100test_RL20220323_1709 ${D}${bindir}
 	install -m 0755 ubm_fru_update ${D}${bindir}
