@@ -1,0 +1,190 @@
+From a3fa5407ce2492344fb4bb11cd9e6598bba2388b Mon Sep 17 00:00:00 2001
+From: Abinaya Dhandapani <Abinaya.Dhandapani@amd.com>
+Date: Fri, 27 Oct 2023 01:26:12 -0500
+Subject: [PATCH] Remove VR at slave address 0x60 for chalupa platform
+
+Signed-off-by: Abinaya Dhandapani <Abinaya.Dhandapani@amd.com>
+---
+ .../boot/dts/aspeed-bmc-amd-chalupa-i3c.dts   | 40 +++++++------------
+ arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts  | 40 +++++++------------
+ 2 files changed, 28 insertions(+), 52 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
+index 6e18c3eafe56..695d1f482055 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
+@@ -210,26 +210,20 @@ i2c@0 {
+                         #size-cells = <0>;
+                         reg = <0>;
+
+-                        p0_vdd_core0_run@60 {
+-                                //VDD core0 run/soc
+-                                compatible = "isil,isl68137";
+-                                reg = <0x60>;
+-                        };
+-
+-                        p0_vdd_core1_run@61 {
+-                                //VDD core1 run
++                        p0_vdd_core_0_run@61 {
++                                //VDD CORE0 RUN
+                                 compatible = "isil,isl68137";
+                                 reg = <0x61>;
+                         };
+
+-                        p0_vdd_vddio_run@62 {
+-                                //VDD IO RUN
++                        p0_vdd_core_1_run@62 {
++                                //VDD CORE1 RUN
+                                 compatible = "isil,isl68137";
+                                 reg = <0x62>;
+                         };
+
+-                        p0_vdd_11_sus@63 {
+-                                //VDD 11 sus
++                        p0_vdd_vddio_run@63 {
++                                //VDD IO run
+                                 compatible = "isil,isl68137";
+                                 reg = <0x63>;
+                         };
+@@ -241,7 +235,7 @@ p0_vdd_18_dual@64 {
+                         };
+
+                         p0_vdd_33_dual@65 {
+-                                //VDD 33 DUAL VRM
++                                //VDD 33 DUAL
+                                 compatible = "isil,isl68137";
+                                 reg = <0x65>;
+                         };
+@@ -265,26 +259,20 @@ i2c@0 {
+                         #size-cells = <0>;
+                         reg = <0>;
+
+-                        p1_vdd_core0_run@60 {
+-                                //VDD core0 run/soc
+-                                compatible = "isil,isl68137";
+-                                reg = <0x60>;
+-                        };
+-
+-                        p1_vdd_core1_run@61 {
+-                                //VDD core1 run
++                        p1_vdd_core0_run@61 {
++                                //VDD CORE0 RUN
+                                 compatible = "isil,isl68137";
+                                 reg = <0x61>;
+                         };
+
+-                        p1_vdd_vddio_run@62 {
+-                                //VDD IO RUN
++                        p1_vdd_core1_run@62 {
++                                //VDD CORE1 RUN
+                                 compatible = "isil,isl68137";
+                                 reg = <0x62>;
+                         };
+
+-                        p1_vdd_11_sus@63 {
+-                                //VDD 11 sus
++                        p1_vdd_vddio_run@63 {
++                                //VDD IO RUN
+                                 compatible = "isil,isl68137";
+                                 reg = <0x63>;
+                         };
+@@ -296,7 +284,7 @@ p1_vdd_18_dual@64 {
+                         };
+
+                         p1_vdd_33_dual@65 {
+-                                //VDD 33 DUAL VRM
++                                //VDD 33 DUAL
+                                 compatible = "isil,isl68137";
+                                 reg = <0x65>;
+                         };
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
+index d684c9f0617e..9b2d7c4fc931 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
+@@ -210,26 +210,20 @@ i2c@0 {
+                         #size-cells = <0>;
+                         reg = <0>;
+
+-                        p0_vdd_core0_run@60 {
+-                                //VDD core0 run/soc
+-                                compatible = "isil,isl68137";
+-                                reg = <0x60>;
+-                        };
+-
+-                        p0_vdd_core1_run@61 {
+-                                //VDD core1 run
++                        p0_vdd_core_0_run@61 {
++                                //VDD CORE0 RUN
+                                 compatible = "isil,isl68137";
+                                 reg = <0x61>;
+                         };
+
+-                        p0_vdd_vddio_run@62 {
+-                                //VDD IO RUN
++                        p0_vdd_core_1_run@62 {
++                                //VDD CORE1 RUN
+                                 compatible = "isil,isl68137";
+                                 reg = <0x62>;
+                         };
+
+-                        p0_vdd_11_sus@63 {
+-                                //VDD 11 sus
++                        p0_vdd_vddio_run@63 {
++                                //VDD IO run
+                                 compatible = "isil,isl68137";
+                                 reg = <0x63>;
+                         };
+@@ -241,7 +235,7 @@ p0_vdd_18_dual@64 {
+                         };
+
+                         p0_vdd_33_dual@65 {
+-                                //VDD 33 DUAL VRM
++                                //VDD 33 DUAL
+                                 compatible = "isil,isl68137";
+                                 reg = <0x65>;
+                         };
+@@ -265,26 +259,20 @@ i2c@0 {
+                         #size-cells = <0>;
+                         reg = <0>;
+
+-                        p1_vdd_core0_run@60 {
+-                                //VDD core0 run/soc
+-                                compatible = "isil,isl68137";
+-                                reg = <0x60>;
+-                        };
+-
+-                        p1_vdd_core1_run@61 {
+-                                //VDD core1 run
++                        p1_vdd_core0_run@61 {
++                                //VDD CORE0 RUN
+                                 compatible = "isil,isl68137";
+                                 reg = <0x61>;
+                         };
+
+-                        p1_vdd_vddio_run@62 {
+-                                //VDD IO RUN
++                        p1_vdd_core1_run@62 {
++                                //VDD CORE1 RUN
+                                 compatible = "isil,isl68137";
+                                 reg = <0x62>;
+                         };
+
+-                        p1_vdd_11_sus@63 {
+-                                //VDD 11 sus
++                        p1_vdd_vddio_run@63 {
++                                //VDD IO RUN
+                                 compatible = "isil,isl68137";
+                                 reg = <0x63>;
+                         };
+@@ -296,7 +284,7 @@ p1_vdd_18_dual@64 {
+                         };
+
+                         p1_vdd_33_dual@65 {
+-                                //VDD 33 DUAL VRM
++                                //VDD 33 DUAL
+                                 compatible = "isil,isl68137";
+                                 reg = <0x65>;
+                         };
+--
+2.25.1
+

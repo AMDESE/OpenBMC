@@ -71,4 +71,5 @@ SRC_URI += "file://amd-bmc-baseline.cfg \
             file://0069-linux-speed-Remove-debug-prints-from-i3c-driver.patch \
             file://0070-arm-dts-aspeed-enable-safs-mix-mode.patch \
             file://0071-recipes-kernel-Enable-i2c-slave-backend-device.patch \
+            file://0072-Remove-VR-at-slave-address-0x60-for-chalupa-platform.patch \
            "
