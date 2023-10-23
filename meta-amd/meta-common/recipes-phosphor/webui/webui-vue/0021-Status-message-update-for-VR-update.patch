@@ -1,0 +1,42 @@
+From d9e59fdbf7977c89d12f7e4e093b26f290d98aa6 Mon Sep 17 00:00:00 2001
+From: Abinaya Dhandapani <Abinaya.Dhandapani@amd.com>
+Date: Fri, 27 Oct 2023 00:47:14 -0500
+Subject: [PATCH] Status message update for VR patch
+
+Signed-off-by: Abinaya Dhandapani <Abinaya.Dhandapani@amd.com>
+---
+ src/locales/en-US.json                                  | 2 +-
+ src/views/Operations/Firmware/FirmwareCardsVRBundle.vue | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/locales/en-US.json b/src/locales/en-US.json
+index 580e4e3..91fbd0e 100644
+--- a/src/locales/en-US.json
++++ b/src/locales/en-US.json
+@@ -377,7 +377,7 @@
+       "verifyUpdate": "Verify update",
+       "verifyUpdateMessage": "Refresh the application to verify firmware updated successfully",
+       "updateCompleted": "Update completed",
+-      "updateCompletedMessage": "Firmware updated successfully. Please refresh to verify",
++      "updateCompletedMessage": "Firmware updated successfully. For VR bundle update, please check VR bundle firmware status list for detailed info",
+       "updateAborted": "Firmware update failed. Please check logs"
+     },
+     "table":{
+diff --git a/src/views/Operations/Firmware/FirmwareCardsVRBundle.vue b/src/views/Operations/Firmware/FirmwareCardsVRBundle.vue
+index 847c643..2c1d4f8 100644
+--- a/src/views/Operations/Firmware/FirmwareCardsVRBundle.vue
++++ b/src/views/Operations/Firmware/FirmwareCardsVRBundle.vue
+@@ -133,11 +133,11 @@ export default {
+     },
+     vrstatusIcon(status) {
+       switch (status) {
+-        case 'Pass':
++        case 'Update Completed':
+           return 'success';
+         case 'Warning':
+           return 'warning';
+-        case 'Fail':
++        case 'Update Failed':
+           return 'danger';
+         default:
+           return '';
