@@ -13,12 +13,6 @@ sync_hwmon_path() {
            "3D"|"40"|"41"|"42"|"52")  # Onyx board_ids
                 ln -s  /etc/default/obmc/hwmon_onyx/ /etc/default/obmc/hwmon
            ;;
-           "5F")  # Sidley board_ids
-                ln -s  /etc/default/obmc/hwmon_sidley/ /etc/default/obmc/hwmon
-           ;;
-           "60")  # Pary Peak board_ids
-                ln -s  /etc/default/obmc/hwmon_parrypeak/ /etc/default/obmc/hwmon
-           ;;
            "5C"|"5D"|"5E"|"6C"|"6D")  # SH5 board_ids
                 ln -s  /etc/default/obmc/hwmon_sh5d807/ /etc/default/obmc/hwmon
            ;;
