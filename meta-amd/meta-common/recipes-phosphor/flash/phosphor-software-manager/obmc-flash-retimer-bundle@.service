@@ -1,0 +1,7 @@
+[Unit]
+Description=Flash %I Retimer firmware
+
+[Service]
+Type=oneshot
+RemainAfterExit=no
+ExecStart=/usr/sbin/bmc_retimer_update /tmp/images/%i

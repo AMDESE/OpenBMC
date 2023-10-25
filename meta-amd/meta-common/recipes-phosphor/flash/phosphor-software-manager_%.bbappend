@@ -21,13 +21,14 @@ SRC_URI += "file://bios-update.sh \
             file://0016-Added-support-for-VR-Bundle-firmware-update.patch \
             file://0017-recipes-phosphor-flash-Add-support-for-backplane-upd.patch \
             file://0018-Preserve-firmware-inventory-on-factory-reset.patch \
+            file://0019-recipes-phosphor-flash-add-support-for-retimer-bundl.patch \
             "
 
 DEPENDS += "amd-lcd-lib"
 
 TARGET_LDFLAGS += " -llcdlib32"
 
-PACKAGECONFIG_append = " flash_bios flash_scm_fpga flash_hpm_fpga flash_vr_bundle flash_retimer flash_bp_fw"
+PACKAGECONFIG_append = " flash_bios flash_scm_fpga flash_hpm_fpga flash_vr_bundle flash_retimer_bundle flash_bp_fw"
 RDEPENDS_${PN} += "bash"
 
 do_install_append() {
