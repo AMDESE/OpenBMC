@@ -24,4 +24,5 @@ SRC_URI += "file://0001-webvue-ui-Support-HPM-and-SCM-FPGA-firmware-updates.patc
             file://0020-enable-checkbox-for-firmware-inventory-reset.patch \
             file://0021-Status-message-update-for-VR-update.patch \
             file://0022-webui-vue-Corrected-Factory-reset-message.patch \
+            file://0023-web-vue-add-support-for-Retimer-Bundle-firmware-upda.patch \
             "

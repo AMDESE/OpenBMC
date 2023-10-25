@@ -1,0 +1,467 @@
+From 69f4a5cd5a1c4f26cb746f4590ccd4353245fabe Mon Sep 17 00:00:00 2001
+From: Mahesh Kurapati <mahesh.kurapati@amd.com>
+Date: Mon, 23 Oct 2023 15:14:42 -0500
+Subject: [PATCH] web-vue : add support for Retimer Bundle firmware update
+
+enhanced webui to display the retimer version, and checksum
+details on the web interface.
+
+Signed-off-by: Mahesh Kurapati <mahesh.kurapati@amd.com>
+
+%% original patch: 0021-web-vue-add-support-for-Retimer-Bundle-firmware-upda.patch
+---
+ src/locales/en-US.json                        |  11 +-
+ src/store/index.js                            |   2 +
+ src/store/modules/Operations/FirmwareStore.js |  23 ++-
+ .../modules/Operations/RetimerBundleStore.js  |  47 +++++
+ src/views/Operations/Firmware/Firmware.vue    |  11 +-
+ .../Firmware/FirmwareCardsRetimer.vue         |  40 -----
+ .../Firmware/FirmwareCardsRetimerBundle.vue   | 161 ++++++++++++++++++
+ 7 files changed, 236 insertions(+), 59 deletions(-)
+ create mode 100644 src/store/modules/Operations/RetimerBundleStore.js
+ delete mode 100644 src/views/Operations/Firmware/FirmwareCardsRetimer.vue
+ create mode 100644 src/views/Operations/Firmware/FirmwareCardsRetimerBundle.vue
+
+diff --git a/src/locales/en-US.json b/src/locales/en-US.json
+index 580e4e3..1394a1f 100644
+--- a/src/locales/en-US.json
++++ b/src/locales/en-US.json
+@@ -333,7 +333,8 @@
+     "sectionTitleHostCards": "Host",
+     "sectionTitleSCMCards": "SCM FPGA",
+     "sectionTitleHPMCards": "HPM FPGA",
+-    "sectionTitleRetimerCards": "PCIe Retimer",
++    "sectionTitleRetimercardsBundle": "PCIe Retimer Bundle Firmware",
++    "viewRetimerBundleFirmware": "View Retimer Bundle Firmware versions",
+     "sectionTitleUpdateFirmware": "Update firmware",
+     "sectionTitleVrcardsBundle": "VR Bundle Firmware",
+     "viewVRBundleFirmware": "View VR Bundle Firmware versions",
+@@ -387,6 +388,14 @@
+       "slaveAddress": "Slave Address",
+       "healthStatus": "Status",
+       "checkSum": "Checksum"
++    },
++    "tableRetimers":{
++      "firmwareID": "Retimer ID",
++      "riser": "Riser",
++      "firmwareversion": "Version",
++      "slaveAddress": "Slave Address",
++      "healthStatus": "Status",
++      "checkSum": "Checksum"
+     }
+   },
+   "pageInventory": {
+diff --git a/src/store/index.js b/src/store/index.js
+index 765f6a2..3a41a9d 100644
+--- a/src/store/index.js
++++ b/src/store/index.js
+@@ -10,6 +10,7 @@ import UserManagementStore from './modules/SecurityAndAccess/UserManagementStore
+ import CertificatesStore from './modules/SecurityAndAccess/CertificatesStore';
+ import FirmwareStore from './modules/Operations/FirmwareStore';
+ import VRBundleStore from './modules/Operations/VRBundleStore.js';
++import RetimerBundleStore from './modules/Operations/RetimerBundleStore.js';
+ import BootSettingsStore from './modules/Operations/BootSettingsStore';
+ import ControlStore from './modules/Operations/ControlStore';
+ import PowerControlStore from './modules/ResourceManagement/PowerControlStore';
+@@ -62,6 +63,7 @@ export default new Vuex.Store({
+     memory: MemoryStore,
+     fan: FanStore,
+     vrBundle: VRBundleStore,
++    retimerBundle: RetimerBundleStore,
+     chassis: ChassisStore,
+     bmc: BmcStore,
+     processors: ProcessorStore,
+diff --git a/src/store/modules/Operations/FirmwareStore.js b/src/store/modules/Operations/FirmwareStore.js
+index 7f80224..e22b793 100644
+--- a/src/store/modules/Operations/FirmwareStore.js
++++ b/src/store/modules/Operations/FirmwareStore.js
+@@ -8,13 +8,12 @@ const FirmwareStore = {
+     hostFirmware: [],
+     scmFirmware: [],
+     hpmFirmware: [],
+-    retimerFirmware: [],
++    retimerBundleFirmware: [],
+     vrBundleFirmware: [],
+     bmcActiveFirmwareId: null,
+     hostActiveFirmwareId: null,
+     scmActiveFirmwareId: null,
+     hpmActiveFirmwareId: null,
+-    retimerActiveFirmwareId: null,
+     applyTime: null,
+     tftpAvailable: false,
+     taskId: null,
+@@ -41,8 +40,10 @@ const FirmwareStore = {
+     activeHpmFirmware: (state) => {
+       return state.hpmFirmware.find((firmware) => firmware.id !== null);
+     },
+-    activeRetimerFirmware: (state) => {
+-      return state.retimerFirmware.find((firmware) => firmware.id !== null);
++    activeRetimerBundleFirmware: (state) => {
++      return state.retimerBundleFirmware.find(
++        (firmware) => firmware.id !== null
++      );
+     },
+     activeVrBundleFirmware: (state) => {
+       return state.vrBundleFirmware.find((firmware) => firmware.id !== null);
+@@ -63,13 +64,12 @@ const FirmwareStore = {
+     setActiveHostFirmwareId: (state, id) => (state.hostActiveFirmwareId = id),
+     setActiveScmFimwareId: (state, id) => (state.scmActiveFirmwareID = id),
+     setActiveHpmFimwareId: (state, id) => (state.hpmActiveFirmwareID = id),
+-    setActiveRetimerFirmwareId: (state, id) =>
+-      (state.retimerActiveFirmwareID = id),
+     setBmcFirmware: (state, firmware) => (state.bmcFirmware = firmware),
+     setHostFirmware: (state, firmware) => (state.hostFirmware = firmware),
+     setScmFirmware: (state, firmware) => (state.scmFirmware = firmware),
+     setHpmFirmware: (state, firmware) => (state.hpmFirmware = firmware),
+-    setRetimerFirmware: (state, firmware) => (state.retimerFirmware = firmware),
++    setRetimerBundleFirmware: (state, firmware) =>
++      (state.retimerBundleFirmware = firmware),
+     setVrBundleFirmware: (state, firmware) =>
+       (state.vrBundleFirmware = firmware),
+     setApplyTime: (state, applyTime) => (state.applyTime = applyTime),
+@@ -84,7 +84,6 @@ const FirmwareStore = {
+       dispatch('getActiveBmcFirmware');
+       dispatch('getActiveScmFirmware');
+       dispatch('getActiveHpmFirmware');
+-      dispatch('getActiveRetimerFirmware');
+       return await dispatch('getFirmwareInventory');
+     },
+     getActiveBmcFirmware({ commit }) {
+@@ -119,7 +118,7 @@ const FirmwareStore = {
+           const hostFirmware = [];
+           const scmFirmware = [];
+           const hpmFirmware = [];
+-          const retimerFirmware = [];
++          const retimerBundleFirmware = [];
+           const vrBundleFirmware = [];
+           response.forEach(({ data }) => {
+             const firmwareType = data?.RelatedItem?.[0]?.['@odata.id']
+@@ -141,8 +140,8 @@ const FirmwareStore = {
+               hpmFirmware.push(item);
+             } else if (descType === 'SCM_FPGA image') {
+               scmFirmware.push(item);
+-            } else if (descType === 'RETIMER image') {
+-              retimerFirmware.push(item);
++            } else if (descType === 'RETIMER_BUNDLE image') {
++              retimerBundleFirmware.push(item);
+             } else if (descType === 'VR_BUNDLE image') {
+               vrBundleFirmware.push(item);
+             }
+@@ -151,7 +150,7 @@ const FirmwareStore = {
+           commit('setHostFirmware', hostFirmware);
+           commit('setScmFirmware', scmFirmware);
+           commit('setHpmFirmware', hpmFirmware);
+-          commit('setRetimerFirmware', retimerFirmware);
++          commit('setRetimerBundleFirmware', retimerBundleFirmware);
+           commit('setVrBundleFirmware', vrBundleFirmware);
+         })
+         .catch((error) => {
+diff --git a/src/store/modules/Operations/RetimerBundleStore.js b/src/store/modules/Operations/RetimerBundleStore.js
+new file mode 100644
+index 0000000..09d7452
+--- /dev/null
++++ b/src/store/modules/Operations/RetimerBundleStore.js
+@@ -0,0 +1,47 @@
++import api from '@/store/api';
++
++const RetimerBundleStore = {
++  namespaced: true,
++  state: {
++    retimerbundledata: [],
++  },
++  getters: {
++    retimerbundledata: (state) => state.retimerbundledata,
++  },
++  mutations: {
++    setRetimerBundleInfo: (state, data) => {
++      state.retimerbundledata = data.map((retimerbundle) => {
++        const {
++          SlaveAddress,
++          FirmwareID,
++          FirmwareVersion,
++          Riser,
++          HealthStatus,
++          Checksum,
++        } = retimerbundle;
++        return {
++          slaveAddress: SlaveAddress,
++          firmwareID: FirmwareID,
++          firmwareversion: FirmwareVersion,
++          riser: Riser,
++          healthStatus: HealthStatus,
++          checkSum: Checksum,
++        };
++      });
++    },
++  },
++  actions: {
++    async getRetimerbundleInfo({ commit }) {
++      return await api
++        .get(
++          '/redfish/v1/UpdateService/FirmwareInventory/retimer_bundle_active'
++        )
++        .then(({ data: { RetimerBundle = [] } }) =>
++          commit('setRetimerBundleInfo', RetimerBundle)
++        )
++        .catch((error) => console.log(error));
++    },
++  },
++};
++
++export default RetimerBundleStore;
+diff --git a/src/views/Operations/Firmware/Firmware.vue b/src/views/Operations/Firmware/Firmware.vue
+index f527f80..0a0f421 100644
+--- a/src/views/Operations/Firmware/Firmware.vue
++++ b/src/views/Operations/Firmware/Firmware.vue
+@@ -23,11 +23,11 @@
+
+         <!-- VR bundle Firmware -->
+         <vr-bundle v-if="!isSingleFileUploadEnabled" />
+-        <!-- Retimer Firmware -->
+-        <retimer-cards v-if="!isSingleFileUploadEnabled" />
++
++        <!-- Retimer bundle Firmware -->
++        <retimer-bundle v-if="!isSingleFileUploadEnabled" />
+       </b-col>
+     </b-row>
+-
+     <!-- Update firmware-->
+     <page-section
+       :section-title="$t('pageFirmware.sectionTitleUpdateFirmware')"
+@@ -53,10 +53,9 @@ import HostCards from './FirmwareCardsHost';
+ import ScmCards from './FirmwareCardsSCM';
+ import HpmCards from './FirmwareCardsHPM';
+ import VrBundle from './FirmwareCardsVRBundle';
+-import RetimerCards from './FirmwareCardsRetimer';
++import RetimerBundle from './FirmwareCardsRetimerBundle';
+ import PageSection from '@/components/Global/PageSection';
+ import PageTitle from '@/components/Global/PageTitle';
+-
+ import LoadingBarMixin, { loading } from '@/components/Mixins/LoadingBarMixin';
+
+ export default {
+@@ -69,7 +68,7 @@ export default {
+     ScmCards,
+     HpmCards,
+     VrBundle,
+-    RetimerCards,
++    RetimerBundle,
+     PageSection,
+     PageTitle,
+   },
+diff --git a/src/views/Operations/Firmware/FirmwareCardsRetimer.vue b/src/views/Operations/Firmware/FirmwareCardsRetimer.vue
+deleted file mode 100644
+index a3ae47d..0000000
+--- a/src/views/Operations/Firmware/FirmwareCardsRetimer.vue
++++ /dev/null
+@@ -1,40 +0,0 @@
+-<template>
+-  <page-section :section-title="$t('pageFirmware.sectionTitleRetimerCards')">
+-    <b-card-group deck>
+-      <!-- Running image -->
+-      <b-card>
+-        <template #header>
+-          <p class="font-weight-bold m-0">
+-            {{ $t('pageFirmware.cardTitleRunning') }}
+-          </p>
+-        </template>
+-        <dl class="mb-0">
+-          <dt>{{ $t('pageFirmware.cardBodyVersion') }}</dt>
+-          <dd class="mb-0">{{ runningVersion }}</dd>
+-        </dl>
+-      </b-card>
+-    </b-card-group>
+-  </page-section>
+-</template>
+-
+-<script>
+-import PageSection from '@/components/Global/PageSection';
+-
+-export default {
+-  components: { PageSection },
+-  computed: {
+-    running() {
+-      return this.$store.getters['firmware/activeRetimerFirmware'];
+-    },
+-    runningVersion() {
+-      return this.running?.version || '-1';
+-    },
+-  },
+-};
+-</script>
+-
+-<style lang="scss" scoped>
+-.page-section {
+-  margin-top: -$spacer * 1.5;
+-}
+-</style>
+diff --git a/src/views/Operations/Firmware/FirmwareCardsRetimerBundle.vue b/src/views/Operations/Firmware/FirmwareCardsRetimerBundle.vue
+new file mode 100644
+index 0000000..91bed87
+--- /dev/null
++++ b/src/views/Operations/Firmware/FirmwareCardsRetimerBundle.vue
+@@ -0,0 +1,161 @@
++<template>
++  <page-section
++    :section-title="$t('pageFirmware.sectionTitleRetimercardsBundle')"
++  >
++    <b-card-group deck>
++      <!-- Running image -->
++      <b-card>
++        <template #header>
++          <p class="font-weight-bold m-0">
++            {{ $t('pageFirmware.cardTitleRunning') }}
++          </p>
++        </template>
++        <b-col>
++          <dl class="mb-0">
++            <dt>{{ $t('pageFirmware.cardBodyVersion') }}</dt>
++            <dd class="mb-0">{{ runningVersion }}</dd>
++          </dl>
++        </b-col>
++      </b-card>
++    </b-card-group>
++    <b-button
++      v-b-toggle.collapse-retimerbundle-table
++      data-test-id="FirmwareCardRetimersBundle-button-viewRetimerBundleFirmware"
++      variant="link"
++      class="mt-3"
++    >
++      <icon-chevron />
++      {{ $t('pageFirmware.viewRetimerBundleFirmware') }}
++    </b-button>
++    <b-collapse id="collapse-retimerbundle-table" class="mt-3">
++      <b-table
++        sort-icon-left
++        no-sort-reset
++        hover
++        responsive="md"
++        show-empty
++        :items="retimerbundledata"
++        :fields="fields"
++        :sort-desc="true"
++        :sort-compare="sortCompare"
++        :filter="searchFilter"
++        :empty-text="$t('global.table.emptyMessage')"
++        :empty-filtered-text="$t('global.table.emptySearchMessage')"
++        @filtered="onFiltered"
++      >
++        <!-- Health -->
++        <template #cell(healthStatus)="{ value }">
++          <status-icon :status="retimerstatusIcon(value)" />
++          {{ value }}
++        </template>
++      </b-table>
++    </b-collapse>
++  </page-section>
++</template>
++
++<script>
++import PageSection from '@/components/Global/PageSection';
++import IconChevron from '@carbon/icons-vue/es/chevron--up/20';
++import StatusIcon from '@/components/Global/StatusIcon';
++import TableDataFormatterMixin from '@/components/Mixins/TableDataFormatterMixin';
++import TableSortMixin from '@/components/Mixins/TableSortMixin';
++import TableRowExpandMixin, {
++  expandRowLabel,
++} from '@/components/Mixins/TableRowExpandMixin';
++
++export default {
++  components: { IconChevron, PageSection, StatusIcon },
++  mixins: [TableRowExpandMixin, TableDataFormatterMixin, TableSortMixin],
++  data() {
++    return {
++      fields: [
++        {
++          key: 'expandRow',
++          label: '',
++          tdClass: 'table-row-expand',
++          sortable: false,
++        },
++        {
++          key: 'riser',
++          label: this.$t('pageFirmware.tableRetimers.riser'),
++          formatter: this.tableFormatter,
++        },
++        {
++          key: 'slaveAddress',
++          label: this.$t('pageFirmware.tableRetimers.slaveAddress'),
++          formatter: this.tableFormatter,
++          sortable: true,
++        },
++        {
++          key: 'firmwareID',
++          label: this.$t('pageFirmware.tableRetimers.firmwareID'),
++          formatter: this.tableFormatter,
++          sortable: true,
++        },
++        {
++          key: 'firmwareversion',
++          label: this.$t('pageFirmware.tableRetimers.firmwareversion'),
++          formatter: this.tableFormatter,
++          sortable: true,
++        },
++        {
++          key: 'checkSum',
++          label: this.$t('pageFirmware.tableRetimers.checkSum'),
++          formatter: this.tableFormatter,
++        },
++        {
++          key: 'healthStatus',
++          label: this.$t('pageFirmware.tableRetimers.healthStatus'),
++          formatter: this.tableFormatter,
++          tdClass: 'text-nowrap',
++        },
++      ],
++      expandRowLabel: expandRowLabel,
++    };
++  },
++  computed: {
++    retimerbundledata() {
++      return this.$store.getters['retimerBundle/retimerbundledata'];
++    },
++    running() {
++      return this.$store.getters['firmware/activeRetimerBundleFirmware'];
++    },
++    runningVersion() {
++      return this.running?.version || '-1';
++    },
++  },
++  created() {
++    this.$store.dispatch('retimerBundle/getRetimerbundleInfo');
++  },
++  methods: {
++    sortCompare(a, b, key) {
++      if (key === 'healthStatus') {
++        return this.sortStatus(a, b, key);
++      }
++    },
++    retimerstatusIcon(status) {
++      switch (status) {
++        case 'Pass':
++          return 'success';
++        case 'Warning':
++          return 'warning';
++        case 'Fail':
++          return 'danger';
++        default:
++          return '';
++      }
++    },
++  },
++};
++</script>
++
++<style lang="scss" scoped>
++.btn.collapsed {
++  svg {
++    transform: rotate(180deg);
++  }
++  .page-section {
++    margin-top: -$spacer * 1.5;
++  }
++}
++</style>
+--
+2.17.1
+
