@@ -1,0 +1,66 @@
+From 9a620c8454780e9c738e69155c5f1010170fa9a2 Mon Sep 17 00:00:00 2001
+From: Mahesh Kurapati <mahesh.kurapati@amd.com>
+Date: Mon, 23 Oct 2023 14:16:42 -0500
+Subject: [PATCH] phosphor-dbus-interface: add dbus interface for retimer
+ bundle firmware
+
+Added a new dbus interface yaml file describing the attributes for each
+retimer's firmware.  Properties are FirmwareID, CRC, riser number,
+i2c slave address, and status of the firmware update for each retimer.
+
+Signed-off-by: Mahesh Kurapati <mahesh.kurapati@amd.com>
+---
+ .../RetimerBundleVersion.interface.yaml       | 27 +++++++++++++++++++
+ .../Software/Version.interface.yaml           |  2 +-
+ 2 files changed, 28 insertions(+), 1 deletion(-)
+ create mode 100644 xyz/openbmc_project/Software/RetimerBundleVersion.interface.yaml
+
+diff --git a/xyz/openbmc_project/Software/RetimerBundleVersion.interface.yaml b/xyz/openbmc_project/Software/RetimerBundleVersion.interface.yaml
+new file mode 100644
+index 0000000..93a9c12
+--- /dev/null
++++ b/xyz/openbmc_project/Software/RetimerBundleVersion.interface.yaml
+@@ -0,0 +1,27 @@
++description: >
++    An extended version string for a xyz.openbmc_project.Software.RetimerBundleVersion.
++properties:
++    - name: FirmwareID
++      type: array[string]
++      description: >
++          Firmware IDs associated with each firmware.
++    - name: Versions
++      type: array[string]
++      description: >
++          Array of all firmware versions.
++    - name: Status
++      type: array[string]
++      description: >
++          Array consist status of all firmware flashed in Bundle.
++    - name: SlaveAddress
++      type: array[string]
++      description: >
++          Array of all slave address.
++    - name: Riser
++      type: array[string]
++      description: >
++          Array consist riser details of retimer.
++    - name: Checksum
++      type: array[string]
++      description: >
++          Array consist checksum details of retimer fw.
+diff --git a/xyz/openbmc_project/Software/Version.interface.yaml b/xyz/openbmc_project/Software/Version.interface.yaml
+index fa8c5e2..b807719 100644
+--- a/xyz/openbmc_project/Software/Version.interface.yaml
++++ b/xyz/openbmc_project/Software/Version.interface.yaml
+@@ -47,7 +47,7 @@ enumerations:
+         - name: VR_BUNDLE
+           description: >
+             The version is a version for a VR BUNDLE.
+-        - name: RETIMER
++        - name: RETIMER_BUNDLE
+           description: >
+             The version is a version for PCIe Retimer
+         - name: BP_FW
+--
+2.17.1
+

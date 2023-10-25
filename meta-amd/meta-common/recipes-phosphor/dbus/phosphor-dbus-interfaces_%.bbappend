@@ -17,6 +17,7 @@ SRC_URI += "file://0001-recipes-phosphor-dbus-Add-enumeration-SCM_FPGA-for-v.pat
             file://0013-Add-a-new-Post-Package-Repair-Interface.patch \
             file://0014-phosphor-dbus-interfaces-Made-PprData-to-return-Arra.patch \
             file://0015-Add-ResetFwInventory-to-FactoryReset-interface.patch \
+            file://0016-phosphor-dbus-interface-add-dbus-interface-for-retim.patch \
             "
 
 do_configure_append() {
