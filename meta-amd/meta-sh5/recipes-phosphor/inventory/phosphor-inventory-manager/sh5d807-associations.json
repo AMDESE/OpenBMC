@@ -14,7 +14,6 @@
                     "/xyz/openbmc_project/sensors/voltage/ADC_FPGA_VDD_CORE",
                     "/xyz/openbmc_project/sensors/voltage/ADC_FPGA_VDD_18",
                     "/xyz/openbmc_project/sensors/voltage/ADC_FPGA_VDD_33",
-                    "/xyz/openbmc_project/sensors/voltage/ADC_LOM_VDD_33",
                     "/xyz/openbmc_project/sensors/voltage/ADC_LOM_VDD_12",
                     "/xyz/openbmc_project/sensors/voltage/ADC_VDD_12_DUAL",
 
@@ -27,23 +26,7 @@
                     "/xyz/openbmc_project/sensors/temperature/LM75A_4E",
                     "/xyz/openbmc_project/sensors/temperature/LM75A_4F",
 
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_1",
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_2",
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_3",
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_4",
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_5",
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_6",
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_7",
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_8",
-
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_9",
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_10",
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_11",
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_12",
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_13",
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_14",
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_15",
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_16",
+                    "/xyz/openbmc_project/sensors/temperature/CPU0_Temp",
 
                     "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan1",
                     "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan2",
@@ -62,67 +45,49 @@
 
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_VDD1_VIN",
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_VDD1_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDDCR_VDD1_IOUT",
                     "/xyz/openbmc_project/sensors/temperature/VDDCR_VDD1_TEMP",
                     "/xyz/openbmc_project/sensors/voltage/VDD_18_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDD_18_IOUT",
 
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_SOC_VIN",
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_SOC_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDDCR_SOC_IOUT",
                     "/xyz/openbmc_project/sensors/temperature/VDDCR_SOC_TEMP",
                     "/xyz/openbmc_project/sensors/voltage/VDD_075_USR_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDD_075_USR_IOUT",
                     "/xyz/openbmc_project/sensors/temperature/VDD_075_USR_TEMP",
 
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_VDD2_VIN",
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_VDD2_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDDCR_VDD2_IOUT",
                     "/xyz/openbmc_project/sensors/temperature/VDDCR_VDD2_TEMP",
                     "/xyz/openbmc_project/sensors/voltage/VDD_18_S5_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDD_18_S5_IOUT",
 
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_VDD3_VIN",
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_VDD3_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDDCR_VDD3_IOUT",
                     "/xyz/openbmc_project/sensors/temperature/VDDCR_VDD3_TEMP",
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_SOCIO_A_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDDCR_SOCIO_A_IOUT",
 
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_VDD0_VIN",
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_VDD0_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDDCR_VDD0_IOUT",
                     "/xyz/openbmc_project/sensors/temperature/VDDCR_VDD0_TEMP",
                     "/xyz/openbmc_project/sensors/voltage/VDDIO_11_E32_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDDIO_11_E32_IOUT",
 
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_11_HBM_B_VIN",
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_11_HBM_B_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDDCR_11_HBM_B_IOUT",
                     "/xyz/openbmc_project/sensors/temperature/VDDCR_11_HBM_B_TEMP",
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_SOCIO_C_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDDCR_SOCIO_C_IOUT",
 
                     "/xyz/openbmc_project/sensors/voltage/VDD_075_HBM_B_VIN",
                     "/xyz/openbmc_project/sensors/voltage/VDD_075_HBM_B_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDD_075_HBM_B_IOUT",
                     "/xyz/openbmc_project/sensors/temperature/VDD_075_HBM_B_TEMP",
                     "/xyz/openbmc_project/sensors/voltage/VDDIO_04_HBM_B_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDDIO_04_HBM_B_IOUT",
 
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_11_HBM_D_VIN",
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_11_HBM_D_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDDCR_11_HBM_D_IOUT",
                     "/xyz/openbmc_project/sensors/temperature/VDDCR_11_HBM_D_TEMP",
                     "/xyz/openbmc_project/sensors/voltage/VDD_33_S5_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDD_33_S5_IOUT",
 
                     "/xyz/openbmc_project/sensors/voltage/VDD_075_HBM_D_VIN",
                     "/xyz/openbmc_project/sensors/voltage/VDD_075_HBM_D_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDD_075_HBM_D_IOUT",
                     "/xyz/openbmc_project/sensors/temperature/VDD_075_HBM_D_TEMP",
-                    "/xyz/openbmc_project/sensors/voltage/VDDIO_04_HBM_D_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDDIO_04_HBM_D_IOUT"
+                    "/xyz/openbmc_project/sensors/voltage/VDDIO_04_HBM_D_VOUT"
                 ]
             }
         ]
@@ -142,7 +107,6 @@
                     "/xyz/openbmc_project/sensors/voltage/ADC_FPGA_VDD_CORE",
                     "/xyz/openbmc_project/sensors/voltage/ADC_FPGA_VDD_18",
                     "/xyz/openbmc_project/sensors/voltage/ADC_FPGA_VDD_33",
-                    "/xyz/openbmc_project/sensors/voltage/ADC_LOM_VDD_33",
                     "/xyz/openbmc_project/sensors/voltage/ADC_LOM_VDD_12",
                     "/xyz/openbmc_project/sensors/voltage/ADC_VDD_12_DUAL",
 
@@ -155,23 +119,7 @@
                     "/xyz/openbmc_project/sensors/temperature/LM75A_4E",
                     "/xyz/openbmc_project/sensors/temperature/LM75A_4F",
 
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_1",
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_2",
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_3",
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_4",
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_5",
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_6",
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_7",
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_8",
-
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_9",
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_10",
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_11",
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_12",
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_13",
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_14",
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_15",
-                    "/xyz/openbmc_project/sensors/temperature/P0_THERM_16",
+                    "/xyz/openbmc_project/sensors/temperature/CPU0_Temp",
 
                     "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan1",
                     "/xyz/openbmc_project/sensors/fan_tach/Chassis_Fan2",
@@ -188,69 +136,51 @@
                     "/xyz/openbmc_project/sensors/fan_tach/P0_CPU_Fan",
                     "/xyz/openbmc_project/sensors/fan_tach/P0_WaterPump_Fan",
 
-                    "/xyz/openbmc_project/sensors/voltage/VDDCR_VDD1_VIN",
+                     "/xyz/openbmc_project/sensors/voltage/VDDCR_VDD1_VIN",
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_VDD1_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDDCR_VDD1_IOUT",
                     "/xyz/openbmc_project/sensors/temperature/VDDCR_VDD1_TEMP",
                     "/xyz/openbmc_project/sensors/voltage/VDD_18_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDD_18_IOUT",
 
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_SOC_VIN",
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_SOC_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDDCR_SOC_IOUT",
                     "/xyz/openbmc_project/sensors/temperature/VDDCR_SOC_TEMP",
                     "/xyz/openbmc_project/sensors/voltage/VDD_075_USR_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDD_075_USR_IOUT",
                     "/xyz/openbmc_project/sensors/temperature/VDD_075_USR_TEMP",
 
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_VDD2_VIN",
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_VDD2_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDDCR_VDD2_IOUT",
                     "/xyz/openbmc_project/sensors/temperature/VDDCR_VDD2_TEMP",
                     "/xyz/openbmc_project/sensors/voltage/VDD_18_S5_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDD_18_S5_IOUT",
 
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_VDD3_VIN",
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_VDD3_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDDCR_VDD3_IOUT",
                     "/xyz/openbmc_project/sensors/temperature/VDDCR_VDD3_TEMP",
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_SOCIO_A_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDDCR_SOCIO_A_IOUT",
 
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_VDD0_VIN",
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_VDD0_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDDCR_VDD0_IOUT",
                     "/xyz/openbmc_project/sensors/temperature/VDDCR_VDD0_TEMP",
                     "/xyz/openbmc_project/sensors/voltage/VDDIO_11_E32_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDDIO_11_E32_IOUT",
 
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_11_HBM_B_VIN",
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_11_HBM_B_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDDCR_11_HBM_B_IOUT",
                     "/xyz/openbmc_project/sensors/temperature/VDDCR_11_HBM_B_TEMP",
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_SOCIO_C_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDDCR_SOCIO_C_IOUT",
 
                     "/xyz/openbmc_project/sensors/voltage/VDD_075_HBM_B_VIN",
                     "/xyz/openbmc_project/sensors/voltage/VDD_075_HBM_B_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDD_075_HBM_B_IOUT",
                     "/xyz/openbmc_project/sensors/temperature/VDD_075_HBM_B_TEMP",
                     "/xyz/openbmc_project/sensors/voltage/VDDIO_04_HBM_B_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDDIO_04_HBM_B_IOUT",
 
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_11_HBM_D_VIN",
                     "/xyz/openbmc_project/sensors/voltage/VDDCR_11_HBM_D_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDDCR_11_HBM_D_IOUT",
                     "/xyz/openbmc_project/sensors/temperature/VDDCR_11_HBM_D_TEMP",
                     "/xyz/openbmc_project/sensors/voltage/VDD_33_S5_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDD_33_S5_IOUT",
 
                     "/xyz/openbmc_project/sensors/voltage/VDD_075_HBM_D_VIN",
                     "/xyz/openbmc_project/sensors/voltage/VDD_075_HBM_D_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDD_075_HBM_D_IOUT",
                     "/xyz/openbmc_project/sensors/temperature/VDD_075_HBM_D_TEMP",
-                    "/xyz/openbmc_project/sensors/voltage/VDDIO_04_HBM_D_VOUT",
-                    "/xyz/openbmc_project/sensors/current/VDDIO_04_HBM_D_IOUT"
+                    "/xyz/openbmc_project/sensors/voltage/VDDIO_04_HBM_D_VOUT"
                 ]
             }
         ]

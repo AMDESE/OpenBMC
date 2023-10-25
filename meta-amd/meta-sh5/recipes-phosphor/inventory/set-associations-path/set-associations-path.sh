@@ -12,12 +12,6 @@ sync_associations_path() {
        "3D"|"40"|"41"|"42"|"52")  # Onyx board_ids
             ln -s  /usr/share/phosphor-inventory-manager/onyx-associations.json /usr/share/phosphor-inventory-manager/associations.json
        ;;
-       "5F")  # Sidley board_ids
-        ln -s  /usr/share/phosphor-inventory-manager/sidley-associations.json /usr/share/phosphor-inventory-manager/associations.json
-       ;;
-       "60")  # Pary Peak board_ids
-        ln -s  /usr/share/phosphor-inventory-manager/parrypeak-associations.json /usr/share/phosphor-inventory-manager/associations.json
-       ;;
        "5C"|"5D"|"5E"|"6C"|"6D")  # SH5 board_ids
         ln -s  /usr/share/phosphor-inventory-manager/sh5d807-associations.json /usr/share/phosphor-inventory-manager/associations.json
        ;;
