@@ -4,7 +4,6 @@ set -e
 
 # Fan Controller Dev ID
 EMC2305_DEV=0x4D
-CPLD_DEV=0x28
 
 #Speed Limit 20% (Range 0x0 to 0xFF)
 SPEED_LIMIT=0x32
@@ -47,72 +46,29 @@ set_emc2305_fan_speed()
 set_emc2305_pump_fan_speed()
 {
    speed_val=0xFF
-   if [[ $curr_emc2305_ctrl -eq 4 ]]; then
-        # Set Onyx pump fan speed
-        # Pump fan is on emc2305 controller# 3, fan#4
-        echo "Setting Onyx Pump Fans at full speed...."
-        i2cset -f -y ${i2c_bus_array[2]} $EMC2305_DEV ${FAN_SET_REG[3]} $speed_val
+   if [[ $curr_emc2305_ctrl -eq 3 ]]; then
+        # Set SH5 pump fan speed
+        # Pump fan is on emc2305 controller# 3
+        echo "Setting SH5 Pump Fans at full speed...."
+        i2cset -f -y ${i2c_bus_array[2]} $EMC2305_DEV ${FAN_SET_REG[1]} $speed_val
         if [ $? -ne 0 ]; then
             echo "Error: Setting Pump fan speed failed.."
         fi
-   elif [[ $curr_emc2305_ctrl -eq 5 ]]; then
-        # Set Quartz pump fan speed
-        # Pump fan is on emc2305 controller# 5, fan# 4 & 5
-        echo "Setting Quartz Pump Fans at full speed...."
-        for (( j=3; j < 5; j++ ));
-        do
-            i2cset -f -y ${i2c_bus_array[4]} $EMC2305_DEV ${FAN_SET_REG[j]} $speed_val
-            if [ $? -ne 0 ]; then
-                echo "Error: Setting Pump fan speed failed.."
-            fi
-        done
    fi
-}
-
-set_cpld_fan_speed()
-{
-    #Fan speed control Regs 6 fans
-    CPLD_FAN_SET_REG=("0x18" "0x19" "0x1A" "0x1B" "0x1C" "0x1D")
-    cpld_num_of_pwms=${#CPLD_FAN_SET_REG[@]}
-    echo " Num of pwms = ${cpld_num_of_pwms}"
-    # Get the CPLD i2c bus number
-    cpld_i2c_bus_num=`find /sys/bus/i2c/drivers | grep cpld| grep 0028 | cut -d"/" -f 7 | cut -d"-" -f 1`
-    echo "clpd i2c bust num = ${cpld_i2c_bus_num}"
-
-    # Write speed value to CPLD controller Regs.
-    # Set speed to 30% pwm, (CPLD range 0 to 100 %)
-    pwm_val=30
-    echo "Setting all Fan speeds to $pwm_val pwm"
-    for ((i=0; i<${cpld_num_of_pwms}; i++));
-    do
-        i2cset -f -y ${cpld_i2c_bus_num} $CPLD_DEV ${CPLD_FAN_SET_REG[i]} $pwm_val || retval=$?
-        if [[ "$retval" -ne 0 ]]; then
-            echo "Error: Setting fan speed failed or there is no Fan connected..."
-            break
-        fi
-    done
 }
 
 
 # Main()
 #---------
 
-# Read board_id from u-boot env
-board_id=`fw_printenv board_id | sed -n "s/^board_id=//p"`
-echo "board_id = ${board_id}"
-
-if [[ $board_id == "4A" || $board_id == "4B" || $board_id == "4C" || $board_id == "4D" || $board_id == "4E" || $board_id == "4F" ]]; then
-    set_cpld_fan_speed
+# Verify that input speed is not below Limit value.
+if [[ $1 -lt $SPEED_LIMIT ]]; then
+    echo "Error : You can not set Fan speed less then 20% (0x32)"
+    exit -1
 else
-    # Verify that input speed is not below Limit value.
-    if [[ $1 -lt $SPEED_LIMIT ]]; then
-        echo "Error : You can not set Fan speed less then 20% (0x32)"
-        exit -1
-    else
-        speed_val=$1
-    fi
-
-    # Call functions to set EMC2305  Fan speeds
-    set_emc2305_fan_speed
-    set_emc2305_pump_fan_speed
+    speed_val=$1
 fi
+
+# Call functions to set EMC2305  Fan speeds
+set_emc2305_fan_speed
+set_emc2305_pump_fan_speed
