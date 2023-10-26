@@ -6,4 +6,4 @@ PathExists=/tmp/apml_init_complete
 Unit=phosphor-pid-control.service
 
 [Install]
-#WantedBy=multi-user.target
+WantedBy=multi-user.target
