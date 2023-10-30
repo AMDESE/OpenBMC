@@ -1,0 +1,578 @@
+From 40c24aa6f5f4d58a6ef1c90d0ae18e80addc242f Mon Sep 17 00:00:00 2001
+From: Abinaya Dhandapani <Abinaya.Dhandapani@amd.com>
+Date: Thu, 2 Nov 2023 01:35:35 -0500
+Subject: [PATCH] Add TDA devices
+
+Signed-off-by: Abinaya Dhandapani <Abinaya.Dhandapani@amd.com>
+---
+ .../boot/dts/aspeed-bmc-amd-chalupa-i3c.dts   |  15 ++
+ arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts  |  15 ++
+ .../boot/dts/aspeed-bmc-amd-galena-i3c.dts    |  19 ++-
+ arch/arm/boot/dts/aspeed-bmc-amd-galena.dts   |  19 ++-
+ .../boot/dts/aspeed-bmc-amd-huambo-i3c.dts    | 151 ++++++++++--------
+ arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts   | 139 ++++++++--------
+ .../boot/dts/aspeed-bmc-amd-recluse-i3c.dts   |  19 ++-
+ arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts  |  21 ++-
+ 8 files changed, 253 insertions(+), 145 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
+index 695d1f482055..e05e7a0d8c51 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
+@@ -192,6 +192,21 @@ i2cswitch@70 {
+ &i2c4 {
+ 	// Net name i2c1 (SCM_I2C1)
+ 	status = "okay";
++	vdd33run@13 {
++		//VDD_33_RUN VRM
++		compatible = "pmbus";
++		reg = <0x13>;
++	};
++	vdd33dual@14 {
++		//VDD_33_DUAL VRM
++		compatible = "pmbus";
++		reg = <0x14>;
++	};
++	vdd5dual@15 {
++		//VDD_5_DUAL VRM
++		compatible = "pmbus";
++		reg = <0x15>;
++	};
+ };
+
+ // BMC Chalupa P0 VRs
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
+index 9b2d7c4fc931..d99913865b7c 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
+@@ -192,6 +192,21 @@ i2cswitch@70 {
+ &i2c4 {
+ 	// Net name i2c1 (SCM_I2C1)
+ 	status = "okay";
++	vdd33run@13 {
++		//VDD_33_RUN VRM
++		compatible = "pmbus";
++		reg = <0x13>;
++	};
++	vdd33dual@14 {
++		//VDD_33_DUAL VRM
++		compatible = "pmbus";
++		reg = <0x14>;
++	};
++	vdd5dual@15 {
++		//VDD_5_DUAL VRM
++		compatible = "pmbus";
++		reg = <0x15>;
++	};
+ };
+
+ // BMC Chalupa P0 VRs
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts
+index 2e47032ed7c2..27dd6bb497a1 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts
+@@ -192,6 +192,21 @@ tca9546a@70 {
+ &i2c4 {
+ 	// Net name i2c1
+ 	status = "okay";
++	vdd33run@13 {
++		//VDD_33_RUN VRM
++		compatible = "pmbus";
++		reg = <0x13>;
++	};
++	vdd33dual@14 {
++		//VDD_33_DUAL VRM
++		compatible = "pmbus";
++		reg = <0x14>;
++	};
++	vdd5dual@15 {
++		//VDD_5_DUAL VRM
++		compatible = "pmbus";
++		reg = <0x15>;
++	};
+ };
+
+ // BMC galena VRs
+@@ -226,12 +241,12 @@ core1vrm@42 {
+ 			};
+ 			vdd33dualvrm@16 {
+ 				//VDD 33 DUAL VRM
+-				compatible = "infineon,xdpe12284";
++				compatible = "pmbus";
+ 				reg = <0x16>;
+ 			};
+ 			vdd18dualvrm@17 {
+ 				//VDD 18 DUAL VRM
+-				compatible = "infineon,xdpe12284";
++				compatible = "pmbus";
+ 				reg = <0x17>;
+ 			};
+ 		};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts b/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
+index c56895f918ce..af5ebbc0dafe 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
+@@ -192,6 +192,21 @@ tca9546a@70 {
+ &i2c4 {
+ 	// Net name i2c1
+ 	status = "okay";
++	vdd33run@13 {
++		//VDD_33_RUN VRM
++		compatible = "pmbus";
++		reg = <0x13>;
++	};
++	vdd33dual@14 {
++		//VDD_33_DUAL VRM
++		compatible = "pmbus";
++		reg = <0x14>;
++	};
++	vdd5dual@15 {
++		//VDD_5_DUAL VRM
++		compatible = "pmbus";
++		reg = <0x15>;
++	};
+ };
+
+ // BMC galena VRs
+@@ -226,12 +241,12 @@ core1vrm@42 {
+ 			};
+ 			vdd33dualvrm@16 {
+ 				//VDD 33 DUAL VRM
+-				compatible = "infineon,xdpe12284";
++				compatible = "pmbus";
+ 				reg = <0x16>;
+ 			};
+ 			vdd18dualvrm@17 {
+ 				//VDD 18 DUAL VRM
+-				compatible = "infineon,xdpe12284";
++				compatible = "pmbus";
+ 				reg = <0x17>;
+ 			};
+ 		};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts
+index bf3d8f74d711..8933bb4bd5de 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts
+@@ -192,6 +192,21 @@ i2cswitch@70 {
+ &i2c4 {
+ 	// Net name i2c1 (SCM_I2C1)
+ 	status = "okay";
++	vdd33run@13 {
++		//VDD_33_RUN VRM
++		compatible = "pmbus";
++		reg = <0x13>;
++	};
++	vdd33dual@14 {
++		//VDD_33_DUAL VRM
++		compatible = "pmbus";
++		reg = <0x14>;
++	};
++	vdd5dual@15 {
++		//VDD_5_DUAL VRM
++		compatible = "pmbus";
++		reg = <0x15>;
++	};
+ };
+
+ // BMC Huambo P0 VRs
+@@ -210,40 +225,40 @@ i2c@0 {
+                         #size-cells = <0>;
+                         reg = <0>;
+
+-                        p0_vdd_core0_run@60 {
+-                                //VDD core0 run/soc
+-                                compatible = "isil,isl68137";
+-                                reg = <0x60>;
+-                        };
+-
+-                        p0_vdd_core1_run@61 {
+-                                //VDD core1 run
+-                                compatible = "isil,isl68137";
+-                                reg = <0x61>;
+-                        };
+-
+-                        p0_vdd_vddio_run@62 {
+-                                //VDD IO RUN
+-                                compatible = "isil,isl68137";
+-                                reg = <0x62>;
+-                        };
+-
+-                        p0_vdd_11_sus@63 {
+-                                //VDD 11 sus
+-                                compatible = "isil,isl68137";
+-                                reg = <0x63>;
+-                        };
+-
+-                        p0_vdd_18_dual@64 {
+-                                //VDD 18 DUAL
+-                                compatible = "isil,isl68137";
+-                                reg = <0x64>;
+-                        };
+-
+-                        p0_vdd_33_dual@65 {
+-                                //VDD 33 DUAL VRM
+-                                compatible = "isil,isl68137";
+-                                reg = <0x65>;
++						p0_vdd_core0_run@60 {
++								//VDD core0 run/soc
++								compatible = "isil,isl68137";
++								reg = <0x60>;
++						};
++
++						p0_vdd_core1_run@61 {
++								//VDD core1 run
++								compatible = "isil,isl68137";
++								reg = <0x61>;
++						};
++
++						p0_vdd_vddio_run@62 {
++								//VDD IO RUN
++								compatible = "isil,isl68137";
++								reg = <0x62>;
++						};
++
++						p0_vdd_11_sus@63 {
++								//VDD 11 sus
++								compatible = "isil,isl68137";
++								reg = <0x63>;
++						};
++
++						p0_vdd_18_dual@64 {
++								//VDD 18 DUAL
++								compatible = "isil,isl68137";
++								reg = <0x64>;
++						};
++
++						p0_vdd_33_dual@65 {
++								//VDD 33 DUAL VRM
++								compatible = "isil,isl68137";
++								reg = <0x65>;
+                         };
+                 };
+ 	};
+@@ -265,40 +280,40 @@ i2c@0 {
+                         #size-cells = <0>;
+                         reg = <0>;
+
+-                        p1_vdd_core0_run@60 {
+-                                //VDD core0 run/soc
+-                                compatible = "isil,isl68137";
+-                                reg = <0x60>;
+-                        };
+-
+-                        p1_vdd_core1_run@61 {
+-                                //VDD core1 run
+-                                compatible = "isil,isl68137";
+-                                reg = <0x61>;
+-                        };
+-
+-                        p1_vdd_vddio_run@62 {
+-                                //VDD IO RUN
+-                                compatible = "isil,isl68137";
+-                                reg = <0x62>;
+-                        };
+-
+-                        p1_vdd_11_sus@63 {
+-                                //VDD 11 sus
+-                                compatible = "isil,isl68137";
+-                                reg = <0x63>;
+-                        };
+-
+-                        p1_vdd_18_dual@64 {
+-                                //VDD 18 DUAL
+-                                compatible = "isil,isl68137";
+-                                reg = <0x64>;
+-                        };
+-
+-                        p1_vdd_33_dual@65 {
+-                                //VDD 33 DUAL VRM
+-                                compatible = "isil,isl68137";
+-                                reg = <0x65>;
++						p1_vdd_core0_run@60 {
++								//VDD core0 run/soc
++								compatible = "isil,isl68137";
++								reg = <0x60>;
++						};
++
++						p1_vdd_core1_run@61 {
++								//VDD core1 run
++								compatible = "isil,isl68137";
++								reg = <0x61>;
++						};
++
++						p1_vdd_vddio_run@62 {
++								//VDD IO RUN
++								compatible = "isil,isl68137";
++								reg = <0x62>;
++						};
++
++						p1_vdd_11_sus@63 {
++								//VDD 11 sus
++								compatible = "isil,isl68137";
++								reg = <0x63>;
++						};
++
++						p1_vdd_18_dual@64 {
++								//VDD 18 DUAL
++								compatible = "isil,isl68137";
++								reg = <0x64>;
++						};
++
++						p1_vdd_33_dual@65 {
++								//VDD 33 DUAL VRM
++								compatible = "isil,isl68137";
++								reg = <0x65>;
+                         };
+                 };
+ 	};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts b/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
+index a81cd70473cc..2358b8abb147 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
+@@ -192,6 +192,21 @@ i2cswitch@70 {
+ &i2c4 {
+ 	// Net name i2c1 (SCM_I2C1)
+ 	status = "okay";
++	vdd33run@13 {
++		//VDD_33_RUN VRM
++		compatible = "pmbus";
++		reg = <0x13>;
++	};
++	vdd33dual@14 {
++		//VDD_33_DUAL VRM
++		compatible = "pmbus";
++		reg = <0x14>;
++	};
++	vdd5dual@15 {
++		//VDD_5_DUAL VRM
++		compatible = "pmbus";
++		reg = <0x15>;
++	};
+ };
+
+ // BMC Huambo P0 VRs
+@@ -210,40 +225,34 @@ i2c@0 {
+                         #size-cells = <0>;
+                         reg = <0>;
+
+-                        p0_vdd_core0_run@60 {
+-                                //VDD core0 run/soc
+-                                compatible = "isil,isl68137";
+-                                reg = <0x60>;
+-                        };
+-
+-                        p0_vdd_core1_run@61 {
+-                                //VDD core1 run
+-                                compatible = "isil,isl68137";
+-                                reg = <0x61>;
+-                        };
+-
+-                        p0_vdd_vddio_run@62 {
+-                                //VDD IO RUN
+-                                compatible = "isil,isl68137";
+-                                reg = <0x62>;
+-                        };
+-
+-                        p0_vdd_11_sus@63 {
+-                                //VDD 11 sus
+-                                compatible = "isil,isl68137";
+-                                reg = <0x63>;
+-                        };
+-
+-                        p0_vdd_18_dual@64 {
+-                                //VDD 18 DUAL
+-                                compatible = "isil,isl68137";
+-                                reg = <0x64>;
+-                        };
+-
+-                        p0_vdd_33_dual@65 {
+-                                //VDD 33 DUAL VRM
+-                                compatible = "isil,isl68137";
+-                                reg = <0x65>;
++						p0_vdd_core0_run@61 {
++								//VDD core0 run
++								compatible = "isil,isl68137";
++								reg = <0x61>;
++						};
++
++						p0_vdd_core1_run@62 {
++								//VDD core1 run
++								compatible = "isil,isl68137";
++								reg = <0x62>;
++						};
++
++						p0_vddio_run@63 {
++								//VDDIO run
++								compatible = "isil,isl68137";
++								reg = <0x63>;
++						};
++
++						p0_vdd_18_dual@64 {
++								//VDD 18 DUAL
++								compatible = "isil,isl68137";
++								reg = <0x64>;
++						};
++
++						p0_vdd_33_dual@65 {
++								//VDD 33 DUAL VRM
++								compatible = "isil,isl68137";
++								reg = <0x65>;
+                         };
+                 };
+ 	};
+@@ -265,40 +274,34 @@ i2c@0 {
+                         #size-cells = <0>;
+                         reg = <0>;
+
+-                        p1_vdd_core0_run@60 {
+-                                //VDD core0 run/soc
+-                                compatible = "isil,isl68137";
+-                                reg = <0x60>;
+-                        };
+-
+-                        p1_vdd_core1_run@61 {
+-                                //VDD core1 run
+-                                compatible = "isil,isl68137";
+-                                reg = <0x61>;
+-                        };
+-
+-                        p1_vdd_vddio_run@62 {
+-                                //VDD IO RUN
+-                                compatible = "isil,isl68137";
+-                                reg = <0x62>;
+-                        };
+-
+-                        p1_vdd_11_sus@63 {
+-                                //VDD 11 sus
+-                                compatible = "isil,isl68137";
+-                                reg = <0x63>;
+-                        };
+-
+-                        p1_vdd_18_dual@64 {
+-                                //VDD 18 DUAL
+-                                compatible = "isil,isl68137";
+-                                reg = <0x64>;
+-                        };
+-
+-                        p1_vdd_33_dual@65 {
+-                                //VDD 33 DUAL VRM
+-                                compatible = "isil,isl68137";
+-                                reg = <0x65>;
++						p1_vdd_core0_run@61 {
++								//VDD core0 run
++								compatible = "isil,isl68137";
++								reg = <0x61>;
++						};
++
++						p1_vdd_core1_run@62 {
++								//VDD core1 run
++								compatible = "isil,isl68137";
++								reg = <0x62>;
++						};
++
++						p1_vddio_run@63 {
++								//VDDIO run
++								compatible = "isil,isl68137";
++								reg = <0x63>;
++						};
++
++						p1_vdd_18_dual@64 {
++								//VDD 18 DUAL
++								compatible = "isil,isl68137";
++								reg = <0x64>;
++						};
++
++						p1_vdd_33_dual@65 {
++								//VDD 33 DUAL VRM
++								compatible = "isil,isl68137";
++								reg = <0x65>;
+                         };
+                 };
+ 	};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts
+index 828ce3369c2f..b9ff5bcd7c07 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts
+@@ -192,6 +192,21 @@ tca9546a@70 {
+ &i2c4 {
+ 	// Net name i2c1
+ 	status = "okay";
++	vdd33run@13 {
++		//VDD_33_RUN VRM
++		compatible = "pmbus";
++		reg = <0x13>;
++	};
++	vdd33dual@14 {
++		//VDD_33_DUAL VRM
++		compatible = "pmbus";
++		reg = <0x14>;
++	};
++	vdd5dual@15 {
++		//VDD_5_DUAL VRM
++		compatible = "pmbus";
++		reg = <0x15>;
++	};
+ };
+
+ // BMC Recluse VRs
+@@ -226,12 +241,12 @@ core1vrm@42 {
+ 			};
+ 			vdd33dualvrm@16 {
+ 				//VDD 33 DUAL VRM
+-				compatible = "infineon,xdpe12284";
++				compatible = "pmbus";
+ 				reg = <0x16>;
+ 			};
+ 			vdd18dualvrm@17 {
+ 				//VDD 18 DUAL VRM
+-				compatible = "infineon,xdpe12284";
++				compatible = "pmbus";
+ 				reg = <0x17>;
+ 			};
+ 		};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts b/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
+index 84bcb2d7cfdd..47420619cb0e 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
+@@ -191,7 +191,22 @@ tca9546a@70 {
+
+ &i2c4 {
+ 	// Net name i2c1
+-	status = "okay";
++    status = "okay";
++	vdd33run@13 {
++		//VDD_33_RUN VRM
++		compatible = "pmbus";
++		reg = <0x13>;
++	};
++	vdd33dual@14 {
++		//VDD_33_DUAL VRM
++		compatible = "pmbus";
++		reg = <0x14>;
++	};
++	vdd5dual@15 {
++		//VDD_5_DUAL VRM
++		compatible = "pmbus";
++		reg = <0x15>;
++	};
+ };
+
+ // BMC Recluse VRs
+@@ -226,12 +241,12 @@ core1vrm@42 {
+ 			};
+ 			vdd33dualvrm@16 {
+ 				//VDD 33 DUAL VRM
+-				compatible = "infineon,xdpe12284";
++				compatible = "pmbus";
+ 				reg = <0x16>;
+ 			};
+ 			vdd18dualvrm@17 {
+ 				//VDD 18 DUAL VRM
+-				compatible = "infineon,xdpe12284";
++				compatible = "pmbus";
+ 				reg = <0x17>;
+ 			};
+ 		};
+--
+2.25.1
+
