@@ -1,0 +1,188 @@
+From 1caadc305103d2f75728b7bb336e7d8bf70737c0 Mon Sep 17 00:00:00 2001
+From: Ashok Kumar <ashok2.kumar@amd.com>
+Date: Thu, 2 Nov 2023 12:55:23 -0500
+Subject: [PATCH 1/1] Implement Error message for PCIe and Storage endpoint
+
+ - Support added - in-case BMC dont received data
+   from BIOS, check for new interface and post
+   error to refish API
+
+Signed-off-by: Ashok Kumar <ashok2.kumar@amd.com>
+---
+ redfish-core/include/error_messages.hpp       |  9 ++++
+ .../registries/base_message_registry.hpp      | 14 ++++-
+ redfish-core/lib/pcie.hpp                     |  5 ++
+ redfish-core/lib/storage.hpp                  | 51 ++++++++++++++++---
+ redfish-core/src/error_messages.cpp           | 27 ++++++++++
+ 5 files changed, 97 insertions(+), 9 deletions(-)
+
+diff --git a/redfish-core/include/error_messages.hpp b/redfish-core/include/error_messages.hpp
+index f6381d14..776b67b9 100644
+--- a/redfish-core/include/error_messages.hpp
++++ b/redfish-core/include/error_messages.hpp
+@@ -969,6 +969,15 @@ void mutualExclusiveProperties(crow::Response& res, const std::string& arg1,
+ nlohmann::json cpuPropertyNotFound(const std::string& arg1);
+
+ void cpuPropertyNotFound(crow::Response& res, const std::string& arg1);
++
++/**
++ * @brief Formats PCIeDataUnknownInSharedMemory message into JSON
++ * Message body: "The properties with is not available to perform this request."
++ *
++ * @returns Message PCIeDataUnknownInSharedMemory formatted to JSON */
++nlohmann::json PCIeDataUnknownInSharedMemory(void);
++
++void PCIeDataUnknownInSharedMemory(crow::Response& res);
+ } // namespace messages
+
+ } // namespace redfish
+diff --git a/redfish-core/include/registries/base_message_registry.hpp b/redfish-core/include/registries/base_message_registry.hpp
+index cff9759b..aa35c3cb 100644
+--- a/redfish-core/include/registries/base_message_registry.hpp
++++ b/redfish-core/include/registries/base_message_registry.hpp
+@@ -36,7 +36,7 @@ const Header header = {
+ constexpr const char* url =
+     "https://redfish.dmtf.org/registries/Base.1.8.1.json";
+
+-constexpr std::array<MessageEntry, 75> registry = {
++constexpr std::array<MessageEntry, 76> registry = {
+     MessageEntry{
+         "AccessDenied",
+         {
+@@ -1154,5 +1154,17 @@ constexpr std::array<MessageEntry, 75> registry = {
+             "Apml library may not be configured properly, check apml configuration"
+             "and resubmit",
+         }},
++   MessageEntry{
++        "PCIeDataUnknownInSharedMemory",
++        {
++            "Indicates that the BMC does not received PCIe data from BIOS in ",
++            "shared memory to perform this request.",
++            "Warning",
++            "Warning",
++            0,
++            {},
++            "Check supported version of BIOS or do Host power cycle and "
++            "resubmit the request",
++        }},
+ };
+ } // namespace redfish::message_registries::base
+diff --git a/redfish-core/lib/pcie.hpp b/redfish-core/lib/pcie.hpp
+index 7f30a31a..f80f8fc8 100644
+--- a/redfish-core/lib/pcie.hpp
++++ b/redfish-core/lib/pcie.hpp
+@@ -57,6 +57,11 @@ static inline void
+             {
+                 continue;
+             }
++            if (devName == "MemoryStatus")
++            {
++                messages::PCIeDataUnknownInSharedMemory(asyncResp->res);
++                return;
++            }
+             pcieDeviceList.push_back(
+                 {{"@odata.id",
+                   "/redfish/v1/Systems/system/PCIeDevices/" + devName}});
+diff --git a/redfish-core/lib/storage.hpp b/redfish-core/lib/storage.hpp
+index d2a6f17c..d159b518 100644
+--- a/redfish-core/lib/storage.hpp
++++ b/redfish-core/lib/storage.hpp
+@@ -41,14 +41,49 @@ class StorageCollection : public Node
+     void doGet(const std::shared_ptr<bmcweb::AsyncResp>& asyncResp,
+                const crow::Request&, const std::vector<std::string>&) override
+     {
+-        asyncResp->res.jsonValue["@odata.type"] =
+-            "#StorageCollection.StorageCollection";
+-        asyncResp->res.jsonValue["@odata.id"] =
+-            "/redfish/v1/Systems/system/Storage";
+-        asyncResp->res.jsonValue["Name"] = "Storage Collection";
+-        asyncResp->res.jsonValue["Members"] = {
+-            {{"@odata.id", "/redfish/v1/Systems/system/Storage/1"}}};
+-        asyncResp->res.jsonValue["Members@odata.count"] = 1;
++        constexpr char const* pciePath = "/xyz/openbmc_project/PCIe";
++        auto getPCIeMapCallback = [asyncResp](
++                                  const boost::system::error_code ec,
++                                  std::vector<std::string>& pcieDevicePaths) {
++             if (ec)
++             {
++                 BMCWEB_LOG_DEBUG << "no device paths found ec: "
++                                  << ec.message();
++                 // Not an error, system just doesn't have PCIe info
++                 return;
++             }
++             for (const std::string& pcieDevicePath : pcieDevicePaths)
++             {
++                 size_t devStart = pcieDevicePath.rfind('/');
++                 if (devStart == std::string::npos)
++                 {
++                     continue;
++                 }
++
++                 std::string devName = pcieDevicePath.substr(devStart + 1);
++                 if (devName == "MemoryStatus")
++                 {
++                    // MemoryStatus - new interface will created if No Data
++                    // received from BIOS - post error in Redfish URI
++                    messages::PCIeDataUnknownInSharedMemory(asyncResp->res);
++                    return;
++                 }
++             }
++             asyncResp->res.jsonValue["@odata.type"] =
++                  "#StorageCollection.StorageCollection";
++             asyncResp->res.jsonValue["@odata.id"] =
++                  "/redfish/v1/Systems/system/Storage";
++             asyncResp->res.jsonValue["Name"] = "Storage Collection";
++             asyncResp->res.jsonValue["Members"] = {
++                 {{"@odata.id", "/redfish/v1/Systems/system/Storage/1"}}};
++             asyncResp->res.jsonValue["Members@odata.count"] = 1;
++
++       };
++       crow::connections::systemBus->async_method_call(
++         std::move(getPCIeMapCallback), "xyz.openbmc_project.ObjectMapper",
++         "/xyz/openbmc_project/object_mapper",
++         "xyz.openbmc_project.ObjectMapper", "GetSubTreePaths",
++         std::string(pciePath) + "/", 1, std::array<std::string, 0>());
+     }
+ };
+
+diff --git a/redfish-core/src/error_messages.cpp b/redfish-core/src/error_messages.cpp
+index 31d55a66..8219f975 100644
+--- a/redfish-core/src/error_messages.cpp
++++ b/redfish-core/src/error_messages.cpp
+@@ -2173,6 +2173,33 @@ void cpuPropertyNotFound(crow::Response& res, const std::string& arg1)
+     res.result(boost::beast::http::status::bad_request);
+     addMessageToErrorJson(res.jsonValue, cpuPropertyNotFound(arg1));
+ }
++/**
++ * @internal
++ * @brief Formats PCIeDataUnknownInSharedMemory message into JSON
++ *
++ * See header file for more information
++ * @endinternal
++ */
++nlohmann::json PCIeDataUnknownInSharedMemory(void)
++{
++    return nlohmann::json{
++        {"@odata.type", "#Message.v1_1_1.Message"},
++        {"MessageId", "Base.1.8.1.PCIeDataUnknownInSharedMemory"},
++        {"Message", "Indicates that the BMC does not received PCIe data "
++                    "from BIOS in shared memory to perform this request."},
++        {"MessageArgs", nlohmann::json::array()},
++        {"MessageSeverity", "Warning"},
++        {"Resolution",
++         "Check supported version of BIOS or do Host Power cycle "
++         "and resubmit the request."}};
++}
++
++void PCIeDataUnknownInSharedMemory(crow::Response& res)
++{
++    res.result(boost::beast::http::status::bad_request);
++    addMessageToErrorJson(res.jsonValue, PCIeDataUnknownInSharedMemory());
++}
++
+ } // namespace messages
+
+ } // namespace redfish
+--
+2.25.1
+

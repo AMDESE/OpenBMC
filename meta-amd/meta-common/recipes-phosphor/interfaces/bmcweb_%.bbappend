@@ -29,5 +29,6 @@ SRC_URI += "file://0001-Reset-server-settings-only-changes-to-invoke-CMOS.patch 
             file://0022-bmcweb-handle-multiple-PPR-Request.patch \
             file://0023-bmcweb-limit-Runtime-PPR-to-Max-8.patch \
             file://0024-Redfish-command-to-set-ResetFwInventory-property.patch \
+            file://0025-Implement-Error-message-for-PCIe-and-Storage-endpoin.patch \
             "
 
