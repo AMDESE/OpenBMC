@@ -1,0 +1,31 @@
+From c46f87ca8720330fd1c45a8ac84bcf33551fd061 Mon Sep 17 00:00:00 2001
+From: Ashok Kumar <ashok2.kumar@amd.com>
+Date: Thu, 2 Nov 2023 13:12:47 -0500
+Subject: [PATCH 1/1] webui-vue: Corrected Factory reset message
+
+Factory reset message modified
+
+Signed-off-by: Ashok Kumar <ashok2.kumar@amd.com>
+---
+ src/locales/en-US.json | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/locales/en-US.json b/src/locales/en-US.json
+index 91fbd0e..bd31e08 100644
+--- a/src/locales/en-US.json
++++ b/src/locales/en-US.json
+@@ -315,9 +315,9 @@
+       "resetWarningCheckLabel": "Continue without shutting down the system"
+     },
+     "toast": {
+-      "resetBiosSuccess": "Factory reset of server settings successful.",
++      "resetBiosSuccess": "Command to initiate factory reset of server settings successful.",
+       "resetBiosError": "Factory reset of server settings failed.",
+-      "resetToDefaultsSuccess": "Factory reset of BMC and server settings successful.",
++      "resetToDefaultsSuccess": "Command to initiate factory reset of BMC and server settings successful.",
+       "resetToDefaultsError": "Factory reset of BMC and server settings failed.",
+       "resetFwInventorySuccess": "Reset of Firmware Inventory successful",
+       "resetFwInventoryError": "Reset of Firmware Inventory failed"
+--
+2.25.1
+
