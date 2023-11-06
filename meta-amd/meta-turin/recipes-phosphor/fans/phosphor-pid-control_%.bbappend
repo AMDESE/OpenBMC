@@ -8,6 +8,9 @@ SRC_URI_append += " file://galena-stepwise-config.json \
                     file://purico-stepwise-config.json \
                     file://volcano-stepwise-config.json \
                     file://huambo-stepwise-config.json \
+                    file://chalupa1P-stepwise-config.json \
+                    file://volcano1P-stepwise-config.json \
+                    file://huambo1P-stepwise-config.json \
                     file://set-platform-json-config.sh \
                     file://phosphor-pid-control.service \
                     file://0001-phosphor-pid-control-Add-CPU-Temp-simulation-code.patch \
@@ -20,6 +23,9 @@ FILES_${PN}_append = " ${datadir}/swampd/galena-stepwise-config.json \
                        ${datadir}/swampd/purico-stepwise-config.json \
                        ${datadir}/swampd/volcano-stepwise-config.json \
                        ${datadir}/swampd/huambo-stepwise-config.json \
+                       ${datadir}/swampd/chalupa1P-stepwise-config.json \
+                       ${datadir}/swampd/volcano1P-stepwise-config.json \
+                       ${datadir}/swampd/huambo1P-stepwise-config.json \
                        ${bindir}/set-platform-json-config.sh \
                      "
 
@@ -44,6 +50,12 @@ do_install_append() {
         ${D}${datadir}/swampd/volcano-stepwise-config.json
     install -m 0644 -D ${WORKDIR}/huambo-stepwise-config.json \
         ${D}${datadir}/swampd/huambo-stepwise-config.json
+    install -m 0644 -D ${WORKDIR}/chalupa1P-stepwise-config.json \
+        ${D}${datadir}/swampd/chalupa1P-stepwise-config.json
+    install -m 0644 -D ${WORKDIR}/volcano1P-stepwise-config.json \
+        ${D}${datadir}/swampd/volcano1P-stepwise-config.json
+    install -m 0644 -D ${WORKDIR}/huambo1P-stepwise-config.json \
+        ${D}${datadir}/swampd/huambo1P-stepwise-config.json
 
     install -d ${D}${systemd_system_unitdir}
     install -m 0644 ${WORKDIR}/phosphor-pid-control.service \
