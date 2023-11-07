@@ -49,6 +49,7 @@ RDEPENDS_${PN}-system = " \
         amd-spdm \
         amd-yaap \
         auto-notify \
+        bmc-retimer-update \
         bmcweb \
         cpu-info \
         debug-apps \
@@ -63,7 +64,6 @@ RDEPENDS_${PN}-system = " \
         phosphor-post-code-manager \
         power-capping \
         phosphor-misc-usb-ctrl \
-        retimer-update \
         set-fan-speed \
         set-associations-path \
         usb-network \
