@@ -531,22 +531,22 @@
   sensorID: 0x7B
   sensorType: 4
   offset: 0xff
-/xyz/openbmc_project/sensors/fan_tach/P0_WaterPump_Fanr0:
+/xyz/openbmc_project/sensors/fan_tach/P0_WaterPump_Fan1:
   eventReadingType: 1
   sensorID: 0x7C
   sensorType: 4
   offset: 0xff
-/xyz/openbmc_project/sensors/fan_tach/P0_WaterPump_Fanr1:
+/xyz/openbmc_project/sensors/fan_tach/P0_WaterPump_Fan2:
   eventReadingType: 1
   sensorID: 0x7D
   sensorType: 4
   offset: 0xff
-/xyz/openbmc_project/sensors/fan_tach/P1_WaterPump_Fanr0:
+/xyz/openbmc_project/sensors/fan_tach/P1_WaterPump_Fan1:
   eventReadingType: 1
   sensorID: 0x7E
   sensorType: 4
   offset: 0xff
-/xyz/openbmc_project/sensors/fan_tach/P1_WaterPump_Fanr1:
+/xyz/openbmc_project/sensors/fan_tach/P1_WaterPump_Fan2:
   eventReadingType: 1
   sensorID: 0x7F
   sensorType: 4

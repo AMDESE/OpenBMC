@@ -532,7 +532,7 @@
             type: double
   multiplierM: 96
   mutability: Mutability::Write|Mutability::Read
-  path: /xyz/openbmc_project/sensors/fan_tach/P0_WaterPump_Fanr0
+  path: /xyz/openbmc_project/sensors/fan_tach/P0_WaterPump_Fan1
   rExp: 0
   readingType: readingData
   scale: 0
@@ -554,7 +554,7 @@
             type: double
   multiplierM: 96
   mutability: Mutability::Write|Mutability::Read
-  path: /xyz/openbmc_project/sensors/fan_tach/P0_WaterPump_Fanr1
+  path: /xyz/openbmc_project/sensors/fan_tach/P0_WaterPump_Fan2
   rExp: 0
   readingType: readingData
   scale: 0
@@ -576,7 +576,7 @@
             type: double
   multiplierM: 96
   mutability: Mutability::Write|Mutability::Read
-  path: /xyz/openbmc_project/sensors/fan_tach/P1_WaterPump_Fanr0
+  path: /xyz/openbmc_project/sensors/fan_tach/P1_WaterPump_Fan1
   rExp: 0
   readingType: readingData
   scale: 0
@@ -598,7 +598,7 @@
             type: double
   multiplierM: 96
   mutability: Mutability::Write|Mutability::Read
-  path: /xyz/openbmc_project/sensors/fan_tach/P1_WaterPump_Fanr1
+  path: /xyz/openbmc_project/sensors/fan_tach/P1_WaterPump_Fan2
   rExp: 0
   readingType: readingData
   scale: 0
