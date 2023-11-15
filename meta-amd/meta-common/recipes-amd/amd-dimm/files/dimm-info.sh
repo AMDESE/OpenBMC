@@ -16,7 +16,7 @@ ITEM_DIMM="xyz.openbmc_project.Inventory.Item.Dimm"
 board_id=`fw_printenv board_id | sed -n "s/^board_id=//p"`
 
 case $board_id in
-       "6A" | "72" | "73" | "6B"| "74" | "75")  # Purico or Volcano
+       "6A" | "72" | "73" | "6B"| "74" | "75" | "7F")  # Purico or Volcano
             echo "Lenovo Turin system " $board_id " do not run dimm-info "
             exit
        ;;
