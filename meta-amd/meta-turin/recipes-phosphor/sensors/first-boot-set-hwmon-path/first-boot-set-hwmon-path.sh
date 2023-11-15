@@ -25,7 +25,7 @@ sync_hwmon_path() {
            "67")  # huambo board_ids
                 ln -s  /etc/default/obmc/hwmon_huambo/ /etc/default/obmc/hwmon
            ;;
-           "6B"| "74" | "75")  # volcano board_ids
+           "6B"| "74" | "75" | "7F")  # volcano board_ids
                 ln -s  /etc/default/obmc/hwmon_volcano/ /etc/default/obmc/hwmon
            ;;
            *)  # Default set to galena board
