@@ -1,0 +1,53 @@
+From af14941ba27fe4ecaa5e4ee5ea4fb3a70ad0da4d Mon Sep 17 00:00:00 2001
+From: Mohsen Dolaty <mohsen.dolaty@amd.com>
+Date: Wed, 15 Nov 2023 11:39:13 -0600
+Subject: [PATCH 1/1] u-boot: Add Turin Volcano with 4 Pump Fans
+
+Add new Platform ID (0x7F) for Volcano with 4 Pumps
+Other Volcanos only have 2 pumps
+
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
+---
+ common/image-fit.c      | 1 +
+ common/main.c           | 1 +
+ include/amd-platforms.h | 1 +
+ 3 files changed, 3 insertions(+)
+
+diff --git a/common/image-fit.c b/common/image-fit.c
+index fa5f141a81..2516101dd0 100644
+--- a/common/image-fit.c
++++ b/common/image-fit.c
+@@ -1968,6 +1968,7 @@ int fit_image_load(bootm_headers_t *images, ulong addr,
+ 				case VOLCANO:
+ 				case VOLCANO_1:
+ 				case VOLCANO_2:
++				case VOLCANO_4:
+ 					if (strncmp(apml_i3c, "true", APML_I3C_CHAR_CNT) == 0)
+ 						sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-volcano-i3c.dtb");
+ 					else
+diff --git a/common/main.c b/common/main.c
+index e3c5ebf702..0eac68de7a 100644
+--- a/common/main.c
++++ b/common/main.c
+@@ -148,6 +148,7 @@ void set_hostname()
+ 				case VOLCANO:
+ 				case VOLCANO_1:
+ 				case VOLCANO_2:
++				case VOLCANO_4:
+ 					sprintf(hostname, "volcano-%02x%02x", octate_5, octate_6);
+ 					num_of_cpu = TWO_SOCKET_CONFIG;
+ 					break;
+diff --git a/include/amd-platforms.h b/include/amd-platforms.h
+index 1f2e1bafbc..82264f0095 100644
+--- a/include/amd-platforms.h
++++ b/include/amd-platforms.h
+@@ -77,6 +77,7 @@
+ #define VOLCANO         107 // 0x6B
+ #define VOLCANO_1       116 // 0x74
+ #define VOLCANO_2       117 // 0x75
++#define VOLCANO_4       127 // 0x7F
+ #define GALENA_CHARZ1   119 // 0x77
+ #define GALENA_CHARZ2   120 // 0x78
+
+--
+2.25.1
