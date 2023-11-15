@@ -27,6 +27,9 @@ sync_associations_path() {
         "6B" | "74" | "75")  # Volcano board_ids
             ln -s  /usr/share/phosphor-inventory-manager/volcano-associations.json /usr/share/phosphor-inventory-manager/associations.json
         ;;
+        "7F")  # Volcano with 4 Pumps board_ids
+            ln -s  /usr/share/phosphor-inventory-manager/volcano4-associations.json /usr/share/phosphor-inventory-manager/associations.json
+        ;;
         *)  # Default set to galena board
             ln -s  /usr/share/phosphor-inventory-manager/galena-associations.json /usr/share/phosphor-inventory-manager/associations.json
     esac
