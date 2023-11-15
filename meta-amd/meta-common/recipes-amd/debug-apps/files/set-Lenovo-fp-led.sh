@@ -9,7 +9,7 @@ case $boardID in
         I2C_BUS=276
         IOX_ADDR=0x1B
     ;;
-    "6B"| "74" | "75")  # volcano board_ids
+    "6B"| "74" | "75" | "7F")  # volcano board_ids
         echo "Volcano, set LED "
         I2C_BUS=206
         IOX_ADDR=0x1B
