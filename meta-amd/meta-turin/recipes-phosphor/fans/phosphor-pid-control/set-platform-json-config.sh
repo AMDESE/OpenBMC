@@ -42,7 +42,7 @@ case $boardID in
    "6A"|"72"|"73")  # Purico board_ids
         ln -s /usr/share/swampd/purico-stepwise-config.json /usr/share/swampd/config.json
    ;;
-   "6B"|"74"|"75")  # Volcano board_ids
+   "6B"|"74"|"75"|"7F")  # Volcano board_ids
         if [ $CPU1Present -eq 1 ] ; then
             ln -s /usr/share/swampd/volcano-stepwise-config.json /usr/share/swampd/config.json
         else
