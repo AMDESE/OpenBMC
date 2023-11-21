@@ -75,4 +75,5 @@ SRC_URI += "file://amd-bmc-baseline.cfg \
             file://0073-arm-dts-aspeed-modify-sh5-device-tree-for-VRs-DIMM-and-adc.patch \
             file://0074-Add-TDA-VR-devices-to-dts-for-turin.patch \
             file://0075-drivers-mtd-spi-Add-support-for-GD55-SPI.patch \
+            file://0076-ARM-dts-aspeed-Add-Turin-FP-ID-Button-to-GPIO.patch \
            "

@@ -1,0 +1,70 @@
+From 2c8d4597521bd437c988741393d7f5ba324f5922 Mon Sep 17 00:00:00 2001
+From: Mohsen Dolaty <mohsen.dolaty@amd.com>
+Date: Mon, 20 Nov 2023 19:04:53 -0600
+Subject: [PATCH 1/1] linux-aspeed: Add Turin FP ID Button to GPIO
+
+Add Front Panel ID Button to Turin Volcano and Purico GPIO (Y0)
+in DTS
+
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts  | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-purico.dts      | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts     | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
+index fe100f2504e4..4be809576f94 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
+@@ -1093,7 +1093,7 @@ &gpio0 {
+ 	/*V0-V7*/	"","","","RSMRST","","","","",
+ 	/*W0-W7*/	"","","","","","","","",
+ 	/*X0-X7*/	"","","","","","","","",
+-	/*Y0-Y7*/	"","","","","","","","",
++	/*Y0-Y7*/	"FP_ID_BTN_L","","","","","","","",
+ 	/*Z0-Z7*/	"","","","","","","","";
+ };
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+index 86a163a9cac9..9e510872147f 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+@@ -1087,7 +1087,7 @@ &gpio0 {
+ 	/*V0-V7*/	"","","","RSMRST","","","","",
+ 	/*W0-W7*/	"","","","","","","","",
+ 	/*X0-X7*/	"","","","","","","","",
+-	/*Y0-Y7*/	"","","","","","","","",
++	/*Y0-Y7*/	"FP_ID_BTN_L","","","","","","","",
+ 	/*Z0-Z7*/	"","","","","","","","";
+ };
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts
+index ac5e6ccd1363..e7ac5b71cceb 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts
+@@ -1229,7 +1229,7 @@ &gpio0 {
+ 	/*V0-V7*/	"","","","RSMRST","","","","",
+ 	/*W0-W7*/	"","","","","","","","",
+ 	/*X0-X7*/	"","","","","","","","",
+-	/*Y0-Y7*/	"","","","","","","","",
++	/*Y0-Y7*/	"FP_ID_BTN_L","","","","","","","",
+ 	/*Z0-Z7*/	"","","","","","","","",
+ 	/*AA0-AA7*/	"","","","","","","","",
+ 	/*AB0-AB7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts b/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
+index 29740404c2ed..09364291052f 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
+@@ -1217,7 +1217,7 @@ &gpio0 {
+ 	/*V0-V7*/	"","","","RSMRST","","","","",
+ 	/*W0-W7*/	"","","","","","","","",
+ 	/*X0-X7*/	"","","","","","","","",
+-	/*Y0-Y7*/	"","","","","","","","",
++	/*Y0-Y7*/	"FP_ID_BTN_L","","","","","","","",
+ 	/*Z0-Z7*/	"","","","","","","","",
+ 	/*AA0-AA7*/	"","","","","","","","",
+ 	/*AB0-AB7*/	"","","","","","","","",
+--
+2.25.1
