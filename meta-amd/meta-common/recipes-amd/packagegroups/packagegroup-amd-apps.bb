@@ -49,6 +49,7 @@ RDEPENDS_${PN}-system = " \
         amd-spdm \
         amd-yaap \
         auto-notify \
+        bmc-fp-led \
         bmc-retimer-update \
         bmcweb \
         cpu-info \
