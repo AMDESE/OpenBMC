@@ -66,5 +66,5 @@ SRC_URI += "file://amd-bmc-baseline.cfg \
             file://0063-ARM-dts-aspeed-Enabled-BMC-device-for-I3c-DTS-file.patch \
             file://0064-ARM-dts-aspeed-Add-MP-2857-PMBus-VR-driver.patch \
             file://0065-ARM-dts-aspeed-Modify-volcano-dts-to-support-E3.s-BP.patch \
-            0066-ARM-dts-aspeed-Add-Vishay-sic458-pmbus-vr-driver.patch \
+            file://0066-ARM-dts-aspeed-Add-Vishay-sic458-pmbus-vr-driver.patch \
            "
