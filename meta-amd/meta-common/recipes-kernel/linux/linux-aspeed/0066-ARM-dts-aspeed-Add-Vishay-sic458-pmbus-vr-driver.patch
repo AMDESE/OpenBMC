@@ -1,0 +1,395 @@
+From 882cc6cc29cfdee32a6428fd4edd83d8f3705bf6 Mon Sep 17 00:00:00 2001
+From: Andrew Peng <pengms1@lenovo.com>
+Date: Tue, 21 Nov 2023 17:53:24 +0800
+Subject: [PATCH] ARM:dts:aspeed: Add Vishay sic458 pmbus vr driver
+
+ - Add Vishay sic458 pmbus vr driver
+ - Update purico dts file
+
+Signed-off-by: Andrew Peng <pengms1@lenovo.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-purico.dts |  31 +++
+ drivers/hwmon/pmbus/Kconfig                 |   9 +
+ drivers/hwmon/pmbus/Makefile                |   1 +
+ drivers/hwmon/pmbus/sic458.c                | 282 ++++++++++++++++++++
+ 4 files changed, 323 insertions(+)
+ mode change 100644 => 100755 drivers/hwmon/pmbus/Kconfig
+ mode change 100644 => 100755 drivers/hwmon/pmbus/Makefile
+ create mode 100755 drivers/hwmon/pmbus/sic458.c
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+index cd2080a6ea72..8e274b3952fc 100755
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+@@ -204,6 +204,25 @@
+ &i2c4 {
+ 	// Net name i2c1
+ 	status = "okay";
++
++    p3V3@16 {
++        //P3V3
++        compatible = "vishay,sic458";
++        reg = <0x16>;
++    };
++
++    p5vaux@1d {
++        //P5V_AUX
++        compatible = "vishay,sic458";
++        reg = <0x1d>;
++    };
++
++    pvdd18@1e {
++        //P3V3_AUX
++        compatible = "vishay,sic458";
++        reg = <0x1e>;
++    };
++
+ };
+ 
+ // HPM CPU VRs
+@@ -239,6 +258,18 @@
+ 				compatible = "mps,mp2857";
+ 				reg = <0x63>;
+ 			};
++
++			pvdd33@19 {
++				//pvdd 3.3
++				compatible = "vishay,sic458";
++				reg = <0x19>;
++			};
++
++			pvdd18@17 {
++				//pvdd 1.8
++				compatible = "vishay,sic458";
++				reg = <0x17>;
++			};
+ 		};
+ 
+ 	};
+diff --git a/drivers/hwmon/pmbus/Kconfig b/drivers/hwmon/pmbus/Kconfig
+old mode 100644
+new mode 100755
+index 435dae59527f..8379333890e6
+--- a/drivers/hwmon/pmbus/Kconfig
++++ b/drivers/hwmon/pmbus/Kconfig
+@@ -238,6 +238,15 @@ config SENSORS_PXE1610
+ 	  This driver can also be built as a module. If so, the module will
+ 	  be called pxe1610.
+ 
++config SENSORS_SIC458
++        tristate "Vishay SIC458"
++        help
++          If you say yes here you get hardware monitoring support for Vishay
++          SIC458 Controller.
++
++          This driver can also be built as a module. If so, the module will
++          be called sic458.
++
+ config SENSORS_TPS40422
+ 	tristate "TI TPS40422"
+ 	help
+diff --git a/drivers/hwmon/pmbus/Makefile b/drivers/hwmon/pmbus/Makefile
+old mode 100644
+new mode 100755
+index c957d51ef630..c7a3925494e9
+--- a/drivers/hwmon/pmbus/Makefile
++++ b/drivers/hwmon/pmbus/Makefile
+@@ -27,6 +27,7 @@ obj-$(CONFIG_SENSORS_MAX8688)	+= max8688.o
+ obj-$(CONFIG_SENSORS_MP2975)	+= mp2975.o
+ obj-$(CONFIG_SENSORS_MP2857)	+= mp2857.o
+ obj-$(CONFIG_SENSORS_PXE1610)	+= pxe1610.o
++obj-$(CONFIG_SENSORS_SIC458)	+= sic458.o
+ obj-$(CONFIG_SENSORS_TPS40422)	+= tps40422.o
+ obj-$(CONFIG_SENSORS_TPS53679)	+= tps53679.o
+ obj-$(CONFIG_SENSORS_UCD9000)	+= ucd9000.o
+diff --git a/drivers/hwmon/pmbus/sic458.c b/drivers/hwmon/pmbus/sic458.c
+new file mode 100755
+index 000000000000..eb16d7f3c52c
+--- /dev/null
++++ b/drivers/hwmon/pmbus/sic458.c
+@@ -0,0 +1,282 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Hardware monitoring driver for Vishay Multi-phase Digital VR Controllers(SIC458)
++ *
++ * Copyright (C) 2023 MPS
++ */
++
++#include <linux/err.h>
++#include <linux/i2c.h>
++#include <linux/init.h>
++#include <linux/kernel.h>
++#include <linux/delay.h>
++#include <linux/module.h>
++#include "pmbus.h"
++
++#define DEBUG   0
++#define BIT10   0x0400
++#define SIC458_PAGE_NUM         1
++#define SIC458_FUNC     (PMBUS_HAVE_VIN | PMBUS_HAVE_VOUT | \
++                                PMBUS_HAVE_IOUT | PMBUS_HAVE_IIN | \
++                                PMBUS_HAVE_TEMP | PMBUS_HAVE_POUT)
++
++
++struct sic458_data {
++    struct pmbus_driver_info *info;
++    struct i2c_client client;
++    int    vid_step[SIC458_PAGE_NUM];
++};
++
++static struct sic458_data data;
++
++static int read_word_data(struct i2c_client *client, int page, int reg)
++{
++    int ret;
++    data.client.addr = client->addr;
++    ret = i2c_smbus_read_word_data(&data.client, reg);
++
++    return ret;
++}
++
++static int
++sic458_read_vin(struct i2c_client *client, int page, int reg)
++{
++    int ret;
++    s16 exponent;
++    s32 mantissa;
++    ret = read_word_data(client, page, reg);
++    /*
++    * READ_VIN requires fixup to scale it to linear11 format. Register data format
++    * provides 11 bits for sensed IOUT and 5 bits for exponent.
++    *
++    */
++    exponent = ~(((s16)ret) >> 11)+1;
++    mantissa = (s16)(ret & GENMASK(10, 0));
++
++    if(DEBUG) printk(KERN_ALERT "Obtained data from SIC458, Vin: ret:%hx,  exp:%hx,  mantissa:%hx\n",  ret, exponent , mantissa);
++    ret = mantissa * 1000 / (1 << exponent);
++
++    if(DEBUG) printk(KERN_ALERT "Converted data:%x\n",ret);
++    return ret;
++}
++
++static int
++sic458_read_vout(struct i2c_client *client, int page, int reg)
++{
++    /*
++    * The voltage report format is LINEAR16
++    *  M × 2^-9
++    *  range 0 V to 48 V
++    */
++    int ret;
++    ret = read_word_data(client, page, reg);
++    if(DEBUG) printk(KERN_ALERT "Obtained data from SIC458, Vout-%d: %hx \n", page, ret);
++    ret = ret * 1000  / (1 << 9);
++
++    if(DEBUG) printk(KERN_ALERT "Converted data:%x\n",ret);
++    return ret;
++}
++
++static int
++sic458_read_temperature(struct i2c_client *client, int page, int reg)
++{
++    int ret;
++    s16 exponent;
++    s32 mantissa;
++    ret = read_word_data(client, page, reg);
++    /*
++    * temperature requires fixup to scale it to linear11 format. Register data format
++    * provides 11 bits for sensed temperature and 5 bits for exponent.
++    *
++    */
++    exponent = ~(((s16)ret) >> 11)+1;
++    mantissa = (s16)(ret & GENMASK(10, 0));
++
++    if(DEBUG) printk(KERN_ALERT "Obtained data from SIC458, temperature: ret:%hx,  exp:%hx,  mantissa:%hx\n",  ret, exponent , mantissa);
++    ret = mantissa  / (1 << exponent);
++
++    if(DEBUG) printk(KERN_ALERT "Converted data:%x\n",ret);
++    return ret;
++}
++
++static int
++sic458_read_pout(struct i2c_client *client, int page, int reg)
++{
++    int ret;
++    s16 exponent;
++    s32 mantissa;
++    ret = read_word_data(client, page, reg);
++    /*
++    * pout requires fixup to scale it to linear11 format. Register data format
++    * provides 11 bits for sensed pout and 5 bits for exponent.
++    *
++    */
++    exponent = ~(((s16)ret) >> 11)+1;
++    mantissa = (s16)(ret & GENMASK(10, 0));
++
++    if(DEBUG) printk(KERN_ALERT "Obtained data from SIC458, pout: ret:%hx,  exp:%hx,  mantissa:%hx\n",  ret, exponent , mantissa);
++    ret = mantissa * 1000 / (1 << exponent);
++
++    if(DEBUG) printk(KERN_ALERT "Converted data:%x\n",ret);
++    return ret;
++}
++
++static int
++sic458_read_iout(struct i2c_client *client, int page, int reg)
++{
++    int ret;
++    s16 exponent;
++    s32 mantissa;
++    ret = read_word_data(client, page, reg);
++    /*
++    * iout requires fixup to scale it to linear11 format. Register data format
++    * provides 11 bits for sensed iout and 5 bits for exponent.
++    *
++    */
++    exponent = ~(((s16)ret) >> 11)+1;
++    mantissa = (s16)(ret & GENMASK(10, 0));
++
++    if(DEBUG) printk(KERN_ALERT "Obtained data from SIC458, iout: ret:%hx,  exp:%hx,  mantissa:%hx\n",  ret, exponent , mantissa);
++    ret = mantissa * 1000 / (1 << exponent);
++
++    if(DEBUG) printk(KERN_ALERT "Converted data:%x\n",ret);
++    return ret;
++}
++
++static int
++sic458_read_iin(struct i2c_client *client, int page, int reg)
++{
++    int ret;
++    s16 exponent;
++    s32 mantissa;
++    ret = read_word_data(client, page, reg);
++    /*
++    * iin requires fixup to scale it to linear11 format. Register data format
++    * provides 11 bits for sensed iin and 5 bits for exponent.
++    *
++    */
++    exponent = ~(((s16)ret) >> 11)+1;
++    mantissa = (s16)(ret & GENMASK(10, 0));
++
++    if(DEBUG) printk(KERN_ALERT "Obtained data from SIC458, iin: ret:%hx,  exp:%hx,  mantissa:%hx\n",  ret, exponent , mantissa);
++    ret = mantissa * 1000 / (1 << exponent);
++
++    if(DEBUG) printk(KERN_ALERT "Converted data:%x\n",ret);
++    return ret;
++}
++
++static int sic458_read_byte_data(struct i2c_client *client, int page, int reg)
++{
++    int ret;
++
++    switch (reg) {
++    case PMBUS_VOUT_MODE:
++        ret = PB_VOUT_MODE_DIRECT;
++        break;
++    default:
++        ret = -EINVAL;
++        break;
++    }
++
++    return ret;
++}
++
++static int sic458_read_word_data(struct i2c_client *client, int page, int phase,
++                  int reg)
++{
++    int ret;
++    switch (reg) {
++        case PMBUS_READ_VIN:
++            ret = sic458_read_vin(client, page, reg);
++            break;
++        case PMBUS_READ_VOUT:
++            ret = sic458_read_vout(client, page, reg);
++            break;
++        case PMBUS_READ_TEMPERATURE_1:
++            ret = sic458_read_temperature(client, page, reg);
++            break;
++        case PMBUS_READ_POUT:
++            ret = sic458_read_pout(client, page, reg);
++            break;
++        case PMBUS_READ_IIN:
++            ret = sic458_read_iin(client, page, reg);
++            break;
++        case PMBUS_READ_IOUT:
++            ret = sic458_read_iout(client, page, reg);
++            break;
++        default:
++            ret = -EINVAL;
++            break;
++    }
++
++    return ret;
++}
++
++static struct pmbus_driver_info sic458_info = {
++    .pages = SIC458_PAGE_NUM,
++
++    .format[PSC_VOLTAGE_IN] = direct,
++    .format[PSC_VOLTAGE_OUT] = direct,
++    .format[PSC_TEMPERATURE] = direct,
++    .format[PSC_POWER] = direct,
++    .format[PSC_CURRENT_IN] = direct,
++    .format[PSC_CURRENT_OUT] = direct,
++    .m[PSC_VOLTAGE_OUT] = 1,
++    .R[PSC_VOLTAGE_OUT] = 3,
++    .b[PSC_VOLTAGE_OUT] = 0,
++    .m[PSC_TEMPERATURE] = 1,
++    .R[PSC_TEMPERATURE] = 3,
++    .b[PSC_TEMPERATURE] = 0,
++    .m[PSC_VOLTAGE_IN] = 1,
++    .R[PSC_VOLTAGE_IN] = 3,
++    .b[PSC_VOLTAGE_IN] = 0,
++    .m[PSC_POWER] = 1,
++    .R[PSC_POWER] = 3,
++    .b[PSC_POWER] = 0,
++    .m[PSC_CURRENT_IN] = 1,
++    .R[PSC_CURRENT_IN] = 3,
++    .b[PSC_CURRENT_IN] = 0,
++    .m[PSC_CURRENT_OUT] = 1,
++    .R[PSC_CURRENT_OUT] = 3,
++    .b[PSC_CURRENT_OUT] = 0,
++
++
++    .func[0] = SIC458_FUNC,
++    .read_word_data = sic458_read_word_data,
++    .read_byte_data = sic458_read_byte_data,
++};
++
++static int sic458_probe(struct i2c_client *client, const struct i2c_device_id *id)
++{
++
++    data.info = &sic458_info;
++    data.client = *client;
++    return pmbus_do_probe(client, &sic458_info);
++}
++
++static const struct i2c_device_id sic458_id[] = {
++    {"sic458", 0},
++    {}
++};
++MODULE_DEVICE_TABLE(i2c, sic458_id);
++
++static const struct of_device_id sic458_of_match[] = {
++    {.compatible = "vishay,sic458"},
++    {}
++};
++MODULE_DEVICE_TABLE(of, sic458_of_match);
++
++static struct i2c_driver sic458_driver = {
++    .driver = {
++        .name = "sic458",
++        .of_match_table = sic458_of_match,
++    },
++    .probe = sic458_probe,
++    .id_table = sic458_id,
++};
++
++module_i2c_driver(sic458_driver);
++
++MODULE_AUTHOR("Andrew Peng <pengms1@lenovo.com>");
++MODULE_DESCRIPTION("PMBus driver for Vishay SIC458 device");
++MODULE_LICENSE("GPL");
+-- 
+2.17.1
+

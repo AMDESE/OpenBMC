@@ -1,0 +1,153 @@
+From 78f83a66f06c27e1898403b4578516c4ae074194 Mon Sep 17 00:00:00 2001
+From: Andrew Peng <pengms1@lenovo.com>
+Date: Wed, 23 Aug 2023 14:45:05 +0800
+Subject: [PATCH] ARM:dts:aspeed: Modify volcano dts to support E3.s BP
+
+ - Add pdb eeprom and two pca9545 i2c mux
+ - Add eeprom of E3.s BP
+
+Signed-off-by: Andrew Peng <pengms1@lenovo.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts | 94 +++++++++++++++++++-
+ 1 file changed, 92 insertions(+), 2 deletions(-)
+ mode change 100644 => 100755 arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts b/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
+old mode 100644
+new mode 100755
+index d042294f4dc3..0506b102981a
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
+@@ -36,12 +36,16 @@
+ 		i2c250 = &BP1;			//U134
+ 		i2c251 = &BP2;
+ 		i2c252 = &BP3;
+-		i2c255 = &BP1_Crtl0;	//U6
+-		i2c256 = &BP1_Crtl1;
++		i2c255 = &BP1_Crtl0;	//U6 E3S_1
++		i2c256 = &BP1_Crtl1;    // E3S_2
+ 		i2c257 = &BP2_Crtl0;
+ 		i2c258 = &BP2_Crtl1;
+ 		i2c259 = &BP3_Crtl0;
+ 		i2c260 = &BP3_Crtl1;
++		i2c261 = &E3S_3_Crtl2;  // E3s
++		i2c262 = &E3S_4_Crtl1;
++		i2c263 = &E3S_5_Crtl2;
++		i2c264 = &E3S_6_Crtl0;
+ 	};
+ 
+ 	chosen {
+@@ -943,24 +947,110 @@
+ 						pagesize = <32>;
+ 					};
+ 
++					pdb_eeprom: eeprom@53 {
++						compatible = "atmel,24c64";
++						reg = <0x53>;
++						pagesize = <32>;
++					};
++
+ 					i2cswitch@71 {
+ 						compatible = "nxp,pca9545";
+ 						#address-cells = <1>;
+ 						#size-cells = <0>;
+ 						reg = <0x71>;
++						i2c-mux-idle-disconnect;
+ 
+ 						//  channel 0 connected to PSOC0
++						//E3.s 1
+ 						BP1_Crtl0: i2c@0 {
+ 							#address-cells = <1>;
+ 							#size-cells = <0>;
+ 							reg = <0>;
++
++							E3S1_eeprom: eeprom@54 {
++							compatible = "atmel,24c32";
++							reg = <0x54>;
++							pagesize = <32>;
++							};
++
+ 						};
+ 
+ 						//  channel 1 connected to PSOC1
++						//E3.s 2
+ 						BP1_Crtl1: i2c@1 {
+ 							#address-cells = <1>;
+ 							#size-cells = <0>;
+ 							reg = <1>;
++
++							E3S2_eeprom: eeprom@54 {
++								compatible = "atmel,24c32";
++								reg = <0x54>;
++								pagesize = <32>;
++							};
++						};
++
++						//E3.s 3
++						E3S_3_Crtl2: i2c@2 {
++							#address-cells = <1>;
++							#size-cells = <0>;
++							reg = <2>;
++
++							E3S3_eeprom: eeprom@54 {
++								compatible = "atmel,24c32";
++								reg = <0x54>;
++								pagesize = <32>;
++							};
++						};
++
++					};
++
++
++					i2cswitch@72 {
++						compatible = "nxp,pca9545";
++						#address-cells = <1>;
++						#size-cells = <0>;
++						reg = <0x72>;
++						i2c-mux-idle-disconnect;
++
++						//  channel 0 connected to PSOC0
++						//E3.s 6
++						E3S_6_Crtl0: i2c@0 {
++							#address-cells = <1>;
++							#size-cells = <0>;
++							reg = <0>;
++
++							E3S4_eeprom: eeprom@54 {
++								compatible = "atmel,24c32";
++								reg = <0x54>;
++								pagesize = <32>;
++							};
++						};
++
++						//  channel 1 connected to PSOC1
++						//E3.s 4
++						E3S_4_Crtl1: i2c@1 {
++							#address-cells = <1>;
++							#size-cells = <0>;
++							reg = <1>;
++
++							E3S5_eeprom: eeprom@54 {
++								compatible = "atmel,24c32";
++								reg = <0x54>;
++								pagesize = <32>;
++							};
++						};
++
++						//E3.s 5
++						E3S_5_Crtl2: i2c@2 {
++							#address-cells = <1>;
++							#size-cells = <0>;
++							reg = <2>;
++
++							E3S6_eeprom: eeprom@54 {
++								compatible = "atmel,24c32";
++								reg = <0x54>;
++								pagesize = <32>;
++							};
+ 						};
+ 					};
+ 				};
+-- 
+2.17.1
+
