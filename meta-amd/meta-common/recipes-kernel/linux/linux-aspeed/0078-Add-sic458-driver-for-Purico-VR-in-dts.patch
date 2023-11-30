@@ -1,0 +1,115 @@
+From 003d686261d9239cf5d6ac96ea655d591fb9e9a1 Mon Sep 17 00:00:00 2001
+From: Abinaya Dhandapani <Abinaya.Dhandapani@amd.com>
+Date: Wed, 29 Nov 2023 06:43:02 -0600
+Subject: [PATCH] Add sic458 driver for Purico VR in dts
+
+Signed-off-by: Abinaya Dhandapani <Abinaya.Dhandapani@amd.com>
+---
+ .../boot/dts/aspeed-bmc-amd-purico-i3c.dts    | 32 ++++++++++++++++++-
+ arch/arm/boot/dts/aspeed-bmc-amd-purico.dts   | 31 +++++++++++++++++-
+ 2 files changed, 61 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
+index 4be809576f94..7092faf012a4 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
+@@ -204,6 +204,25 @@ i2cswitch@70 {
+ &i2c4 {
+ 	// Net name i2c1
+ 	status = "okay";
++
++	p3V3@16 {
++		//P3V3
++		compatible = "vishay,sic458";
++		reg = <0x16>;
++	};
++
++	p5vaux@1d {
++		//P5V_AUX
++		compatible = "vishay,sic458";
++		reg = <0x1d>;
++	};
++
++	pvdd18@1e {
++		//P3V3_AUX
++		compatible = "vishay,sic458";
++		reg = <0x1e>;
++	};
++
+ };
+
+ // HPM CPU VRs
+@@ -239,8 +258,19 @@ vddcr_vddio_33@63 {
+ 				compatible = "mps,mp2857";
+ 				reg = <0x63>;
+ 			};
+-		};
+
++			pvdd33@19 {
++				//pvdd 3.3
++				compatible = "vishay,sic458";
++				reg = <0x19>;
++			};
++
++			pvdd18@17 {
++				//pvdd 1.8
++				compatible = "vishay,sic458";
++				reg = <0x17>;
++			};
++		};
+ 	};
+ };
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+index 9e510872147f..3d487e0ee9cd 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+@@ -204,6 +204,24 @@ i2cswitch@70 {
+ &i2c4 {
+ 	// Net name i2c1
+ 	status = "okay";
++
++	p3V3@16 {
++		//P3V3
++		compatible = "vishay,sic458";
++		reg = <0x16>;
++	};
++
++	p5vaux@1d {
++		//P5V_AUX
++		compatible = "vishay,sic458";
++		reg = <0x1d>;
++	};
++
++	pvdd18@1e {
++		//P3V3_AUX
++		compatible = "vishay,sic458";
++		reg = <0x1e>;
++	};
+ };
+
+ // HPM CPU VRs
+@@ -239,8 +257,19 @@ vddcr_vddio_33@63 {
+ 				compatible = "mps,mp2857";
+ 				reg = <0x63>;
+ 			};
+-		};
+
++			pvdd33@19 {
++				//pvdd 3.3
++				compatible = "vishay,sic458";
++				reg = <0x19>;
++			};
++
++			pvdd18@17 {
++				//pvdd 1.8
++				compatible = "vishay,sic458";
++				reg = <0x17>;
++			};
++		};
+ 	};
+ };
+
+--
+2.25.1
+

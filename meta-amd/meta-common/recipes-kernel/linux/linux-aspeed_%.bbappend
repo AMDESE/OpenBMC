@@ -77,4 +77,5 @@ SRC_URI += "file://amd-bmc-baseline.cfg \
             file://0075-drivers-mtd-spi-Add-support-for-GD55-SPI.patch \
             file://0076-ARM-dts-aspeed-Add-Turin-FP-ID-Button-to-GPIO.patch \
             file://0077-Add-sic458-VR-driver.patch \
+            file://0078-Add-sic458-driver-for-Purico-VR-in-dts.patch \
            "
