@@ -1,0 +1,280 @@
+From 9984b2607f2262f433a3c43909a8d329557a300d Mon Sep 17 00:00:00 2001
+From: Abinaya Dhandapani <Abinaya.Dhandapani@amd.com>
+Date: Fri, 1 Dec 2023 05:19:21 -0600
+Subject: [PATCH] Replace i2c address with pmbus address for TDA VR
+
+Signed-off-by: Abinaya Dhandapani <Abinaya.Dhandapani@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts |  6 +++---
+ arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts     |  6 +++---
+ arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts  | 10 +++++-----
+ arch/arm/boot/dts/aspeed-bmc-amd-galena.dts      | 10 +++++-----
+ arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts  |  6 +++---
+ arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts      |  6 +++---
+ arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts | 10 +++++-----
+ arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts     | 10 +++++-----
+ 8 files changed, 32 insertions(+), 32 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
+index e05e7a0d8c51..4c138c423021 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
+@@ -195,17 +195,17 @@ &i2c4 {
+ 	vdd33run@13 {
+ 		//VDD_33_RUN VRM
+ 		compatible = "pmbus";
+-		reg = <0x13>;
++		reg = <0x43>;
+ 	};
+ 	vdd33dual@14 {
+ 		//VDD_33_DUAL VRM
+ 		compatible = "pmbus";
+-		reg = <0x14>;
++		reg = <0x44>;
+ 	};
+ 	vdd5dual@15 {
+ 		//VDD_5_DUAL VRM
+ 		compatible = "pmbus";
+-		reg = <0x15>;
++		reg = <0x45>;
+ 	};
+ };
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
+index d99913865b7c..982fc64fb008 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
+@@ -195,17 +195,17 @@ &i2c4 {
+ 	vdd33run@13 {
+ 		//VDD_33_RUN VRM
+ 		compatible = "pmbus";
+-		reg = <0x13>;
++		reg = <0x43>;
+ 	};
+ 	vdd33dual@14 {
+ 		//VDD_33_DUAL VRM
+ 		compatible = "pmbus";
+-		reg = <0x14>;
++		reg = <0x44>;
+ 	};
+ 	vdd5dual@15 {
+ 		//VDD_5_DUAL VRM
+ 		compatible = "pmbus";
+-		reg = <0x15>;
++		reg = <0x45>;
+ 	};
+ };
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts
+index 27dd6bb497a1..0be74a259a2b 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts
+@@ -195,17 +195,17 @@ &i2c4 {
+ 	vdd33run@13 {
+ 		//VDD_33_RUN VRM
+ 		compatible = "pmbus";
+-		reg = <0x13>;
++		reg = <0x43>;
+ 	};
+ 	vdd33dual@14 {
+ 		//VDD_33_DUAL VRM
+ 		compatible = "pmbus";
+-		reg = <0x14>;
++		reg = <0x44>;
+ 	};
+ 	vdd5dual@15 {
+ 		//VDD_5_DUAL VRM
+ 		compatible = "pmbus";
+-		reg = <0x15>;
++		reg = <0x45>;
+ 	};
+ };
+
+@@ -242,12 +242,12 @@ core1vrm@42 {
+ 			vdd33dualvrm@16 {
+ 				//VDD 33 DUAL VRM
+ 				compatible = "pmbus";
+-				reg = <0x16>;
++				reg = <0x46>;
+ 			};
+ 			vdd18dualvrm@17 {
+ 				//VDD 18 DUAL VRM
+ 				compatible = "pmbus";
+-				reg = <0x17>;
++				reg = <0x47>;
+ 			};
+ 		};
+ 	};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts b/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
+index af5ebbc0dafe..5c67c4e598d0 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
+@@ -195,17 +195,17 @@ &i2c4 {
+ 	vdd33run@13 {
+ 		//VDD_33_RUN VRM
+ 		compatible = "pmbus";
+-		reg = <0x13>;
++		reg = <0x43>;
+ 	};
+ 	vdd33dual@14 {
+ 		//VDD_33_DUAL VRM
+ 		compatible = "pmbus";
+-		reg = <0x14>;
++		reg = <0x44>;
+ 	};
+ 	vdd5dual@15 {
+ 		//VDD_5_DUAL VRM
+ 		compatible = "pmbus";
+-		reg = <0x15>;
++		reg = <0x45>;
+ 	};
+ };
+
+@@ -242,12 +242,12 @@ core1vrm@42 {
+ 			vdd33dualvrm@16 {
+ 				//VDD 33 DUAL VRM
+ 				compatible = "pmbus";
+-				reg = <0x16>;
++				reg = <0x46>;
+ 			};
+ 			vdd18dualvrm@17 {
+ 				//VDD 18 DUAL VRM
+ 				compatible = "pmbus";
+-				reg = <0x17>;
++				reg = <0x47>;
+ 			};
+ 		};
+ 	};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts
+index 8933bb4bd5de..208c75daad71 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts
+@@ -195,17 +195,17 @@ &i2c4 {
+ 	vdd33run@13 {
+ 		//VDD_33_RUN VRM
+ 		compatible = "pmbus";
+-		reg = <0x13>;
++		reg = <0x43>;
+ 	};
+ 	vdd33dual@14 {
+ 		//VDD_33_DUAL VRM
+ 		compatible = "pmbus";
+-		reg = <0x14>;
++		reg = <0x44>;
+ 	};
+ 	vdd5dual@15 {
+ 		//VDD_5_DUAL VRM
+ 		compatible = "pmbus";
+-		reg = <0x15>;
++		reg = <0x45>;
+ 	};
+ };
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts b/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
+index 2358b8abb147..19a230a9fb9c 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
+@@ -195,17 +195,17 @@ &i2c4 {
+ 	vdd33run@13 {
+ 		//VDD_33_RUN VRM
+ 		compatible = "pmbus";
+-		reg = <0x13>;
++		reg = <0x43>;
+ 	};
+ 	vdd33dual@14 {
+ 		//VDD_33_DUAL VRM
+ 		compatible = "pmbus";
+-		reg = <0x14>;
++		reg = <0x44>;
+ 	};
+ 	vdd5dual@15 {
+ 		//VDD_5_DUAL VRM
+ 		compatible = "pmbus";
+-		reg = <0x15>;
++		reg = <0x45>;
+ 	};
+ };
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts
+index b9ff5bcd7c07..ab5ca13f3d15 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts
+@@ -195,17 +195,17 @@ &i2c4 {
+ 	vdd33run@13 {
+ 		//VDD_33_RUN VRM
+ 		compatible = "pmbus";
+-		reg = <0x13>;
++		reg = <0x43>;
+ 	};
+ 	vdd33dual@14 {
+ 		//VDD_33_DUAL VRM
+ 		compatible = "pmbus";
+-		reg = <0x14>;
++		reg = <0x44>;
+ 	};
+ 	vdd5dual@15 {
+ 		//VDD_5_DUAL VRM
+ 		compatible = "pmbus";
+-		reg = <0x15>;
++		reg = <0x45>;
+ 	};
+ };
+
+@@ -242,12 +242,12 @@ core1vrm@42 {
+ 			vdd33dualvrm@16 {
+ 				//VDD 33 DUAL VRM
+ 				compatible = "pmbus";
+-				reg = <0x16>;
++				reg = <0x46>;
+ 			};
+ 			vdd18dualvrm@17 {
+ 				//VDD 18 DUAL VRM
+ 				compatible = "pmbus";
+-				reg = <0x17>;
++				reg = <0x47>;
+ 			};
+ 		};
+ 	};
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts b/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
+index 47420619cb0e..ae4e53fa3a7f 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
+@@ -195,17 +195,17 @@ &i2c4 {
+ 	vdd33run@13 {
+ 		//VDD_33_RUN VRM
+ 		compatible = "pmbus";
+-		reg = <0x13>;
++		reg = <0x43>;
+ 	};
+ 	vdd33dual@14 {
+ 		//VDD_33_DUAL VRM
+ 		compatible = "pmbus";
+-		reg = <0x14>;
++		reg = <0x44>;
+ 	};
+ 	vdd5dual@15 {
+ 		//VDD_5_DUAL VRM
+ 		compatible = "pmbus";
+-		reg = <0x15>;
++		reg = <0x45>;
+ 	};
+ };
+
+@@ -242,12 +242,12 @@ core1vrm@42 {
+ 			vdd33dualvrm@16 {
+ 				//VDD 33 DUAL VRM
+ 				compatible = "pmbus";
+-				reg = <0x16>;
++				reg = <0x46>;
+ 			};
+ 			vdd18dualvrm@17 {
+ 				//VDD 18 DUAL VRM
+ 				compatible = "pmbus";
+-				reg = <0x17>;
++				reg = <0x47>;
+ 			};
+ 		};
+ 	};
+--
+2.25.1
+
