@@ -1,0 +1,137 @@
+From 51743f2273e530041a4cdffa1037c2412a021dad Mon Sep 17 00:00:00 2001
+From: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
+Date: Tue, 5 Dec 2023 15:30:21 -0600
+Subject: [PATCH 1/1] drivers/soc: Modify aspeed-bmc-dev driver read to wake up
+ on interrupt
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+
+Modifies aspeed-bmc-dev driver read APIs to wake up on interrupt
+HOST2BMC_INT_STS_DOORBELL.
+
+Signed-off-by: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
+---
+ drivers/soc/aspeed/aspeed-bmc-dev.c | 60 +++++++++++++++--------------
+ 1 file changed, 31 insertions(+), 29 deletions(-)
+
+diff --git a/drivers/soc/aspeed/aspeed-bmc-dev.c b/drivers/soc/aspeed/aspeed-bmc-dev.c
+index 7b194f1bd762..c53c01646f31 100644
+--- a/drivers/soc/aspeed/aspeed-bmc-dev.c
++++ b/drivers/soc/aspeed/aspeed-bmc-dev.c
+@@ -151,14 +151,21 @@ static ssize_t aspeed_host2bmc_queue1_rx(struct file *filp, struct kobject *kobj
+ 	struct aspeed_bmc_device *bmc_device = dev_get_drvdata(container_of(kobj, struct device, kobj));
+ 	u32 *data = (u32 *) buf;
+ 	u32 scu_id;
++	volatile u32 status;
+ 	int ret;
+
+-
+ 	ret = wait_event_interruptible(bmc_device->rx_wait0,
+-		!(readl(bmc_device->reg_base + ASPEED_BMC_HOST2BMC_STS) & HOST2BMC_Q1_EMPTY));
++		((status = readl(bmc_device->reg_base + ASPEED_BMC_HOST2BMC_STS)) & HOST2BMC_INT_STS_DOORBELL));
++
++	dev_err(bmc_device->dev, "aspeed_host2bmc_queue1_rx(): status=0x%x\n", status);
+ 	if (ret)
+ 		return -EINTR;
+
++	if (status & HOST2BMC_Q1_EMPTY) {
++		dev_err(bmc_device->dev, "aspeed_host2bmc_queue1_rx(): queue empty\n");
++		return -EIO;
++	}
++
+ 	data[0] = readl(bmc_device->reg_base + ASPEED_BMC_HOST2BMC_Q1);
+ 	regmap_read(bmc_device->scu, ASPEED_SCU04, &scu_id);
+ 	if (scu_id == AST2600A3_SCU04) {
+@@ -178,14 +185,22 @@ static ssize_t aspeed_host2bmc_queue2_rx(struct file *filp, struct kobject *kobj
+ 	struct aspeed_bmc_device *bmc_device = dev_get_drvdata(container_of(kobj, struct device, kobj));
+ 	u32 *data = (u32 *) buf;
+ 	u32 scu_id;
++	volatile u32 status;
+ 	int ret;
+
+
+ 	ret = wait_event_interruptible(bmc_device->rx_wait1,
+-		!(readl(bmc_device->reg_base + ASPEED_BMC_HOST2BMC_STS) & HOST2BMC_Q2_EMPTY));
++		((status = readl(bmc_device->reg_base + ASPEED_BMC_HOST2BMC_STS)) & HOST2BMC_INT_STS_DOORBELL));
++
++	dev_err(bmc_device->dev, "aspeed_host2bmc_queue2_rx(): status=0x%x\n", status);
+ 	if (ret)
+ 		return -EINTR;
+
++	if (status & HOST2BMC_Q2_EMPTY) {
++		dev_err(bmc_device->dev, "aspeed_host2bmc_queue2_rx(): queue empty\n");
++		return -EIO;
++	}
++
+ 	data[0] = readl(bmc_device->reg_base + ASPEED_BMC_HOST2BMC_Q2);
+ 	regmap_read(bmc_device->scu, ASPEED_SCU04, &scu_id);
+ 	if (scu_id == AST2600A3_SCU04) {
+@@ -276,44 +291,30 @@ static irqreturn_t aspeed_bmc_dev_isr(int irq, void *dev_id)
+ {
+ 	struct aspeed_bmc_device *bmc_device = dev_id;
+
+-	u32 host2bmc_q_sts = readl(bmc_device->reg_base + ASPEED_BMC_HOST2BMC_STS);
++	volatile u32 host2bmc_q_sts = readl(bmc_device->reg_base + ASPEED_BMC_HOST2BMC_STS);
+
+-	if (host2bmc_q_sts & HOST2BMC_INT_STS_DOORBELL)
+-		writel(HOST2BMC_INT_STS_DOORBELL, bmc_device->reg_base + ASPEED_BMC_HOST2BMC_STS);
+-
+-	if (host2bmc_q_sts & HOST2BMC_ENABLE_INTB)
+-		writel(HOST2BMC_ENABLE_INTB, bmc_device->reg_base + ASPEED_BMC_HOST2BMC_STS);
++	dev_err(bmc_device->dev, "aspeed_bmc_dev_isr(): host2bmc_q_sts=0x%x\n", host2bmc_q_sts);
+
+ 	if (host2bmc_q_sts & HOST2BMC_Q1_FULL)
+-	{
+-	    dev_err(bmc_device->dev, "Q1 Full\n");
+-	}
++		dev_err(bmc_device->dev, "Q1 Full\n");
+
+ 	if (host2bmc_q_sts & HOST2BMC_Q2_FULL)
+-	{
+-	   dev_err(bmc_device->dev, "Q2 Full\n");
+-	}
+-
++		dev_err(bmc_device->dev, "Q2 Full\n");
+
+ 	if (!(readl(bmc_device->reg_base + ASPEED_BMC_BMC2HOST_STS) & BMC2HOST_Q1_FULL))
+-	{
+-	   wake_up_interruptible(&bmc_device->tx_wait0);
+-	}
++		wake_up_interruptible(&bmc_device->tx_wait0);
+
+ 	if (!(readl(bmc_device->reg_base + ASPEED_BMC_HOST2BMC_STS) & HOST2BMC_Q1_EMPTY))
+-	{
+-	   wake_up_interruptible(&bmc_device->rx_wait0);
+-	}
++		wake_up_interruptible(&bmc_device->rx_wait0);
+
+ 	if (!(readl(bmc_device->reg_base + ASPEED_BMC_BMC2HOST_STS) & BMC2HOST_Q2_FULL))
+-	{
+-	   wake_up_interruptible(&bmc_device->tx_wait1);
+-	}
++		wake_up_interruptible(&bmc_device->tx_wait1);
+
+ 	if (!(readl(bmc_device->reg_base + ASPEED_BMC_HOST2BMC_STS) & HOST2BMC_Q2_EMPTY))
+-	{
+-	   wake_up_interruptible(&bmc_device->rx_wait1);
+-	}
++		wake_up_interruptible(&bmc_device->rx_wait1);
++
++	mdelay(200);
++	writel(HOST2BMC_Q2_FULL_UNMASK | HOST2BMC_Q1_FULL_UNMASK | HOST2BMC_ENABLE_INTB | HOST2BMC_Q1_EMPTY_UNMASK | HOST2BMC_Q2_EMPTY_UNMASK, bmc_device->reg_base + ASPEED_BMC_HOST2BMC_STS);
+
+ 	return IRQ_HANDLED;
+ }
+@@ -353,7 +354,8 @@ static void aspeed_bmc_device_init(struct aspeed_bmc_device *bmc_device)
+
+ 	//Setting BMC to Host Q register
+ 	writel(BMC2HOST_Q2_FULL_UNMASK | BMC2HOST_Q1_FULL_UNMASK | BMC2HOST_ENABLE_INTB, bmc_device->reg_base + ASPEED_BMC_BMC2HOST_STS);
+-	writel(HOST2BMC_Q2_FULL_UNMASK | HOST2BMC_Q1_FULL_UNMASK | HOST2BMC_ENABLE_INTB, bmc_device->reg_base + ASPEED_BMC_HOST2BMC_STS);
++	writel(HOST2BMC_Q2_FULL_UNMASK | HOST2BMC_Q1_FULL_UNMASK | HOST2BMC_ENABLE_INTB | HOST2BMC_Q1_EMPTY_UNMASK | HOST2BMC_Q2_EMPTY_UNMASK, bmc_device->reg_base + ASPEED_BMC_HOST2BMC_STS);
++
+ }
+
+ static const struct of_device_id aspeed_bmc_device_of_matches[] = {
+--
+2.17.1
+

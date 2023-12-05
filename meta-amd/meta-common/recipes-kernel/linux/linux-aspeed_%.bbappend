@@ -79,4 +79,5 @@ SRC_URI += "file://amd-bmc-baseline.cfg \
             file://0077-Add-sic458-VR-driver.patch \
             file://0078-Add-sic458-driver-for-Purico-VR-in-dts.patch \
             file://0079-Replace-i2c-address-with-pmbus-address-for-TDA-VR.patch \
+            file://0080-drivers-soc-Modify-aspeed-bmc-dev-driver-read-to-wak.patch \
            "
