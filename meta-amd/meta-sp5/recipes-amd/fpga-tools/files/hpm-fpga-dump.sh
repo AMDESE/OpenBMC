@@ -19,3 +19,4 @@ case "$board_id" in
         echo " Unknown platform"
         echo " Please program board FRU EEPROM"
         ;;
+esac
