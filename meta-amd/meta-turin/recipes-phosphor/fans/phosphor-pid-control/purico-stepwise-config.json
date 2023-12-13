@@ -141,16 +141,16 @@
             "timeout": 0
         },
         {
-            "name": "VDDCR_SOC_TEMP1",
+            "name": "VDDCR_CPU0_TEMP",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/VDDCR_SOC_TEMP1",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/VDDCR_CPU0_TEMP",
             "ignoreDbusMinMax": true,
             "timeout": 0
         },
         {
-            "name": "VDDCR_11_TEMP1",
+            "name": "VDDCR_CPU1_TEMP",
             "type": "temp",
-            "readPath": "/xyz/openbmc_project/sensors/temperature/VDDCR_11_TEMP1",
+            "readPath": "/xyz/openbmc_project/sensors/temperature/VDDCR_CPU1_TEMP",
             "ignoreDbusMinMax": true,
             "timeout": 0
         }
@@ -190,8 +190,8 @@
                     "name": "CPU0",
                     "type": "stepwise",
                     "inputs": ["CPU0_Temp",
-                               "VDDCR_SOC_TEMP1",
-                               "VDDCR_11_TEMP1"
+                               "VDDCR_CPU0_TEMP",
+                               "VDDCR_CPU1_TEMP"
                               ],
                     "setpoint": 20.0,
                     "pid": {
