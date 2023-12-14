@@ -1,0 +1,182 @@
+From 16e215a135fef155bb9f79f657b3d9a0901e69af Mon Sep 17 00:00:00 2001
+From: Mohsen Dolaty <mohsen.dolaty@amd.com>
+Date: Thu, 14 Dec 2023 10:20:19 -0600
+Subject: [PATCH 1/1] ARM-dts-aspeed: Turin Add MON_RSMRST_L line to GPIO G7
+
+Add monitor RSMRST Line to GPIO G7 for Turin platform.
+RSMRST line needs to be cleared before we call Power Restore Policy
+
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts     | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts  | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-galena.dts      | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts  | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts      | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts  | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-purico.dts      | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts     | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts     | 2 +-
+ 12 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
+index 4c138c423021..30e5ae31c0ea 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
+@@ -1114,7 +1114,7 @@ &gpio0 {
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+ 	/*F0-F7*/	"","","","","","","","",
+-	/*G0-G7*/	"","","","","","","","",
++	/*G0-G7*/	"","","","","","","","MON_RSMRST_L",
+ 	/*H0-H7*/	"","ASSERT_WARM_RST_BTN_L","ASSERT_SOC_RST_BTN_L","","","","","",
+ 	/*I0-I7*/	"","","","","","","","P0_I3C_APML_ALERT_L",
+ 	/*J0-J7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
+index 982fc64fb008..af8b36bed031 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
+@@ -1102,7 +1102,7 @@ &gpio0 {
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+ 	/*F0-F7*/	"","","","","","","","",
+-	/*G0-G7*/	"","","","","","","","",
++	/*G0-G7*/	"","","","","","","","MON_RSMRST_L",
+ 	/*H0-H7*/	"","ASSERT_WARM_RST_BTN_L","ASSERT_SOC_RST_BTN_L","","","","","",
+ 	/*I0-I7*/	"","","","","","","","P0_I3C_APML_ALERT_L",
+ 	/*J0-J7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts
+index 0be74a259a2b..ea12b3ae4f1a 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts
+@@ -807,7 +807,7 @@ &gpio0 {
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+ 	/*F0-F7*/	"","","","","","","","",
+-	/*G0-G7*/	"","","","","","","","",
++	/*G0-G7*/	"","","","","","","","MON_RSMRST_L",
+ 	/*H0-H7*/	"","ASSERT_WARM_RST_BTN_L","ASSERT_SOC_RST_BTN_L","","","","","",
+ 	/*I0-I7*/	"","","","","","","","P0_I3C_APML_ALERT_L",
+ 	/*J0-J7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts b/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
+index 5c67c4e598d0..a2208d98feb0 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
+@@ -801,7 +801,7 @@ &gpio0 {
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+ 	/*F0-F7*/	"","","","","","","","",
+-	/*G0-G7*/	"","","","","","","","",
++	/*G0-G7*/	"","","","","","","","MON_RSMRST_L",
+ 	/*H0-H7*/	"","ASSERT_WARM_RST_BTN_L","ASSERT_SOC_RST_BTN_L","","","","","",
+ 	/*I0-I7*/	"","","","","","","","P0_I3C_APML_ALERT_L",
+ 	/*J0-J7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts
+index 208c75daad71..e7b0a75de95c 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts
+@@ -1126,7 +1126,7 @@ &gpio0 {
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+ 	/*F0-F7*/	"","","","","","","","",
+-	/*G0-G7*/	"","","","","","","","",
++	/*G0-G7*/	"","","","","","","","MON_RSMRST_L",
+ 	/*H0-H7*/	"","ASSERT_WARM_RST_BTN_L","ASSERT_SOC_RST_BTN_L","","","","","",
+ 	/*I0-I7*/	"","","","","","","","P0_I3C_APML_ALERT_L",
+ 	/*J0-J7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts b/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
+index 19a230a9fb9c..d8962fd3d542 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
+@@ -1102,7 +1102,7 @@ &gpio0 {
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+ 	/*F0-F7*/	"","","","","","","","",
+-	/*G0-G7*/	"","","","","","","","",
++	/*G0-G7*/	"","","","","","","","MON_RSMRST_L",
+ 	/*H0-H7*/	"","ASSERT_WARM_RST_BTN_L","ASSERT_SOC_RST_BTN_L","","","","","",
+ 	/*I0-I7*/	"","","","","","","","P0_I3C_APML_ALERT_L",
+ 	/*J0-J7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
+index 7092faf012a4..1a7e44440f74 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
+@@ -1105,7 +1105,7 @@ &gpio0 {
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+ 	/*F0-F7*/	"","","","","","","","",
+-	/*G0-G7*/	"","","","","","","","",
++	/*G0-G7*/	"","","","","","","","MON_RSMRST_L",
+ 	/*H0-H7*/	"","ASSERT_WARM_RST_BTN_L","ASSERT_SOC_RST_BTN_L","","","","","",
+ 	/*I0-I7*/	"","","","","","","","P0_I3C_APML_ALERT_L",
+ 	/*J0-J7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+index 3d487e0ee9cd..29007189aa7c 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+@@ -1098,7 +1098,7 @@ &gpio0 {
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+ 	/*F0-F7*/	"","","","","","","","",
+-	/*G0-G7*/	"","","","","","","","",
++	/*G0-G7*/	"","","","","","","","MON_RSMRST_L",
+ 	/*H0-H7*/	"","ASSERT_WARM_RST_BTN_L","ASSERT_SOC_RST_BTN_L","","","","","",
+ 	/*I0-I7*/	"","","","","","","","P0_I3C_APML_ALERT_L",
+ 	/*J0-J7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts
+index ab5ca13f3d15..c9078e7d4a62 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts
+@@ -807,7 +807,7 @@ &gpio0 {
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+ 	/*F0-F7*/	"","","","","","","","",
+-	/*G0-G7*/	"","","","","","","","",
++	/*G0-G7*/	"","","","","","","","MON_RSMRST_L",
+ 	/*H0-H7*/	"","ASSERT_WARM_RST_BTN_L","ASSERT_SOC_RST_BTN_L","","","","","",
+ 	/*I0-I7*/	"","","","","","","","P0_I3C_APML_ALERT_L",
+ 	/*J0-J7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts b/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
+index ae4e53fa3a7f..4decd0af13fd 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
+@@ -801,7 +801,7 @@ &gpio0 {
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+ 	/*F0-F7*/	"","","","","","","","",
+-	/*G0-G7*/	"","","","","","","","",
++	/*G0-G7*/	"","","","","","","","MON_RSMRST_L",
+ 	/*H0-H7*/	"","ASSERT_WARM_RST_BTN_L","ASSERT_SOC_RST_BTN_L","","","","","",
+ 	/*I0-I7*/	"","","","","","","","P0_I3C_APML_ALERT_L",
+ 	/*J0-J7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts
+index e7ac5b71cceb..8c1849e53802 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts
+@@ -1211,7 +1211,7 @@ &gpio0 {
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+ 	/*F0-F7*/	"","","","","","","","",
+-	/*G0-G7*/	"","","","","","","","",
++	/*G0-G7*/	"","","","","","","","MON_RSMRST_L",
+ 	/*H0-H7*/	"","ASSERT_WARM_RST_BTN_L","ASSERT_SOC_RST_BTN_L","","","","","",
+ 	/*I0-I7*/	"","","","","","","","P0_I3C_APML_ALERT_L",
+ 	/*J0-J7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts b/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
+index 09364291052f..775f906a84c6 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
+@@ -1199,7 +1199,7 @@ &gpio0 {
+ 	/*D0-D7*/	"","","","","","","","",
+ 	/*E0-E7*/	"","","","","","","","",
+ 	/*F0-F7*/	"","","","","","","","",
+-	/*G0-G7*/	"","","","","","","","",
++	/*G0-G7*/	"","","","","","","","MON_RSMRST_L",
+ 	/*H0-H7*/	"","ASSERT_WARM_RST_BTN_L","ASSERT_SOC_RST_BTN_L","","","","","",
+ 	/*I0-I7*/	"","","","","","","","P0_I3C_APML_ALERT_L",
+ 	/*J0-J7*/	"","","","","","","","",
+--
+2.25.1
