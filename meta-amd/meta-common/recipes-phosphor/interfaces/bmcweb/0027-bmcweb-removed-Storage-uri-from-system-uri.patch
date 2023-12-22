@@ -1,0 +1,31 @@
+From 8342d39d570ddbf6ccf59e650124523fc3f394fb Mon Sep 17 00:00:00 2001
+From: Ashok Kumar <ashok2.kumar@amd.com>
+Date: Fri, 22 Dec 2023 09:41:00 -0600
+Subject: [PATCH 1/1] bmcweb: removed Storage uri from system uri
+
+Removed stroage uri from main system uri to avoid getting
+fail in case of any error in storage uri
+
+Fixes: PLAT-147830
+
+Signed-off-by: Ashok Kumar <ashok2.kumar@amd.com>
+---
+ redfish-core/lib/systems.hpp | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/redfish-core/lib/systems.hpp b/redfish-core/lib/systems.hpp
+index 13cbcf39..4b1b04ab 100644
+--- a/redfish-core/lib/systems.hpp
++++ b/redfish-core/lib/systems.hpp
+@@ -2110,8 +2110,6 @@ class Systems : public Node
+             {"@odata.id", "/redfish/v1/Systems/system/Processors"}};
+         asyncResp->res.jsonValue["Memory"] = {
+             {"@odata.id", "/redfish/v1/Systems/system/Memory"}};
+-        asyncResp->res.jsonValue["Storage"] = {
+-            {"@odata.id", "/redfish/v1/Systems/system/Storage"}};
+
+         asyncResp->res.jsonValue["Actions"]["#ComputerSystem.Reset"] = {
+             {"target",
+--
+2.25.1
+
