@@ -1,0 +1,59 @@
+From 376353f1493e16d0464160c4078a224e7a7f1d44 Mon Sep 17 00:00:00 2001
+Message-Id: <376353f1493e16d0464160c4078a224e7a7f1d44.1704743427.git.vinu.vaghasia@amd.com>
+From: Vinu Vaghasia <vinu.vaghasia@amd.com>
+Date: Mon, 8 Jan 2024 13:22:37 -0600
+Subject: [PATCH] amd-power-control: modify SOL service start stop added with
+ power control
+
+SOL service start/stop control added with Host power control to avoid
+the junk character being captured from serial port while Host is power
+off.
+
+Signed-off-by: Vinu Vaghasia <vinu.vaghasia@amd.com>
+---
+ power-control-x86/src/power_control.cpp | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/power-control-x86/src/power_control.cpp b/power-control-x86/src/power_control.cpp
+index ddd4c1e..6f29431 100644
+--- a/power-control-x86/src/power_control.cpp
++++ b/power-control-x86/src/power_control.cpp
+@@ -860,18 +860,35 @@ static int setGPIOOutputForMs(const std::string& name, const int value,
+     return 0;
+ }
+
++static void stopSOLservice()
++{
++   system("/bin/systemctl mask obmc-console@ttyS0.service obmc-console@ttyVUART0.service");
++   system("/bin/systemctl stop obmc-console@ttyS0.service obmc-console@ttyVUART0.service");
++   std::cerr << "SOL service stopped as Host powered off\n";
++}
++
++static void startSOLservice()
++{
++   system("/bin/systemctl unmask obmc-console@ttyS0.service obmc-console@ttyVUART0.service");
++   system("/bin/systemctl start obmc-console@ttyS0.service obmc-console@ttyVUART0.service");
++   std::cerr << "SOL service started as Host powering on/n";
++}
++
+ static void powerOn()
+ {
+     setGPIOOutputForMs("ASSERT_PWR_BTN_L", 0, powerPulseTimeMs);
++    startSOLservice();
+ }
+
+ static void gracefulPowerOff()
+ {
++    stopSOLservice();
+     setGPIOOutputForMs("ASSERT_PWR_BTN_L", 0, powerPulseTimeMs);
+ }
+
+ static void forcePowerOff()
+ {
++    stopSOLservice();
+     setGPIOOutputForMs("ASSERT_PWR_BTN_L", 0, forceOffPulseTimeMs);
+     return;
+ }
+--
+2.17.1
+
