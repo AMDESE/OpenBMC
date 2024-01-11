@@ -9,9 +9,8 @@ DEPENDS += "i2c-tools"
 DEPENDS += "i3c-tools"
 RDEPENDS_${PN} += "bash"
 
-SRC_URI += "git://git@github.com/amd/apml_library.git;protocol=ssh"
+SRC_URI += "git://git@github.com/amd/apml_library.git;protocol=ssh;tag=apml-3.3.0"
 #SRC_URI += "git://git@github.com/amd/esmi_oob_library.git;protocol=ssh"
-SRCREV = "5327a39ddc244eaf69794c5a57d5fd5a5bbe3a87"
 
 SRC_URI += "file://0001-amd-apml-Enable-apml-library-with-i3c.patch \
             file://0002-amd-apml-select-APML-over-i2c-i3c.patch  \
