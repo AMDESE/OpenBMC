@@ -39,18 +39,11 @@ RDEPENDS_${PN}-flash = " \
 SUMMARY_${PN}-system = "AMD System"
 RDEPENDS_${PN}-system = " \
         amd-apml \
-        amd-bmc-ubm \
         amd-clear-cmos \
         amd-dimm \
         amd-lcd-lib \
         amd-mctp-tool \
-        amd-ppr \
         amd-ras \
-        amd-spdm \
-        amd-yaap \
-        auto-notify \
-        bmc-fp-led \
-        bmc-retimer-update \
         bmcweb \
         cpu-info \
         debug-apps \
@@ -58,7 +51,6 @@ RDEPENDS_${PN}-system = " \
         fpga-tools \
         i3c-tools \
         ipmitool \
-        iodevices-inventory \
         phosphor-hostlogger \
         phosphor-pid-control \
         phosphor-host-postd \
