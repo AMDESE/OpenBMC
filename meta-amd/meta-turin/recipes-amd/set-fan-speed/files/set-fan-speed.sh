@@ -129,7 +129,7 @@ case "$board_id" in
     set_nct7362
     set_nct7362_fan_speed
     ;;
-    "6B" | "74" | "75")
+    "6B" | "74" | "75" | "7F")
     echo "Set Volcano Fans "
     set_nct7362
     set_nct7362_fan_speed
