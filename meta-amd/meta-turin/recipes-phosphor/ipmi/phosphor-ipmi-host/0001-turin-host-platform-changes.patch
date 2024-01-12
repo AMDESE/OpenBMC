@@ -4,6 +4,7 @@ Date: Wed, 11 Jan 2023 13:34:48 -0600
 Subject: [PATCH 1/1] turin-host-platform-changes
 
 Signed-off-by: Alisha Kulkarni <ALISHA.KULKARNI@amd.com>
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
 ---
  Makefile.am                      |  78 +++++++++++++++---
  configure.ac                     | 103 ++++++++++++++++++++----
@@ -18,7 +19,7 @@ Signed-off-by: Alisha Kulkarni <ALISHA.KULKARNI@amd.com>
  selutility.hpp                   |   8 ++
  sensorhandler.cpp                |  10 +--
  sensorhandler.hpp                |  13 +++
- storagehandler.cpp               | 134 ++++++++++++++++++++++++++++++-
+ storagehandler.cpp               | 136 ++++++++++++++++++++++++++++++-
  14 files changed, 352 insertions(+), 51 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
@@ -507,7 +508,7 @@ diff --git a/storagehandler.cpp b/storagehandler.cpp
 index 3f09940..7495e57 100644
 --- a/storagehandler.cpp
 +++ b/storagehandler.cpp
-@@ -24,6 +24,26 @@
+@@ -24,6 +24,27 @@
  #include <variant>
  #include <xyz/openbmc_project/Common/error.hpp>
 
@@ -526,6 +527,7 @@ index 3f09940..7495e57 100644
 +constexpr auto VOLCANO_1      = 107;   //0x6B
 +constexpr auto VOLCANO_2      = 116;   //0x74
 +constexpr auto VOLCANO_3      = 117;   //0x75
++constexpr auto VOLCANO_4      = 127;   //0x7F
 +constexpr auto HUAMBO         = 103;   //0x67
 +
 +#define COMMAND_BOARD_ID    ("/sbin/fw_printenv -n board_id")
@@ -549,7 +551,7 @@ index 3f09940..7495e57 100644
  constexpr uint8_t eventDataSize = 3;
  namespace
  {
-@@ -750,8 +771,117 @@ ipmi::RspType<uint8_t,  // SDR version
+@@ -750,8 +772,118 @@ ipmi::RspType<uint8_t,  // SDR version
                                   operationSupport);
  }
 
@@ -593,6 +595,7 @@ index 3f09940..7495e57 100644
 +                case VOLCANO_1:
 +                case VOLCANO_2:
 +                case VOLCANO_3:
++                case VOLCANO_4:
 +                    return "volcano";
 +                case HUAMBO:
 +                   return "huambo";
