@@ -4,6 +4,7 @@ Date: Thu, 22 Dec 2022 16:14:04 -0600
 Subject: [PATCH 1/1] turin-fru-changes
 
 Signed-off-by: Alisha Kulkarni <ALISHA.KULKARNI@amd.com>
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
 ---
  Makefile.am                       |  57 ++++++++++++--
  configure.ac                      |  47 +++++++++--
@@ -13,7 +14,7 @@ Signed-off-by: Alisha Kulkarni <ALISHA.KULKARNI@amd.com>
  scripts/fru_gen.py                |  13 +++-
  scripts/writefru.mako.cpp         |   2 +-
  types.hpp                         |   8 ++
- writefrudata.cpp                  | 125 +++++++++++++++++++++++++++++-
+ writefrudata.cpp                  | 127 +++++++++++++++++++++++++++++-
  9 files changed, 249 insertions(+), 23 deletions(-)
 
 diff --git a/Makefile.am b/Makefile.am
@@ -293,7 +294,7 @@ diff --git a/writefrudata.cpp b/writefrudata.cpp
 index eca66d6..42c47b0 100644
 --- a/writefrudata.cpp
 +++ b/writefrudata.cpp
-@@ -20,11 +20,30 @@
+@@ -20,11 +20,31 @@
  #include <sstream>
  #include <vector>
 
@@ -311,6 +312,7 @@ index eca66d6..42c47b0 100644
 +constexpr auto VOLCANO_1      = 107;   //0x6B
 +constexpr auto VOLCANO_2      = 116;   //0x74
 +constexpr auto VOLCANO_3      = 117;   //0x75
++constexpr auto VOLCANO_4      = 127;   //0x7F
 +constexpr auto HUAMBO         = 103;   //0x67
 +
 +#define COMMAND_BOARD_ID    ("/sbin/fw_printenv -n board_id")
@@ -326,7 +328,7 @@ index eca66d6..42c47b0 100644
 
  using FruAreaVector = std::vector<std::unique_ptr<IPMIFruArea>>;
 
-@@ -159,6 +178,64 @@ auto getService(sdbusplus::bus::bus& bus, const std::string& intf,
+@@ -159,6 +179,65 @@ auto getService(sdbusplus::bus::bus& bus, const std::string& intf,
      return mapperResponse.begin()->first;
  }
 
@@ -370,6 +372,7 @@ index eca66d6..42c47b0 100644
 +                case VOLCANO_1:
 +                case VOLCANO_2:
 +                case VOLCANO_3:
++                case VOLCANO_4:
 +                    return "volcano";
 +                case HUAMBO:
 +                    return "huambo";
