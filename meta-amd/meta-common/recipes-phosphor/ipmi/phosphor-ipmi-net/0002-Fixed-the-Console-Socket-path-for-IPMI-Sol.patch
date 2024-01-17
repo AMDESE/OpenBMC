@@ -1,0 +1,29 @@
+From d0628e36fe63403a044c89c1b82a3a463dbe873b Mon Sep 17 00:00:00 2001
+From: Ashok Kumar <ashok2.kumar@amd.com>
+Date: Wed, 17 Jan 2024 02:44:37 -0600
+Subject: [PATCH 1/1] Fixed the Console Socket path for IPMI Sol
+
+Modified the console Socket path
+Fixes: FWDEV-64074
+
+Signed-off-by: Ashok Kumar <ashok2.kumar@amd.com>
+---
+ sol/sol_manager.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/sol/sol_manager.hpp b/sol/sol_manager.hpp
+index 4b85971..370775b 100644
+--- a/sol/sol_manager.hpp
++++ b/sol/sol_manager.hpp
+@@ -18,7 +18,7 @@ constexpr size_t MAX_PAYLOAD_SIZE = 255;
+ constexpr uint8_t MAJOR_VERSION = 0x01;
+ constexpr uint8_t MINOR_VERSION = 0x00;
+
+-constexpr char CONSOLE_SOCKET_PATH[] = "\0obmc-console";
++constexpr char CONSOLE_SOCKET_PATH[] = "\0obmc-console.host0";
+ constexpr size_t CONSOLE_SOCKET_PATH_LEN = sizeof(CONSOLE_SOCKET_PATH) - 1;
+
+ constexpr uint8_t accIntervalFactor = 5;
+--
+2.25.1
+
