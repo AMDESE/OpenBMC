@@ -1,0 +1,124 @@
+From 57e6ddcd06d73861a25a38975d147fdb39b82527 Mon Sep 17 00:00:00 2001
+From: Abinaya Dhandapani <adhandap@amd.com>
+Date: Thu, 11 Jan 2024 10:37:26 -0600
+Subject: [PATCH] Add RSMRST GPIO line to Genoa platforms
+
+Signed-off-by: Abinaya Dhandapani <adhandap@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts     | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts         | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts   | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts       | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts     | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts         | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-titanite-i3c.dts | 2 +-
+ arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts     | 2 +-
+ 8 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts
+index 054e9b8b5750..081ea6bb3731 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts
+@@ -802,7 +802,7 @@ &gpio0 {
+ 	/*S0-S7*/	"","","","","","","P0_DIMM_AF_ERROR","P0_DIMM_GL_ERROR",
+ 	/*T0-T7*/	"","","","","","","","",
+ 	/*U0-U7*/	"","","","","","","","",
+-	/*V0-V7*/	"","","","","","","","",
++	/*V0-V7*/	"","","","RSMRST","","","","",
+ 	/*W0-W7*/	"","","","","","","","",
+ 	/*X0-X7*/	"","","","","","","","",
+ 	/*Y0-Y7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+index 7c26bd216c08..b3d4781d3435 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+@@ -816,7 +816,7 @@ &gpio0 {
+ 	/*S0-S7*/	"","","","","","","P0_DIMM_AF_ERROR","P0_DIMM_GL_ERROR",
+ 	/*T0-T7*/	"","","","","","","","",
+ 	/*U0-U7*/	"","","","","","","","",
+-	/*V0-V7*/	"","","","","","","","",
++	/*V0-V7*/	"","","","RSMRST","","","","",
+ 	/*W0-W7*/	"","","","","","","","",
+ 	/*X0-X7*/	"","","","","","","","",
+ 	/*Y0-Y7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts
+index d67c1095f1df..1e4bfbcba6b1 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts
+@@ -1116,7 +1116,7 @@ &gpio0 {
+ 	/*S0-S7*/	"","","","","P1_DIMM_AF_ERROR","P1_DIMM_GL_ERROR","P0_DIMM_AF_ERROR","P0_DIMM_GL_ERROR",
+ 	/*T0-T7*/	"","","","","","","","",
+ 	/*U0-U7*/	"","","","","P1_I3C_APML_ALERT_L","","","",
+-	/*V0-V7*/	"","","","","","","","",
++	/*V0-V7*/	"","","","RSMRST","","","","",
+ 	/*W0-W7*/	"","","","","","","","",
+ 	/*X0-X7*/	"","","","","","","","",
+ 	/*Y0-Y7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+index 6bf3e6d70222..159db8ecc351 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+@@ -1110,7 +1110,7 @@ &gpio0 {
+ 	/*S0-S7*/	"","","","","P1_DIMM_AF_ERROR","P1_DIMM_GL_ERROR","P0_DIMM_AF_ERROR","P0_DIMM_GL_ERROR",
+ 	/*T0-T7*/	"","","","","","","","",
+ 	/*U0-U7*/	"","","","","P1_I3C_APML_ALERT_L","","","",
+-	/*V0-V7*/	"","","","","","","","",
++	/*V0-V7*/	"","","","RSMRST","","","","",
+ 	/*W0-W7*/	"","","","","","","","",
+ 	/*X0-X7*/	"","","","","","","","",
+ 	/*Y0-Y7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts
+index 06a859ea5cb6..abdd8ed929db 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts
+@@ -856,7 +856,7 @@ &gpio0 {
+ 	/*S0-S7*/	"","","","","","","P0_DIMM_AF_ERROR","P0_DIMM_GL_ERROR",
+ 	/*T0-T7*/	"","","","","","","","",
+ 	/*U0-U7*/	"","","","","","","","",
+-	/*V0-V7*/	"","","","","","","","",
++	/*V0-V7*/	"","","","RSMRST","","","","",
+ 	/*W0-W7*/	"","","","","","","","",
+ 	/*X0-X7*/	"","","","","","","","",
+ 	/*Y0-Y7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+index 21ded2743f6a..c16c6276dca3 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+@@ -856,7 +856,7 @@ &gpio0 {
+ 	/*S0-S7*/	"","","","","","","P0_DIMM_AF_ERROR","P0_DIMM_GL_ERROR",
+ 	/*T0-T7*/	"","","","","","","","",
+ 	/*U0-U7*/	"","","","","","","","",
+-	/*V0-V7*/	"","","","","","","","",
++	/*V0-V7*/	"","","","RSMRST","","","","",
+ 	/*W0-W7*/	"","","","","","","","",
+ 	/*X0-X7*/	"","","","","","","","",
+ 	/*Y0-Y7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-titanite-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-titanite-i3c.dts
+index 3712a473a1f9..095bdb2bc482 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-titanite-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-titanite-i3c.dts
+@@ -892,7 +892,7 @@ &gpio0 {
+ 	/*S0-S7*/	"","","","","P1_DIMM_AF_ERROR","P1_DIMM_GL_ERROR","P0_DIMM_AF_ERROR","P0_DIMM_GL_ERROR",
+ 	/*T0-T7*/	"","","","","","","","",
+ 	/*U0-U7*/	"","","","","P1_I3C_APML_ALERT_L","","","",
+-	/*V0-V7*/	"","","","","","","","",
++	/*V0-V7*/	"","","","RSMRST","","","","",
+ 	/*W0-W7*/	"","","","","","","","",
+ 	/*X0-X7*/	"","","","","","","","",
+ 	/*Y0-Y7*/	"","","","","","","","",
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts b/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
+index a0896daec6eb..dcdbd72fd54c 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
+@@ -886,7 +886,7 @@ &gpio0 {
+ 	/*S0-S7*/	"","","","","P1_DIMM_AF_ERROR","P1_DIMM_GL_ERROR","P0_DIMM_AF_ERROR","P0_DIMM_GL_ERROR",
+ 	/*T0-T7*/	"","","","","","","","",
+ 	/*U0-U7*/	"","","","","P1_I3C_APML_ALERT_L","","","",
+-	/*V0-V7*/	"","","","","","","","",
++	/*V0-V7*/	"","","","RSMRST","","","","",
+ 	/*W0-W7*/	"","","","","","","","",
+ 	/*X0-X7*/	"","","","","","","","",
+ 	/*Y0-Y7*/	"","","","","","","","",
+--
+2.25.1
+
