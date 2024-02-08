@@ -1,0 +1,28 @@
+From 769d162a9ee92557fe4dd950af9e03df321be83b Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Thu, 8 Feb 2024 04:21:21 -0600
+Subject: [PATCH] u-boot: Boot from first DTB on unknown board ID
+
+Remove quartz from default FDT config
+In case of uknown board id, load first dtb configuration
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+---
+ common/image-fit.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/common/image-fit.c b/common/image-fit.c
+index 2516101dd0..9614650b84 100644
+--- a/common/image-fit.c
++++ b/common/image-fit.c
+@@ -1975,7 +1975,9 @@ int fit_image_load(bootm_headers_t *images, ulong addr,
+ 						sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-volcano.dtb");
+ 					break;
+ 				default :
+-					sprintf((char *)fit_uname_config, "conf-aspeed-bmc-amd-quartz.dtb");
++					printf("!!! Board ID %d is not supported by this image!!!\n", board_id);
++					printf("Using first available DTB...\n");
++					fit_uname_config = fit_uname_configp ? *fit_uname_configp : NULL;
+ 					break;
+ 			} // switch
+

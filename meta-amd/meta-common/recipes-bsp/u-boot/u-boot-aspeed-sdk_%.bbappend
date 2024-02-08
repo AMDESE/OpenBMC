@@ -11,4 +11,5 @@ SRC_URI += "file://amd-ast2600-u-boot.cfg \
             file://0006-u-boot-Turin-APML-over-i2c-i3c.patch  \
             file://0007-u-boot-SP5-APML-over-i2c-i3c.patch \
             file://0008-u-boot-Add-Turin-Volcano-with-4-Pump-Fans.patch \
+            file://0009-u-boot-Boot-from-first-DTB-on-unknown-board-ID.patch \
             "
