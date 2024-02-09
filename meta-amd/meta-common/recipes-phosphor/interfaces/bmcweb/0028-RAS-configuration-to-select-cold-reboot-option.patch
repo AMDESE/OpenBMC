@@ -1,0 +1,109 @@
+From 873eb84db963df3afb62b1def419c794add7a952 Mon Sep 17 00:00:00 2001
+From: Abinaya Dhandapani <adhandap@amd.com>
+Date: Wed, 14 Feb 2024 10:55:23 -0600
+Subject: [PATCH] BMC-CHECK
+
+Signed-off-by: Abinaya Dhandapani <adhandap@amd.com>
+---
+ redfish-core/lib/log_services.hpp | 46 +++++++++++++++++++++++++++++--
+ 1 file changed, 44 insertions(+), 2 deletions(-)
+
+diff --git a/redfish-core/lib/log_services.hpp b/redfish-core/lib/log_services.hpp
+index fac01c2c..9c32efdb 100644
+--- a/redfish-core/lib/log_services.hpp
++++ b/redfish-core/lib/log_services.hpp
+@@ -40,6 +40,8 @@
+
+ #define MAX_RUNTIME_PPR_CNT      (8)
+ #define PPR_TYPE_BOOTTIME_MASK   (0x8000)
++#define SYS_RESET ("SYS_RST")
++#define RSMRST ("RSMRST")
+
+ namespace redfish
+ {
+@@ -2868,7 +2870,7 @@ class CrashdumpConfiguration : public Node
+             [asyncResp](
+                 const boost::system::error_code ec,
+                 const std::vector<std::pair<
+-                    std::string, std::variant<uint16_t, bool,
++                    std::string, std::variant<uint16_t, bool,std::string,
+                                      std::vector<std::pair<std::string, std::string>>,
+                                      std::vector<std::string>>>>&
+                     propertiesList) {
+@@ -2880,7 +2882,7 @@ class CrashdumpConfiguration : public Node
+                 BMCWEB_LOG_DEBUG << "Got " << propertiesList.size()
+                                  << "properties for Crashdump configuration";
+                 for (const std::pair<std::string,
+-                                     std::variant<uint16_t, bool,
++                                     std::variant<uint16_t, bool,std::string,
+                                      std::vector<std::pair<std::string, std::string>>,
+                                      std::vector<std::string>>>&
+                          property : propertiesList)
+@@ -3045,6 +3047,16 @@ class CrashdumpConfiguration : public Node
+                                 *value;
+                         }
+                     }
++                    if (property.first == "ResetSignal")
++                    {
++                        const std::string* value =
++                            std::get_if<std::string>(&property.second);
++                        if (value != nullptr)
++                        {
++                            asyncResp->res
++                                .jsonValue["ResetSignal"] = *value;
++                        }
++                    }
+                     if (property.first == "sigIDOffset")
+                     {
+                         const std::vector<std::string>* value =
+@@ -3090,6 +3102,7 @@ class CrashdumpConfiguration : public Node
+         std::optional<uint16_t> systemRecovery;
+         std::optional<bool> harvestuCodeVersion;
+         std::optional<bool> harvestPpin;
++        std::optional<std::string> ResetSignal;
+         std::optional<std::vector<std::string>> sigIDOffset;
+         std::optional<std::vector<std::pair<std::string, std::string>>> P0_DimmLabels;
+         std::optional<std::vector<std::pair<std::string, std::string>>> P1_DimmLabels;
+@@ -3111,6 +3124,7 @@ class CrashdumpConfiguration : public Node
+                                 "systemRecovery", systemRecovery,
+                                 "harvestPpin", harvestPpin,
+                                 "harvestuCodeVersion", harvestuCodeVersion,
++                                "ResetSignal",ResetSignal,
+                                 "sigIDOffset",sigIDOffset,
+                                 "P0_DIMM_LABELS",P0_DimmLabels,
+                                 "P1_DIMM_LABELS",P1_DimmLabels,
+@@ -3206,6 +3220,34 @@ class CrashdumpConfiguration : public Node
+             std::variant<bool>(*harvestuCodeVersion));
+         }
+
++        if(ResetSignal)
++        {
++
++            if((ResetSignal != SYS_RESET) && (ResetSignal != RSMRST))
++            {
++                messages::propertyValueNotInList(asyncResp->res, *ResetSignal,
++                                                 "ResetSignal");
++
++                BMCWEB_LOG_DEBUG << "The accepted ResetSignal value is SYS_RESET and RSMRST";
++                return;
++            }
++            crow::connections::systemBus->async_method_call(
++            [asyncResp](const boost::system::error_code ec) {
++                if (ec)
++                {
++                    BMCWEB_LOG_ERROR << "D-Bus responses error: " << ec;
++                    messages::internalError(asyncResp->res);
++                    return;
++                }
++                messages::success(asyncResp->res);
++                return;
++            },
++            crashdumpObject,crashdumpPath,
++            "org.freedesktop.DBus.Properties", "Set",
++            crashdumpConfigurationInterface, "ResetSignal",
++            std::variant<std::string>(*ResetSignal));
++        }
++
+         if(sigIDOffset)
+         {
+             crow::connections::systemBus->async_method_call(
