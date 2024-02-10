@@ -79,6 +79,7 @@ SRC_URI += "file://amd-bmc-baseline.cfg \
             file://0077-Add-sic458-VR-driver.patch \
             file://0078-Add-sic458-driver-for-Purico-VR-in-dts.patch \
             file://0079-Replace-i2c-address-with-pmbus-address-for-TDA-VR.patch \
+            file://0080-drivers-soc-Modify-aspeed-bmc-dev-driver-read-to-wak.patch \
             file://0081-ARM-dts-aspeed-Turin-Add-MON_RSMRST_L-line-to-GPIO-G.patch \
             file://0082-Map-RSMRST-GPIO-line-for-Genoa-legacy-boards.patch \
             file://0083-ARM-dts-aspeed-Genoa-Add-MON_RSMRST_L-to-GPIO-G7.patch \
