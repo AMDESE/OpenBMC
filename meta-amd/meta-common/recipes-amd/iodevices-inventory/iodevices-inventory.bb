@@ -4,7 +4,7 @@ xyz.openbmc_project.PCIe.service for IO Device (PCIe and Storage) fetch the data
 and set the DBus interface for Redfish API."
 
 SRC_URI = "git://git@github.com/AMDESE/amd-iodevices-inventory.git;branch=main;protocol=ssh"
-SRCREV = "80e197eb2d95e149ede9fb8fb596ed8014d2b079"
+SRCREV = "${AUTOREV}"
 
 S = "${WORKDIR}/git"
 
