@@ -1,0 +1,29 @@
+From ab96279b98d1cba83739a8601097be69726527e6 Mon Sep 17 00:00:00 2001
+From: Ashok Kumar <ashok2.kumar@amd.com>
+Date: Tue, 20 Feb 2024 09:12:07 -0600
+Subject: [PATCH 1/1] Removed PCIeDevices uri from main system uri
+
+Removed PCIeDevices uri from main system uri to avoid getting
+fail main system uri in case of any error in PCIeDevice uri
+Fixes: FWDEV-71609
+
+Signed-off-by: Ashok Kumar <ashok2.kumar@amd.com>
+---
+ redfish-core/lib/systems.hpp | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/redfish-core/lib/systems.hpp b/redfish-core/lib/systems.hpp
+index 4b1b04ab..d243a89d 100644
+--- a/redfish-core/lib/systems.hpp
++++ b/redfish-core/lib/systems.hpp
+@@ -2169,7 +2169,6 @@ class Systems : public Node
+         getHostState(asyncResp);
+         getBootProperties(asyncResp);
+         getBootProgress(asyncResp);
+-        getPCIeDeviceList(asyncResp, "PCIeDevices");
+         getHostWatchdogTimer(asyncResp);
+         getPowerRestorePolicy(asyncResp);
+         getAutomaticRetry(asyncResp);
+--
+2.25.1
+

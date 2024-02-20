@@ -33,5 +33,6 @@ SRC_URI += "file://0001-Reset-server-settings-only-changes-to-invoke-CMOS.patch 
             file://0026-bmcweb-add-redfish-support-for-retimer-bundle-update.patch \
             file://0027-bmcweb-removed-Storage-uri-from-system-uri.patch \
             file://0028-RAS-configuration-to-select-cold-reboot-option.patch \
+            file://0029-Removed-PCIeDevices-uri-from-main-system-uri.patch \
             "
 
