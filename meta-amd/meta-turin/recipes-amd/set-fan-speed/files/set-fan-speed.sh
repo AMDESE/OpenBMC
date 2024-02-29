@@ -123,20 +123,16 @@ else
     speed_val=$1
 fi
 
+systemctl stop phosphor-pid-control.service
+systemctl disable phosphor-pid-control.service
+
 case "$board_id" in
     "6A" | "72" | "73")
     echo "Set Purico Fans "
     set_nct7362
     set_nct7362_fan_speed
     ;;
-    "6B")
-    speed_val=204
-    systemctl disable phosphor-pid-control.service
-    echo "Set Volcano EVT/DVT Fans "
-    set_nct7362
-    set_nct7362_fan_speed
-    ;;
-    "74" | "75" | "7F")
+    "6B" | "74" | "75" | "7F")
     echo "Set Volcano Fans "
     set_nct7362
     set_nct7362_fan_speed
