@@ -1,0 +1,143 @@
+From 74a70d8afd0915ebbe09071fe09220fb343b3286 Mon Sep 17 00:00:00 2001
+From: Mohsen Dolaty <mohsen.dolaty@amd.com>
+Date: Tue, 5 Mar 2024 09:33:59 -0600
+Subject: [PATCH 1/1] u-boot: Add Board rev to UBOOT parameters
+
+Read Board Rev from HPM FRU Internal area and
+Add it to UBOOT parameters
+Clean up AMD Platform Header file (removed duplicated defines)
+
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
+---
+ common/main.c           | 38 ++++++++++++++++++++++----------------
+ include/amd-platforms.h | 20 ++++----------------
+ 2 files changed, 26 insertions(+), 32 deletions(-)
+
+diff --git a/common/main.c b/common/main.c
+index 0eac68de7a..9bd108d6b9 100644
+--- a/common/main.c
++++ b/common/main.c
+@@ -187,37 +187,37 @@ void set_hostname()
+ /*
+  * Read board ID from mother board eeprom and set as an env
+  */
+-void set_board_id()
++void set_board_config(unsigned int offset, unsigned int len, char *name)
+ {
+ 	char *s;
+-	unsigned char board_id [BOARD_ID_LEN];
++	unsigned char fru[CONFIG_LEN];
+ 	int ret, i=0;
+-	char brdid[BOARD_ID_BUFF_LEN];
++	unsigned char data[CONFIG_LEN];
+
+-	/* Check if the board_id env is set */
+-	s = env_get("board_id");
++	/* Check if the config is set */
++	s = env_get(name);
+
+-	/* Read board_id from eeprom */
++	/* Read config from eeprom */
+ 	i2c_set_bus_num(EEPROM_I2C_BUS);
+-	ret = i2c_read(EEPROM_DEV_ADDR, EEPROM_BOARD_ID_OFFSET, EEPROM_ADDR_LEN, board_id, BOARD_ID_LEN);
++	ret = i2c_read(EEPROM_DEV_ADDR, offset, EEPROM_ADDR_LEN, fru, len);
+ 	if (ret < 0) {
+-		printf("Error : Retrieving board_id from EEPROM Failed\n");
++		printf("Error : Retrieving config from EEPROM Failed\n");
+ 	}
+ 	else {
+-		sprintf(brdid, "%x", board_id[0]);
++		sprintf(data, "%02x", fru[0]);
+ 		/* Convert char to upper case */
+-		for ( i=0; i < BOARD_ID_BUFF_LEN; i++) {
+-			brdid[i]= toupper(brdid[i]);
++		for ( i=0; i < EEPROM_ADDR_LEN; i++) {
++			data[i]= toupper(data[i]);
+ 		}
+
+ 		/* if the env is not set OR env id  and eeprom id are different, then set from eeprom id */
+-		if ( (s == NULL) || (strcmp(s, brdid) !=0 ) ) {
+-			env_set("board_id", brdid);
++		if ( (s == NULL) || (strcmp(s, data) !=0 ) ) {
++			env_set(name, data);
+ 			env_save();
+ 		}
+ 	}
+
+-	printf("Board_id : %s\n", env_get("board_id"));
++	printf("%s : %s\n", name, env_get(name));
+ 	return;
+ }
+
+@@ -276,6 +276,7 @@ static void run_preboot_environment_command(void)
+ void main_loop(void)
+ {
+ 	const char *s;
++	char name[CONFIG_LEN];
+ 	u32 por_rst = readl(ASPEED_SYS_SCRATCH_1FC);
+
+ 	bootstage_mark_name(BOOTSTAGE_ID_MAIN_LOOP, "main_loop");
+@@ -298,8 +299,13 @@ void main_loop(void)
+ 		env_set("por_rst", "false");
+ 	env_save();
+
+-	/* Read board id from eerpom and set env */
+-	set_board_id();
++	/* Read board id and board_rev from eeprom and set env */
++	memset(name, 0, CONFIG_LEN);
++	sprintf(name, "%s", "board_id");
++	set_board_config(EEPROM_BOARD_ID_OFFSET, BOARD_ID_LEN, name);
++	memset(name, 0, CONFIG_LEN);
++	sprintf(name, "%s", "board_rev");
++	set_board_config(EEPROM_BOARD_REV_OFFSET, BOARD_REV_LEN, name);
+ 	set_hostname();
+ 	init_rot_flash();
+ 	s = bootdelay_process();
+diff --git a/include/amd-platforms.h b/include/amd-platforms.h
+index 82264f0095..8796fba5ff 100644
+--- a/include/amd-platforms.h
++++ b/include/amd-platforms.h
+@@ -7,16 +7,18 @@
+ #ifndef _AMD_PLATFOMS_H_
+ #define _AMD_PLATFOMS_H
+
++// EEPROM info
+ #define EEPROM_I2C_BUS          7
+ #define EEPROM_DEV_ADDR         0X50
+ #define EEPROM_BOARD_ID_OFFSET  0X10
++#define EEPROM_BOARD_REV_OFFSET 0X18
+ #define EEPROM_ADDR_LEN         2
+ #define BOARD_ID_LEN            1
+-#define BOARD_ID_BUFF_LEN       2
++#define BOARD_REV_LEN           1
++#define CONFIG_LEN              16
+
+ #define HOSTNAME_BUFF_LEN       32
+ #define CMD_BOOT_ARGS_BUFF_LEN  512
+-#define HEX_BASE                16
+ #define OCTATE_5_OFFSET         12
+ #define OCTATE_6_OFFSET         15
+ #define MAC_ADDR_ARRAY_SIZE     17
+@@ -81,20 +83,6 @@
+ #define GALENA_CHARZ1   119 // 0x77
+ #define GALENA_CHARZ2   120 // 0x78
+
+-// EEPROM info
+-#define EEPROM_I2C_BUS          7
+-#define EEPROM_DEV_ADDR         0X50
+-#define EEPROM_BOARD_ID_OFFSET  0X10
+-#define EEPROM_ADDR_LEN         2
+-#define BOARD_ID_LEN            1
+-#define BOARD_ID_BUFF_LEN       2
+-#define HOSTNAME_BUFF_LEN       32
+-#define CMD_BOOT_ARGS_BUFF_LEN  512
+-#define HEX_BASE                16
+-#define OCTATE_5_OFFSET         12
+-#define OCTATE_6_OFFSET         15
+-#define MAC_ADDR_ARRAY_SIZE     17
+-
+ // Sys Scratch reg that holds sys_rst info
+ #define ASPEED_SYS_SCRATCH_1FC 0x1e6e21fc
+
+--
+2.25.1
