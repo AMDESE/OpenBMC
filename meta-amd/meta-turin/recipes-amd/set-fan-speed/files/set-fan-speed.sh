@@ -123,9 +123,6 @@ else
     speed_val=$1
 fi
 
-systemctl stop phosphor-pid-control.service
-systemctl disable phosphor-pid-control.service
-
 case "$board_id" in
     "6A" | "72" | "73")
     echo "Set Purico Fans "
