@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd /sys/bus/platform/drivers/dw-i3c-master/
+cd /sys/bus/platform/drivers/ast2600-i3c-master/
 
 echo 1e7a2000.i3c0 > unbind
 echo 1e7a3000.i3c1 > unbind

@@ -5,23 +5,23 @@ dimm_per_ch=`/sbin/fw_printenv -n dimm_per_ch`
 dimm_per_bus=`/sbin/fw_printenv -n dimm_per_bus`
 por_rst=`/sbin/fw_printenv -n por_rst`
 max_loop_cnt=1
+
+I2C_TOOL="/usr/sbin/i2ctransfer"
 I3C_TOOL="/usr/bin/i3ctransfer"
+MODE="I2C"
+spd_addr=0x50
+if [ "$(</sys/bus/i3c/devices/i3c-0/mode)" == "pure" ]; then
+    MODE="I3C"
+fi
+
 LOG_DIR="/var/lib/dimm"
 dimm_sh="${LOG_DIR}/dimm.sh"
 dimm_info="${LOG_DIR}/dimm_info.txt"
+
 SET_PROP="busctl set-property xyz.openbmc_project.Inventory.Manager /xyz/openbmc_project/inventory/system/chassis/motherboard/"
 ITEM_DIMM="xyz.openbmc_project.Inventory.Item.Dimm"
 
-# check for Volcano and Purico system and exit
 board_id=`fw_printenv board_id | sed -n "s/^board_id=//p"`
-
-case $board_id in
-       "6A" | "72" | "73" | "6B"| "74" | "75" | "7F")  # Purico or Volcano
-            echo "Lenovo Turin system " $board_id " do not run dimm-info "
-            exit
-       ;;
-esac
-
 power_status() {
         st=$(busctl get-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis CurrentPowerState | cut -d"." -f6)
         if [ "$st" == "On\"" ]; then
@@ -72,7 +72,7 @@ else
 fi
 
 # BMC has access to I3C
-i3cid=0
+ixcid=0
 sock_id=0
 channel=0
 dimmNum=0
@@ -89,28 +89,51 @@ rm $dimm_info
 echo "#!/bin/bash" >> $dimm_sh
 chmod 777 $dimm_sh
 
+
 while [[ $sock_id < $max_loop_cnt ]]
 do
     for i3c_bus_per_soc in 1 2
     do
         # Check if at least one DIMM present on this BUS
-        ls /dev/i3c-${i3cid}-* > /dev/null 2>&1
-        if [[ $? -ne 0 ]]
-        then
-            echo "No dimms detected on S"${sock_id} "I3C_Bus"${i3cid}
-            echo "No dimms detected on S"${sock_id} "I3C_Bus"${i3cid} >> $dimm_info
-            # No DIMMs on this I3C bus
-            (( i3cid += 1))
+        no_dimms=0
+        if [ "$MODE" == "I2C" ]; then
+            i2cnum=$(i2cdetect -y -l|grep "i3c$ixcid"|awk -F'[^0-9]+' '{ print $3 }')
+            ls /sys/bus/i2c/devices/i2c-${i2cnum}/${i2cnum}-00* > /dev/null 2>&1
+            if [[ $? -ne 0 ]]
+            then
+                echo "No dimms detected on S"${sock_id} "i3c"${ixcid}
+                echo "No dimms detected on S"${sock_id} "i3c"${ixcid} >> $dimm_info
+                no_dimms=1
+           fi
+	else
+            ls /dev/bus/i3c/${ixcid}-* > /dev/null 2>&1
+            if [[ $? -ne 0 ]]
+            then
+                echo "No dimms detected on S"${sock_id} "I3C_Bus"${ixcid}
+                echo "No dimms detected on S"${sock_id} "I3C_Bus"${ixcid} >> $dimm_info
+                no_dimms=1
+           fi
+        fi
+        # No DIMMs on this bus
+        if [ $no_dimms -eq 1 ]; then
+            # No DIMMs on this I2C/I3C bus
+            (( ixcid += 1))
             (( channel += dimm_per_bus ))
             continue
         fi
+
         # This section reads various SPD bytes and provides dimm info
         for (( dimm=0; dimm<dimm_per_bus; dimm++ ))
         do
-            (( dimmNum = (i3cid * dimm_per_bus)+(dimm) ))
             # Driver generated I3C name for this dimm
-            pmic_name="/dev/i3c-${i3cid}-2040000000${dimm}"
-            spd_name="/dev/i3c-${i3cid}-3c00000000${dimm}"
+            if [ "$MODE" == "I2C" ]; then
+	         spd_name="$ixcid"
+                 (( dimmNum = (ixcid * dimm_per_bus)+(dimm) ))
+            else
+	         pmic_name="/dev/bus/i3c/${ixcid}-2040000000${dimm}"
+	         spd_name="/dev/bus/i3c/${ixcid}-3c00000000${dimm}"
+                 (( dimmNum = (ixcid * dimm_per_bus)+(dimm) ))
+            fi
 
             if [ $dimm_per_bus == 3 ];then
                 case "$dimmNum" in
@@ -315,7 +338,15 @@ do
             echo "--------------------------" >> $dimm_info
             echo $dimmID                   >> $dimm_info
             # Check if DIMM is present
-            $I3C_TOOL -d ${spd_name} -w 0x80,0x00 -r 0x1 > /dev/null 2>&1
+            if [ "$MODE" == "I2C" ]; then
+                # set the 16bit addressing mode for the SPD contents.
+                # Once set, can't be unset afterwards when the system is powered on.
+                # To reset it to the default 8 bit mode, do the AC power cycle.
+                i2cset -f -y $i2cnum $(( spd_addr+dimm )) 0x0b 0x08 b
+                $I2C_TOOL -y $i2cnum w2@$(( spd_addr+dimm )) 0x80 0x00 r1 > /dev/null 2>&1
+            else
+                $I3C_TOOL -d ${spd_name} -w 0x80,0x00 -r 0x1 > /dev/null 2>&1
+            fi
             if [[ $? -ne 0 ]]
             then
                 # DIMM not present
@@ -332,7 +363,11 @@ do
             id=$(( channel + dimm ))
 
             # Read DIMM Protocol Type
-            mapfile -s 3  -t spd_data < <($I3C_TOOL -d ${spd_name} -w 0x80,0x00 -r 0x40)
+            if [ "$MODE" == "I2C" ]; then
+                mapfile -t -d" " spd_data < <( $I2C_TOOL -y $i2cnum w2@$(( spd_addr+dimm )) 0x80 0x00  r0x40 )
+            else
+                mapfile -s 3  -t spd_data < <($I3C_TOOL -d ${spd_name} -w 0x80,0x00 -r 0x40)
+            fi
             if [[ ${spd_data[2]} -eq "0x12" ]]
             then
                 bus_type=DDR5
@@ -433,7 +468,11 @@ do
             echo $SET_PROP$dimmID $ITEM_DIMM " MemoryDataWidth q " $spd_iowidth >> $dimm_sh
 
             # Read Number of Ranks
-            mapfile -s 3  -t spd_data < <($I3C_TOOL -d ${spd_name} -w 0xC0,0x01 -r 0x40)
+            if [ "$MODE" == "I2C" ]; then
+                mapfile -t -d" " spd_data < <( $I2C_TOOL -y $i2cnum w2@$(( spd_addr+dimm )) 0xC0 0x01  r0x40 )
+            else
+                mapfile -s 3  -t spd_data < <($I3C_TOOL -d ${spd_name} -w 0xC0,0x01 -r 0x40)
+            fi
             busWidth1=${spd_data[43]}
             busWidth=$(($busWidth1 & 0x1f))
             if [[ $busWidth -eq "0x12" ]]
@@ -581,7 +620,11 @@ do
             $SET_PROP$dimmID $ITEM_DIMM MemorySizeInKB u $capacity
 
             # Read DIMM Vendor
-            mapfile -s 3  -t spd_data < <($I3C_TOOL -d ${spd_name} -w 0x80,0x04 -r 0x40)
+            if [ "$MODE" == "I2C" ]; then
+                mapfile -t -d" " spd_data < <( $I2C_TOOL -y $i2cnum w2@$(( spd_addr+dimm )) 0x80 0x04  r0x40 )
+            else
+                mapfile -s 3  -t spd_data < <($I3C_TOOL -d ${spd_name} -w 0x80,0x04 -r 0x40)
+            fi
             vendor=${spd_data[40]}
             vendor1=${spd_data[41]}
             if [[ $vendor -eq "0x80" ]]
@@ -603,7 +646,11 @@ do
             fi
 
             # Read DIMM RCD vendor and revision
-            mapfile -s 3  -t spd_data < <($I3C_TOOL -d ${spd_name} -w 0xC0,0x01 -r 0x40)
+            if [ "$MODE" == "I2C" ]; then
+                mapfile -t -d" " spd_data < <( $I2C_TOOL -y $i2cnum w2@$(( spd_addr+dimm )) 0xC0 0x01  r0x40 )
+            else
+                mapfile -s 3  -t spd_data < <($I3C_TOOL -d ${spd_name} -w 0xC0,0x01 -r 0x40)
+            fi
             if [[ ${spd_data[48]} -eq "0x86" ]] && [[ ${spd_data[49]} -eq "0x32" ]]
             then
                 rcd=Montage
@@ -636,7 +683,11 @@ do
             echo "\"RCD\"" ":" \"$rcd $rcd_rev\" >> $dimm_info
 
             # Read DIMM Part Number
-            mapfile -s 3  -t spd_data < <($I3C_TOOL -d ${spd_name} -w 0x80,0x04 -r 0x40)
+            if [ "$MODE" == "I2C" ]; then
+                mapfile -t -d" " spd_data < <( $I2C_TOOL -y $i2cnum w2@$(( spd_addr+dimm )) 0x80 0x04  r0x40 )
+            else
+                mapfile -s 3  -t spd_data < <($I3C_TOOL -d ${spd_name} -w 0x80,0x04 -r 0x40)
+            fi
             spdPN1=$(echo -e   "${spd_data[9]}"  | awk '{printf "%c",$1}')
             spdPN2=$(echo -e   "${spd_data[10]}" | awk '{printf "%c",$1}')
             spdPN3=$(echo -e   "${spd_data[11]}" | awk '{printf "%c",$1}')
@@ -712,7 +763,7 @@ do
         done # END of dimm loop
 
         (( channel += 6 ))
-        (( i3cid += 1 ))
+        (( ixcid += 1 ))
 
     done # END of i3c_bus_per_sock loop
     (( sock_id += 1 ))
