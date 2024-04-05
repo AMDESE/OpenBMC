@@ -1,4 +1,4 @@
-From b1cc42fb600a1752bb4a985395ec84d3fc191843 Mon Sep 17 00:00:00 2001
+From 1e69f38e2a7537bfa841a69c3cf09dff8eeeabe4 Mon Sep 17 00:00:00 2001
 From: OpenEmbedded <oe.patch@oe>
 Date: Thu, 14 Mar 2024 15:13:34 -0500
 Subject: [PATCH] linux-aspeed : modify the dts files as per new the new
@@ -13,32 +13,32 @@ Tested : on Volcano
 
 Signed-off-by: Mahesh Kurapati <mahesh.kurapati@amd.com>
 ---
- .../boot/dts/aspeed-bmc-amd-chalupa-i3c.dts   | 205 ++++++++-
- arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts  | 194 ++++++++-
- arch/arm/boot/dts/aspeed-bmc-amd-cinnabar.dts | 272 +++++++-----
- .../boot/dts/aspeed-bmc-amd-galena-i3c.dts    | 111 ++++-
- arch/arm/boot/dts/aspeed-bmc-amd-galena.dts   | 104 ++++-
- .../boot/dts/aspeed-bmc-amd-huambo-i3c.dts    | 206 +++++++++-
- arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts   | 194 ++++++++-
- arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts | 112 ++++-
- arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts     | 104 ++++-
- .../boot/dts/aspeed-bmc-amd-purico-i3c.dts    | 279 +++++--------
- arch/arm/boot/dts/aspeed-bmc-amd-purico.dts   | 271 +++++-------
- .../boot/dts/aspeed-bmc-amd-quartz-i3c.dts    | 207 +++++++++-
- arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts   | 193 ++++++++-
- .../boot/dts/aspeed-bmc-amd-recluse-i3c.dts   | 112 ++++-
- arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts  | 104 ++++-
- arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts | 279 +++++--------
- arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts     | 274 +++++-------
+ .../boot/dts/aspeed-bmc-amd-chalupa-i3c.dts   | 205 ++++++-
+ arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts  | 194 ++++++-
+ arch/arm/boot/dts/aspeed-bmc-amd-cinnabar.dts | 272 +++++----
+ .../boot/dts/aspeed-bmc-amd-galena-i3c.dts    | 111 +++-
+ arch/arm/boot/dts/aspeed-bmc-amd-galena.dts   | 104 +++-
+ .../boot/dts/aspeed-bmc-amd-huambo-i3c.dts    | 206 ++++++-
+ arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts   | 194 ++++++-
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts | 112 +++-
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts     | 104 +++-
+ .../boot/dts/aspeed-bmc-amd-purico-i3c.dts    | 527 ++++++++++++------
+ arch/arm/boot/dts/aspeed-bmc-amd-purico.dts   | 520 +++++++++++------
+ .../boot/dts/aspeed-bmc-amd-quartz-i3c.dts    | 207 ++++++-
+ arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts   | 193 ++++++-
+ .../boot/dts/aspeed-bmc-amd-recluse-i3c.dts   | 112 +++-
+ arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts  | 104 +++-
+ arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts | 279 ++++------
+ arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts     | 274 ++++-----
  arch/arm/boot/dts/aspeed-bmc-amd-sh5d807.dts  |   6 +-
- arch/arm/boot/dts/aspeed-bmc-amd-shale.dts    | 204 ++++++++-
- arch/arm/boot/dts/aspeed-bmc-amd-sunstone.dts | 389 ++++++++++++++++--
- .../boot/dts/aspeed-bmc-amd-titanite-i3c.dts  | 207 +++++++++-
- arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts | 194 ++++++++-
- .../boot/dts/aspeed-bmc-amd-volcano-i3c.dts   | 207 +++++++++-
- arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts  | 194 ++++++++-
- arch/arm/boot/dts/aspeed-g6.dtsi              | 122 +++++-
- 25 files changed, 3734 insertions(+), 1010 deletions(-)
+ arch/arm/boot/dts/aspeed-bmc-amd-shale.dts    | 204 ++++++-
+ arch/arm/boot/dts/aspeed-bmc-amd-sunstone.dts | 389 ++++++++++++-
+ .../boot/dts/aspeed-bmc-amd-titanite-i3c.dts  | 207 ++++++-
+ arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts | 194 ++++++-
+ .../boot/dts/aspeed-bmc-amd-volcano-i3c.dts   | 207 ++++++-
+ arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts  | 194 ++++++-
+ arch/arm/boot/dts/aspeed-g6.dtsi              | 122 +++-
+ 25 files changed, 4239 insertions(+), 1002 deletions(-)
 
 diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
 index 30e5ae31c0ea..f1751ede7830 100644
@@ -2036,7 +2036,7 @@ index a3c344192112..baea186fbdda 100644
  	// P0 APML - i2c10
  	status = "okay";
 diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
-index 1a7e44440f74..19ea31a70db8 100644
+index 1a7e44440f74..62b44800f239 100644
 --- a/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
 +++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
 @@ -32,6 +32,9 @@ aliases {
@@ -2077,15 +2077,21 @@ index 1a7e44440f74..19ea31a70db8 100644
 
  	//DIMM G
  	spd5118_1_0: spd@50,3C000000000 {
-@@ -879,192 +883,113 @@ rcd_1_5: rcd@5d,2C000000005 {
- 		reg = <0x5d 0x2C0 0x00000005>;
+@@ -880,191 +884,368 @@ rcd_1_5: rcd@5d,2C000000005 {
  		assigned-address = <0x5d>;
  	};
--};
--&i3c2 {
+ };
++
+ &i3c2 {
 -        // P1 DIMM (A-F) SPD Access
 -        status = "okay";
-+ };
++	// P1 DIMM (A-F) SPD Access
++	status = "okay";
++	jdec-spd;
++	i2c-scl-hz = <100000>;
++	i3c-scl-hz = <2000000>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_i3c3_default>;
 
 -        jdec-spd;
 -        bus_id = <0x02>;
@@ -2168,12 +2174,178 @@ index 1a7e44440f74..19ea31a70db8 100644
 -                reg = <0x5d 0x2C0 0x00000005>;
 -                assigned-address = <0x5d>;
 -        };
--};
-+#else // #ifdef ENABLE_I3C_SPD_DIMM
++	//DIMM A
++	spd5118_2_0: spd@50,3C000000000 {
++		reg = <0x50 0x3C0 0x00000000>;
++		assigned-address = <0x50>;
++	};
++	pmic5xxx_2_0: pmic@48,20400000000 {
++		reg = <0x48 0x204 0x00000000>;
++		assigned-address = <0x48>;
++	};
++	rcd_2_0: rcd@58,2C000000000 {
++		reg = <0x58 0x2C0 0x00000000>;
++		assigned-address = <0x58>;
++	};
++	//DIMM B
++	spd5118_2_1: spd@51,3C000000001 {
++		reg = <0x51 0x3C0 0x00000001>;
++		assigned-address = <0x51>;
++	};
++	pmic5xxx_2_1: pmic@49,20400000001 {
++		reg = <0x49 0x204 0x00000001>;
++		assigned-address = <0x49>;
++	};
++	rcd_2_1: rcd@59,2C000000001 {
++		reg = <0x59 0x2C0 0x00000001>;
++		assigned-address = <0x59>;
++	};
++	//DIMM C
++	spd5118_2_2: spd@52,3C000000002 {
++		reg = <0x52 0x3C0 0x00000002>;
++		assigned-address = <0x52>;
++	};
++	pmic5xxx_2_2: pmic@4a,20400000002 {
++		reg = <0x4a 0x204 0x00000002>;
++		assigned-address = <0x4a>;
++	};
++	rcd_2_2: rcd@5a,2C000000002 {
++		reg = <0x5a 0x2C0 0x00000002>;
++		assigned-address = <0x5a>;
++	};
++	//DIMM D
++	spd5118_2_3: spd@53,3C000000003 {
++		reg = <0x53 0x3C0 0x00000003>;
++		assigned-address = <0x53>;
++	};
++	pmic5xxx_2_3: pmic@4b,20400000003 {
++		reg = <0x4b 0x204 0x00000003>;
++		assigned-address = <0x4b>;
++	};
++	rcd_2_3: rcd@5b,2C000000003 {
++		reg = <0x5b 0x2C0 0x00000003>;
++		assigned-address = <0x5b>;
++	};
++	//DIMM E
++	spd5118_2_4: spd@54,3C000000004 {
++		reg = <0x54 0x3C0 0x00000004>;
++		assigned-address = <0x54>;
++	};
++	pmic5xxx_2_4: pmic@4c,20400000004 {
++		reg = <0x4c 0x204 0x00000004>;
++		assigned-address = <0x4c>;
++	};
++	rcd_2_4: rcd@5c,2C000000004 {
++		reg = <0x5c 0x2C0 0x00000004>;
++		assigned-address = <0x5c>;
++	};
++	//DIMM F
++	spd5118_2_5: spd@55,3C000000005 {
++		reg = <0x55 0x3C0 0x00000005>;
++		assigned-address = <0x55>;
++	};
++	pmic5xxx_2_5: pmic@4d,20400000005 {
++		reg = <0x4d 0x204 0x00000005>;
++		assigned-address = <0x4d>;
++	};
++	rcd_2_5: rcd@5d,2C000000005 {
++		reg = <0x5d 0x2C0 0x00000005>;
++		assigned-address = <0x5d>;
++	};
+ };
 
--&i3c3 {
+ &i3c3 {
 -        // P1 DIMM (G-L) SPD Access
 -        status = "okay";
++	// P1 DIMM (G-L) SPD Access
++	status = "okay";
++	jdec-spd;
++	i2c-scl-hz = <100000>;
++	i3c-scl-hz = <2000000>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_i3c4_default>;
++
++	//DIMM G
++	spd5118_3_0: spd@50,3C000000000 {
++		reg = <0x50 0x3C0 0x00000000>;
++		assigned-address = <0x50>;
++	};
++	pmic5xxx_3_0: pmic@48,20400000000 {
++		reg = <0x48 0x204 0x00000000>;
++		assigned-address = <0x48>;
++	};
++	rcd_3_0: rcd@58,2C000000000 {
++		reg = <0x58 0x2C0 0x00000000>;
++		assigned-address = <0x58>;
++	};
++	//DIMM H
++	spd5118_3_1: spd@51,3C000000001 {
++		reg = <0x51 0x3C0 0x00000001>;
++		assigned-address = <0x51>;
++	};
++	pmic5xxx_3_1: pmic@49,20400000001 {
++		reg = <0x49 0x204 0x00000001>;
++		assigned-address = <0x49>;
++	};
++	rcd_3_1: rcd@59,2C000000001 {
++		reg = <0x59 0x2C0 0x00000001>;
++		assigned-address = <0x59>;
++	};
++	//DIMM I
++	spd5118_3_2: spd@52,3C000000002 {
++		reg = <0x52 0x3C0 0x00000002>;
++		assigned-address = <0x52>;
++	};
++	pmic5xxx_3_2: pmic@4a,20400000002 {
++		reg = <0x4a 0x204 0x00000002>;
++		assigned-address = <0x4a>;
++	};
++	rcd_3_2: rcd@5a,2C000000002 {
++		reg = <0x5a 0x2C0 0x00000002>;
++		assigned-address = <0x5a>;
++	};
++	//DIMM J
++	spd5118_3_3: spd@53,3C000000003 {
++		reg = <0x53 0x3C0 0x00000003>;
++		assigned-address = <0x53>;
++	};
++	pmic5xxx_3_3: pmic@4b,20400000003 {
++		reg = <0x4b 0x204 0x00000003>;
++		assigned-address = <0x4b>;
++	};
++	rcd_3_3: rcd@5b,2C000000003 {
++		reg = <0x5b 0x2C0 0x00000003>;
++		assigned-address = <0x5b>;
++	};
++	//DIMM K
++	spd5118_3_4: spd@54,3C000000004 {
++		reg = <0x54 0x3C0 0x00000004>;
++		assigned-address = <0x54>;
++	};
++	pmic5xxx_3_4: pmic@4c,20400000004 {
++		reg = <0x4c 0x204 0x00000004>;
++		assigned-address = <0x4c>;
++	};
++	rcd_3_4: rcd@5c,2C000000004 {
++		reg = <0x5c 0x2C0 0x00000004>;
++		assigned-address = <0x5c>;
++	};
++	//DIMM L
++	spd5118_3_5: spd@55,3C000000005 {
++		reg = <0x55 0x3C0 0x00000005>;
++		assigned-address = <0x55>;
++	};
++	pmic5xxx_3_5: pmic@4d,20400000005 {
++		reg = <0x4d 0x204 0x00000005>;
++		assigned-address = <0x4d>;
++	};
++	rcd_3_5: rcd@5d,2C000000005 {
++		reg = <0x5d 0x2C0 0x00000005>;
++		assigned-address = <0x5d>;
++	};
++};
++#else // #ifdef ENABLE_I3C_SPD_DIMM
++
 +#define JESD300_SPD_I2C_MODE(bus, index, addr) \
 +spd_ ## bus ## _ ## index: spd@addr { \
 +	compatible = "eeprom"; \
@@ -2191,43 +2363,6 @@ index 1a7e44440f74..19ea31a70db8 100644
 +	compatible = "eeprom"; \
 +	reg = <0x ## addr 0x0 0x0>; \
 +}
-+
-+&i3c0 {
-+	// P0 DIMM (A-F) SPD Access
-+	status = "okay";
-+	jdec-spd;
-+	i2c-scl-hz = <100000>;
-+
-+	// DIMM A
-+	JESD300_SPD_I2C_MODE(0, 0, 50);
-+	JESD300_PMIC_I2C_MODE(0, 0, 48);
-+	JESD300_RCD_I2C_MODE(0, 0, 58);
-+
-+	// DIMM B
-+	JESD300_SPD_I2C_MODE(0, 1, 51);
-+	JESD300_PMIC_I2C_MODE(0, 1, 49);
-+	JESD300_RCD_I2C_MODE(0, 1, 59);
-+
-+	// DIMM C
-+	JESD300_SPD_I2C_MODE(0, 2, 52);
-+	JESD300_PMIC_I2C_MODE(0, 2, 4A);
-+	JESD300_RCD_I2C_MODE(0, 2, 5A);
-+
-+	// DIMM D
-+	JESD300_SPD_I2C_MODE(0, 3, 53);
-+	JESD300_PMIC_I2C_MODE(0, 3, 4B);
-+	JESD300_RCD_I2C_MODE(0, 3, 5B);
-+
-+	// DIMM E
-+	JESD300_SPD_I2C_MODE(0, 4, 54);
-+	JESD300_PMIC_I2C_MODE(0, 4, 4C);
-+	JESD300_RCD_I2C_MODE(0, 4, 5C);
-+
-+	// DIMM F
-+	JESD300_SPD_I2C_MODE(0, 5, 55);
-+	JESD300_PMIC_I2C_MODE(0, 5, 4D);
-+	JESD300_RCD_I2C_MODE(0, 5, 5D);
-+};
 
 -        jdec-spd;
 -        bus_id = <0x03>;
@@ -2310,6 +2445,43 @@ index 1a7e44440f74..19ea31a70db8 100644
 -                reg = <0x5d 0x2C0 0x00000005>;
 -                assigned-address = <0x5d>;
 -        };
++&i3c0 {
++	// P0 DIMM (A-F) SPD Access
++	status = "okay";
++	jdec-spd;
++	i2c-scl-hz = <100000>;
++
++	// DIMM A
++	JESD300_SPD_I2C_MODE(0, 0, 50);
++	JESD300_PMIC_I2C_MODE(0, 0, 48);
++	JESD300_RCD_I2C_MODE(0, 0, 58);
++
++	// DIMM B
++	JESD300_SPD_I2C_MODE(0, 1, 51);
++	JESD300_PMIC_I2C_MODE(0, 1, 49);
++	JESD300_RCD_I2C_MODE(0, 1, 59);
++
++	// DIMM C
++	JESD300_SPD_I2C_MODE(0, 2, 52);
++	JESD300_PMIC_I2C_MODE(0, 2, 4A);
++	JESD300_RCD_I2C_MODE(0, 2, 5A);
++
++	// DIMM D
++	JESD300_SPD_I2C_MODE(0, 3, 53);
++	JESD300_PMIC_I2C_MODE(0, 3, 4B);
++	JESD300_RCD_I2C_MODE(0, 3, 5B);
++
++	// DIMM E
++	JESD300_SPD_I2C_MODE(0, 4, 54);
++	JESD300_PMIC_I2C_MODE(0, 4, 4C);
++	JESD300_RCD_I2C_MODE(0, 4, 5C);
++
++	// DIMM F
++	JESD300_SPD_I2C_MODE(0, 5, 55);
++	JESD300_PMIC_I2C_MODE(0, 5, 4D);
++	JESD300_RCD_I2C_MODE(0, 5, 5D);
+ };
+
 +&i3c1 {
 +	// P0 DIMM (G-L) SPD Access
 +	status = "okay";
@@ -2345,9 +2517,88 @@ index 1a7e44440f74..19ea31a70db8 100644
 +	JESD300_SPD_I2C_MODE(1, 5, 55);
 +	JESD300_PMIC_I2C_MODE(1, 5, 4D);
 +	JESD300_RCD_I2C_MODE(1, 5, 5D);
- };
++};
++
++&i3c2 {
++	// P1 DIMM (A-F) SPD Access
++	status = "okay";
++	jdec-spd;
++	i2c-scl-hz = <100000>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_i3c3_default>;
++
++	// DIMM A
++	JESD300_SPD_I2C_MODE(2, 0, 50);
++	JESD300_PMIC_I2C_MODE(2, 0, 48);
++	JESD300_RCD_I2C_MODE(2, 0, 58);
++
++	// DIMM B
++	JESD300_SPD_I2C_MODE(2, 1, 51);
++	JESD300_PMIC_I2C_MODE(2, 1, 49);
++	JESD300_RCD_I2C_MODE(2, 1, 59);
++
++	// DIMM C
++	JESD300_SPD_I2C_MODE(2, 2, 52);
++	JESD300_PMIC_I2C_MODE(2, 2, 4A);
++	JESD300_RCD_I2C_MODE(2, 2, 5A);
++
++	// DIMM D
++	JESD300_SPD_I2C_MODE(2, 3, 53);
++	JESD300_PMIC_I2C_MODE(2, 3, 4B);
++	JESD300_RCD_I2C_MODE(2, 3, 5B);
++
++	// DIMM E
++	JESD300_SPD_I2C_MODE(2, 4, 54);
++	JESD300_PMIC_I2C_MODE(2, 4, 4C);
++	JESD300_RCD_I2C_MODE(2, 4, 5C);
++
++	// DIMM F
++	JESD300_SPD_I2C_MODE(2, 5, 55);
++	JESD300_PMIC_I2C_MODE(2, 5, 4D);
++	JESD300_RCD_I2C_MODE(2, 5, 5D);
++};
++
++&i3c3 {
++	// P1 DIMM (G-L) SPD Access
++	status = "okay";
++	jdec-spd;
++	i2c-scl-hz = <100000>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_i3c4_default>;
++
++	// DIMM G
++	JESD300_SPD_I2C_MODE(3, 0, 50);
++	JESD300_PMIC_I2C_MODE(3, 0, 48);
++	JESD300_RCD_I2C_MODE(3, 0, 58);
++
++	// DIMM H
++	JESD300_SPD_I2C_MODE(3, 1, 51);
++	JESD300_PMIC_I2C_MODE(3, 1, 49);
++	JESD300_RCD_I2C_MODE(3, 1, 59);
++
++	// DIMM I
++	JESD300_SPD_I2C_MODE(3, 2, 52);
++	JESD300_PMIC_I2C_MODE(3, 2, 4A);
++	JESD300_RCD_I2C_MODE(3, 2, 5A);
++
++	// DIMM J
++	JESD300_SPD_I2C_MODE(3, 3, 53);
++	JESD300_PMIC_I2C_MODE(3, 3, 4B);
++	JESD300_RCD_I2C_MODE(3, 3, 5B);
++
++	// DIMM K
++	JESD300_SPD_I2C_MODE(3, 4, 54);
++	JESD300_PMIC_I2C_MODE(3, 4, 4C);
++	JESD300_RCD_I2C_MODE(3, 4, 5C);
++
++	// DIMM L
++	JESD300_SPD_I2C_MODE(3, 5, 55);
++	JESD300_PMIC_I2C_MODE(3, 5, 4D);
++	JESD300_RCD_I2C_MODE(3, 5, 5D);
++};
++
 +#endif // #ifdef ENABLE_I3C_SPD_DIMM
-
++
  &i3c4 {
  	// P0 APML
  	status = "okay";
@@ -2365,7 +2616,7 @@ index 1a7e44440f74..19ea31a70db8 100644
  	sbtsi_p0_0: sbtsi@4c,22400000001 {
  		reg = <0x4c 0x224 0x00000001>;
 diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
-index 29007189aa7c..df349cffa5aa 100644
+index 29007189aa7c..6a47e7ad9ce7 100644
 --- a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
 +++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
 @@ -706,12 +706,13 @@ i2c_slave_backend@30 {
@@ -2396,15 +2647,21 @@ index 29007189aa7c..df349cffa5aa 100644
 
  	//DIMM G
  	spd5118_1_0: spd@50,3C000000000 {
-@@ -878,180 +879,102 @@ rcd_1_5: rcd@5d,2C000000005 {
- 		reg = <0x5d 0x2C0 0x00000005>;
+@@ -879,180 +880,359 @@ rcd_1_5: rcd@5d,2C000000005 {
  		assigned-address = <0x5d>;
  	};
--};
--&i3c2 {
+ };
++
+ &i3c2 {
 -        // P1 DIMM (A-F) SPD Access
 -        status = "okay";
-+ };
++	// P1 DIMM (A-F) SPD Access
++	status = "okay";
++	jdec-spd;
++	i2c-scl-hz = <100000>;
++	i3c-scl-hz = <2000000>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_i3c3_default>;
 
 -        jdec-spd;
 -        bus_id = <0x02>;
@@ -2487,12 +2744,179 @@ index 29007189aa7c..df349cffa5aa 100644
 -                reg = <0x5d 0x2C0 0x00000005>;
 -                assigned-address = <0x5d>;
 -        };
--};
-+#else // #ifdef ENABLE_I3C_SPD_DIMM
++	//DIMM A
++	spd5118_2_0: spd@50,3C000000000 {
++		reg = <0x50 0x3C0 0x00000000>;
++		assigned-address = <0x50>;
++	};
++	pmic5xxx_2_0: pmic@48,20400000000 {
++		reg = <0x48 0x204 0x00000000>;
++		assigned-address = <0x48>;
++	};
++	rcd_2_0: rcd@58,2C000000000 {
++		reg = <0x58 0x2C0 0x00000000>;
++		assigned-address = <0x58>;
++	};
++	//DIMM B
++	spd5118_2_1: spd@51,3C000000001 {
++		reg = <0x51 0x3C0 0x00000001>;
++		assigned-address = <0x51>;
++	};
++	pmic5xxx_2_1: pmic@49,20400000001 {
++		reg = <0x49 0x204 0x00000001>;
++		assigned-address = <0x49>;
++	};
++	rcd_2_1: rcd@59,2C000000001 {
++		reg = <0x59 0x2C0 0x00000001>;
++		assigned-address = <0x59>;
++	};
++	//DIMM C
++	spd5118_2_2: spd@52,3C000000002 {
++		reg = <0x52 0x3C0 0x00000002>;
++		assigned-address = <0x52>;
++	};
++	pmic5xxx_2_2: pmic@4a,20400000002 {
++		reg = <0x4a 0x204 0x00000002>;
++		assigned-address = <0x4a>;
++	};
++	rcd_2_2: rcd@5a,2C000000002 {
++		reg = <0x5a 0x2C0 0x00000002>;
++		assigned-address = <0x5a>;
++	};
++	//DIMM D
++	spd5118_2_3: spd@53,3C000000003 {
++		reg = <0x53 0x3C0 0x00000003>;
++		assigned-address = <0x53>;
++	};
++	pmic5xxx_2_3: pmic@4b,20400000003 {
++		reg = <0x4b 0x204 0x00000003>;
++		assigned-address = <0x4b>;
++	};
++	rcd_2_3: rcd@5b,2C000000003 {
++		reg = <0x5b 0x2C0 0x00000003>;
++		assigned-address = <0x5b>;
++	};
++	//DIMM E
++	spd5118_2_4: spd@54,3C000000004 {
++		reg = <0x54 0x3C0 0x00000004>;
++		assigned-address = <0x54>;
++	};
++	pmic5xxx_2_4: pmic@4c,20400000004 {
++		reg = <0x4c 0x204 0x00000004>;
++		assigned-address = <0x4c>;
++	};
++	rcd_2_4: rcd@5c,2C000000004 {
++		reg = <0x5c 0x2C0 0x00000004>;
++		assigned-address = <0x5c>;
++	};
++	//DIMM F
++	spd5118_2_5: spd@55,3C000000005 {
++		reg = <0x55 0x3C0 0x00000005>;
++		assigned-address = <0x55>;
++	};
++	pmic5xxx_2_5: pmic@4d,20400000005 {
++		reg = <0x4d 0x204 0x00000005>;
++		assigned-address = <0x4d>;
++	};
++	rcd_2_5: rcd@5d,2C000000005 {
++		reg = <0x5d 0x2C0 0x00000005>;
++		assigned-address = <0x5d>;
++	};
+ };
 
--&i3c3 {
+ &i3c3 {
 -        // P1 DIMM (G-L) SPD Access
 -        status = "okay";
++	// P1 DIMM (G-L) SPD Access
++	status = "okay";
++	jdec-spd;
++	i2c-scl-hz = <100000>;
++	i3c-scl-hz = <2000000>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_i3c4_default>;
++
++	//DIMM G
++	spd5118_3_0: spd@50,3C000000000 {
++		reg = <0x50 0x3C0 0x00000000>;
++		assigned-address = <0x50>;
++	};
++	pmic5xxx_3_0: pmic@48,20400000000 {
++		reg = <0x48 0x204 0x00000000>;
++		assigned-address = <0x48>;
++	};
++	rcd_3_0: rcd@58,2C000000000 {
++		reg = <0x58 0x2C0 0x00000000>;
++		assigned-address = <0x58>;
++	};
++	//DIMM H
++	spd5118_3_1: spd@51,3C000000001 {
++		reg = <0x51 0x3C0 0x00000001>;
++		assigned-address = <0x51>;
++	};
++	pmic5xxx_3_1: pmic@49,20400000001 {
++		reg = <0x49 0x204 0x00000001>;
++		assigned-address = <0x49>;
++	};
++	rcd_3_1: rcd@59,2C000000001 {
++		reg = <0x59 0x2C0 0x00000001>;
++		assigned-address = <0x59>;
++	};
++	//DIMM I
++	spd5118_3_2: spd@52,3C000000002 {
++		reg = <0x52 0x3C0 0x00000002>;
++		assigned-address = <0x52>;
++	};
++	pmic5xxx_3_2: pmic@4a,20400000002 {
++		reg = <0x4a 0x204 0x00000002>;
++		assigned-address = <0x4a>;
++	};
++	rcd_3_2: rcd@5a,2C000000002 {
++		reg = <0x5a 0x2C0 0x00000002>;
++		assigned-address = <0x5a>;
++	};
++	//DIMM J
++	spd5118_3_3: spd@53,3C000000003 {
++		reg = <0x53 0x3C0 0x00000003>;
++		assigned-address = <0x53>;
++	};
++	pmic5xxx_3_3: pmic@4b,20400000003 {
++		reg = <0x4b 0x204 0x00000003>;
++		assigned-address = <0x4b>;
++	};
++	rcd_3_3: rcd@5b,2C000000003 {
++		reg = <0x5b 0x2C0 0x00000003>;
++		assigned-address = <0x5b>;
++	};
++	//DIMM K
++	spd5118_3_4: spd@54,3C000000004 {
++		reg = <0x54 0x3C0 0x00000004>;
++		assigned-address = <0x54>;
++	};
++	pmic5xxx_3_4: pmic@4c,20400000004 {
++		reg = <0x4c 0x204 0x00000004>;
++		assigned-address = <0x4c>;
++	};
++	rcd_3_4: rcd@5c,2C000000004 {
++		reg = <0x5c 0x2C0 0x00000004>;
++		assigned-address = <0x5c>;
++	};
++	//DIMM L
++	spd5118_3_5: spd@55,3C000000005 {
++		reg = <0x55 0x3C0 0x00000005>;
++		assigned-address = <0x55>;
++	};
++	pmic5xxx_3_5: pmic@4d,20400000005 {
++		reg = <0x4d 0x204 0x00000005>;
++		assigned-address = <0x4d>;
++	};
++	rcd_3_5: rcd@5d,2C000000005 {
++		reg = <0x5d 0x2C0 0x00000005>;
++		assigned-address = <0x5d>;
++	};
++};
++
++#else // #ifdef ENABLE_I3C_SPD_DIMM
++
 +#define JESD300_SPD_I2C_MODE(bus, index, addr) \
 +spd_ ## bus ## _ ## index: spd@addr { \
 +	compatible = "eeprom"; \
@@ -2546,6 +2970,82 @@ index 29007189aa7c..df349cffa5aa 100644
 +	JESD300_SPD_I2C_MODE(0, 5, 55);
 +	JESD300_PMIC_I2C_MODE(0, 5, 4D);
 +	JESD300_RCD_I2C_MODE(0, 5, 5D);
++};
++
++&i3c1 {
++	// P0 DIMM (G-L) SPD Access
++	status = "okay";
++	jdec-spd;
++	i2c-scl-hz = <100000>;
++
++	// DIMM G
++	JESD300_SPD_I2C_MODE(1, 0, 50);
++	JESD300_PMIC_I2C_MODE(1, 0, 48);
++	JESD300_RCD_I2C_MODE(1, 0, 58);
++
++	// DIMM H
++	JESD300_SPD_I2C_MODE(1, 1, 51);
++	JESD300_PMIC_I2C_MODE(1, 1, 49);
++	JESD300_RCD_I2C_MODE(1, 1, 59);
++
++	// DIMM I
++	JESD300_SPD_I2C_MODE(1, 2, 52);
++	JESD300_PMIC_I2C_MODE(1, 2, 4A);
++	JESD300_RCD_I2C_MODE(1, 2, 5A);
++
++	// DIMM J
++	JESD300_SPD_I2C_MODE(1, 3, 53);
++	JESD300_PMIC_I2C_MODE(1, 3, 4B);
++	JESD300_RCD_I2C_MODE(1, 3, 5B);
++
++	// DIMM K
++	JESD300_SPD_I2C_MODE(1, 4, 54);
++	JESD300_PMIC_I2C_MODE(1, 4, 4C);
++	JESD300_RCD_I2C_MODE(1, 4, 5C);
++
++	// DIMM L
++	JESD300_SPD_I2C_MODE(1, 5, 55);
++	JESD300_PMIC_I2C_MODE(1, 5, 4D);
++	JESD300_RCD_I2C_MODE(1, 5, 5D);
++};
++
++&i3c2 {
++	// P1 DIMM (A-F) SPD Access
++	status = "okay";
++	jdec-spd;
++	i2c-scl-hz = <100000>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_i3c3_default>;
++
++	// DIMM A
++	JESD300_SPD_I2C_MODE(2, 0, 50);
++	JESD300_PMIC_I2C_MODE(2, 0, 48);
++	JESD300_RCD_I2C_MODE(2, 0, 58);
++
++	// DIMM B
++	JESD300_SPD_I2C_MODE(2, 1, 51);
++	JESD300_PMIC_I2C_MODE(2, 1, 49);
++	JESD300_RCD_I2C_MODE(2, 1, 59);
++
++	// DIMM C
++	JESD300_SPD_I2C_MODE(2, 2, 52);
++	JESD300_PMIC_I2C_MODE(2, 2, 4A);
++	JESD300_RCD_I2C_MODE(2, 2, 5A);
++
++	// DIMM D
++	JESD300_SPD_I2C_MODE(2, 3, 53);
++	JESD300_PMIC_I2C_MODE(2, 3, 4B);
++	JESD300_RCD_I2C_MODE(2, 3, 5B);
++
++	// DIMM E
++	JESD300_SPD_I2C_MODE(2, 4, 54);
++	JESD300_PMIC_I2C_MODE(2, 4, 4C);
++	JESD300_RCD_I2C_MODE(2, 4, 5C);
++
++	// DIMM F
++	JESD300_SPD_I2C_MODE(2, 5, 55);
++	JESD300_PMIC_I2C_MODE(2, 5, 4D);
++	JESD300_RCD_I2C_MODE(2, 5, 5D);
 +};
 
 -        jdec-spd;
@@ -2629,46 +3129,50 @@ index 29007189aa7c..df349cffa5aa 100644
 -                reg = <0x5d 0x2C0 0x00000005>;
 -                assigned-address = <0x5d>;
 -        };
-+&i3c1 {
-+	// P0 DIMM (G-L) SPD Access
++&i3c3 {
++	// P1 DIMM (G-L) SPD Access
 +	status = "okay";
 +	jdec-spd;
 +	i2c-scl-hz = <100000>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_i3c4_default>;
 +
 +	// DIMM G
-+	JESD300_SPD_I2C_MODE(1, 0, 50);
-+	JESD300_PMIC_I2C_MODE(1, 0, 48);
-+	JESD300_RCD_I2C_MODE(1, 0, 58);
++	JESD300_SPD_I2C_MODE(3, 0, 50);
++	JESD300_PMIC_I2C_MODE(3, 0, 48);
++	JESD300_RCD_I2C_MODE(3, 0, 58);
 +
 +	// DIMM H
-+	JESD300_SPD_I2C_MODE(1, 1, 51);
-+	JESD300_PMIC_I2C_MODE(1, 1, 49);
-+	JESD300_RCD_I2C_MODE(1, 1, 59);
++	JESD300_SPD_I2C_MODE(3, 1, 51);
++	JESD300_PMIC_I2C_MODE(3, 1, 49);
++	JESD300_RCD_I2C_MODE(3, 1, 59);
 +
 +	// DIMM I
-+	JESD300_SPD_I2C_MODE(1, 2, 52);
-+	JESD300_PMIC_I2C_MODE(1, 2, 4A);
-+	JESD300_RCD_I2C_MODE(1, 2, 5A);
++	JESD300_SPD_I2C_MODE(3, 2, 52);
++	JESD300_PMIC_I2C_MODE(3, 2, 4A);
++	JESD300_RCD_I2C_MODE(3, 2, 5A);
 +
 +	// DIMM J
-+	JESD300_SPD_I2C_MODE(1, 3, 53);
-+	JESD300_PMIC_I2C_MODE(1, 3, 4B);
-+	JESD300_RCD_I2C_MODE(1, 3, 5B);
++	JESD300_SPD_I2C_MODE(3, 3, 53);
++	JESD300_PMIC_I2C_MODE(3, 3, 4B);
++	JESD300_RCD_I2C_MODE(3, 3, 5B);
 +
 +	// DIMM K
-+	JESD300_SPD_I2C_MODE(1, 4, 54);
-+	JESD300_PMIC_I2C_MODE(1, 4, 4C);
-+	JESD300_RCD_I2C_MODE(1, 4, 5C);
++	JESD300_SPD_I2C_MODE(3, 4, 54);
++	JESD300_PMIC_I2C_MODE(3, 4, 4C);
++	JESD300_RCD_I2C_MODE(3, 4, 5C);
 +
 +	// DIMM L
-+	JESD300_SPD_I2C_MODE(1, 5, 55);
-+	JESD300_PMIC_I2C_MODE(1, 5, 4D);
-+	JESD300_RCD_I2C_MODE(1, 5, 5D);
++	JESD300_SPD_I2C_MODE(3, 5, 55);
++	JESD300_PMIC_I2C_MODE(3, 5, 4D);
++	JESD300_RCD_I2C_MODE(3, 5, 5D);
  };
-+#endif // #ifdef ENABLE_I3C_SPD_DIMM
 
++#endif // #ifdef ENABLE_I3C_SPD_DIMM
++
  &i2c2 {
  	// P0 APML - i2c10
+ 	status = "okay";
 diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts
 index 822543d57995..d475f306f95b 100644
 --- a/arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts
