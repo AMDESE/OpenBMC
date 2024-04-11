@@ -28,6 +28,9 @@ pmic_i2c_err_dump()
 
 pmic_i3c_err_dump()
 {
+    local i3cid=$1
+    local dimm=$2
+
     # assume BMC has access to I3C
     pmic_name="/dev/bus/i3c/${i3cid}-2040000000${dimm}"
     # Check if DIMM is present

@@ -7,6 +7,7 @@ fi
 
 # Read number of CPU from u-boot env
 num_of_cpu=`/sbin/fw_printenv -n num_of_cpu`
+dimm_per_ch=`/sbin/fw_printenv -n dimm_per_ch`
 dimm_per_bus=`/sbin/fw_printenv -n dimm_per_bus`
 I2C_TOOL="/usr/sbin/i2ctransfer"
 I3C_TOOL="/usr/bin/i3ctransfer"
@@ -215,9 +216,10 @@ pmic_i3c_dump()
 }
 
 # read and process DIMM PMIC Regs
+max_i3c_bus_per_soc=$((2 * dimm_per_ch))
 while [[ $sock_id < $num_of_cpu ]]
 do
-    for i3c_bus_per_soc in 1 2
+    for i3c_bus_per_soc in $(seq 1 $max_i3c_bus_per_soc)
     do
         # Check if at least one DIMM present on this BUS
         i2cid=
