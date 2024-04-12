@@ -23,7 +23,7 @@ DEPENDS += "autoconf-archive-native \
             systemd \
            "
 
-SRC_URI += "git://github.com/openbmc/obmc-console"
+SRC_URI += "git://github.com/openbmc/obmc-console;protocol=https"
 SRC_URI += "file://${BPN}.conf"
 
 SRCREV = "cabd9db06da91ecf2198c1baaf20360d1424c2f3"

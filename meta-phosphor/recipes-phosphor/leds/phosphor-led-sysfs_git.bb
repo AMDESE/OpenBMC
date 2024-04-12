@@ -17,7 +17,7 @@ DEPENDS += "boost"
 
 DBUS_SERVICE_${PN} += "xyz.openbmc_project.led.controller@.service"
 
-SRC_URI += "git://github.com/openbmc/phosphor-led-sysfs"
+SRC_URI += "git://github.com/openbmc/phosphor-led-sysfs;protocol=https"
 SRC_URI += "file://70-leds.rules"
 SRCREV = "429750a01d4ea65f335a50d26eb1855a1c6e769e"
 S = "${WORKDIR}/git"

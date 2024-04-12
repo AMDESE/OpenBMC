@@ -21,7 +21,7 @@ RRECOMMENDS_${PN} += "phosphor-debug-collector"
 
 # Source code repository
 S = "${WORKDIR}/git"
-SRC_URI = "git://github.com/openbmc/phosphor-hostlogger"
+SRC_URI = "git://github.com/openbmc/phosphor-hostlogger;protocol=https"
 SRCREV = "dfee0da0a855933a3d61df5d190d19d82a72bed7"
 
 # Systemd service template

@@ -10,7 +10,7 @@ inherit autotools pkgconfig
 inherit python3native
 inherit systemd
 
-SRC_URI += "git://github.com/openbmc/phosphor-networkd"
+SRC_URI += "git://github.com/openbmc/phosphor-networkd;protocol=https"
 SRCREV = "1e710d04a61092b45ff4ccd58656cb5cee3cba5b"
 
 DEPENDS += "systemd"

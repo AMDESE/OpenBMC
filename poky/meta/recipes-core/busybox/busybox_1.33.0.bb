@@ -1,6 +1,6 @@
 require busybox.inc
 
-SRC_URI = "https://busybox.net/downloads/busybox-${PV}.tar.bz2;name=tarball \
+SRC_URI = "https://busybox.net/downloads/busybox-${PV}.tar.bz2 \
            file://busybox-udhcpc-no_deconfig.patch \
            file://find-touchscreen.sh \
            file://busybox-cron \
@@ -49,4 +49,4 @@ SRC_URI = "https://busybox.net/downloads/busybox-${PV}.tar.bz2;name=tarball \
 "
 SRC_URI_append_libc-musl = " file://musl.cfg "
 
-SRC_URI[tarball.sha256sum] = "d568681c91a85edc6710770cebc1e80e042ad74d305b5c2e6d57a5f3de3b8fbd"
+SRC_URI[sha256sum] = "d568681c91a85edc6710770cebc1e80e042ad74d305b5c2e6d57a5f3de3b8fbd"

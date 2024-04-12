@@ -5,7 +5,7 @@ PV = "1.0+git${SRCPV}"
 LICENSE = "Apache-2.0"
 LIC_FILES_CHKSUM = "file://LICENSE;md5=e3fc50a88d0a364313df4b21ef20c29e"
 
-SRC_URI = "git://github.com/openbmc/webui-vue.git"
+SRC_URI = "git://github.com/openbmc/webui-vue.git;protocol=https"
 SRCREV = "71114feb9a800d42f6eeddfa477077a8ab8e44f6"
 S = "${WORKDIR}/git"
 

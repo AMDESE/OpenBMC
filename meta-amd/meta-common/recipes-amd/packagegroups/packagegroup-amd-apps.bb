@@ -38,14 +38,10 @@ RDEPENDS_${PN}-flash = " \
 
 SUMMARY_${PN}-system = "AMD System"
 RDEPENDS_${PN}-system = " \
-        amd-apml \
         amd-clear-cmos \
         amd-dimm \
-        amd-lcd-lib \
         amd-mctp-tool \
-        amd-ras \
         bmcweb \
-        cpu-info \
         debug-apps \
         first-boot-set-hwmon-path \
         fpga-tools \
@@ -55,11 +51,9 @@ RDEPENDS_${PN}-system = " \
         phosphor-pid-control \
         phosphor-host-postd \
         phosphor-post-code-manager \
-        power-capping \
         phosphor-misc-usb-ctrl \
         set-fan-speed \
         set-associations-path \
         usb-network \
-        vr-update \
         webui-vue \
         "
