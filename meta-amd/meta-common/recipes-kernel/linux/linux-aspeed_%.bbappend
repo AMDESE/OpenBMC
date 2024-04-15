@@ -85,4 +85,5 @@ SRC_URI += "file://amd-bmc-baseline.cfg \
             file://0083-ARM-dts-aspeed-Genoa-Add-MON_RSMRST_L-to-GPIO-G7.patch \
             file://0084-linux-aspeed-port-new-i3c-driver-from-aspeed-repo.patch \
             file://0085-linux-aspeed-dts-changes-for-new-i3c-driver.patch \
+            file://0086-drivers-mtd-Add-support-for-Gigadevice-GD25LB-series.patch \
             "
