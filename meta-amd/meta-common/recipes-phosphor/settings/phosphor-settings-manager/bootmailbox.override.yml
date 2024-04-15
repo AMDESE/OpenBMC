@@ -1,0 +1,18 @@
+---
+/xyz/openbmc_project/control/host0/boot/mailbox:
+    - Interface: xyz.openbmc_project.Control.Boot.Mailbox
+      Properties:
+          Supported:
+              Default: 'true'
+          IANAEnterpriseNumber:
+              # This is AMD's IANA number
+              Default: 3704
+          Data:
+              # The mailbox must be no smaller that 5 blocks. That is 80 bytes.
+              # This array does NOT include the 3-byte IANA enterprise number.
+              # So the minimum is 77 bytes.
+              Default: >
+                  {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+                   0,0}
