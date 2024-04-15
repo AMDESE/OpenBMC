@@ -1,6 +1,6 @@
-From 07624623ebc69de8d53cd121aa8c0efc76db6bd0 Mon Sep 17 00:00:00 2001
+From 3ad9921b62cd3bcbd3ee5ee6e3421183c9b94da0 Mon Sep 17 00:00:00 2001
 From: Mohsen Dolaty <mohsen.dolaty@amd.com>
-Date: Thu, 21 Mar 2024 14:03:05 -0500
+Date: Mon, 15 Apr 2024 08:01:49 -0500
 Subject: [PATCH 1/1] drivers:soc Modify aspeed bmc dev driver read
 
 Modify ASPEED BMC Dev Driver Read functions for Q1 and Q2
@@ -10,14 +10,39 @@ interrupt
 
 Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
 ---
- drivers/soc/aspeed/aspeed-bmc-dev.c | 42 +++++++++++++++++------------
- 1 file changed, 25 insertions(+), 17 deletions(-)
+ arch/arm/boot/dts/aspeed-g6.dtsi    |  3 +-
+ drivers/soc/aspeed/aspeed-bmc-dev.c | 70 +++++++++++++++++++++--------
+ 2 files changed, 54 insertions(+), 19 deletions(-)
 
+diff --git a/arch/arm/boot/dts/aspeed-g6.dtsi b/arch/arm/boot/dts/aspeed-g6.dtsi
+index ee1e570c94c6..6b2f64ca7288 100644
+--- a/arch/arm/boot/dts/aspeed-g6.dtsi
++++ b/arch/arm/boot/dts/aspeed-g6.dtsi
+@@ -849,7 +849,8 @@ i3c: bus@1e7a0000 {
+                         bmc_dev: bmc_dev@1e7e0000 {
+                                 compatible = "aspeed,ast2600-bmc-device";
+                                 reg = <0x1e7e0000 0xB000>;
+-                                interrupts = <GIC_SPI 99 IRQ_TYPE_LEVEL_HIGH>;
++                                interrupts-extended = <&gic GIC_SPI 99 IRQ_TYPE_LEVEL_HIGH>,
++                                                      <&scu_ic0 ASPEED_AST2600_SCU_IC0_PCIE_PERST_LO_TO_HI>;
+                                 aspeed,scu = <&syscon>;
+                                 pcie2lpc;
+                                 status = "disabled";
 diff --git a/drivers/soc/aspeed/aspeed-bmc-dev.c b/drivers/soc/aspeed/aspeed-bmc-dev.c
-index 7b194f1bd762..69c1b44933bd 100644
+index 7b194f1bd762..630a7e3fe477 100644
 --- a/drivers/soc/aspeed/aspeed-bmc-dev.c
 +++ b/drivers/soc/aspeed/aspeed-bmc-dev.c
-@@ -152,17 +152,22 @@ static ssize_t aspeed_host2bmc_queue1_rx(struct file *filp, struct kobject *kobj
+@@ -49,7 +49,8 @@ struct aspeed_bmc_device {
+ 	struct kernfs_node	*kn1;
+
+ 	int pcie2lpc;
+-	unsigned int irq;
++	int irq;
++	int pcie_irq;
+ };
+
+ #define BMC_MEM_BAR_SIZE		0x100000
+@@ -152,17 +153,22 @@ static ssize_t aspeed_host2bmc_queue1_rx(struct file *filp, struct kobject *kobj
  	u32 *data = (u32 *) buf;
  	u32 scu_id;
  	int ret;
@@ -43,7 +68,7 @@ index 7b194f1bd762..69c1b44933bd 100644
  	} else {
  		//A0 : BIT(12) A1 : BIT(15)
  		regmap_update_bits(bmc_device->scu, 0x560, BIT(15), BIT(15));
-@@ -179,17 +184,22 @@ static ssize_t aspeed_host2bmc_queue2_rx(struct file *filp, struct kobject *kobj
+@@ -179,17 +185,22 @@ static ssize_t aspeed_host2bmc_queue2_rx(struct file *filp, struct kobject *kobj
  	u32 *data = (u32 *) buf;
  	u32 scu_id;
  	int ret;
@@ -69,7 +94,26 @@ index 7b194f1bd762..69c1b44933bd 100644
  	} else {
  		//A0 : BIT(12) A1 : BIT(15)
  		regmap_update_bits(bmc_device->scu, 0x560, BIT(15), BIT(15));
-@@ -278,11 +288,19 @@ static irqreturn_t aspeed_bmc_dev_isr(int irq, void *dev_id)
+@@ -272,17 +283,38 @@ static ssize_t aspeed_bmc2host_queue2_tx(struct file *filp, struct kobject *kobj
+ 	return sizeof(u32);
+ }
+
++static irqreturn_t aspeed_bmc_dev_pcie_isr(int irq, void *dev_id)
++{
++	struct aspeed_bmc_device *bmc_device = dev_id;
++
++	while (!(readl(bmc_device->reg_base + ASPEED_BMC_HOST2BMC_STS) & HOST2BMC_Q1_EMPTY))
++		readl(bmc_device->reg_base + ASPEED_BMC_HOST2BMC_Q1);
++
++	while (!(readl(bmc_device->reg_base + ASPEED_BMC_HOST2BMC_STS) & HOST2BMC_Q2_EMPTY))
++		readl(bmc_device->reg_base + ASPEED_BMC_HOST2BMC_Q2);
++
++	return IRQ_HANDLED;
++}
++
+ static irqreturn_t aspeed_bmc_dev_isr(int irq, void *dev_id)
+ {
+ 	struct aspeed_bmc_device *bmc_device = dev_id;
 
  	u32 host2bmc_q_sts = readl(bmc_device->reg_base + ASPEED_BMC_HOST2BMC_STS);
 
@@ -89,7 +133,7 @@ index 7b194f1bd762..69c1b44933bd 100644
 
  	if (host2bmc_q_sts & HOST2BMC_Q1_FULL)
  	{
-@@ -300,21 +318,11 @@ static irqreturn_t aspeed_bmc_dev_isr(int irq, void *dev_id)
+@@ -300,21 +332,11 @@ static irqreturn_t aspeed_bmc_dev_isr(int irq, void *dev_id)
  	   wake_up_interruptible(&bmc_device->tx_wait0);
  	}
 
@@ -111,7 +155,7 @@ index 7b194f1bd762..69c1b44933bd 100644
  	return IRQ_HANDLED;
  }
 
-@@ -352,7 +360,7 @@ static void aspeed_bmc_device_init(struct aspeed_bmc_device *bmc_device)
+@@ -352,7 +374,7 @@ static void aspeed_bmc_device_init(struct aspeed_bmc_device *bmc_device)
  	writel(bmc_device->bmc_mem_phy, bmc_device->reg_base + ASPEED_BMC_MEM_BAR_REMAP);
 
  	//Setting BMC to Host Q register
@@ -120,5 +164,24 @@ index 7b194f1bd762..69c1b44933bd 100644
  	writel(HOST2BMC_Q2_FULL_UNMASK | HOST2BMC_Q1_FULL_UNMASK | HOST2BMC_ENABLE_INTB, bmc_device->reg_base + ASPEED_BMC_HOST2BMC_STS);
  }
 
+@@ -453,6 +475,18 @@ static int aspeed_bmc_device_probe(struct platform_device *pdev)
+ 		goto out_unmap;
+ 	}
+
++	bmc_device->pcie_irq =  platform_get_irq(pdev, 1);
++	if (bmc_device->pcie_irq < 0) {
++		dev_err(&pdev->dev, "platform get of pcie irq[=%d] failed!\n", bmc_device->pcie_irq);
++	} else {
++		ret = devm_request_irq(&pdev->dev, bmc_device->pcie_irq, aspeed_bmc_dev_pcie_isr,
++					IRQF_SHARED, dev_name(&pdev->dev), bmc_device);
++		if (ret < 0) {
++			dev_err(dev, "Failed to request PCI-E IRQ %d.\n", ret);
++			bmc_device->pcie_irq = -1;
++		}
++	}
++
+ 	bmc_device->miscdev.minor = MISC_DYNAMIC_MINOR;
+ 	bmc_device->miscdev.name = DEVICE_NAME;
+ 	bmc_device->miscdev.fops = &aspeed_bmc_device_fops;
 --
 2.25.1
