@@ -19,11 +19,11 @@ customization for your server platform.
 sudo apt-get install -y git build-essential libsdl1.2-dev texinfo gawk chrpath diffstat
 ```
 
-### 2) Download the source
+### 2) Download the source from my Branch (mySP5)
 ```
-mkdir OpenBMC
-cd OpenBMC
-git clone https://github.com/AMDESE/OpenBMC.git .
+mkdir OpenBMC-SP5
+cd OpenBMC-SP5
+git clone --branch mySP5 https://github.com/PaulHung1005/OpenBMC-SP5.git .
 ```
 
 ### 3) Target your hardware
