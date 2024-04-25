@@ -1,0 +1,233 @@
+From 0f13f7cb4edefdb57c33572305219bf027e89d02 Mon Sep 17 00:00:00 2001
+From: Mohsen Dolaty <mohsen.dolaty@amd.com>
+Date: Thu, 25 Apr 2024 14:51:59 -0500
+Subject: [PATCH 1/1] bmcweb: Add PPR Config Class
+
+Add PPR Configuration class with 2 new methods
+getPostPackageRepairConfig()
+setPostPackageRepairConfig()
+
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
+---
+ redfish-core/include/redfish.hpp  |   1 +
+ redfish-core/lib/log_services.hpp | 173 ++++++++++++++++++++++++++++++
+ 2 files changed, 174 insertions(+)
+
+diff --git a/redfish-core/include/redfish.hpp b/redfish-core/include/redfish.hpp
+index 33e3ed81..640b97d7 100644
+--- a/redfish-core/include/redfish.hpp
++++ b/redfish-core/include/redfish.hpp
+@@ -146,6 +146,7 @@ class RedfishService
+         nodes.emplace_back(std::make_unique<CrashdumpConfiguration>(app));
+         nodes.emplace_back(std::make_unique<pprService>(app));
+         nodes.emplace_back(std::make_unique<pprStatus>(app));
++        nodes.emplace_back(std::make_unique<pprConfig>(app));
+         nodes.emplace_back(std::make_unique<pprFile>(app));
+ #endif // BMCWEB_ENABLE_REDFISH_CPU_LOG
+
+diff --git a/redfish-core/lib/log_services.hpp b/redfish-core/lib/log_services.hpp
+index 0d6216a9..abda7031 100644
+--- a/redfish-core/lib/log_services.hpp
++++ b/redfish-core/lib/log_services.hpp
+@@ -3854,12 +3854,16 @@ class pprService : public Node
+             {"#LogService.pprStatus",
+              {{"target", "/redfish/v1/Systems/system/LogServices/PostPackageRepair/"
+                          "Status"}}},
++            {"#LogService.pprConfig",
++             {{"target", "/redfish/v1/Systems/system/LogServices/PostPackageRepair/"
++                         "Config"}}},
+             {"#LogService.pprFile",
+              {{"target", "/redfish/v1/Systems/system/LogServices/PostPackageRepair/"
+                          "RepairData"}}}};
+     }
+ };
+
++// PPR Status
+ static void getPostPackageRepairStatus(
+         const std::shared_ptr<bmcweb::AsyncResp> &aResp)
+ {
+@@ -3949,6 +3953,155 @@ private:
+
+ };
+
++// PPR Config
++
++#define BT_SET_TO_HARD_MASK  0x0001;
++#define RT_TO_BT_MASK        0x0002;
++bool oobPprEnable = false;
++
++static void getPostPackageRepairConfig(
++        const std::shared_ptr<bmcweb::AsyncResp> &aResp)
++{
++    crow::connections::systemBus->async_method_call(
++        [aResp](
++        const boost::system::error_code ec,
++        std::vector<uint16_t>& postpackagerepairconfig) {
++        if (ec) {
++           BMCWEB_LOG_ERROR
++           << "DBUS response error in getPostPackageRepairConfig" << ec.message();
++           messages::internalError(aResp->res);
++           return;
++        }
++
++        nlohmann::json pprConfig = nlohmann::json::array();
++
++        bool RtToBt;
++        bool BtSetToHard;
++
++        if (postpackagerepairconfig[0] == 0)
++            oobPprEnable = false;
++        else
++            oobPprEnable = true;
++        if (postpackagerepairconfig[1] == 0)
++            RtToBt = false;
++        else
++            RtToBt = true;
++        if (postpackagerepairconfig[2] == 0)
++            BtSetToHard = false;
++        else
++            BtSetToHard = true;
++
++        nlohmann::json jsonPpr = {
++            { "OobPprEnable" , oobPprEnable },
++            { "autoScheduleRtAsBtPpr" , RtToBt },
++            { "autoScheduleBtAsHard" , BtSetToHard }
++        };
++        pprConfig.push_back(jsonPpr);
++
++        aResp->res.jsonValue["Members"] = pprConfig;
++        aResp->res.jsonValue["Members@odata.count"] = 1;
++    },
++    pprFileObject, pprFilePath, pprFileInterface,
++    "getPostPackageRepairConfig");
++
++    messages::success(aResp->res);
++    return;
++}
++
++static void setPostPackageRepairConfig(
++    const std::shared_ptr<bmcweb::AsyncResp> &asyncResp,
++    uint16_t flag, bool data) {
++
++  crow::connections::systemBus->async_method_call(
++      [asyncResp, flag, data](
++          const boost::system::error_code ec, bool &result) {
++    if (ec) {
++      BMCWEB_LOG_ERROR
++      << "DBUS response error in setPostPackageRepairConfig" << ec.message();
++      messages::internalError(asyncResp->res);
++      return;
++    }
++    BMCWEB_LOG_DEBUG
++    << "DBUS POST Package Repair Config Changed : " << int(result);
++  },
++  pprFileObject, pprFilePath, pprFileInterface,
++  "setPostPackageRepairConfig", flag, data);
++
++}
++
++class pprConfig: public Node {
++public:
++
++    pprConfig(App &app) :
++            Node(app,
++                    "/redfish/v1/Systems/system/LogServices/PostPackageRepair/Config") {
++        // Note: Deviated from redfish privilege registry for GET & HEAD
++        // method for security reasons.
++        entityPrivileges = {
++            {boost::beast::http::verb::get, {{"ConfigureComponents"}}},
++            {boost::beast::http::verb::head, {{"ConfigureComponents"}}},
++            {boost::beast::http::verb::patch, {{"ConfigureManager"}}},
++            {boost::beast::http::verb::put, {{"ConfigureManager"}}},
++            {boost::beast::http::verb::delete_, {{"ConfigureManager"}}},
++            {boost::beast::http::verb::post, {{"ConfigureManager"}}}};
++    }
++
++private:
++    void doGet(const std::shared_ptr<bmcweb::AsyncResp> &asyncResp,
++            const crow::Request&, const std::vector<std::string>&)
++                    override
++    {
++      asyncResp->res.jsonValue["@odata.type"] = "#LogEntry.v1_4_0.LogEntry";
++      asyncResp->res.jsonValue["@odata.id"] =
++          "/redfish/v1/Systems/system/LogServices/PostPackageRepair/"
++          "Config";
++      asyncResp->res.jsonValue["Name"] = "Post Package Repair Config";
++      asyncResp->res.jsonValue["Description"] =
++          "Post Package Repair Configuration";
++      asyncResp->res.jsonValue["Members"] = nlohmann::json::array();
++      asyncResp->res.jsonValue["Members@odata.count"] = 0;
++
++      getPostPackageRepairConfig(asyncResp);
++      return;
++    }
++
++    void doPatch(const std::shared_ptr<bmcweb::AsyncResp>& asyncResp,
++                const crow::Request& req,
++                const std::vector<std::string>&) override
++    {
++      std::optional<bool> BtSetToHard;
++      std::optional<bool> RtToBt;
++      uint16_t flag = 0;
++      bool data = false;
++
++      if (!json_util::readJson(req, asyncResp->res,
++                               "autoScheduleBtAsHard", BtSetToHard,
++                               "autoScheduleRtAsBtPpr", RtToBt))
++      {
++          return;
++      }
++
++      if(BtSetToHard)
++      {
++          flag = BT_SET_TO_HARD_MASK;
++          data = BtSetToHard.value();
++      }
++      if(RtToBt)
++      {
++          flag = RT_TO_BT_MASK;
++          data = RtToBt.value();
++      }
++      if (flag == 0)
++      {
++          std::cout << "PPR Config Error: patch command, Param not found " << std::endl;
++          return;
++      }
++      setPostPackageRepairConfig(asyncResp, flag, data);
++      messages::success(asyncResp->res);
++      return;
++    }
++};
++
+ static void setPostPackageRepairData(
+     const std::shared_ptr<bmcweb::AsyncResp> &asyncResp,
+     uint16_t Index, uint16_t repairEntryNum, uint16_t repairType,
+@@ -4028,6 +4181,26 @@ private:
+       uint16_t RuntimeIndex = 0;
+       nlohmann::json jsonRequest;
+
++      crow::connections::systemBus->async_method_call(
++            [asyncResp](const boost::system::error_code ec, const std::variant<bool>& oobPpr) {
++                if (ec)
++                {
++                    BMCWEB_LOG_ERROR << "D-Bus responses error for OOB PPR Enable: " << ec;
++                    messages::internalError(asyncResp->res);
++                    return;
++                }
++                oobPprEnable = std::get_if<bool>(&oobPpr);
++            },
++            pprFileObject, pprFilePath,
++            "org.freedesktop.DBus.Properties", "Get",
++            pprFileInterface, "oobPprEnable");
++
++      if(oobPprEnable == false) {
++        BMCWEB_LOG_ERROR << "Error: OOB PPR is Not Enabled";
++        messages::internalError(asyncResp->res);
++        return;
++      }
++
+       if (!json_util::processJsonFromRequest(asyncResp->res, req,
+           jsonRequest)) {
+         BMCWEB_LOG_ERROR << "Error: Json value not readable";
+--
+2.25.1
