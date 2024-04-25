@@ -1,0 +1,71 @@
+From 9b7ba800fa0277d839d12b3362514ff775808e7c Mon Sep 17 00:00:00 2001
+From: Mohsen Dolaty <mohsen.dolaty@amd.com>
+Date: Thu, 25 Apr 2024 15:26:44 -0500
+Subject: [PATCH 1/1] DBus: add PPR Config variables and methods
+
+Add 3 new boolean variable and 2 new methods for PPR configuration.
+array[boolean] does not work in DBus YAML.
+instead, used array[uint6] in getPostPackageRepairConfig().
+
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
+---
+ .../PostPackageRepair/PprData.interface.yaml  | 37 +++++++++++++++++++
+ 1 file changed, 37 insertions(+)
+
+diff --git a/xyz/openbmc_project/PostPackageRepair/PprData.interface.yaml b/xyz/openbmc_project/PostPackageRepair/PprData.interface.yaml
+index 72419c7..f58a499 100644
+--- a/xyz/openbmc_project/PostPackageRepair/PprData.interface.yaml
++++ b/xyz/openbmc_project/PostPackageRepair/PprData.interface.yaml
+@@ -11,6 +11,18 @@ properties:
+       type: boolean
+       description: >
+           The post package repair record added.
++    - name: oobPprEnable
++      type: boolean
++      description: >
++          The OOB post package repair is Enabled.
++    - name: RtToBt
++      type: boolean
++      description: >
++          create BT from successful RT PPR.
++    - name: BtSetToHard
++      type: boolean
++      description: >
++          when creating BT from RT PPR, set it to Hard Repair.
+
+ methods:
+     - name: setPostPackageRepairData
+@@ -46,6 +58,31 @@ methods:
+           type: array[struct[uint16,uint16,uint16,uint16,array[uint16]]]
+           description: >
+             An array of post package repair entries and its status.
++    - name: getPostPackageRepairConfig
++      description: >
++          Method to get the post package repair configuration.
++      returns:
++        - name: pprConfig
++          type: array[uint16]
++          description: >
++            An array of post package Repair Config data
++    - name: setPostPackageRepairConfig
++      description: >
++          Method to set the post package repair configuraton.
++      parameters:
++        - name: chgFlag
++          type: uint16
++          description: >
++            An uint16 value with each bit indicate which config parameter has been changed.
++        - name: data
++          type: boolean
++          description: >
++            A boolean value to indicate whether the config parameter is enabled or disabled.
++      returns:
++        - name: result
++          type: boolean
++          description: >
++            A boolean value to indicate whether configuration was changed or not.
+     - name: startRuntimeRepair
+       description: >
+           Method to get the cached post package repair status.
+--
+2.25.1
