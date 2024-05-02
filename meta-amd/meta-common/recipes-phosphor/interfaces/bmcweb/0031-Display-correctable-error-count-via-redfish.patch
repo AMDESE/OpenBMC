@@ -1,0 +1,146 @@
+From d2f808b43c8fc6a9063b6a6376097c9a7f8fe1c3 Mon Sep 17 00:00:00 2001
+From: Abinaya Dhandapani <adhandap@amd.com>
+Date: Tue, 7 May 2024 01:55:11 -0500
+Subject: [PATCH] dram cecc error
+
+Signed-off-by: Abinaya Dhandapani <adhandap@amd.com>
+---
+ redfish-core/include/redfish.hpp |   1 +
+ redfish-core/lib/memory.hpp      | 100 +++++++++++++++++++++++++++++++
+ 2 files changed, 101 insertions(+)
+
+diff --git a/redfish-core/include/redfish.hpp b/redfish-core/include/redfish.hpp
+index 640b97d7..ce38c644 100644
+--- a/redfish-core/include/redfish.hpp
++++ b/redfish-core/include/redfish.hpp
+@@ -156,6 +156,7 @@ class RedfishService
+         nodes.emplace_back(std::make_unique<OperatingConfig>(app));
+         nodes.emplace_back(std::make_unique<MemoryCollection>(app));
+         nodes.emplace_back(std::make_unique<Memory>(app));
++        nodes.emplace_back(std::make_unique<MemoryMetrics>(app));
+
+         nodes.emplace_back(std::make_unique<SystemsCollection>(app));
+         nodes.emplace_back(std::make_unique<Systems>(app));
+diff --git a/redfish-core/lib/memory.hpp b/redfish-core/lib/memory.hpp
+index 3da4e0bd..054a6daf 100644
+--- a/redfish-core/lib/memory.hpp
++++ b/redfish-core/lib/memory.hpp
+@@ -467,6 +467,9 @@ inline void getDimmDataByService(std::shared_ptr<bmcweb::AsyncResp> aResp,
+             aResp->res.jsonValue["Id"] = dimmId;
+             aResp->res.jsonValue["Name"] = "DIMM Slot";
+
++            aResp->res.jsonValue["Metrics"] = {
++            {"@odata.id", "/redfish/v1/Systems/system/Memory/" + dimmId + "/MemoryMetrics"}};
++
+             const auto memorySizeProperty = properties.find("MemorySizeInKB");
+             if (memorySizeProperty != properties.end())
+             {
+@@ -916,6 +919,64 @@ inline void getDimmData(std::shared_ptr<bmcweb::AsyncResp> aResp,
+             "xyz.openbmc_project.Inventory.Item.PersistentMemory.Partition"});
+ }
+
++inline void handleMemoryMetricsGet(
++    const std::shared_ptr<bmcweb::AsyncResp>& asyncResp,
++    const std::string& dimmId)
++{
++    asyncResp->res.jsonValue["@odata.type"] =
++        "#MemoryMetrics.v1_4_1.MemoryMetrics";
++    asyncResp->res.jsonValue["Name"] = " MemoryMetrics of " + dimmId;
++    asyncResp->res.jsonValue["Id"] = dimmId + "_MemoryMetrics";
++    asyncResp->res.jsonValue["@odata.id"] = "/redfish/v1/Systems/system/Memory/"
++                                             + dimmId + "/MemoryMetrics";
++
++    /*Extract Processor ID from the DIMM Label*/
++    std::string prefix = dimmId.substr(0, 2);
++    std::string DimmEccProperty;
++
++    if (prefix == "P0")
++    {
++        DimmEccProperty = "P0_DIMM_ECC_COUNT";
++    }
++    else if (prefix == "P1")
++    {
++        DimmEccProperty = "P1_DIMM_ECC_COUNT";
++    }
++    else
++    {
++        BMCWEB_LOG_ERROR << "Invalid Processor ID: ";
++        return;
++    }
++
++    crow::connections::systemBus->async_method_call(
++        [asyncResp,dimmId](
++        const boost::system::error_code ec,
++        const std::variant<std::vector<std::pair<std::string,
++                          uint64_t>>>& property) {
++            if (ec)
++            {
++                BMCWEB_LOG_ERROR << "D-Bus responses error: " << ec;
++                return;
++            }
++            if (const auto* vec = std::get_if<std::vector<std::pair<std::string,
++                                  uint64_t>>>(&property))
++            {
++                for (const auto& pair : *vec)
++                {
++                    if (pair.first == dimmId)
++                    {
++                        asyncResp->res.jsonValue["CurrentPeriod"]
++                              ["CorrectableECCErrorCount"] = pair.second;
++                    }
++                }
++            }
++        },
++        "com.amd.crashdump", "/com/amd/crashdump/dramEccPath",
++        "org.freedesktop.DBus.Properties", "Get",
++        "com.amd.crashdump.DimmEcc.ErrorCount",
++        DimmEccProperty);
++}
++
+ class MemoryCollection : public Node
+ {
+   public:
+@@ -995,4 +1056,43 @@ class Memory : public Node
+     }
+ };
+
++class MemoryMetrics : public Node
++{
++  public:
++    /*
++     * Default Constructor
++     */
++    MemoryMetrics(App& app) :
++        Node(app, "/redfish/v1/Systems/system/Memory/<str>/MemoryMetrics/",
++                    std::string())
++    {
++        entityPrivileges = {
++            {boost::beast::http::verb::get, {{"Login"}}},
++            {boost::beast::http::verb::head, {{"Login"}}},
++            {boost::beast::http::verb::patch, {{"ConfigureComponents"}}},
++            {boost::beast::http::verb::put, {{"ConfigureComponents"}}},
++            {boost::beast::http::verb::delete_, {{"ConfigureComponents"}}},
++            {boost::beast::http::verb::post, {{"ConfigureComponents"}}}};
++    }
++
++  private:
++    /**
++     * Functions triggers appropriate requests on DBus
++     */
++    void doGet(const std::shared_ptr<bmcweb::AsyncResp>& asyncResp,
++               const crow::Request&,
++               const std::vector<std::string>& params) override
++    {
++        // Check if there is required param, truly entering this shall be
++        // impossible
++        if (params.size() != 1)
++        {
++            messages::internalError(asyncResp->res);
++            return;
++        }
++        const std::string& dimmId = params[0];
++        handleMemoryMetricsGet(asyncResp, dimmId);
++    }
++};
++
+ } // namespace redfish
