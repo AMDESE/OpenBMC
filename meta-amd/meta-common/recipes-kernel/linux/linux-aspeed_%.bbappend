@@ -88,4 +88,5 @@ SRC_URI += "file://amd-bmc-baseline.cfg \
             file://0086-drivers-mtd-Add-support-for-Gigadevice-GD25LB-series.patch \
             file://0087-recipes-kernel-linux-linux-aspeed-SPDM-driver-update.patch \
             file://0088-recipes-kernel-linux-aspeed-Device-name-changed.patch \
+            file://0089-recipes-kernel-linux-aspeed-corrected-compatible-sla.patch \
             "

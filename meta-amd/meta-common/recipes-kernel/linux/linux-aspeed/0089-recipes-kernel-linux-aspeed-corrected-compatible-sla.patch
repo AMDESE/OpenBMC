@@ -1,0 +1,208 @@
+From 03028a4d0c4d572c225570b8b87c3f81da8c52d3 Mon Sep 17 00:00:00 2001
+From: Ashok Kumar <ashok2.kumar@amd.com>
+Date: Thu, 2 May 2024 08:44:20 -0500
+Subject: [PATCH] recipes-kernel/linux-aspeed: corrected compatible =
+ slave-backend device name
+
+missed the compatible = slave-backend in last commit for device name changed
+Fixes: FWDEV-77404
+
+Signed-off-by: Ashok Kumar <ashok2.kumar@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts | 4 ++--
+ arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts     | 4 ++--
+ arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts  | 4 ++--
+ arch/arm/boot/dts/aspeed-bmc-amd-galena.dts      | 4 ++--
+ arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts  | 4 ++--
+ arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts      | 4 ++--
+ arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts  | 4 ++--
+ arch/arm/boot/dts/aspeed-bmc-amd-purico.dts      | 4 ++--
+ arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts | 4 ++--
+ arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts     | 4 ++--
+ arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts | 4 ++--
+ arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts     | 4 ++--
+ 12 files changed, 24 insertions(+), 24 deletions(-)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
+index e536df384e84..8e137bcfb9d9 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa-i3c.dts
+@@ -689,8 +689,8 @@ bmceeprom@50 {
+ &i2c15 {
+ 	// RoT
+ 	status = "okay";
+-	slave_backend@30 {
+-		compatible = "i2c-slave-backend";
++	i2c_slave_backend@30 {
++		compatible = "slave-backend";
+ 		reg = <0x30>;
+ 	};
+ };
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
+index decfc07cd84a..5ab2a56c2a33 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-chalupa.dts
+@@ -687,8 +687,8 @@ bmceeprom@50 {
+ &i2c15 {
+ 	// RoT
+ 	status = "okay";
+-	slave_backend@30 {
+-		compatible = "i2c-slave-backend";
++	i2c_slave_backend@30 {
++		compatible = "slave-backend";
+ 		reg = <0x30>;
+ 	};
+ };
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts
+index 271de647ada7..f1ad4730e838 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-galena-i3c.dts
+@@ -331,8 +331,8 @@ bmceeprom@50 {
+ &i2c15 {
+ 	// RoT
+ 	status = "okay";
+-	slave_backend@30 {
+-		compatible = "i2c-slave-backend";
++	i2c_slave_backend@30 {
++		compatible = "slave-backend";
+ 		reg = <0x30>;
+ 	};
+ };
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts b/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
+index c0dfd1c9e94b..696ae35f4858 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-galena.dts
+@@ -329,8 +329,8 @@ bmceeprom@50 {
+ &i2c15 {
+ 	// RoT
+ 	status = "okay";
+-	slave_backend@30 {
+-		compatible = "i2c-slave-backend";
++	i2c_slave_backend@30 {
++		compatible = "slave-backend";
+ 		reg = <0x30>;
+ 	};
+ };
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts
+index 6224ab2dc4b8..e6a4b61885e2 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-huambo-i3c.dts
+@@ -702,8 +702,8 @@ bmceeprom@50 {
+ &i2c15 {
+ 	// RoT
+ 	status = "okay";
+-	slave_backend@30 {
+-		compatible = "i2c-slave-backend";
++	i2c_slave_backend@30 {
++		compatible = "slave-backend";
+ 		reg = <0x30>;
+ 	};
+ };
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts b/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
+index a0523bf94605..842ccd132a47 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-huambo.dts
+@@ -687,8 +687,8 @@ bmceeprom@50 {
+ &i2c15 {
+ 	// RoT
+ 	status = "okay";
+-	slave_backend@30 {
+-		compatible = "i2c-slave-backend";
++	i2c_slave_backend@30 {
++		compatible = "slave-backend";
+ 		reg = <0x30>;
+ 	};
+ };
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
+index 36f2d77e77b8..11d7f4129582 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico-i3c.dts
+@@ -702,8 +702,8 @@ bmceeprom@50 {
+ // ROT
+ &i2c15 {
+ 	status = "okay";
+-	slave_backend@30 {
+-		compatible = "i2c-slave-backend";
++	i2c_slave_backend@30 {
++		compatible = "slave-backend";
+ 		reg = <0x30>;
+ 	};
+ };
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+index b5627255024c..39e3e80f4f33 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-purico.dts
+@@ -698,8 +698,8 @@ bmceeprom@50 {
+ // ROT
+ &i2c15 {
+ 	status = "okay";
+-	slave_backend@30 {
+-		compatible = "i2c-slave-backend";
++	i2c_slave_backend@30 {
++		compatible = "slave-backend";
+ 		reg = <0x30>;
+ 	};
+ };
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts
+index b38921c93f1b..e040751af2bf 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-recluse-i3c.dts
+@@ -332,8 +332,8 @@ bmceeprom@50 {
+ &i2c15 {
+ 	// RoT
+ 	status = "okay";
+-	slave_backend@30 {
+-		compatible = "i2c-slave-backend";
++	i2c_slave_backend@30 {
++		compatible = "slave-backend";
+ 		reg = <0x30>;
+ 	};
+ };
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts b/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
+index e520954eb905..631d4f250a6f 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-recluse.dts
+@@ -329,8 +329,8 @@ bmceeprom@50 {
+ &i2c15 {
+ 	// RoT
+ 	status = "okay";
+-	slave_backend@30 {
+-		compatible = "i2c-slave-backend";
++	i2c_slave_backend@30 {
++		compatible = "slave-backend";
+ 		reg = <0x30>;
+ 	};
+ };
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts
+index bce24d654117..d54bd9131f9c 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-volcano-i3c.dts
+@@ -1357,8 +1357,8 @@ bmceeprom@50 {
+ // ROT
+ &i2c15 {
+ 	status = "okay";
+-	slave_backend@30 {
+-		compatible = "i2c-slave-backend";
++	i2c_slave_backend@30 {
++		compatible = "slave-backend";
+ 		reg = <0x30>;
+ 	};
+ };
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts b/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
+index 943ca963b600..ae0e1ee9c5f8 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-volcano.dts
+@@ -1344,8 +1344,8 @@ bmceeprom@50 {
+ // ROT
+ &i2c15 {
+ 	status = "okay";
+-	slave_backend@30 {
+-		compatible = "i2c-slave-backend";
++	i2c_slave_backend@30 {
++		compatible = "slave-backend";
+ 		reg = <0x30>;
+ 	};
+ };
+--
+2.25.1
+
