@@ -1,0 +1,87 @@
+From c6507ce05026d22bcf5d4a0c1fbe7af1d0badfdd Mon Sep 17 00:00:00 2001
+From: Mohsen Dolaty <mohsen.dolaty@amd.com>
+Date: Mon, 6 May 2024 14:47:04 -0500
+Subject: [PATCH 1/1] sbrmi: check for DIMM MR4 Reg for Temp range
+
+Check for DIMM PMIC MR4 Register for DIMM Temp range.
+Based on MR4 value, set the DIMM Temp to 90, 95, or 100 C
+which increase the fans to 100%.
+
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
+---
+ drivers/misc/amd-apml/sbrmi.c | 31 ++++++++++++++++++++++++++++++-
+ 1 file changed, 30 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/misc/amd-apml/sbrmi.c b/drivers/misc/amd-apml/sbrmi.c
+index 47d3087f014f..5b5a9ec9380d 100644
+--- a/drivers/misc/amd-apml/sbrmi.c
++++ b/drivers/misc/amd-apml/sbrmi.c
+@@ -48,6 +48,14 @@ static u32 *dimm_id;
+ /* Two xfers, one write and one read require to read the data */
+ #define I3C_I2C_MSG_XFER_SIZE		0x2
+
++/* DIMM MR4 */
++#define SBRMI_READ_DIMM_MR4_MASK   0x07
++#define SBRMI_READ_DIMM_MR4_03     0x03
++#define SBRMI_READ_DIMM_MR4_04     0x04
++#define SBRMI_SET_DIMM_TEMP_90     0x2D000000
++#define SBRMI_SET_DIMM_TEMP_95     0x2F800000
++#define SBRMI_SET_DIMM_TEMP_100    0x32000000
++
+ static int configure_regmap(struct apml_sbrmi_device *rmi_dev);
+
+ enum sbrmi_msg_id {
+@@ -55,6 +63,7 @@ enum sbrmi_msg_id {
+ 	SBRMI_WRITE_PKG_PWR_LIMIT,
+ 	SBRMI_READ_PKG_PWR_LIMIT,
+ 	SBRMI_READ_PKG_MAX_PWR_LIMIT,
++	SBRMI_READ_DIMM_THERMAL_MR4_REG = 0x46,
+ 	SBRMI_READ_DIMM_THERMAL_SENSOR = 0x48,
+ };
+
+@@ -79,6 +88,7 @@ static int sbrmi_read(struct device *dev, enum hwmon_sensor_types type,
+ 	struct apml_sbrmi_device *rmi_dev = dev_get_drvdata(dev);
+ 	struct apml_message msg = { 0 };
+ 	int ret;
++	int tmp;
+
+ 	if (type != hwmon_power && type != hwmon_temp)
+ 		return -EINVAL;
+@@ -96,15 +106,34 @@ static int sbrmi_read(struct device *dev, enum hwmon_sensor_types type,
+ 		ret = rmi_mailbox_xfer(rmi_dev, &msg);
+ 		break;
+ 	case hwmon_temp_input:
+-		msg.cmd = SBRMI_READ_DIMM_THERMAL_SENSOR;
+ 		if (channel >= MAX_DIMM_COUNT) {
+ 			ret = -EINVAL;
+ 			goto out;
+ 		}
++		// check MR4 for DIMM temp range
+ 		msg.data_in.mb_in[RD_WR_DATA_INDEX] = dimm_id[channel];
++		msg.cmd = SBRMI_READ_DIMM_THERMAL_MR4_REG;
+ 		ret = rmi_mailbox_xfer(rmi_dev, &msg);
+ 		if (ret < 0)
+ 			goto out;
++		tmp = (int)((msg.data_out.mb_out[RD_WR_DATA_INDEX] & SBRMI_READ_DIMM_MR4_MASK));
++		if(tmp >= SBRMI_READ_DIMM_MR4_03)
++		{
++			if (tmp == SBRMI_READ_DIMM_MR4_03)
++				msg.data_out.mb_out[RD_WR_DATA_INDEX] = SBRMI_SET_DIMM_TEMP_90;
++			else if (tmp == SBRMI_READ_DIMM_MR4_04)
++				msg.data_out.mb_out[RD_WR_DATA_INDEX] = SBRMI_SET_DIMM_TEMP_95;
++			else
++				msg.data_out.mb_out[RD_WR_DATA_INDEX] = SBRMI_SET_DIMM_TEMP_100;
++		}
++		else
++		{ // Read Temp
++			msg.cmd = SBRMI_READ_DIMM_THERMAL_SENSOR;
++			msg.data_in.mb_in[RD_WR_DATA_INDEX] = dimm_id[channel];
++			ret = rmi_mailbox_xfer(rmi_dev, &msg);
++			if (ret < 0)
++				goto out;
++		}
+ 		break;
+ 	case hwmon_power_cap_max:
+ 		/* Cache maximum power limit */
+--
+2.25.1
