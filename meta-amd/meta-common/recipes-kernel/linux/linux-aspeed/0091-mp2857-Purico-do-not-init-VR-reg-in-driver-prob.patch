@@ -1,0 +1,171 @@
+From 319c4392149ca8a2d26c1223658879d5d72bd2e8 Mon Sep 17 00:00:00 2001
+From: Mohsen Dolaty <mohsen.dolaty@amd.com>
+Date: Tue, 7 May 2024 12:11:56 -0500
+Subject: [PATCH 1/1] linux-aspeed: mp2857 Purico do not init VR reg in driver
+ probe
+
+Change MP2857 device driver probe so it will not initialize device
+registers (this initialization is causing issues).
+Also change Voltage in, Current in and out, and Power to linear read.
+
+Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
+---
+ drivers/hwmon/pmbus/mp2857.c | 83 +++++-------------------------------
+ 1 file changed, 11 insertions(+), 72 deletions(-)
+
+diff --git a/drivers/hwmon/pmbus/mp2857.c b/drivers/hwmon/pmbus/mp2857.c
+index e6bee7e6c17c..1f9b6f45a547 100644
+--- a/drivers/hwmon/pmbus/mp2857.c
++++ b/drivers/hwmon/pmbus/mp2857.c
+@@ -31,7 +31,7 @@
+ 								PMBUS_HAVE_TEMP | PMBUS_HAVE_POUT | \
+ 								PMBUS_PHASE_VIRTUAL)
+
+-#define MP2857_RAIL2_FUNC		(PMBUS_HAVE_VIN | PMBUS_HAVE_VOUT | PMBUS_HAVE_TEMP | \
++#define MP2857_RAIL2_FUNC		(PMBUS_HAVE_VOUT | PMBUS_HAVE_TEMP | \
+ 								PMBUS_HAVE_IOUT | PMBUS_HAVE_IIN | \
+ 								PMBUS_HAVE_POUT | PMBUS_PHASE_VIRTUAL)
+
+@@ -90,15 +90,6 @@ mp2857_read_vin(struct i2c_client *client, int page, int reg)
+ {
+ 	int ret;
+ 	ret = read_word_data(client, page, reg);
+-	/*
+-	* READ_VIN requires fixup to scale it to linear11 format. Register data format
+-	* provides 10 bits for sensed Vin and 1 reserved bit and 5 bits for exponent.
+-	* EXP fixed value 11100b 1/16=0.0625.
+-	*/
+-	//printk(KERN_ALERT "Obtained data from MP2857, Vin-%d: %hx  %hx\n", page, ret, ret & GENMASK(9, 0));
+-	ret = ((ret & GENMASK(9, 0)) * 625) / 100;
+-
+-	//printk(KERN_ALERT "Converted data:%x\n",ret);
+ 	return ret;
+ }
+
+@@ -129,12 +120,7 @@ mp2857_read_temperature(struct i2c_client *client, int page, int reg)
+ {
+ 	int ret;
+ 	ret = read_word_data(client, page, reg);
+-	/*
+-	* temperature requires fixup to scale it to linear11 format. Register data format
+-	* provides 8 bits for temperature sensed and 3 bit SIGN and 5 bits for exponent.
+-	* EXP value 00000b.
+-	*/
+-	ret &= GENMASK(7, 0);
++
+ 	return ret;
+ }
+
+@@ -146,10 +132,8 @@ mp2857_read_pout(struct i2c_client *client, int page, int reg)
+ 	/*
+ 	* POUT Register data format
+ 	* provides 11 bits for sensed IOUT and 5 bits for exponent.
+-	* probe function set PWR_EXPONENT_BIT[10:6] 5b11100: (1/16)
+-	* EXP value 1/16=0.0625.
+ 	*/
+-	ret = ((ret & GENMASK(10, 0)) * 625) / 100;
++	ret = (ret & GENMASK(10, 0));
+ 	return ret;
+ }
+
+@@ -161,10 +145,10 @@ mp2857_read_iout(struct i2c_client *client, int page, int reg)
+ 	/*
+ 	* IOUT Register data format
+ 	* provides 11 bits for sensed IOUT and 5 bits for exponent.
+-	* probe function set IIN_SCALE_SEL[5:3] 3b101: (1/16) A/LSB
+-	* EXP value 1/16=0.0625.
++	* probe function set IIN_SCALE_SEL[5:3] 3b101: (1/2) A/LSB
++	* EXP value 1/2=0.5.
+ 	*/
+-	ret = ((ret & GENMASK(10, 0)) * 625) / 100;
++	ret = ((ret & GENMASK(10, 0)) * 5) / 10;
+ 	return ret;
+ }
+
+@@ -180,10 +164,8 @@ mp2857_read_iin(struct i2c_client *client, int page, int reg)
+ 	/*
+ 	* IIN Register data format
+ 	* provides 11 bits for sensed IIN and 5 bits for exponent.
+-	* probe function set IOUT_SCALE_SEL[2:0] 3b010: (1/16) A/LSB
+-	* EXP value 1/16=0.0625.
+ 	*/
+-	ret = ((ret & GENMASK(10, 0)) * 625) / 100;
++	ret = (ret & GENMASK(10, 0));
+ 	return ret;
+ }
+
+@@ -237,31 +219,18 @@ static int mp2857_read_word_data(struct i2c_client *client, int page, int phase,
+ static struct pmbus_driver_info mp2857_info = {
+ 	.pages = MP2857_PAGE_NUM,
+
+-	.format[PSC_VOLTAGE_IN] = direct,
++	.format[PSC_VOLTAGE_IN] = linear,
+ 	.format[PSC_VOLTAGE_OUT] = direct,
+ 	.format[PSC_TEMPERATURE] = direct,
+-	.format[PSC_POWER] = direct,
+-	.format[PSC_CURRENT_IN] = direct,
+-	.format[PSC_CURRENT_OUT] = direct,
++	.format[PSC_POWER] = linear,
++	.format[PSC_CURRENT_IN] = linear,
++	.format[PSC_CURRENT_OUT] = linear,
+ 	.m[PSC_VOLTAGE_OUT] = 1,
+ 	.R[PSC_VOLTAGE_OUT] = 3,
+ 	.b[PSC_VOLTAGE_OUT] = 0,
+ 	.m[PSC_TEMPERATURE] = 1,
+ 	.R[PSC_TEMPERATURE] = 3,
+ 	.b[PSC_TEMPERATURE] = 0,
+-	.m[PSC_VOLTAGE_IN] = 1,
+-	.R[PSC_VOLTAGE_IN] = 2,
+-	.b[PSC_VOLTAGE_IN] = 0,
+-	.m[PSC_POWER] = 1,
+-	.R[PSC_POWER] = 2,
+-	.b[PSC_POWER] = 0,
+-	.m[PSC_CURRENT_IN] = 1,
+-	.R[PSC_CURRENT_IN] = 2,
+-	.b[PSC_CURRENT_IN] = 0,
+-	.m[PSC_CURRENT_OUT] = 1,
+-	.R[PSC_CURRENT_OUT] = 2,
+-	.b[PSC_CURRENT_OUT] = 0,
+-
+
+ 	.func[0] = MP2857_RAIL1_FUNC,
+ 	.func[1] = MP2857_RAIL2_FUNC,
+@@ -275,36 +244,6 @@ static int mp2857_probe(struct i2c_client *client, const struct i2c_device_id *i
+ 	data.info = &mp2857_info;
+ 	data.client = *client;
+
+-	// config rail1 iin exp
+-	ret = mp2857_config_exp(client, 2, 0x0B, 0x5, IIN_EXP_POS, IIN_EXP_MSK);
+-	if (ret < 0)
+-		return ret;
+-
+-	// config rail2 iin exp
+-	ret = mp2857_config_exp(client, 2, 0x1B, 0x5, IIN_EXP_POS, IIN_EXP_MSK);
+-	if (ret < 0)
+-		return ret;
+-
+-	// config rail1 iout exp
+-	ret = mp2857_config_exp(client, 2, 0x0B, 0x2, IOUT_EXP_POS, IOUT_EXP_MSK);
+-	if (ret < 0)
+-		return ret;
+-
+-	// config rail2 iout exp
+-	ret = mp2857_config_exp(client, 2, 0x1B, 0x2, IOUT_EXP_POS, IOUT_EXP_MSK);
+-	if (ret < 0)
+-		return ret;
+-
+-	// config rail1 pout exp
+-	ret = mp2857_config_exp(client, 2, 0x0B, 0x1C, POUT_EXP_POS, POUT_EXP_MSK);
+-	if (ret < 0)
+-		return ret;
+-
+-	// config rail2 pou exp
+-	ret = mp2857_config_exp(client, 2, 0x1B, 0x1C, POUT_EXP_POS, POUT_EXP_MSK);
+-	if (ret < 0)
+-		return ret;
+-
+ 	return pmbus_do_probe(client, &mp2857_info);
+ }
+
+--
+2.25.1
