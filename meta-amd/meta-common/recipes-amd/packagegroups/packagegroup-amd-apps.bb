@@ -63,6 +63,7 @@ RDEPENDS_${PN}-system = " \
         phosphor-pid-control \
         phosphor-host-postd \
         phosphor-post-code-manager \
+        phosphor-watchdog \
         power-capping \
         phosphor-misc-usb-ctrl \
         set-fan-speed \
