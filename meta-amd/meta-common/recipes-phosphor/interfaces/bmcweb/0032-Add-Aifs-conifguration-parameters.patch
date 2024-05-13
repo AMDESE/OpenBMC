@@ -1,0 +1,190 @@
+From 41366bc2d9189fbd49a17f77022613363b14d2eb Mon Sep 17 00:00:00 2001
+From: Abinaya Dhandapani <adhandap@amd.com>
+Date: Mon, 13 May 2024 04:17:48 -0500
+Subject: [PATCH] Add Aifs conifguration parameters
+
+Signed-off-by: Abinaya Dhandapani <adhandap@amd.com>
+---
+ .../include/event_service_manager.hpp         | 11 ++++
+ .../registries/openbmc_message_registry.hpp   | 12 +++-
+ redfish-core/lib/log_services.hpp             | 65 ++++++++++++++++++-
+ 3 files changed, 86 insertions(+), 2 deletions(-)
+
+diff --git a/redfish-core/include/event_service_manager.hpp b/redfish-core/include/event_service_manager.hpp
+index a1761bb2..f2d1505c 100644
+--- a/redfish-core/include/event_service_manager.hpp
++++ b/redfish-core/include/event_service_manager.hpp
+@@ -49,6 +49,8 @@ static constexpr const char* metricReportFormatType = "MetricReport";
+ static constexpr const char* eventServiceFile =
+     "/var/lib/bmcweb/eventservice_config.json";
+
++const std::string bmcwebFolder = "/var/lib/bmcweb";
++
+ namespace message_registries
+ {
+ inline boost::beast::span<const MessageEntry>
+@@ -650,6 +652,15 @@ class EventServiceManager
+
+     void initConfig()
+     {
++        if (!std::filesystem::exists(bmcwebFolder))
++        {
++            try {
++                std::filesystem::create_directory(bmcwebFolder);
++            } catch (const std::exception& e) {
++                BMCWEB_LOG_DEBUG << "Error creating /var/lib/bmcweb folder";
++            }
++        }
++
+         std::ifstream eventConfigFile(eventServiceFile);
+         if (!eventConfigFile.good())
+         {
+diff --git a/redfish-core/include/registries/openbmc_message_registry.hpp b/redfish-core/include/registries/openbmc_message_registry.hpp
+index ba32c11e..f70715a3 100644
+--- a/redfish-core/include/registries/openbmc_message_registry.hpp
++++ b/redfish-core/include/registries/openbmc_message_registry.hpp
+@@ -29,7 +29,7 @@ const Header header = {
+     "0.2.0",
+     "OpenBMC",
+ };
+-constexpr std::array<MessageEntry, 187> registry = {
++constexpr std::array<MessageEntry, 188> registry = {
+     MessageEntry{
+         "ADDDCCorrectable",
+         {
+@@ -46,6 +46,16 @@ constexpr std::array<MessageEntry, 187> registry = {
+             },
+             "None.",
+         }},
++    MessageEntry{"AifsFailureMatch",
++                 {
++                     "Indicates AIFS Failure match detected",
++                     "AIFS failure match event occured",
++                     "Critical",
++                     "Critical",
++                     0,
++                     {},
++                     "None.",
++                 }},
+     MessageEntry{
+         "AtScaleDebugFeatureEnabledAtHardware",
+         {
+diff --git a/redfish-core/lib/log_services.hpp b/redfish-core/lib/log_services.hpp
+index abda7031..dd9ed848 100644
+--- a/redfish-core/lib/log_services.hpp
++++ b/redfish-core/lib/log_services.hpp
+@@ -2927,6 +2927,16 @@ class CrashdumpConfiguration : public Node
+                                 .jsonValue["harvestPpin"] = *value;
+                         }
+                     }
++                    if (property.first == "AifsArmed")
++                    {
++                        const bool* value =
++                            std::get_if<bool>(&property.second);
++                        if (value != nullptr)
++                        {
++                            asyncResp->res
++                                .jsonValue["AifsArmed"] = *value;
++                        }
++                    }
+                     if (property.first == "McaPollingEn")
+                     {
+                         const bool* value =
+@@ -3087,6 +3097,16 @@ class CrashdumpConfiguration : public Node
+                                 .jsonValue["P1_DIMM_LABELS"] = *value;
+                         }
+                     }
++                    if (property.first == "AifsSignatureId")
++                    {
++                        const std::vector<std::pair<std::string, std::string>>* value =
++                            std::get_if<std::vector<std::pair<std::string, std::string>>>(&property.second);
++                        if (value != nullptr)
++                        {
++                            asyncResp->res
++                                .jsonValue["AifsSignatureId"] = *value;
++                        }
++                    }
+                 }
+             },
+             crashdumpObject, crashdumpPath,
+@@ -3106,6 +3126,7 @@ class CrashdumpConfiguration : public Node
+         std::optional<std::vector<std::string>> sigIDOffset;
+         std::optional<std::vector<std::pair<std::string, std::string>>> P0_DimmLabels;
+         std::optional<std::vector<std::pair<std::string, std::string>>> P1_DimmLabels;
++        std::optional<std::vector<std::pair<std::string, std::string>>> AifsSignatureId;
+         std::optional<uint16_t> McaPollingPeriod;
+         std::optional<uint16_t> DramCeccPollingPeriod;
+         std::optional<uint16_t> PcieAerPollingPeriod;
+@@ -3118,8 +3139,8 @@ class CrashdumpConfiguration : public Node
+         std::optional<bool> McaThresholdEn;
+         std::optional<bool> DramCeccThresholdEn;
+         std::optional<bool> PcieAerThresholdEn;
++        std::optional<bool> AifsArmed;
+
+-        std::cout << "Doing patch command " << std::endl;
+         if (!json_util::readJson(req, asyncResp->res, "apmlRetries", apmlRetries,
+                                 "systemRecovery", systemRecovery,
+                                 "harvestPpin", harvestPpin,
+@@ -3128,6 +3149,8 @@ class CrashdumpConfiguration : public Node
+                                 "sigIDOffset",sigIDOffset,
+                                 "P0_DIMM_LABELS",P0_DimmLabels,
+                                 "P1_DIMM_LABELS",P1_DimmLabels,
++                                "AifsArmed",AifsArmed,
++                                "AifsSignatureId",AifsSignatureId,
+                                 "McaPollingEn",McaPollingEn,
+                                 "DramCeccPollingEn",DramCeccPollingEn,
+                                 "PcieAerPollingEn",PcieAerPollingEn,
+@@ -3220,6 +3243,25 @@ class CrashdumpConfiguration : public Node
+             std::variant<bool>(*harvestuCodeVersion));
+         }
+
++       if(AifsArmed)
++        {
++            crow::connections::systemBus->async_method_call(
++            [asyncResp](const boost::system::error_code ec) {
++                if (ec)
++                {
++                    BMCWEB_LOG_ERROR << "D-Bus responses error: " << ec;
++                    messages::internalError(asyncResp->res);
++                    return;
++                }
++                messages::success(asyncResp->res);
++                return;
++            },
++            crashdumpObject,crashdumpPath,
++            "org.freedesktop.DBus.Properties", "Set",
++            crashdumpConfigurationInterface, "AifsArmed",
++            std::variant<bool>(*AifsArmed));
++        }
++
+         if(ResetSignal)
+         {
+
+@@ -3353,6 +3395,27 @@ class CrashdumpConfiguration : public Node
+             std::variant<std::vector<std::pair<std::string, std::string>>>(*P1_DimmLabels));
+         }
+
++        if(AifsSignatureId)
++        {
++
++            crow::connections::systemBus->async_method_call(
++            [asyncResp](const boost::system::error_code ec) {
++                if (ec)
++                {
++                    BMCWEB_LOG_ERROR << "D-Bus responses error: " << ec;
++                    messages::internalError(asyncResp->res);
++                    return;
++                }
++                messages::success(asyncResp->res);
++                return;
++            },
++            crashdumpObject,crashdumpPath,
++            "org.freedesktop.DBus.Properties", "Set",
++            crashdumpConfigurationInterface, "AifsSignatureId",
++            std::variant<std::vector<std::pair<std::string, std::string>>>(*AifsSignatureId));
++        }
++
++
+         if(McaPollingEn)
+         {
+             crow::connections::systemBus->async_method_call(

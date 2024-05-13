@@ -36,5 +36,6 @@ SRC_URI += "file://0001-Reset-server-settings-only-changes-to-invoke-CMOS.patch 
             file://0029-Removed-PCIeDevices-uri-from-main-system-uri.patch \
             file://0030-bmcweb-Add-PPR-Config-Class.patch \
             file://0031-Display-correctable-error-count-via-redfish.patch \
+            file://0032-Add-Aifs-conifguration-parameters.patch \
             "
 
