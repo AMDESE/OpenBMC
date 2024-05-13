@@ -16,12 +16,12 @@
   sensorID: 0x01
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/OCP_INLET_Temp:
+/xyz/openbmc_project/sensors/temperature/OCP_SLOT_Temp:
   eventReadingType: 1
   sensorID: 0x02
   sensorType: 1
   offset: 0xff
-/xyz/openbmc_project/sensors/temperature/SCM_INLET_Temp:
+/xyz/openbmc_project/sensors/temperature/SCM_SLOT_Temp:
   eventReadingType: 1
   sensorID: 0x03
   sensorType: 1
