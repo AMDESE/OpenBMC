@@ -54,8 +54,8 @@
                     "/xyz/openbmc_project/sensors/temperature/VDD33_DUAL_TEMP",
 
                     "/xyz/openbmc_project/sensors/temperature/CPU0_REAR_Temp",
-                    "/xyz/openbmc_project/sensors/temperature/OCP_INLET_Temp",
-                    "/xyz/openbmc_project/sensors/temperature/SCM_INLET_Temp",
+                    "/xyz/openbmc_project/sensors/temperature/OCP_SLOT_Temp",
+                    "/xyz/openbmc_project/sensors/temperature/SCM_SLOT_Temp",
                     "/xyz/openbmc_project/sensors/temperature/CPU0_FRONT_Temp",
                     "/xyz/openbmc_project/sensors/temperature/RISER_1_Temp",
                     "/xyz/openbmc_project/sensors/temperature/RISER_2_Temp",
@@ -150,8 +150,8 @@
                     "/xyz/openbmc_project/sensors/temperature/VDD33_DUAL_TEMP",
 
                     "/xyz/openbmc_project/sensors/temperature/CPU0_REAR_Temp",
-                    "/xyz/openbmc_project/sensors/temperature/OCP_INLET_Temp",
-                    "/xyz/openbmc_project/sensors/temperature/SCM_INLET_Temp",
+                    "/xyz/openbmc_project/sensors/temperature/OCP_SLOT_Temp",
+                    "/xyz/openbmc_project/sensors/temperature/SCM_SLOT_Temp",
                     "/xyz/openbmc_project/sensors/temperature/CPU0_FRONT_Temp",
                     "/xyz/openbmc_project/sensors/temperature/RISER_1_Temp",
                     "/xyz/openbmc_project/sensors/temperature/RISER_2_Temp",
