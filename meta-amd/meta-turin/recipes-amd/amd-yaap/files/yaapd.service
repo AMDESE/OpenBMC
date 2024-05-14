@@ -1,0 +1,9 @@
+[Unit]
+Description=Yaapd startup script
+
+[Service]
+ExecStart=/bin/sh -c 'if [[ $(fw_printenv -n board_id) != "69" ]] ; then /usr/bin/yaapd ; fi'
+SyslogIdentifier=yaapd
+
+[Install]
+WantedBy=multi-user.target
