@@ -13,6 +13,7 @@ Add new parameter to either bind or unbind drivers
 handle both I2C and I3C cases
 Add new I3C Mux set for Reg 0x0E for Titanite
 Require num_of_cpu from u-boot env
+Add start/stop for PID services
 
 Signed-off-by: Supreeth Venkatesh <supreeth.venkatesh@amd.com>
 Signed-off-by: Mohsen Dolaty <mohsen.dolaty@amd.com>
@@ -20,8 +21,8 @@ Signed-off-by: Mahesh Kurapati <mahesh.kurapati@amd.com>
 ---
  include/esmi_oob/amd-apml.h |  74 ++++++++++++
  include/esmi_oob/apml.h     |   2 +-
- scripts/set-apml.sh         | 218 ++++++++++++++++++++++++++++++++++++
- 3 files changed, 293 insertions(+), 1 deletion(-)
+ scripts/set-apml.sh         | 220 ++++++++++++++++++++++++++++++++++++
+ 3 files changed, 295 insertions(+), 1 deletion(-)
  create mode 100644 include/esmi_oob/amd-apml.h
  create mode 100755 scripts/set-apml.sh
 
@@ -120,10 +121,10 @@ index 98bb454..1906e29 100644
  /** \file apml.h
 diff --git a/scripts/set-apml.sh b/scripts/set-apml.sh
 new file mode 100755
-index 0000000..8905bd9
+index 0000000..344ccea
 --- /dev/null
 +++ b/scripts/set-apml.sh
-@@ -0,0 +1,218 @@
+@@ -0,0 +1,220 @@
 +#!/bin/bash
 +
 +num_of_cpu=`/sbin/fw_printenv -n num_of_cpu`
@@ -325,7 +326,9 @@ index 0000000..8905bd9
 +        echo "Bind I3C Drivers"
 +        set_i3c_apml
 +    fi
++    systemctl start phosphor-pid-control.service
 +elif [[ $1 == "unbind" ]];then
++    systemctl stop phosphor-pid-control.service
 +    if [[ -a "$DEV_I2C_2" ]];then
 +        echo "UnBind I2C Drivers"
 +        unbind_i2c_drivers
@@ -344,4 +347,3 @@ index 0000000..8905bd9
 +fi
 --
 2.25.1
-
