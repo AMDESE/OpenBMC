@@ -91,4 +91,5 @@ SRC_URI += "file://amd-bmc-baseline.cfg \
             file://0089-recipes-kernel-linux-aspeed-corrected-compatible-sla.patch \
             file://0090-sbrmi-check-for-DIMM-MR4-Reg-for-Temp-range.patch \
             file://0091-mp2857-Purico-do-not-init-VR-reg-in-driver-prob.patch \
+            file://0092-drivers-mtd-Added-GD25LR512-SPI-from-Gigadevice.patch \
             "

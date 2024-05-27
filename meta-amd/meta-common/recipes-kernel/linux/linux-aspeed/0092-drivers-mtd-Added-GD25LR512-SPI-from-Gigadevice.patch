@@ -1,0 +1,28 @@
+From 5afe503786960554d47553619c248addb39ddf1b Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Mon, 27 May 2024 05:25:13 -0500
+Subject: [PATCH] Added SPI NOR Device config for GD25LR512 SPI from
+ Gigadevice.
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+---
+ drivers/mtd/spi-nor/gigadevice.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/mtd/spi-nor/gigadevice.c b/drivers/mtd/spi-nor/gigadevice.c
+index 694ce73fe8da..37ee754c646a 100644
+--- a/drivers/mtd/spi-nor/gigadevice.c
++++ b/drivers/mtd/spi-nor/gigadevice.c
+@@ -56,6 +56,9 @@ static const struct flash_info gigadevice_parts[] = {
+ 	  "gd55b01ge", INFO(0xc8471b, 0, 64 * 1024, 2048,
+ 			SECT_4K | SPI_NOR_QUAD_READ | SPI_NOR_4B_OPCODES |
+ 			SPI_NOR_HAS_LOCK | SPI_NOR_HAS_TB) },
++	{ "gd55lr512mf", INFO(0xc8471b, 0, 64 * 1024, 2048,
++			SECT_4K | SPI_NOR_QUAD_READ | SPI_NOR_4B_OPCODES |
++			SPI_NOR_HAS_LOCK | SPI_NOR_HAS_TB) },
+ 	/* GigaDevice - GD25LB series */
+ 	{"gd25lb series 16Mbit", INFO(0xc86015, 0, 64 * 1024, 32,	SECT_4K |
+ 	SPI_NOR_DUAL_READ | SPI_NOR_QUAD_READ | SPI_NOR_HAS_LOCK)},
+--
+2.17.1
+
