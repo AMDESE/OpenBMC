@@ -13,4 +13,6 @@ SRC_URI += "file://amd-ast2600-u-boot.cfg \
             file://0008-u-boot-Add-Turin-Volcano-with-4-Pump-Fans.patch \
             file://0009-u-boot-Boot-from-first-DTB-on-unknown-board-ID.patch \
             file://0010-u-boot-Add-Board-rev-to-UBOOT-parameters.patch \
+            file://0011-u-boot-Add-enable-gpios-to-mount-Lanai-flash.patch \
+            file://0012-u-boot-Add-env-variable-for-SAFS-boot.patch \
             "

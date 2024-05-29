@@ -14,10 +14,10 @@ Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
  2 files changed, 36 insertions(+)
 
 diff --git a/common/main.c b/common/main.c
-index 1a98b3ea21..5e52358939 100644
+index 85dc2b1a4b..9bd108d6b9 100644
 --- a/common/main.c
 +++ b/common/main.c
-@@ -220,6 +220,37 @@ void set_board_id()
+@@ -221,6 +221,37 @@ void set_board_config(unsigned int offset, unsigned int len, char *name)
  	return;
  }
 
@@ -55,19 +55,19 @@ index 1a98b3ea21..5e52358939 100644
  static void run_preboot_environment_command(void)
  {
  #ifdef CONFIG_PREBOOT
-@@ -269,6 +300,7 @@ void main_loop(void)
- 	/* Read board id from eerpom and set env */
- 	set_board_id();
+@@ -276,6 +307,7 @@ void main_loop(void)
+ 	sprintf(name, "%s", "board_rev");
+ 	set_board_config(EEPROM_BOARD_REV_OFFSET, BOARD_REV_LEN, name);
  	set_hostname();
 +	init_rot_flash();
  	s = bootdelay_process();
  	if (cli_process_fdt(&s))
  		cli_secure_boot_cmd(s);
 diff --git a/include/amd-platforms.h b/include/amd-platforms.h
-index 2f398d9a6f..1f2e1bafbc 100644
+index 56fd5fd92e..8796fba5ff 100644
 --- a/include/amd-platforms.h
 +++ b/include/amd-platforms.h
-@@ -100,4 +100,8 @@
+@@ -89,4 +89,8 @@
  // APML
  #define APML_I3C_CHAR_CNT       (4)
 
@@ -76,6 +76,3 @@ index 2f398d9a6f..1f2e1bafbc 100644
 +#define LANAI_GPIO_V1	"169"
 +
  #endif /* _AMD_PLATFOMS_H */
---
-2.17.1
-

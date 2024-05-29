@@ -1,0 +1,54 @@
+From f1f51a1a66c7edfb86e7f4310011cc3462c1c021 Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Wed, 29 May 2024 02:14:18 -0500
+Subject: [PATCH] u-boot: Add env variable for SAFS boot
+
+Added environment variable 'safs' to set remote flash mode.
+if set to true, lanai spi flash will be routed to BMC for eSPI SAFS.
+if unset or false, lanai spi flash will not be mounted.
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+---
+ common/main.c           | 9 ++++++++-
+ include/amd-platforms.h | 2 ++
+ 2 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/common/main.c b/common/main.c
+index 9bd108d6b9..03b98433ee 100644
+--- a/common/main.c
++++ b/common/main.c
+@@ -277,6 +277,8 @@ void main_loop(void)
+ {
+ 	const char *s;
+ 	char name[CONFIG_LEN];
++	char *rot_safs;
++
+ 	u32 por_rst = readl(ASPEED_SYS_SCRATCH_1FC);
+
+ 	bootstage_mark_name(BOOTSTAGE_ID_MAIN_LOOP, "main_loop");
+@@ -307,7 +309,12 @@ void main_loop(void)
+ 	sprintf(name, "%s", "board_rev");
+ 	set_board_config(EEPROM_BOARD_REV_OFFSET, BOARD_REV_LEN, name);
+ 	set_hostname();
+-	init_rot_flash();
++	rot_safs = env_get("safs");
++	printf("   SAFS Boot is %s\n", rot_safs);
++	if (strncmp(rot_safs, "false", FALSE_CHAR_COUNT) == 0)
++		printf(" Lanai in Remote QSPI mode \n");
++	else
++		init_rot_flash();
+ 	s = bootdelay_process();
+ 	if (cli_process_fdt(&s))
+ 		cli_secure_boot_cmd(s);
+diff --git a/include/amd-platforms.h b/include/amd-platforms.h
+index 8796fba5ff..1764adad8f 100644
+--- a/include/amd-platforms.h
++++ b/include/amd-platforms.h
+@@ -92,5 +92,7 @@
+ // Lanai flash mux gpios
+ #define LANAI_GPIO_V0	"168"
+ #define LANAI_GPIO_V1	"169"
++#define TRUE_CHAR_COUNT (4)
++#define FALSE_CHAR_COUNT (5)
+
+ #endif /* _AMD_PLATFOMS_H */
