@@ -17,6 +17,7 @@ IMAGE_DIR=$1
 GPIOCHIP=816
 GPIOO0=$((${GPIOCHIP} + 112 + 0))
 GPIOO1=$((${GPIOCHIP} + 112 + 1))
+safs_setting=`fw_printenv -n safs`
 
 # Lanai
 GPIOV0=$((${GPIOCHIP} + 168 + 0))
@@ -25,6 +26,57 @@ LANAI_SPI_DEV="1e630000.spi"
 
 SPI_DEV="1e631000.spi"
 SPI_PATH="/sys/bus/platform/drivers/aspeed-smc"
+
+get_mtd_info() {
+	spi_part=$(basename `find $SPI_PATH/$1/mtd/ -type d -maxdepth 1 | grep "mtd[6-9]$"`)
+	if [ $? -eq 0 ]; then
+		echo "Partition found: $spi_part"
+		mbsize=$(expr `cat $SPI_PATH/$1/mtd/*/size` / 1048576) # convert to MB (divide by 1024*1024)
+		echo "SPI size: $mbsize MB"
+		mtd_num=$spi_part
+	else
+		echo "MTD part not found for $1"
+		mtd_num=1000    #/if spi is not detected, default to mtd1000 and fail
+	fi
+}
+
+bind_spi_dev() {
+	if [ ! -d $SPI_PATH/$1/mtd ] ; then
+		echo "binding $1 to aspeed-smc spi driver"
+		echo -n $1 > $SPI_PATH/bind
+		if [ $? -eq 0 ]; then
+			echo "SPI Driver Bind Successful"
+		else
+		    echo "SPI Driver Bind Failed.Run micron_v2.ini or micron_v3.ini using DediProg."
+			if [ "$1" == "$LANAI_SPI_DEV" ] ; then
+				if [ "$safs_setting" == "false" ] ; then
+					set_lanai_gpio_to_host
+				fi
+			else
+				set_gpio_to_host
+			fi
+			sleep 5
+			exit -1
+		fi
+	else
+		echo "Partition already mounted"
+	fi
+}
+
+unbind_spi_dev() {
+	if [ "$1" == "$LANAI_SPI_DEV" ] ; then
+		if [ "$safs_setting" == "false" ] ; then
+			echo "SAFS disabled"
+			echo "Unbind aspeed-smc spi driver for $1"
+			echo -n $1 > $SPI_PATH/unbind
+		else
+			echo "SAFS enabled, skipping unbind"
+		fi
+	else
+		echo "Unbind aspeed-smc spi driver for $1"
+		echo -n $1 > $SPI_PATH/unbind
+	fi
+}
 
 power_status() {
 	st=$(busctl get-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis CurrentPowerState | cut -d"." -f6)
@@ -195,7 +247,9 @@ flash_image_to_mtd() {
 	if [ -e "$IMAGE_FILE" ];
 	then
 		echo "Bios image is $IMAGE_FILE"
-		for d in mtd6 mtd7 ; do
+		# mtd7 - motherboard local spi (after bind)
+		# mtd6 - already bound lanai spi (refer line no 281)
+		for d in $mtd_num ; do
 			if [ -e "/dev/$d" ]; then
 				mtd=`cat /sys/class/mtd/$d/name`
 				if [ $mtd == "pnor" ]; then
@@ -245,26 +299,17 @@ echo "Set GPIO $GPIO to access SPI flash from BMC used by host"
 set_gpio_to_bmc
 
 #Bind spi driver to access flash
-echo "bind aspeed-smc spi driver"
-echo -n $SPI_DEV > $SPI_PATH/bind
-if [ $? -eq 0 ];
-then
-    echo "SPI Driver Bind Successful"
-else
-    echo "SPI Driver Bind Failed.Run micron_v2.ini or micron_v3.ini using DediProg."
-    set_gpio_to_host
-    sleep 5
-    exit -1
-fi
+bind_spi_dev $SPI_DEV
 sleep 1
 
 #Flashcp image to device.
+get_mtd_info $SPI_DEV
+sleep 1
 flash_image_to_mtd
 
 #Unbind spi driver
 sleep 1
-echo "Unbind aspeed-smc spi driver"
-echo -n $SPI_DEV > $SPI_PATH/unbind
+unbind_spi_dev $SPI_DEV
 sleep 1
 
 #Flip GPIO back for host to access SPI flash
@@ -275,16 +320,15 @@ sleep 1
 # Lanai flash start--------------------------
 # (ignore errors but capture return status)
 lanai_ret=0
-set_lanai_gpio_to_bmc || lanai_ret=$?
-echo "Lanai gpio switch status: $lanai_ret"
-echo -n $LANAI_SPI_DEV > $SPI_PATH/bind || lanai_ret=$?
-echo "Lanai spi bind status: $lanai_ret"
+set_lanai_gpio_to_bmc
+bind_spi_dev $LANAI_SPI_DEV
+sleep 1
+get_mtd_info $LANAI_SPI_DEV
+sleep 1
 flash_image_to_mtd || lanai_ret=$?
 echo "Lanai flashcp status: $lanai_ret"
-echo -n $LANAI_SPI_DEV > $SPI_PATH/unbind || lanai_ret=$?
-echo "Lanai unbind status: $lanai_ret"
-set_lanai_gpio_to_host || lanai_ret=$?
-echo "Lanai gpio restore status: $lanai_ret"
+sleep 1
+unbind_spi_dev $LANAI_SPI_DEV
 sleep 1
 # Lanai flash end----------------------------
 

@@ -11,6 +11,26 @@ GPIOV1=$((${GPIOCHIP} + 168 + 1))
 SPI_DEV="1e630000.spi"
 SPI_PATH="/sys/bus/platform/drivers/aspeed-smc"
 
+POWER_CMD_OFF="busctl set-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis RequestedPowerTransition s xyz.openbmc_project.State.Chassis.Transition.Off"
+POWER_CMD_ON="busctl set-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis RequestedPowerTransition s xyz.openbmc_project.State.Chassis.Transition.On"
+
+get_mtd_info() {
+	mtd_num=1000    #/if spi is not detected, default to mtd1000 and fail
+	spi_part=$(basename `find $SPI_PATH/$1/mtd/ -type d -maxdepth 1 | grep "mtd[6-9]$"`)
+	mbsize=$(expr `cat $SPI_PATH/$1/mtd/*/size` / 1048576) # convert to MB (divide by 1024*1024)
+	echo "SPI size: $mbsize MB"
+	mtd_num=$spi_part
+}
+
+power_status() {
+	st=$(busctl get-property xyz.openbmc_project.State.Chassis /xyz/openbmc_project/state/chassis0 xyz.openbmc_project.State.Chassis CurrentPowerState | cut -d"." -f6)
+	if [ "$st" == "On\"" ]; then
+		echo "on"
+	else
+		echo "off"
+	fi
+}
+
 set_gpio_to_bmc()
 {
     echo "switch SCM FPGA GPIO to bmc"
@@ -93,6 +113,37 @@ set_gpio_to_scm_fpga()
 
 echo "SCM FPGA upgrade started at $(date)"
 
+# Lanai Flash SPI is muxed to same fmc controller
+# power-off lanai BIOS flash and unbind
+power_state=$(power_status)
+echo "Current Host state is $power_state"
+
+if [ "$power_state" != "off" ];
+then
+#Power off host server.
+echo "Power off host server"
+$POWER_CMD_OFF
+sleep 10
+fi
+
+if [ $(power_status) != "off" ];
+then
+    echo "Host server didn't power off"
+    echo "SCM upgrade failed"
+    exit -1
+fi
+echo "Host server powered off"
+
+# stop SAFS application using Lanai SPI
+systemctl stop safs-addr-translator.service
+sleep 3
+
+#Unbind spi driver to remove Lanai flash
+sleep 1
+echo "Unbind aspeed-smc spi driver"
+echo -n $SPI_DEV > $SPI_PATH/unbind
+sleep 5
+
 #Flip GPIO to access SPI flash used by SCM FPGA.
 echo "Set GPIO $GPIO to access SPI flash from BMC used by scm fpga"
 set_gpio_to_bmc
@@ -111,6 +162,7 @@ else
 fi
 sleep 1
 
+get_mtd_info $SPI_DEV
 #Flashcp image to device.
 echo $IMAGE_DIR
 pushd $IMAGE_DIR
@@ -118,7 +170,7 @@ IMAGE_FILE=$(find -type f -name '*.bin')
 if [ -e "$IMAGE_FILE" ];
 then
     echo "Scm fpga image is $IMAGE_FILE"
-    for d in mtd6 mtd7 ; do
+    for d in $mtd_num ; do
         if [ -e "/dev/$d" ]; then
             mtd=`cat /sys/class/mtd/$d/name`
             if [ $mtd == "pnor" ]; then

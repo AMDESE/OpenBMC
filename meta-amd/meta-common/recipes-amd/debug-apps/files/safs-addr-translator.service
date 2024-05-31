@@ -4,7 +4,7 @@ After=local-fs.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/safs-test -d /dev/aspeed-espi-flash -m /dev/mtd6
+ExecStart=/bin/sh -c 'if [[ $(fw_printenv -n safs) != "false" ]] ; then /usr/bin/safs-test -d /dev/aspeed-espi-flash -m /dev/mtd6 ; fi'
 
 [Install]
 WantedBy=multi-user.target
