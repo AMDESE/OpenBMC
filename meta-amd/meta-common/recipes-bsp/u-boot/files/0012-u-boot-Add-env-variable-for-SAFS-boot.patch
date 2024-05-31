@@ -30,13 +30,13 @@ index 9bd108d6b9..03b98433ee 100644
  	sprintf(name, "%s", "board_rev");
  	set_board_config(EEPROM_BOARD_REV_OFFSET, BOARD_REV_LEN, name);
  	set_hostname();
--	init_rot_flash();
+-	init_remote_bios_flash();
 +	rot_safs = env_get("safs");
 +	printf("   SAFS Boot is %s\n", rot_safs);
 +	if (strncmp(rot_safs, "false", FALSE_CHAR_COUNT) == 0)
 +		printf(" Lanai in Remote QSPI mode \n");
 +	else
-+		init_rot_flash();
++		init_remote_bios_flash();
  	s = bootdelay_process();
  	if (cli_process_fdt(&s))
  		cli_secure_boot_cmd(s);

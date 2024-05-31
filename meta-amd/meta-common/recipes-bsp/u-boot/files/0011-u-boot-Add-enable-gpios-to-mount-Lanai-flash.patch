@@ -24,7 +24,7 @@ index 85dc2b1a4b..9bd108d6b9 100644
 +/*
 + * Set Lanai mux gpios
 + */
-+void init_rot_flash ()
++void init_remote_bios_flash ()
 +{
 +	printf("eSPI Boot init\n");
 +	run_command_list("mw 1e6e20d8 00000000", -1, 0);
@@ -59,7 +59,7 @@ index 85dc2b1a4b..9bd108d6b9 100644
  	sprintf(name, "%s", "board_rev");
  	set_board_config(EEPROM_BOARD_REV_OFFSET, BOARD_REV_LEN, name);
  	set_hostname();
-+	init_rot_flash();
++	init_remote_bios_flash();
  	s = bootdelay_process();
  	if (cli_process_fdt(&s))
  		cli_secure_boot_cmd(s);
