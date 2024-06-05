@@ -1,0 +1,58 @@
+From 23ada7c436803e70d326f6d69d947bd1fa1e8d45 Mon Sep 17 00:00:00 2001
+From: Abinaya Dhandapani <adhandap@amd.com>
+Date: Wed, 26 Jun 2024 06:22:21 -0500
+Subject: [PATCH] Add methods
+
+Signed-off-by: Abinaya Dhandapani <adhandap@amd.com>
+---
+ .../Sdu/Scandump.interface.yaml               | 41 +++++++++++++++++++
+ 1 file changed, 41 insertions(+)
+ create mode 100644 xyz/openbmc_project/Sdu/Scandump.interface.yaml
+
+diff --git a/xyz/openbmc_project/Sdu/Scandump.interface.yaml b/xyz/openbmc_project/Sdu/Scandump.interface.yaml
+new file mode 100644
+index 0000000..dc24203
+--- /dev/null
++++ b/xyz/openbmc_project/Sdu/Scandump.interface.yaml
+@@ -0,0 +1,41 @@
++description: >
++    Methods to perform the MDC SDU flow over existing Management Interfaces.
++
++methods:
++    - name: getMdcSduState
++      description: >
++          Method to get the current state of the system.
++      returns:
++        - name: sduState
++          type: string
++          description: >
++            Current device state.
++    - name: getMdcSduPpin
++      description: >
++          Method to get the PPIN value.
++      returns:
++        - name: ppin
++          type: string
++          description: >
++            string corresponding to the PPIN value.
++    - name: getMdcSduNonce
++      description: >
++          Method to get the NONCE value.
++      returns:
++        - name: nonce
++          type: string
++          description: >
++            string corresponding to the NONCE value.
++    - name: MdcSduUnlock
++      description: >
++          Method for unlocking the device via MDC SDU.
++      parameters:
++        - name: sduPayload
++          type: string
++          description: >
++            The passphrase required to complete the operation.
++      returns:
++        - name: unlockStatus
++          type: boolean
++          description: >
++            A boolean value to check if the unlock is success of not.

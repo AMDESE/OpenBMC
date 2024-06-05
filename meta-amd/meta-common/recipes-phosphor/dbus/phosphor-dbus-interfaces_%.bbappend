@@ -20,6 +20,7 @@ SRC_URI += "file://0001-recipes-phosphor-dbus-Add-enumeration-SCM_FPGA-for-v.pat
             file://0016-phosphor-dbus-interface-add-dbus-interface-for-retim.patch \
             file://0017-Add-boot-initiator-mailbox-interface.patch \
             file://0018-DBus-add-PPR-Config-variables-and-methods.patch \
+            file://0019-Add-methods-to-support-MDC-SDU.patch \
             "
 
 do_configure_append() {
