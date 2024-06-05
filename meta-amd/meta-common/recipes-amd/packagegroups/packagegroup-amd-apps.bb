@@ -44,6 +44,7 @@ RDEPENDS_${PN}-system = " \
         amd-dimm \
         amd-lcd-lib \
         amd-mctp-tool \
+        amd-mdc-sdu \
         amd-ppr \
         amd-ras \
         amd-spdm \
