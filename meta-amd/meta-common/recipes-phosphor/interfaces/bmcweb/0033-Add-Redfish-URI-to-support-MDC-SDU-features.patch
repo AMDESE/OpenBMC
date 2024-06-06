@@ -1,0 +1,267 @@
+From 7b8af183e0859e8d2ca443a282d19c6ba9236846 Mon Sep 17 00:00:00 2001
+From: Abinaya Dhandapani <adhandap@amd.com>
+Date: Wed, 26 Jun 2024 06:27:40 -0500
+Subject: [PATCH] Add redfish URI to support MDC SDU features.
+
+Signed-off-by: Abinaya Dhandapani <adhandap@amd.com>
+---
+ redfish-core/include/redfish.hpp |   3 +
+ redfish-core/lib/processor.hpp   | 226 +++++++++++++++++++++++++++++++
+ 2 files changed, 229 insertions(+)
+
+diff --git a/redfish-core/include/redfish.hpp b/redfish-core/include/redfish.hpp
+index ce38c644..c708e38b 100644
+--- a/redfish-core/include/redfish.hpp
++++ b/redfish-core/include/redfish.hpp
+@@ -152,6 +152,9 @@ class RedfishService
+
+         nodes.emplace_back(std::make_unique<ProcessorCollection>(app));
+         nodes.emplace_back(std::make_unique<Processor>(app));
++        nodes.emplace_back(std::make_unique<MdcSduState>(app));
++        nodes.emplace_back(std::make_unique<MdcSduPayload>(app));
++        nodes.emplace_back(std::make_unique<MdcSduUnlock>(app));
+         nodes.emplace_back(std::make_unique<OperatingConfigCollection>(app));
+         nodes.emplace_back(std::make_unique<OperatingConfig>(app));
+         nodes.emplace_back(std::make_unique<MemoryCollection>(app));
+diff --git a/redfish-core/lib/processor.hpp b/redfish-core/lib/processor.hpp
+index e518b787..6246df50 100644
+--- a/redfish-core/lib/processor.hpp
++++ b/redfish-core/lib/processor.hpp
+@@ -1307,6 +1307,16 @@ class Processor : public Node
+             "#Processor.v1_11_0.Processor";
+         asyncResp->res.jsonValue["@odata.id"] =
+             "/redfish/v1/Systems/system/Processors/" + processorId;
++        asyncResp->res.jsonValue["Actions"]["Oem"] = {
++            {"#Processor.MdcSduUnlock",
++             {{"target", "/redfish/v1/Systems/system/Processors/" + processorId +
++                         "/Actions/Oem/Processor.MdcSduUnlock"}}},
++            {"#Processor.GetMdcSduState",
++             {{"target", "/redfish/v1/Systems/system/Processors/" + processorId +
++                         "/Actions/Oem/Processor.MdcSduState"}}},
++	    {"#Processor.GetMdcSduPayload",
++	     {{"target", "/redfish/v1/Systems/system/Processors/" + processorId +
++                         "/Actions/Oem/Processor.MdcSduPayload"}}}};
+
+         getProcessorObject(asyncResp, processorId, getProcessorData);
+     }
+@@ -1347,4 +1357,220 @@ class Processor : public Node
+     }
+ };
+
++class MdcSduState : public Node
++{
++  public:
++    /*
++     * Default Constructor
++     */
++    MdcSduState(App& app) :
++        Node(app, "/redfish/v1/Systems/system/Processors/<str>/Actions/Oem/Processor.MdcSduState", std::string())
++    {
++        entityPrivileges = {
++            {boost::beast::http::verb::get, {{"Login"}}},
++            {boost::beast::http::verb::head, {{"Login"}}},
++            {boost::beast::http::verb::patch, {{"ConfigureComponents"}}},
++            {boost::beast::http::verb::put, {{"ConfigureComponents"}}},
++            {boost::beast::http::verb::delete_, {{"ConfigureComponents"}}},
++            {boost::beast::http::verb::post, {{"ConfigureComponents"}}}};
++    }
++
++  private:
++    /**
++     * Functions triggers appropriate requests on DBus
++     */
++    void doGet(const std::shared_ptr<bmcweb::AsyncResp>& asyncResp,
++               const crow::Request&,
++               const std::vector<std::string>& params) override
++    {
++        // Check if there is required param, truly entering this shall be
++        // impossible
++        if (params.size() != 1)
++        {
++            messages::internalError(asyncResp->res);
++            return;
++        }
++        const std::string& processorId = params[0];
++
++        asyncResp->res.jsonValue["@odata.type"] = "#Processor.v1_11_0.Processor";
++        asyncResp->res.jsonValue["@odata.id"] = "/redfish/v1/Systems/system/Processors/" + processorId +
++                                               "/Actions/Oem/Processor.MdcSduState";
++        std::string scandumpInterface = "xyz.openbmc_project.Sdu.Scandump";
++
++        crow::connections::systemBus->async_method_call(
++            [asyncResp](const boost::system::error_code ec,
++                        const std::string& sduState) {
++                if (ec)
++                {
++                    BMCWEB_LOG_ERROR << "Failed to read Mdc Sdu State " << ec;
++                    messages::internalError(asyncResp->res);
++                    return;
++                }
++
++                if (sduState.empty())
++                {
++                    // illegal value
++                    messages::generalError(asyncResp->res);
++                    return;
++                }
++
++                asyncResp->res.jsonValue["MdcSduState"] = sduState;
++            },
++            "xyz.openbmc_project.Sdu", "/xyz/openbmc_project/Sdu",
++            scandumpInterface, "getMdcSduState");
++    }
++};
++
++class MdcSduPayload : public Node
++{
++  public:
++    /*
++     * Default Constructor
++     */
++    MdcSduPayload(App& app) :
++        Node(app, "/redfish/v1/Systems/system/Processors/<str>/Actions/Oem/Processor.MdcSduPayload", std::string())
++    {
++        entityPrivileges = {
++            {boost::beast::http::verb::get, {{"Login"}}},
++            {boost::beast::http::verb::head, {{"Login"}}},
++            {boost::beast::http::verb::patch, {{"ConfigureComponents"}}},
++            {boost::beast::http::verb::put, {{"ConfigureComponents"}}},
++            {boost::beast::http::verb::delete_, {{"ConfigureComponents"}}},
++            {boost::beast::http::verb::post, {{"ConfigureComponents"}}}};
++    }
++
++  private:
++    /**
++     * Functions triggers appropriate requests on DBus
++     */
++    void doGet(const std::shared_ptr<bmcweb::AsyncResp>& asyncResp,
++               const crow::Request&,
++               const std::vector<std::string>& params) override
++    {
++        // Check if there is required param, truly entering this shall be
++        // impossible
++        if (params.size() != 1)
++        {
++            messages::internalError(asyncResp->res);
++            return;
++        }
++        const std::string& processorId = params[0];
++
++        asyncResp->res.jsonValue["@odata.type"] = "#Processor.v1_11_0.Processor";
++        asyncResp->res.jsonValue["@odata.id"] = "/redfish/v1/Systems/system/Processors/" + processorId +
++   						"/Actions/Oem/Processor.MdcSduPayload";
++        std::string scandumpInterface = "xyz.openbmc_project.Sdu.Scandump";
++
++        crow::connections::systemBus->async_method_call(
++            [asyncResp](const boost::system::error_code ec,
++                        const std::string& sduPayload)
++            {
++                if (ec)
++                {
++                    BMCWEB_LOG_ERROR << "Failed to read Mdc Sdu Payload " << ec;
++                    messages::internalError(asyncResp->res);
++                    return;
++                }
++
++                if (sduPayload.empty())
++                {
++                    messages::generalError(asyncResp->res);
++                    return;
++                }
++
++                asyncResp->res.jsonValue["PPIN"] = sduPayload;
++            },
++            "xyz.openbmc_project.Sdu", "/xyz/openbmc_project/Sdu",
++            scandumpInterface, "getMdcSduPpin");
++
++        crow::connections::systemBus->async_method_call(
++            [asyncResp](const boost::system::error_code ec,
++                        const std::string& sduPayload)
++            {
++                if (ec)
++                {
++                    BMCWEB_LOG_ERROR << "Failed to read Mdc Sdu Payload " << ec;
++                    messages::internalError(asyncResp->res);
++                    return;
++                }
++
++                if (sduPayload.empty())
++                {
++                    messages::generalError(asyncResp->res);
++                    return;
++                }
++
++                asyncResp->res.jsonValue["NONCE"] = sduPayload;
++            },
++            "xyz.openbmc_project.Sdu", "/xyz/openbmc_project/Sdu",
++            scandumpInterface, "getMdcSduNonce");
++    }
++};
++
++class MdcSduUnlock : public Node
++{
++  public:
++    /*
++     * Default Constructor
++     */
++    MdcSduUnlock(App& app) :
++        Node(app, "/redfish/v1/Systems/system/Processors/<str>/Actions/Oem/Processor.MdcSduUnlock", std::string())
++    {
++        entityPrivileges = {
++            {boost::beast::http::verb::get, {{"Login"}}},
++            {boost::beast::http::verb::head, {{"Login"}}},
++            {boost::beast::http::verb::patch, {{"ConfigureComponents"}}},
++            {boost::beast::http::verb::put, {{"ConfigureComponents"}}},
++            {boost::beast::http::verb::delete_, {{"ConfigureComponents"}}},
++            {boost::beast::http::verb::post, {{"ConfigureComponents"}}}};
++    }
++
++  private:
++    /**
++     * Functions triggers appropriate requests on DBus
++     */
++    void doPost(const std::shared_ptr<bmcweb::AsyncResp>& asyncResp,
++               const crow::Request& req,
++               const std::vector<std::string>& params) override
++    {
++        // Check if there is required param, truly entering this shall be
++        // impossible
++        if (params.size() != 1)
++        {
++            messages::internalError(asyncResp->res);
++            return;
++        }
++
++        std::string scandumpInterface = "xyz.openbmc_project.Sdu.Scandump";
++
++        std::string sduPayload;
++
++        if (!json_util::readJson(
++                req, asyncResp->res, "SduPayload", sduPayload))
++        {
++            return;
++        }
++
++        crow::connections::systemBus->async_method_call(
++            [asyncResp](const boost::system::error_code ec,const bool ret)
++            {
++                if (ec)
++                {
++                    messages::internalError(asyncResp->res);
++                    return;
++                }
++                if (!ret)  // Check if the return value is false
++                {
++                    messages::internalError(asyncResp->res);
++                    return;
++                }
++                else
++                {
++                    messages::success(asyncResp->res);
++                }
++            },
++            "xyz.openbmc_project.Sdu", "/xyz/openbmc_project/Sdu",
++            scandumpInterface, "MdcSduUnlock",sduPayload);
++        }
++    };
+ } // namespace redfish
