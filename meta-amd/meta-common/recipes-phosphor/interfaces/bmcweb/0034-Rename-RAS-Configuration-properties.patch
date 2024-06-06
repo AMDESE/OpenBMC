@@ -1,0 +1,206 @@
+From a1bbf177e632a842e902a749c73269e71f309d2f Mon Sep 17 00:00:00 2001
+From: Abinaya Dhandapani <adhandap@amd.com>
+Date: Mon, 1 Jul 2024 02:24:19 -0500
+Subject: [PATCH] RAS conifguration property changes
+
+Signed-off-by: Abinaya Dhandapani <adhandap@amd.com>
+---
+ redfish-core/lib/log_services.hpp | 85 +++++++++++++++++++++----------
+ 1 file changed, 58 insertions(+), 27 deletions(-)
+
+diff --git a/redfish-core/lib/log_services.hpp b/redfish-core/lib/log_services.hpp
+index dd9ed848..ab504af4 100644
+--- a/redfish-core/lib/log_services.hpp
++++ b/redfish-core/lib/log_services.hpp
+@@ -2937,6 +2937,16 @@ class CrashdumpConfiguration : public Node
+                                 .jsonValue["AifsArmed"] = *value;
+                         }
+                     }
++                    if (property.first == "DisableAifsResetOnSyncfloodCounter")
++                    {
++                        const bool* value =
++                            std::get_if<bool>(&property.second);
++                        if (value != nullptr)
++                        {
++                            asyncResp->res
++                                .jsonValue["DisableAifsResetOnSyncfloodCounter"] = *value;
++                        }
++                    }
+                     if (property.first == "McaPollingEn")
+                     {
+                         const bool* value =
+@@ -3027,33 +3037,33 @@ class CrashdumpConfiguration : public Node
+                                 *value;
+                         }
+                     }
+-                    if (property.first == "McaErrCounter")
++                    if (property.first == "McaErrThresholdCnt")
+                     {
+                         const uint16_t* value =
+                             std::get_if<uint16_t>(&property.second);
+                         if (value != nullptr)
+                         {
+-                            asyncResp->res.jsonValue["McaErrCounter"] =
++                            asyncResp->res.jsonValue["McaErrThresholdCnt"] =
+                                 *value;
+                         }
+                     }
+-                    if (property.first == "DramCeccErrCounter")
++                    if (property.first == "DramCeccErrThresholdCnt")
+                     {
+                         const uint16_t* value =
+                             std::get_if<uint16_t>(&property.second);
+                         if (value != nullptr)
+                         {
+-                            asyncResp->res.jsonValue["DramCeccErrCounter"] =
++                            asyncResp->res.jsonValue["DramCeccErrThresholdCnt"] =
+                                 *value;
+                         }
+                     }
+-                    if (property.first == "PcieAerErrCounter")
++                    if (property.first == "PcieAerErrThresholdCnt")
+                     {
+                         const uint16_t* value =
+                             std::get_if<uint16_t>(&property.second);
+                         if (value != nullptr)
+                         {
+-                            asyncResp->res.jsonValue["PcieAerErrCounter"] =
++                            asyncResp->res.jsonValue["PcieAerErrThresholdCnt"] =
+                                 *value;
+                         }
+                     }
+@@ -3130,9 +3140,9 @@ class CrashdumpConfiguration : public Node
+         std::optional<uint16_t> McaPollingPeriod;
+         std::optional<uint16_t> DramCeccPollingPeriod;
+         std::optional<uint16_t> PcieAerPollingPeriod;
+-        std::optional<uint16_t> McaErrCounter;
+-        std::optional<uint16_t> DramCeccErrCounter;
+-        std::optional<uint16_t> PcieAerErrCounter;
++        std::optional<uint16_t> McaErrThresholdCnt;
++        std::optional<uint16_t> DramCeccErrThresholdCnt;
++        std::optional<uint16_t> PcieAerErrThresholdCnt;
+         std::optional<bool> McaPollingEn;
+         std::optional<bool> DramCeccPollingEn;
+         std::optional<bool> PcieAerPollingEn;
+@@ -3140,6 +3150,7 @@ class CrashdumpConfiguration : public Node
+         std::optional<bool> DramCeccThresholdEn;
+         std::optional<bool> PcieAerThresholdEn;
+         std::optional<bool> AifsArmed;
++        std::optional<bool> DisableResetCounter;
+
+         if (!json_util::readJson(req, asyncResp->res, "apmlRetries", apmlRetries,
+                                 "systemRecovery", systemRecovery,
+@@ -3150,6 +3161,7 @@ class CrashdumpConfiguration : public Node
+                                 "P0_DIMM_LABELS",P0_DimmLabels,
+                                 "P1_DIMM_LABELS",P1_DimmLabels,
+                                 "AifsArmed",AifsArmed,
++                                "DisableAifsResetOnSyncfloodCounter",DisableResetCounter,
+                                 "AifsSignatureId",AifsSignatureId,
+                                 "McaPollingEn",McaPollingEn,
+                                 "DramCeccPollingEn",DramCeccPollingEn,
+@@ -3160,9 +3172,9 @@ class CrashdumpConfiguration : public Node
+                                 "McaPollingPeriod",McaPollingPeriod,
+                                 "DramCeccPollingPeriod",DramCeccPollingPeriod,
+                                 "PcieAerPollingPeriod",PcieAerPollingPeriod,
+-                                "McaErrCounter",McaErrCounter,
+-                                "DramCeccErrCounter",DramCeccErrCounter,
+-                                "PcieAerErrCounter",PcieAerErrCounter))
++                                "McaErrThresholdCnt",McaErrThresholdCnt,
++                                "DramCeccErrThresholdCnt",DramCeccErrThresholdCnt,
++                                "PcieAerErrThresholdCnt",PcieAerErrThresholdCnt))
+         {
+             return;
+         }
+@@ -3262,6 +3274,25 @@ class CrashdumpConfiguration : public Node
+             std::variant<bool>(*AifsArmed));
+         }
+
++       if(DisableResetCounter)
++        {
++            crow::connections::systemBus->async_method_call(
++            [asyncResp](const boost::system::error_code ec) {
++                if (ec)
++                {
++                    BMCWEB_LOG_ERROR << "D-Bus responses error: " << ec;
++                    messages::internalError(asyncResp->res);
++                    return;
++                }
++                messages::success(asyncResp->res);
++                return;
++            },
++            crashdumpObject,crashdumpPath,
++            "org.freedesktop.DBus.Properties", "Set",
++            crashdumpConfigurationInterface, "DisableAifsResetOnSyncfloodCounter",
++            std::variant<bool>(*DisableResetCounter));
++        }
++
+         if(ResetSignal)
+         {
+
+@@ -3586,12 +3617,12 @@ class CrashdumpConfiguration : public Node
+             std::variant<uint16_t>(*PcieAerPollingPeriod));
+         }
+
+-        if(McaErrCounter)
++        if(McaErrThresholdCnt)
+         {
+-            if ((McaErrCounter < 0x1) || (McaErrCounter > 0xFFF))
++            if ((McaErrThresholdCnt < 0x1) || (McaErrThresholdCnt > 0xFFF))
+             {
+-                messages::propertyValueNotInList(asyncResp->res, std::to_string(McaErrCounter.value()),
+-                                                 "McaErrCounter");
++                messages::propertyValueNotInList(asyncResp->res, std::to_string(McaErrThresholdCnt.value()),
++                                                 "McaErrThresholdCnt");
+                 BMCWEB_LOG_DEBUG << "The accepted MCA error threshold range is between 1 and 4095";
+                 return;
+             }
+@@ -3609,17 +3640,17 @@ class CrashdumpConfiguration : public Node
+             },
+             crashdumpObject, crashdumpPath,
+             "org.freedesktop.DBus.Properties", "Set",
+-            crashdumpConfigurationInterface, "McaErrCounter",
+-            std::variant<uint16_t>(*McaErrCounter));
++            crashdumpConfigurationInterface, "McaErrThresholdCnt",
++            std::variant<uint16_t>(*McaErrThresholdCnt));
+         }
+
+-        if(DramCeccErrCounter)
++        if(DramCeccErrThresholdCnt)
+         {
+
+-            if ((DramCeccErrCounter < 0x1) || (DramCeccErrCounter > 0xFFFF))
++            if ((DramCeccErrThresholdCnt < 0x1) || (DramCeccErrThresholdCnt > 0xFFFF))
+             {
+-                messages::propertyValueNotInList(asyncResp->res, std::to_string(DramCeccErrCounter.value()),
+-                                                 "DramCeccErrCounter");
++                messages::propertyValueNotInList(asyncResp->res, std::to_string(DramCeccErrThresholdCnt.value()),
++                                                 "DramCeccErrThresholdCnt");
+                 BMCWEB_LOG_DEBUG << "The accepted DRAM Cecc error threshold range is between 1 and 65,535";
+                 return;
+             }
+@@ -3637,11 +3668,11 @@ class CrashdumpConfiguration : public Node
+             },
+             crashdumpObject, crashdumpPath,
+             "org.freedesktop.DBus.Properties", "Set",
+-            crashdumpConfigurationInterface, "DramCeccErrCounter",
+-            std::variant<uint16_t>(*DramCeccErrCounter));
++            crashdumpConfigurationInterface, "DramCeccErrThresholdCnt",
++            std::variant<uint16_t>(*DramCeccErrThresholdCnt));
+         }
+
+-        if(PcieAerErrCounter)
++        if(PcieAerErrThresholdCnt)
+         {
+             crow::connections::systemBus->async_method_call(
+             [asyncResp](const boost::system::error_code ec) {
+@@ -3656,8 +3687,8 @@ class CrashdumpConfiguration : public Node
+             },
+             crashdumpObject, crashdumpPath,
+             "org.freedesktop.DBus.Properties", "Set",
+-            crashdumpConfigurationInterface, "PcieAerErrCounter",
+-            std::variant<uint16_t>(*PcieAerErrCounter));
++            crashdumpConfigurationInterface, "PcieAerErrThresholdCnt",
++            std::variant<uint16_t>(*PcieAerErrThresholdCnt));
+         }
+     }
+ };
