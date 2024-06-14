@@ -1,0 +1,159 @@
+From 2d4224b5103ef67e88765afbfbd6c8ce94751f22 Mon Sep 17 00:00:00 2001
+From: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+Date: Fri, 14 Jun 2024 04:16:25 -0500
+Subject: [PATCH] ARM:dts:aspeed: Add eSPI SAFS to AMD IRME platforms
+
+Added eSPI SAFS configuration to SP5 IRME platforms
+
+Signed-off-by: Rajaganesh Rathinasabapathi <Rajaganesh.Rathinasabapathi@amd.com>
+---
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts     | 6 ++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts         | 7 +++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts   | 6 ++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts       | 6 ++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts     | 6 ++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts         | 6 ++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-titanite-i3c.dts | 6 ++++++
+ arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts     | 6 ++++++
+ 8 files changed, 49 insertions(+)
+
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts
+index 9ba1faac958e..7a359d058566 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-onyx-i3c.dts
+@@ -871,6 +871,12 @@ rcd_ ## bus ## _ ## index: rcd@addr { \
+ 	pinctrl-0 = <&pinctrl_espi_default &pinctrl_espialt_default>;
+
+ 	perif,dma-mode;
++	perif,memcyc-src-addr = <0x30000000>;
++	perif,memcyc-size = <0x4000000>;
++
++	/* SAFS - Hw mode */
++	flash,dma-mode;
++	flash,safs-mode = <0x00>;
+ };
+
+ &espi_mmbi {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+index baea186fbdda..e30102404841 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-onyx.dts
+@@ -883,6 +883,13 @@ rcd_ ## bus ## _ ## index: rcd@addr { \
+ 	pinctrl-0 = <&pinctrl_espi_default &pinctrl_espialt_default>;
+
+ 	perif,dma-mode;
++	perif,memcyc-src-addr = <0x30000000>;
++	perif,memcyc-size = <0x4000000>;
++
++	/* SAFS - Hw mode */
++	flash,dma-mode;
++	flash,safs-mode = <0x00>;
++
+ };
+
+ &espi_mmbi {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts
+index d475f306f95b..4d1c7ff67769 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-quartz-i3c.dts
+@@ -1266,6 +1266,12 @@ rcd_ ## bus ## _ ## index: rcd@addr { \
+ 	pinctrl-0 = <&pinctrl_espi_default &pinctrl_espialt_default>;
+
+ 	perif,dma-mode;
++	perif,memcyc-src-addr = <0x30000000>;
++	perif,memcyc-size = <0x4000000>;
++
++	/* SAFS - Hw mode */
++	flash,dma-mode;
++	flash,safs-mode = <0x00>;
+ };
+
+ &espi_mmbi {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+index f104c106916e..77e012203a3c 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-quartz.dts
+@@ -1258,6 +1258,12 @@ rcd_ ## bus ## _ ## index: rcd@addr { \
+ 	pinctrl-0 = <&pinctrl_espi_default &pinctrl_espialt_default>;
+
+ 	perif,dma-mode;
++	perif,memcyc-src-addr = <0x30000000>;
++	perif,memcyc-size = <0x4000000>;
++
++	/* SAFS - Hw mode */
++	flash,dma-mode;
++	flash,safs-mode = <0x00>;
+ };
+
+ &espi_mmbi {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts
+index c6b0fffc152a..9506c3d215d1 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-ruby-i3c.dts
+@@ -1008,6 +1008,12 @@ rcd_ ## bus ## _ ## index: rcd@addr { \
+ 	pinctrl-0 = <&pinctrl_espi_default &pinctrl_espialt_default>;
+
+ 	perif,dma-mode;
++	perif,memcyc-src-addr = <0x30000000>;
++	perif,memcyc-size = <0x4000000>;
++
++	/* SAFS - Hw mode */
++	flash,dma-mode;
++	flash,safs-mode = <0x00>;
+ };
+
+ &espi_mmbi {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+index fab6057f0873..96549538e794 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-ruby.dts
+@@ -1008,6 +1008,12 @@ rcd_ ## bus ## _ ## index: rcd@addr { \
+ 	pinctrl-0 = <&pinctrl_espi_default &pinctrl_espialt_default>;
+
+ 	perif,dma-mode;
++	perif,memcyc-src-addr = <0x30000000>;
++	perif,memcyc-size = <0x4000000>;
++
++	/* SAFS - Hw mode */
++	flash,dma-mode;
++	flash,safs-mode = <0x00>;
+ };
+
+ &espi_mmbi {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-titanite-i3c.dts b/arch/arm/boot/dts/aspeed-bmc-amd-titanite-i3c.dts
+index a2acb6e563ba..ca0d76c91b21 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-titanite-i3c.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-titanite-i3c.dts
+@@ -1042,6 +1042,12 @@ rcd_ ## bus ## _ ## index: rcd@addr { \
+ 	pinctrl-0 = <&pinctrl_espi_default &pinctrl_espialt_default>;
+
+ 	perif,dma-mode;
++	perif,memcyc-src-addr = <0x30000000>;
++	perif,memcyc-size = <0x4000000>;
++
++	/* SAFS - Hw mode */
++	flash,dma-mode;
++	flash,safs-mode = <0x00>;
+ };
+
+ &espi_mmbi {
+diff --git a/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts b/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
+index 3ef3c6889665..dc0ebe445001 100644
+--- a/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
++++ b/arch/arm/boot/dts/aspeed-bmc-amd-titanite.dts
+@@ -1035,6 +1035,12 @@ rcd_ ## bus ## _ ## index: rcd@addr { \
+ 	pinctrl-0 = <&pinctrl_espi_default &pinctrl_espialt_default>;
+
+ 	perif,dma-mode;
++	perif,memcyc-src-addr = <0x30000000>;
++	perif,memcyc-size = <0x4000000>;
++
++	/* SAFS - Hw mode */
++	flash,dma-mode;
++	flash,safs-mode = <0x00>;
+ };
+
+ &espi_mmbi {
+--
+2.17.1
+
