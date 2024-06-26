@@ -1,0 +1,36 @@
+From c8b84bfeb9492ab2855d928639c21830621d5184 Mon Sep 17 00:00:00 2001
+From: Abinaya Dhandapani <adhandap@amd.com>
+Date: Thu, 27 Jun 2024 09:30:02 -0500
+Subject: [PATCH] sbrmi: Add new mailbox error code 0x5
+
+Signed-off-by: Abinaya Dhandapani <adhandap@amd.com>
+---
+ drivers/misc/amd-apml/sbrmi-common.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/misc/amd-apml/sbrmi-common.c b/drivers/misc/amd-apml/sbrmi-common.c
+index 7527c186adb3..40fa4f8e52f9 100644
+--- a/drivers/misc/amd-apml/sbrmi-common.c
++++ b/drivers/misc/amd-apml/sbrmi-common.c
+@@ -21,6 +21,9 @@
+ #define START_CMD	0x80
+ #define TRIGGER_MAILBOX	0x01
+
++/* Mailbox error with additional data */
++#define ERR_WITH_DATA	0x5
++
+ /* Default message lengths as per APML command protocol */
+ /* MSR */
+ #define MSR_RD_REG_LEN		0xa
+@@ -457,7 +460,7 @@ int rmi_mailbox_xfer(struct apml_sbrmi_device *rmi_dev,
+ 		goto exit_unlock;
+
+ 	ret = regmap_read(rmi_dev->regmap, SBRMI_OUTBNDMSG7, &ec);
+-	if (ret || ec)
++	if (ret || (ec && ec != ERR_WITH_DATA))
+ 		goto exit_clear_alert;
+
+ 	/*
+--
+2.25.1
+

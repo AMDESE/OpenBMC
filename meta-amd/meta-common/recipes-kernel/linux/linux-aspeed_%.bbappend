@@ -93,4 +93,5 @@ SRC_URI += "file://amd-bmc-baseline.cfg \
             file://0091-mp2857-Purico-do-not-init-VR-reg-in-driver-prob.patch \
             file://0092-drivers-mtd-Added-GD25LR512-SPI-from-Gigadevice.patch \
             file://0093-ARM-dts-aspeed-Add-eSPI-SAFS-to-AMD-IRME-platforms.patch \
+            file://0094-sbrmi-Add-additional-error-code-0x5.patch \
             "
