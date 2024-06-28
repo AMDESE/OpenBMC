@@ -47,11 +47,13 @@ bind_spi_dev() {
 		if [ $? -eq 0 ]; then
 			echo "SPI Driver Bind Successful"
 		else
-		    echo "SPI Driver Bind Failed.Run micron_v2.ini or micron_v3.ini using DediProg."
+			echo "SPI Driver Bind Failed.Run micron_v2.ini or micron_v3.ini using DediProg."
 			if [ "$1" == "$LANAI_SPI_DEV" ] ; then
 				if [ "$safs_setting" == "false" ] ; then
 					set_lanai_gpio_to_host
 				fi
+				echo "Please check Lanai flash SPI mode."
+				return    # do not exit script for lanai's case
 			else
 				set_gpio_to_host
 			fi
