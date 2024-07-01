@@ -9,7 +9,7 @@ DEPENDS += "i2c-tools"
 DEPENDS += "i3c-tools"
 RDEPENDS_${PN} += "bash"
 
-SRC_URI += "git://git@github.com/amd/apml_library.git;protocol=ssh;tag=apml-3.5.0"
+SRC_URI += "git://git@github.com/amd/apml_library.git;protocol=ssh;tag=apml-3.7.0"
 
 SRC_URI += "file://0001-amd-apml-Enable-apml-library-with-i3c.patch \
            "
